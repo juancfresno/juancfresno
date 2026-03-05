@@ -1,0 +1,58 @@
+// Import order matters — variables first, then everything that uses them
+@use 'variables' as *;
+@use 'mixins' as *;
+@use 'reset';
+@use 'typography';
+
+// ─── Custom properties (CSS vars exposed for JS/GSAP access) ──────────────────
+:root {
+  --color-bg:         #{$color-bg};
+  --color-accent:     #{$color-accent};
+  --nav-height:       #{$nav-height};
+  --gutter:           #{$gutter};
+  --ease-out-expo:    #{$ease-out-expo};
+}
+
+// ─── Custom cursor — hide OS cursor on fine-pointer devices ───────────────────
+@media (pointer: fine) {
+  *, *::before, *::after {
+    cursor: none !important;
+  }
+}
+
+// ─── Selection ────────────────────────────────────────────────────────────────
+::selection {
+  background: $color-accent;
+  color: $color-bg;
+}
+
+// ─── Scrollbar ────────────────────────────────────────────────────────────────
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: $color-bg; }
+::-webkit-scrollbar-thumb { background: $color-surface; border-radius: 2px; }
+
+// ─── Lenis smooth scroll class ────────────────────────────────────────────────
+html.lenis, html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+// ─── Utility ──────────────────────────────────────────────────────────────────
+.visually-hidden {
+  @include visually-hidden;
+}
+
+.container {
+  @include container;
+}

@@ -1,0 +1,324 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ABOUT PAGE — awwwards-level scroll reveal
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// ─── Page layout ─────────────────────────────────────────────────────────────
+.page {
+  padding: 9.6875rem 3.125rem 6rem; // 155px top (nav) · 50px sides
+  max-width: $max-width;
+  margin: 0 auto;
+
+  @include respond-to(md) {
+    padding: 8rem $gutter 4rem;
+  }
+}
+
+// ─── Generic reveal animation ────────────────────────────────────────────────
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity   0.7s $ease-out-quart,
+    transform 0.7s $ease-out-quart;
+}
+
+.revealVisible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+// ─── Word-by-word reveal ─────────────────────────────────────────────────────
+.revealWords {
+  .rw {
+    display: inline;
+    opacity: 0;
+    filter: blur(3px);
+    transition:
+      opacity 0.5s $ease-out-quart,
+      filter  0.5s $ease-out-quart;
+  }
+}
+
+.revealWordsVisible {
+  .rw {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+// Highlighted words
+.rwHl {
+  color: $color-text !important;
+  font-weight: $fw-regular !important;
+}
+
+// ─── Divider (ElasticLine) ───────────────────────────────────────────────────
+.divider {
+  width: 100%;
+  color: $color-border;
+  margin: 1.5rem 0;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// HERO IDENTIFIER
+// ═══════════════════════════════════════════════════════════════════════════════
+.hero {
+  margin-bottom: 4rem;
+}
+
+.heroRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-4;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.heroName,
+.heroRole {
+  font-family: $font-mono;
+  font-size: 0.6875rem; // 11px
+  line-height: 0.8125rem; // 13px
+  font-weight: $fw-regular;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  color: #8df8cd; // brand/green from Figma
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// BIO — Large body text
+// ═══════════════════════════════════════════════════════════════════════════════
+.bio {
+  margin-bottom: 6rem;
+  max-width: 62.5rem; // 1000px
+}
+
+.bioText {
+  font-family: $font-sans;
+  font-size: clamp(1.5rem, 2.4vw, 2.5rem); // 24px → 40px
+  font-weight: $fw-regular;
+  line-height: 1.15; // 46px @ 40px
+  letter-spacing: -0.02em; // -0.8px @ 40px
+  color: #ddedff;
+  margin-bottom: 2rem;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// PORTRAIT
+// ═══════════════════════════════════════════════════════════════════════════════
+.portraitWrap {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 8rem;
+  padding-right: 5%;
+
+  @include respond-to(md) {
+    justify-content: center;
+    padding-right: 0;
+  }
+}
+
+.portrait {
+  width: clamp(280px, 34vw, 564px);
+  aspect-ratio: 564 / 705;
+  background: linear-gradient(
+    145deg,
+    rgba(0, 61, 255, 0.15) 0%,
+    rgba(141, 248, 205, 0.08) 50%,
+    rgba(16, 16, 14, 0.4) 100%
+  );
+  border-radius: 2px;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SECTIONS — shared pattern
+// ═══════════════════════════════════════════════════════════════════════════════
+.section {
+  margin-bottom: 5rem;
+}
+
+.sectionLabel {
+  display: inline-block;
+  font-family: $font-mono;
+  font-size: 0.625rem; // 10px
+  font-weight: $fw-regular;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: $color-text;
+  opacity: 0.5;
+  margin-bottom: 2.5rem;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SERVICIOS
+// ═══════════════════════════════════════════════════════════════════════════════
+.servicesList {
+  display: flex;
+  flex-direction: column;
+}
+
+.serviceItem {
+  padding: 1rem 0;
+}
+
+.serviceTitle {
+  font-family: $font-sans;
+  font-size: clamp(1.25rem, 1.8vw, 1.875rem); // 20px → 30px
+  font-weight: $fw-light;
+  line-height: 1;
+  letter-spacing: -0.03em; // -0.9px @ 30px
+  color: $color-text;
+  margin-bottom: 1rem;
+}
+
+.serviceDesc {
+  font-family: $font-sans;
+  font-size: 1rem; // 16px
+  font-weight: $fw-light;
+  line-height: 1.5;
+  color: #9c9ea0; // neutrals/grey-60
+  opacity: 0.9;
+  margin-bottom: 1rem;
+  max-width: 40rem;
+}
+
+.serviceTags {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.serviceTag {
+  font-family: $font-sans;
+  font-size: 0.8125rem; // 13px
+  font-weight: $fw-light;
+  line-height: 1.38; // 18px
+  letter-spacing: 0;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// PROCESO CREATIVO
+// ═══════════════════════════════════════════════════════════════════════════════
+.processList {
+  display: flex;
+  flex-direction: column;
+}
+
+.processItem {
+  padding: 1rem 0;
+}
+
+.processHeader {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.processNum {
+  font-family: $font-sans;
+  font-size: clamp(1.25rem, 1.8vw, 1.875rem);
+  font-weight: $fw-light;
+  color: $color-text;
+  opacity: 0.4;
+}
+
+.processTitle {
+  font-family: $font-sans;
+  font-size: clamp(1.25rem, 1.8vw, 1.875rem);
+  font-weight: $fw-light;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: $color-text;
+}
+
+.processArrow {
+  font-weight: $fw-light;
+  opacity: 0.4;
+  margin-left: 0.25rem;
+}
+
+.processDesc {
+  font-family: $font-sans;
+  font-size: 1rem;
+  font-weight: $fw-light;
+  line-height: 1.5;
+  color: #9c9ea0;
+  opacity: 0.9;
+  max-width: 40rem;
+  padding-left: 3.5rem; // align with title text (after number)
+
+  @include respond-to(sm) {
+    padding-left: 0;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// NAMES LIST (Studios, Clients)
+// ═══════════════════════════════════════════════════════════════════════════════
+.namesList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  margin-bottom: 0.5rem;
+}
+
+.nameItem {
+  font-family: $font-sans;
+  font-size: clamp(1rem, 1.5vw, 1.5rem); // 16px → 24px
+  font-weight: $fw-light;
+  line-height: 1.6;
+  color: $color-text;
+  opacity: 0.7;
+
+  // Comma separator via CSS
+  &:not(:last-child)::after {
+    content: ',\00a0';
+    opacity: 0.4;
+  }
+
+  // Hover highlight
+  transition: opacity 0.25s $ease-out-quart;
+  &:hover {
+    opacity: 1;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SIDE PROJECTS GRID
+// ═══════════════════════════════════════════════════════════════════════════════
+.projectsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.25rem 2rem;
+
+  @include respond-to(md) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @include respond-to(sm) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.projectItem {
+  font-family: $font-sans;
+  font-size: 1rem;
+  font-weight: $fw-light;
+  line-height: 2;
+  color: $color-text;
+  opacity: 0.6;
+  transition: opacity 0.25s $ease-out-quart;
+
+  &:hover {
+    opacity: 1;
+  }
+}

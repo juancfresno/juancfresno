@@ -1,0 +1,231 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+// ─── Footer wrapper ───────────────────────────────────────────────────────────
+.footer {
+  width: 100%;
+}
+
+.inner {
+  padding: 0 1.25rem 1.5rem;
+}
+
+// ─── Social row ───────────────────────────────────────────────────────────────
+.social {
+  display: flex;
+  align-items: center;
+  gap: 1.5625rem; // 25px — del Figma
+  flex-wrap: wrap;
+  padding-bottom: 1.5625rem;
+}
+
+.socialLink {
+  display: block;
+  color: $color-text;
+  opacity: 0.5;
+  transition: opacity $duration-fast $ease-out-quart;
+
+  &:hover {
+    opacity: 1;
+
+    // Activa las animaciones VHS en los layers del glitch
+    .socialGlMain {
+      animation:
+        vhs-body    0.31s steps(1) infinite,
+        vhs-flicker 0.83s linear   infinite;
+    }
+    .socialGlR { animation: vhs-r 0.43s steps(1) infinite; }
+    .socialGlB { animation: vhs-b 0.57s steps(1) infinite 0.09s; }
+  }
+
+  @include focus-ring;
+}
+
+// ─── Social VHS glitch — wrapper y layers ─────────────────────────────────────
+.socialGlWrap {
+  position: relative;
+  display: block;
+  line-height: 0;
+}
+
+.socialGlLayer {
+  display: block;
+  line-height: 0;
+  svg { display: block; }
+}
+
+// Capa principal — body shake + flicker (animación en hover del link)
+.socialGlMain {
+  position: relative;
+  z-index: 3;
+  will-change: transform;
+}
+
+// Canal R — mismo color blanco, desplaza derecha con clip-path (sin tinte de color)
+.socialGlR {
+  @include abs-fill;
+  z-index: 2;
+  clip-path: inset(0 0 100% 0);
+  will-change: transform, clip-path;
+}
+
+// Canal B — mismo color blanco, desplaza izquierda con clip-path (sin tinte de color)
+.socialGlB {
+  @include abs-fill;
+  z-index: 1;
+  clip-path: inset(0 0 100% 0);
+  will-change: transform, clip-path;
+}
+
+
+// ══════════════════════════════════════════════════════════════════════════════
+// VHS GLITCH KEYFRAMES — duplicados aquí para que estén disponibles
+// en este módulo CSS (CSS Modules escopa los keyframes por archivo)
+// ══════════════════════════════════════════════════════════════════════════════
+
+@keyframes vhs-r {
+  0%   { transform: translateX(0);     clip-path: inset(0 0 100% 0);  }
+  7%   { transform: translateX(10px);  clip-path: inset(0% 0 55% 0);  }
+  14%  { transform: translateX(8px);   clip-path: inset(58% 0 5% 0);  }
+  21%  { transform: translateX(11px);  clip-path: inset(18% 0 47% 0); }
+  28%  { transform: translateX(0);     clip-path: inset(0 0 100% 0);  }
+  35%  { transform: translateX(12px);  clip-path: inset(35% 0 30% 0); }
+  42%  { transform: translateX(8px);   clip-path: inset(0% 0 62% 0);  }
+  49%  { transform: translateX(0);     clip-path: inset(0 0 100% 0);  }
+  56%  { transform: translateX(14px);  clip-path: inset(60% 0 0% 0);  }
+  63%  { transform: translateX(9px);   clip-path: inset(5% 0 58% 0);  }
+  70%  { transform: translateX(0);     clip-path: inset(0 0 100% 0);  }
+  77%  { transform: translateX(11px);  clip-path: inset(42% 0 22% 0); }
+  84%  { transform: translateX(8px);   clip-path: inset(0% 0 60% 0);  }
+  91%  { transform: translateX(0);     clip-path: inset(0 0 100% 0);  }
+  98%  { transform: translateX(13px);  clip-path: inset(55% 0 8% 0);  }
+  100% { transform: translateX(0);     clip-path: inset(0 0 100% 0);  }
+}
+
+@keyframes vhs-b {
+  0%   { transform: translateX(0);      clip-path: inset(0 0 100% 0);  }
+  11%  { transform: translateX(-11px);  clip-path: inset(62% 0 3% 0);  }
+  19%  { transform: translateX(-8px);   clip-path: inset(8% 0 55% 0);  }
+  27%  { transform: translateX(-10px);  clip-path: inset(40% 0 25% 0); }
+  35%  { transform: translateX(0);      clip-path: inset(0 0 100% 0);  }
+  43%  { transform: translateX(-13px);  clip-path: inset(0% 0 60% 0);  }
+  51%  { transform: translateX(-9px);   clip-path: inset(58% 0 5% 0);  }
+  59%  { transform: translateX(-12px);  clip-path: inset(22% 0 43% 0); }
+  67%  { transform: translateX(0);      clip-path: inset(0 0 100% 0);  }
+  75%  { transform: translateX(-10px);  clip-path: inset(48% 0 15% 0); }
+  83%  { transform: translateX(-8px);   clip-path: inset(0% 0 65% 0);  }
+  91%  { transform: translateX(0);      clip-path: inset(0 0 100% 0);  }
+  99%  { transform: translateX(-11px);  clip-path: inset(30% 0 35% 0); }
+  100% { transform: translateX(0);      clip-path: inset(0 0 100% 0);  }
+}
+
+@keyframes vhs-body {
+  0%,  100% { transform: translate(0, 0)     skewX(0deg);    }
+  8%         { transform: translate(2px, 0)   skewX(-0.6deg); }
+  16%        { transform: translate(-1px, 0)  skewX(0.4deg);  }
+  24%        { transform: translate(0, 0)     skewX(0deg);    }
+  44%        { transform: translate(-3px, 0)  skewX(0.8deg);  }
+  52%        { transform: translate(1px, 0)   skewX(-0.5deg); }
+  60%        { transform: translate(0, 0)     skewX(0deg);    }
+  74%        { transform: translate(4px, 0)   skewX(-1.0deg); }
+  82%        { transform: translate(-2px, 0)  skewX(0.7deg);  }
+  90%        { transform: translate(0, 0)     skewX(0deg);    }
+}
+
+@keyframes vhs-flicker {
+  0%,  100% { opacity: 1;    }
+  29%        { opacity: 1;    }
+  30%        { opacity: 0.3;  }
+  31%        { opacity: 1;    }
+  58%        { opacity: 1;    }
+  59%        { opacity: 0.65; }
+  60%        { opacity: 1;    }
+  81%        { opacity: 1;    }
+  82%        { opacity: 0.12; }
+  83%        { opacity: 0.9;  }
+  84%        { opacity: 1;    }
+}
+
+// ─── Divider — SVG ElasticLine, stroke vía currentColor ───────────────────────
+.line {
+  width: 100%;
+  color: $color-border;
+  margin-bottom: 1.5625rem;
+}
+
+// ─── Meta row ─────────────────────────────────────────────────────────────────
+.meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-4;
+  flex-wrap: wrap;
+}
+
+.metaRight {
+  display: flex;
+  align-items: center;
+  gap: $space-4;
+
+  // LiveClock <time> — misma tipografía que copyright/location
+  time {
+    font-family: $font-mono;
+    font-size: 0.6875rem;
+    line-height: 0.8125rem;
+    font-weight: 400;
+    letter-spacing: $ls-wide;
+    text-transform: uppercase;
+    color: $color-text-muted;
+    font-variant-numeric: tabular-nums; // dígitos de ancho fijo para evitar saltos
+  }
+}
+
+.copyright,
+.location {
+  font-family: $font-mono;
+  font-size: 0.6875rem; // 11px — del Figma
+  line-height: 0.8125rem; // 13px
+  font-weight: 400;
+  letter-spacing: $ls-wide;
+  text-transform: uppercase;
+  color: $color-text;
+}
+
+.location {
+  color: $color-text-muted;
+
+  @include respond-to(sm) {
+    display: none;
+  }
+}
+
+
+// ══════════════════════════════════════════════════════════════════════════════
+// LIGHT PAGE VARIANT — inverted dark footer for light-bg pages (contact, etc.)
+// ══════════════════════════════════════════════════════════════════════════════
+
+.light {
+  // Social wordmarks — dark text
+  .socialLink {
+    color: $color-bg;
+  }
+
+  // Separator line
+  .line {
+    color: rgba(16, 16, 14, 0.12);
+  }
+
+  // Meta text
+  .copyright {
+    color: $color-bg;
+  }
+
+  .location {
+    color: rgba(16, 16, 14, 0.55);
+  }
+
+  // LiveClock
+  .metaRight time {
+    color: rgba(16, 16, 14, 0.55);
+  }
+}

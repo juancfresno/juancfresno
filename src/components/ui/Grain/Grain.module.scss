@@ -1,0 +1,17 @@
+@use '../../../styles/variables' as *;
+
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: $z-toast; // encima de todo excepto modals
+  pointer-events: none;
+  user-select: none;
+
+  // Aquí vive la sutileza — 3.5% de opacidad
+  // mix-blend-mode screen suma brillo en zonas oscuras: perfecto para fondo negro
+  opacity: 0.035;
+  mix-blend-mode: screen;
+
+  // GPU layer para evitar repaints del resto del DOM
+  will-change: contents;
+}

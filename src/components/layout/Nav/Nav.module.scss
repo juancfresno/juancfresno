@@ -1,0 +1,378 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+// ─── Nav wrapper ──────────────────────────────────────────────────────────────
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: $z-nav;
+  transform: translateY(0);
+  transition:
+    transform  $duration-slow  $ease-out-expo,
+    opacity    $duration-base  $ease-out-quart;
+
+  &.hidden {
+    transform: translateY(-110%);
+  }
+}
+
+// ─── Inner row ────────────────────────────────────────────────────────────────
+.inner {
+  display: flex;
+  align-items: center;              // centro vertical — face (32px) vs texto (13px)
+  justify-content: space-between;
+  padding: 1.25rem;
+}
+
+// ─── Left cluster: face + nav menu ───────────────────────────────────────────
+.left {
+  display: flex;
+  align-items: center;
+  gap: 2rem;                        // 32px — de Figma entre biako face y primer link
+}
+
+// ─── Face icon ────────────────────────────────────────────────────────────────
+.face {
+  display: block;
+  flex-shrink: 0;
+  outline-offset: 4px;
+
+  @include focus-ring;
+
+  // Activa el glitch en los layers internos al hover del link
+  &:hover {
+    .faceGlMain {
+      animation:
+        vhs-body    0.31s steps(1) infinite,
+        vhs-flicker 0.83s linear   infinite;
+    }
+    .faceGlR { animation: vhs-r 0.43s steps(1) infinite; }
+    .faceGlB { animation: vhs-b 0.57s steps(1) infinite 0.09s; }
+  }
+}
+
+// ─── Biako face VHS glitch — 3 layers con CSS filter para canales RGB ─────────
+.faceGlitchWrap {
+  position: relative;
+  display: inline-block;
+  line-height: 0;
+}
+
+.faceGl {
+  display: block;
+  line-height: 0;
+  svg { display: block; }
+}
+
+.faceGlMain {
+  position: relative;
+  z-index: 3;
+  will-change: transform;
+}
+
+// Canal rojo — filter convierte los colores del SVG a tonos rojos
+.faceGlR {
+  @include abs-fill;
+  z-index: 2;
+  filter: sepia(1) saturate(5) hue-rotate(310deg);
+  clip-path: inset(0 0 100% 0);
+  will-change: transform, clip-path;
+}
+
+// Canal cian — filter convierte los colores del SVG a tonos cian
+.faceGlB {
+  @include abs-fill;
+  z-index: 1;
+  filter: sepia(1) saturate(5) hue-rotate(150deg);
+  clip-path: inset(0 0 100% 0);
+  will-change: transform, clip-path;
+}
+
+// ─── Nav menu ─────────────────────────────────────────────────────────────────
+.navMenu {
+  display: flex;
+  align-items: center;
+  gap: 1.625rem;                    // 26px — de Figma entre links
+}
+
+// ─── Nav link ─────────────────────────────────────────────────────────────────
+.navLink {
+  position: relative;
+  isolation: isolate;               // stacking context para el ::before chip
+
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;                         // gap entre texto y flecha SVG
+
+  font-family: $font-mono;
+  font-size: 11px;
+  font-weight: $fw-regular;
+  line-height: 13px;
+  letter-spacing: 0;
+  text-transform: uppercase;
+
+  color: $color-text-mid;           // 60% por defecto
+  transition: color $duration-fast $ease-out-quart;
+
+  // ── Chip de fondo — pastilla azul claro ──────────────────────────────────
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -3px -6px;
+    border-radius: 3px;
+    background: #c6dbf9;
+    opacity: 0;
+    transform: scale(0.88);
+    // Exit: rápido y sin spring
+    transition:
+      opacity   0.14s ease-in,
+      transform 0.18s ease-in;
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  // Entry: chip aparece primero con spring, luego viene la flecha
+  &:hover::before,
+  &.active::before {
+    opacity: 1;
+    transform: scale(1);
+    transition:
+      opacity   0.18s ease-out,
+      transform 0.26s $ease-spring;
+  }
+
+  // Texto oscuro sobre el chip claro
+  &:hover,
+  &.active {
+    color: $color-bg;
+  }
+
+  @include focus-ring;
+}
+
+// Span de texto — necesario para aislar el overflow del navArrow
+.navLinkText {
+  display: inline-block;
+}
+
+// ─── Arrow SVG container ──────────────────────────────────────────────────────
+.navArrow {
+  display: inline-block;
+  flex-shrink: 0;
+  // Alineación óptica: el SVG 9×9 necesita descender un pelo para alinearse
+  // con la baseline de Geist Mono 11/13
+  margin-top: 0.5px;
+  overflow: visible;                // los strokes con round linecap pueden salir del box
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// FLECHA — animación stroke-dashoffset
+//
+// Técnica: dos paths (shaft + head) con stroke-dasharray = longitud exacta del path
+//          • En reposo: dashoffset = dasharray → path invisible (gap ocupa todo)
+//          • En hover : dashoffset → 0 → path se dibuja de inicio a fin
+//
+// Longitudes:
+//   Shaft "M 1.5 1.5 L 7.5 7.5": √((6²+6²)) = √72 ≈ 8.485 → 8.5
+//   Head  "M 7.5 3.5 L 7.5 7.5 L 3.5 7.5":  4 + 4 = 8
+//
+// Timing (chip → shaft → head):
+//   • Chip crece  0 – ~0.26s  (ease-spring, sin delay)
+//   • Shaft dibuja  0.15s – 0.51s  (expo, delay 0.15s)
+//   • Head forma    0.31s – 0.63s  (expo, delay 0.31s = 0.15 + 0.16)
+//
+// Entrada/salida independientes:
+//   • Entrada (hover):   .navLink:hover sobreescribe transition → expo + delay
+//   • Salida (unhover):  transition del estado base → ease-in rápido, sin delay
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ── Shaft ─────────────────────────────────────────────────────────────────────
+.navArrowShaft {
+  stroke-dasharray: 8.5;
+  stroke-dashoffset: 8.5;
+
+  // Exit: desaparece rápido y sincronizado
+  transition: stroke-dashoffset 0.2s ease-in;
+
+  // Entry: espera a que el chip aparezca, luego se dibuja (delay 0.15s)
+  .navLink:hover &,
+  .navLink.active & {
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 0.36s $ease-out-expo 0.15s;
+  }
+}
+
+// ── Head (bracket L ↘) ────────────────────────────────────────────────────────
+.navArrowHead {
+  stroke-dasharray: 8;
+  stroke-dashoffset: 8;
+
+  // Exit: desaparece antes que el shaft (sin delay)
+  transition: stroke-dashoffset 0.18s ease-in;
+
+  // Entry: arranca cuando el shaft lleva 0.16s corriendo → delay total 0.31s
+  .navLink:hover &,
+  .navLink.active & {
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 0.32s $ease-out-expo 0.31s;
+  }
+}
+
+// ─── Wordmark — VHS glitch container ──────────────────────────────────────────
+.logo {
+  display: block;
+  flex-shrink: 0;
+  color: $color-text;
+
+  &:hover {
+    .glMain {
+      animation:
+        vhs-body    0.31s steps(1) infinite,
+        vhs-flicker 0.83s linear   infinite;
+    }
+    .glR { animation: vhs-r 0.43s steps(1) infinite; }
+    .glB { animation: vhs-b 0.57s steps(1) infinite 0.09s; }
+    // ← glScan eliminado — creaba un brillo no deseado en la parte superior
+  }
+
+  @include focus-ring;
+}
+
+// ─── Glitch wrapper ───────────────────────────────────────────────────────────
+.glitchWrap {
+  position: relative;
+  display: inline-block;
+  line-height: 0;
+}
+
+.gl {
+  display: block;
+  line-height: 0;
+  svg { display: block; }
+}
+
+.glMain {
+  position: relative;
+  z-index: 3;
+  color: $color-text;
+  will-change: transform;
+}
+
+.glR {
+  @include abs-fill;
+  z-index: 2;
+  color: #ff1a3c;
+  clip-path: inset(0 0 100% 0);
+  will-change: transform, clip-path;
+}
+
+.glB {
+  @include abs-fill;
+  z-index: 1;
+  color: #00e5ff;
+  clip-path: inset(0 0 100% 0);
+  will-change: transform, clip-path;
+}
+
+// ─── Separator line ───────────────────────────────────────────────────────────
+.lineWrap {
+  padding: 0 1.25rem;
+}
+
+.line {
+  color: $color-border;
+}
+
+
+// ══════════════════════════════════════════════════════════════════════════════
+// LIGHT PAGE VARIANT — inverted dark nav for light-bg pages (contact, etc.)
+// ══════════════════════════════════════════════════════════════════════════════
+
+.light {
+  // Nav links — dark text
+  .navLink {
+    color: rgba(16, 16, 14, 0.55);
+  }
+
+  // Hover/active stays the same (dark text on blue chip)
+  // Chip color #c6dbf9 works on both
+
+  // Logo wordmark
+  .glMain { color: $color-bg; }
+
+  // Face — invert to dark
+  .faceGlitchWrap { filter: brightness(0.08); }
+
+  // Separator
+  .line { color: rgba(16, 16, 14, 0.12); }
+}
+
+
+// ══════════════════════════════════════════════════════════════════════════════
+// VHS GLITCH KEYFRAMES
+// ══════════════════════════════════════════════════════════════════════════════
+
+@keyframes vhs-r {
+  0%   { transform: translateX(0);     clip-path: inset(0 0 100% 0);  }
+  7%   { transform: translateX(10px);  clip-path: inset(0% 0 55% 0);  }
+  14%  { transform: translateX(8px);   clip-path: inset(58% 0 5% 0);  }
+  21%  { transform: translateX(11px);  clip-path: inset(18% 0 47% 0); }
+  28%  { transform: translateX(0);     clip-path: inset(0 0 100% 0);  }
+  35%  { transform: translateX(12px);  clip-path: inset(35% 0 30% 0); }
+  42%  { transform: translateX(8px);   clip-path: inset(0% 0 62% 0);  }
+  49%  { transform: translateX(0);     clip-path: inset(0 0 100% 0);  }
+  56%  { transform: translateX(14px);  clip-path: inset(60% 0 0% 0);  }
+  63%  { transform: translateX(9px);   clip-path: inset(5% 0 58% 0);  }
+  70%  { transform: translateX(0);     clip-path: inset(0 0 100% 0);  }
+  77%  { transform: translateX(11px);  clip-path: inset(42% 0 22% 0); }
+  84%  { transform: translateX(8px);   clip-path: inset(0% 0 60% 0);  }
+  91%  { transform: translateX(0);     clip-path: inset(0 0 100% 0);  }
+  98%  { transform: translateX(13px);  clip-path: inset(55% 0 8% 0);  }
+  100% { transform: translateX(0);     clip-path: inset(0 0 100% 0);  }
+}
+
+@keyframes vhs-b {
+  0%   { transform: translateX(0);      clip-path: inset(0 0 100% 0);  }
+  11%  { transform: translateX(-11px);  clip-path: inset(62% 0 3% 0);  }
+  19%  { transform: translateX(-8px);   clip-path: inset(8% 0 55% 0);  }
+  27%  { transform: translateX(-10px);  clip-path: inset(40% 0 25% 0); }
+  35%  { transform: translateX(0);      clip-path: inset(0 0 100% 0);  }
+  43%  { transform: translateX(-13px);  clip-path: inset(0% 0 60% 0);  }
+  51%  { transform: translateX(-9px);   clip-path: inset(58% 0 5% 0);  }
+  59%  { transform: translateX(-12px);  clip-path: inset(22% 0 43% 0); }
+  67%  { transform: translateX(0);      clip-path: inset(0 0 100% 0);  }
+  75%  { transform: translateX(-10px);  clip-path: inset(48% 0 15% 0); }
+  83%  { transform: translateX(-8px);   clip-path: inset(0% 0 65% 0);  }
+  91%  { transform: translateX(0);      clip-path: inset(0 0 100% 0);  }
+  99%  { transform: translateX(-11px);  clip-path: inset(30% 0 35% 0); }
+  100% { transform: translateX(0);      clip-path: inset(0 0 100% 0);  }
+}
+
+@keyframes vhs-body {
+  0%,  100% { transform: translate(0, 0)     skewX(0deg);    }
+  8%         { transform: translate(2px, 0)   skewX(-0.6deg); }
+  16%        { transform: translate(-1px, 0)  skewX(0.4deg);  }
+  24%        { transform: translate(0, 0)     skewX(0deg);    }
+  44%        { transform: translate(-3px, 0)  skewX(0.8deg);  }
+  52%        { transform: translate(1px, 0)   skewX(-0.5deg); }
+  60%        { transform: translate(0, 0)     skewX(0deg);    }
+  74%        { transform: translate(4px, 0)   skewX(-1.0deg); }
+  82%        { transform: translate(-2px, 0)  skewX(0.7deg);  }
+  90%        { transform: translate(0, 0)     skewX(0deg);    }
+}
+
+@keyframes vhs-flicker {
+  0%,  100% { opacity: 1;    }
+  29%        { opacity: 1;    }
+  30%        { opacity: 0.3;  }
+  31%        { opacity: 1;    }
+  58%        { opacity: 1;    }
+  59%        { opacity: 0.65; }
+  60%        { opacity: 1;    }
+  81%        { opacity: 1;    }
+  82%        { opacity: 0.12; }
+  83%        { opacity: 0.9;  }
+  84%        { opacity: 1;    }
+}

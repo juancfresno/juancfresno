@@ -1,0 +1,143 @@
+@use 'variables' as *;
+
+// ─── Responsive ───────────────────────────────────────────────────────────────
+@mixin respond-to($bp) {
+  @if $bp == xs    { @media (max-width: #{$bp-xs})  { @content; } }
+  @else if $bp == sm    { @media (max-width: #{$bp-sm})  { @content; } }
+  @else if $bp == md    { @media (max-width: #{$bp-md})  { @content; } }
+  @else if $bp == lg    { @media (max-width: #{$bp-lg})  { @content; } }
+  @else if $bp == xl    { @media (max-width: #{$bp-xl})  { @content; } }
+  @else if $bp == 2xl   { @media (max-width: #{$bp-2xl}) { @content; } }
+}
+
+@mixin respond-min($bp) {
+  @if $bp == xs    { @media (min-width: #{$bp-xs})  { @content; } }
+  @else if $bp == sm    { @media (min-width: #{$bp-sm})  { @content; } }
+  @else if $bp == md    { @media (min-width: #{$bp-md})  { @content; } }
+  @else if $bp == lg    { @media (min-width: #{$bp-lg})  { @content; } }
+  @else if $bp == xl    { @media (min-width: #{$bp-xl})  { @content; } }
+  @else if $bp == 2xl   { @media (min-width: #{$bp-2xl}) { @content; } }
+}
+
+// ─── Layout ───────────────────────────────────────────────────────────────────
+@mixin container {
+  width: 100%;
+  max-width: $max-width;
+  margin-inline: auto;
+  padding-inline: $gutter;
+}
+
+@mixin grid($cols: $cols-12, $gap: $space-4) {
+  display: grid;
+  grid-template-columns: $cols;
+  gap: $gap;
+}
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin abs-fill {
+  position: absolute;
+  inset: 0;
+}
+
+@mixin fixed-fill {
+  position: fixed;
+  inset: 0;
+}
+
+// ─── Typography ───────────────────────────────────────────────────────────────
+@mixin heading-display {
+  font-family: $font-display;
+  font-weight: $fw-bold;
+  line-height: $lh-tight;
+  letter-spacing: $ls-tight;
+}
+
+@mixin text-mono {
+  font-family: $font-mono;
+  font-size: $fs-xs;
+  letter-spacing: $ls-wide;
+  text-transform: uppercase;
+}
+
+@mixin truncate($lines: 1) {
+  @if $lines == 1 {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  } @else {
+    display: -webkit-box;
+    -webkit-line-clamp: $lines;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+// ─── Visual ───────────────────────────────────────────────────────────────────
+@mixin glass($blur: 12px, $bg: rgba(10, 10, 10, 0.6)) {
+  background: $bg;
+  backdrop-filter: blur($blur);
+  -webkit-backdrop-filter: blur($blur);
+}
+
+@mixin gradient-text($from: $color-accent, $to: $color-accent-2) {
+  background: linear-gradient(135deg, $from, $to);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+@mixin hover-lift($y: -4px) {
+  transition: transform $duration-base $ease-out-quart;
+  &:hover {
+    transform: translateY($y);
+  }
+}
+
+@mixin link-underline($color: $color-accent, $height: 1px) {
+  position: relative;
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: $height;
+    background: $color;
+    transition: width $duration-base $ease-out-expo;
+  }
+  &:hover::after,
+  &.active::after {
+    width: 100%;
+  }
+}
+
+// ─── Accessibility ────────────────────────────────────────────────────────────
+@mixin visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@mixin focus-ring($color: $color-accent) {
+  &:focus-visible {
+    outline: 2px solid $color;
+    outline-offset: 3px;
+  }
+}

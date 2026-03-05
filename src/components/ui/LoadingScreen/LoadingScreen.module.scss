@@ -1,0 +1,153 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// LOADING SCREEN — brand intro with progress bar
+// ═══════════════════════════════════════════════════════════════════════════════
+
+$loading-bg:    #c6dbf9;
+$loading-dark:  #10100e;
+
+// ─── Full-viewport container ─────────────────────────────────────────────────
+.screen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999; // above pixel dissolve canvas (9998)
+  background-color: $loading-bg;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 20px; // 20px lateral — liquid, edge to edge
+  transition: opacity 600ms $ease-out-quart;
+  overflow: hidden;
+}
+
+.screenFading {
+  opacity: 0;
+  pointer-events: none;
+}
+
+// ─── Content wrapper — entry animation ───────────────────────────────────────
+.content {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  // Entry: fade in + slide up
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.6s $ease-out-quart 0.1s,
+              transform 0.6s $ease-out-quart 0.1s;
+}
+
+.contentVisible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+// ─── Main row: face — line — logo ────────────────────────────────────────────
+.row {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  width: 100%;
+
+  @include respond-to(sm) {
+    gap: 0.75rem;
+  }
+}
+
+// ─── Face icon ───────────────────────────────────────────────────────────────
+.face {
+  flex-shrink: 0;
+  color: $loading-dark;
+  line-height: 0;
+}
+
+.faceSvg {
+  width: 36px;
+  height: auto;
+
+  @include respond-to(sm) {
+    width: 28px;
+  }
+}
+
+// ─── Fresno logo ─────────────────────────────────────────────────────────────
+.logo {
+  flex-shrink: 0;
+  color: $loading-dark;
+  line-height: 0;
+  // opacity driven by inline style — smooth micro-transitions
+  transition: opacity 0.15s linear;
+}
+
+.logoSvg {
+  width: 120px;
+  height: auto;
+
+  @include respond-to(sm) {
+    width: 80px;
+  }
+}
+
+// ─── Progress line ───────────────────────────────────────────────────────────
+.lineWrap {
+  flex: 1;
+  min-width: 0;
+}
+
+.lineTrack {
+  width: 100%;
+  height: 1px;
+  background: rgba($loading-dark, 0.12);
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.5px;
+}
+
+.lineFill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: $loading-dark;
+  transform-origin: left center;
+  // scaleX driven by inline style
+  will-change: transform;
+}
+
+// ─── Info row: counter + yeepa — flush to edges ─────────────────────────────
+.info {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.counter {
+  font-family: $font-mono;
+  font-size: 0.6875rem; // 11px — Figma spec
+  font-weight: $fw-regular;
+  letter-spacing: 0.04em;
+  color: $loading-dark;
+  // Monospace numerals for no layout shift
+  font-variant-numeric: tabular-nums;
+}
+
+.yeepa {
+  font-family: $font-mono;
+  font-size: 0.6875rem;
+  font-weight: $fw-regular;
+  letter-spacing: 0.04em;
+  color: $loading-dark;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.45s $ease-out-quart,
+              transform 0.45s $ease-out-quart;
+}
+
+.yeepaVisible {
+  opacity: 1;
+  transform: translateY(0);
+}

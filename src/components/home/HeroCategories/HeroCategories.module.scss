@@ -1,0 +1,183 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+// ─── Section container ───────────────────────────────────────────────────────
+.section {
+  padding: 3rem 3.125rem 0; // ~50px lateral (matches Figma left:50px)
+  width: 100%;
+
+  @include respond-to(md) {
+    padding: 2rem $gutter 0;
+  }
+}
+
+// ─── Categories line ─────────────────────────────────────────────────────────
+.categories {
+  font-family: $font-sans;
+  // Fluid size: 40px @ 1680px → scales down proportionally
+  font-size: clamp(1.125rem, 2.4vw, 2.5rem); // 18px → 40px
+  font-weight: $fw-regular;
+  line-height: 1.15;
+  letter-spacing: -0.02em; // -0.8px @ 40px
+  color: #ddedff;
+  opacity: 0.9;
+}
+
+// ─── Category wrapper (keeps dash + word inline) ─────────────────────────────
+.catWrap {
+  white-space: nowrap;
+}
+
+// ─── Dash separator — HIDDEN by default, fades in with categories ────────────
+.dash {
+  display: inline;
+  opacity: 0;
+  transition: opacity 0.4s $ease-out-quart;
+}
+
+.dashVisible {
+  opacity: 0.5;
+}
+
+// ─── Individual category — hidden by default, scramble JS controls text ──────
+.category {
+  display: inline-block;
+  cursor: default;
+  opacity: 0;
+  transition: opacity 0.15s $ease-out-quart; // quick fade-in then scramble takes over visually
+}
+
+.categoryVisible {
+  opacity: 1;
+}
+
+// ─── VHS Glitch — wrapper y layers (same pattern as Footer social icons) ─────
+.glWrap {
+  position: relative;
+  display: inline-block; // inline for text flow
+}
+
+.glLayer {
+  display: inline-block;
+}
+
+// Capa principal — body shake + flicker (activated on .category:hover)
+.glMain {
+  position: relative;
+  z-index: 3;
+  will-change: transform;
+}
+
+// Canal R — desplaza derecha con clip-path
+.glR {
+  @include abs-fill;
+  z-index: 2;
+  clip-path: inset(0 0 100% 0);
+  will-change: transform, clip-path;
+}
+
+// Canal B — desplaza izquierda con clip-path
+.glB {
+  @include abs-fill;
+  z-index: 1;
+  clip-path: inset(0 0 100% 0);
+  will-change: transform, clip-path;
+}
+
+// ─── Hover activation — triggers VHS on the category ─────────────────────────
+.category:hover {
+  .glMain {
+    animation:
+      vhs-body    0.31s steps(1) infinite,
+      vhs-flicker 0.83s linear   infinite;
+  }
+  .glR { animation: vhs-r 0.43s steps(1) infinite; }
+  .glB { animation: vhs-b 0.57s steps(1) infinite 0.09s; }
+}
+
+// ─── Video placeholder — blue rect, hidden by default ────────────────────────
+.placeholder {
+  margin-top: 3rem;
+  width: clamp(260px, 27vw, 448px);
+  aspect-ratio: 448 / 299;
+  background: #003dff;
+  will-change: transform;
+
+  // Hidden by default — only shows on category hover
+  opacity: 0;
+  transition: opacity 0.35s $ease-out-quart;
+  pointer-events: none;
+}
+
+.placeholderVisible {
+  opacity: 1;
+}
+
+
+// ══════════════════════════════════════════════════════════════════════════════
+// VHS GLITCH KEYFRAMES — duplicados aquí para que estén disponibles
+// en este módulo CSS (CSS Modules escopa los keyframes por archivo)
+// ══════════════════════════════════════════════════════════════════════════════
+
+@keyframes vhs-r {
+  0%   { transform: translateX(0);     clip-path: inset(0 0 100% 0);  }
+  7%   { transform: translateX(10px);  clip-path: inset(0% 0 55% 0);  }
+  14%  { transform: translateX(8px);   clip-path: inset(58% 0 5% 0);  }
+  21%  { transform: translateX(11px);  clip-path: inset(18% 0 47% 0); }
+  28%  { transform: translateX(0);     clip-path: inset(0 0 100% 0);  }
+  35%  { transform: translateX(12px);  clip-path: inset(35% 0 30% 0); }
+  42%  { transform: translateX(8px);   clip-path: inset(0% 0 62% 0);  }
+  49%  { transform: translateX(0);     clip-path: inset(0 0 100% 0);  }
+  56%  { transform: translateX(14px);  clip-path: inset(60% 0 0% 0);  }
+  63%  { transform: translateX(9px);   clip-path: inset(5% 0 58% 0);  }
+  70%  { transform: translateX(0);     clip-path: inset(0 0 100% 0);  }
+  77%  { transform: translateX(11px);  clip-path: inset(42% 0 22% 0); }
+  84%  { transform: translateX(8px);   clip-path: inset(0% 0 60% 0);  }
+  91%  { transform: translateX(0);     clip-path: inset(0 0 100% 0);  }
+  98%  { transform: translateX(13px);  clip-path: inset(55% 0 8% 0);  }
+  100% { transform: translateX(0);     clip-path: inset(0 0 100% 0);  }
+}
+
+@keyframes vhs-b {
+  0%   { transform: translateX(0);      clip-path: inset(0 0 100% 0);  }
+  11%  { transform: translateX(-11px);  clip-path: inset(62% 0 3% 0);  }
+  19%  { transform: translateX(-8px);   clip-path: inset(8% 0 55% 0);  }
+  27%  { transform: translateX(-10px);  clip-path: inset(40% 0 25% 0); }
+  35%  { transform: translateX(0);      clip-path: inset(0 0 100% 0);  }
+  43%  { transform: translateX(-13px);  clip-path: inset(0% 0 60% 0);  }
+  51%  { transform: translateX(-9px);   clip-path: inset(58% 0 5% 0);  }
+  59%  { transform: translateX(-12px);  clip-path: inset(22% 0 43% 0); }
+  67%  { transform: translateX(0);      clip-path: inset(0 0 100% 0);  }
+  75%  { transform: translateX(-10px);  clip-path: inset(48% 0 15% 0); }
+  83%  { transform: translateX(-8px);   clip-path: inset(0% 0 65% 0);  }
+  91%  { transform: translateX(0);      clip-path: inset(0 0 100% 0);  }
+  99%  { transform: translateX(-11px);  clip-path: inset(30% 0 35% 0); }
+  100% { transform: translateX(0);      clip-path: inset(0 0 100% 0);  }
+}
+
+@keyframes vhs-body {
+  0%,  100% { transform: translate(0, 0)     skewX(0deg);    }
+  8%         { transform: translate(2px, 0)   skewX(-0.6deg); }
+  16%        { transform: translate(-1px, 0)  skewX(0.4deg);  }
+  24%        { transform: translate(0, 0)     skewX(0deg);    }
+  44%        { transform: translate(-3px, 0)  skewX(0.8deg);  }
+  52%        { transform: translate(1px, 0)   skewX(-0.5deg); }
+  60%        { transform: translate(0, 0)     skewX(0deg);    }
+  74%        { transform: translate(4px, 0)   skewX(-1.0deg); }
+  82%        { transform: translate(-2px, 0)  skewX(0.7deg);  }
+  90%        { transform: translate(0, 0)     skewX(0deg);    }
+}
+
+@keyframes vhs-flicker {
+  0%,  100% { opacity: 1;    }
+  29%        { opacity: 1;    }
+  30%        { opacity: 0.3;  }
+  31%        { opacity: 1;    }
+  58%        { opacity: 1;    }
+  59%        { opacity: 0.65; }
+  60%        { opacity: 1;    }
+  81%        { opacity: 1;    }
+  82%        { opacity: 0.12; }
+  83%        { opacity: 0.9;  }
+  84%        { opacity: 1;    }
+}

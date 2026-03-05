@@ -1,0 +1,83 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+// ─── Hero intro — text reveal ─────────────────────────────────────────────────
+.hero {
+  padding: 9.6875rem $gutter 0; // 155px top (from Figma) — accounts for fixed nav
+  max-width: 53.75rem;          // 860px (from Figma)
+}
+
+// ─── Character spans (name) ──────────────────────────────────────────────────
+.char {
+  display: inline-block;
+  opacity: 0;
+  filter: blur(6px);
+  transform: translateY(2px);
+  transition:
+    opacity   0.5s $ease-out-quart,
+    filter    0.5s $ease-out-quart,
+    transform 0.5s $ease-out-quart;
+}
+
+// ─── Word spans (subtitle + body) ────────────────────────────────────────────
+.word {
+  opacity: 0;
+  filter: blur(4px);
+  transition:
+    opacity 0.45s $ease-out-quart,
+    filter  0.45s $ease-out-quart;
+}
+
+// ─── Reveal state — triggered via JS className toggle ────────────────────────
+.revealed {
+  .char {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+  }
+  .word {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+// ─── Typography — matching Figma spec (Switzer → Inter fallback) ─────────────
+.name {
+  font-family: $font-sans;
+  font-size: 1rem;               // 16px
+  font-weight: $fw-regular;      // 400
+  line-height: 1.5;
+  color: $color-text;
+  opacity: 0.9;
+  margin-bottom: 0.5rem;         // 8px gap (Figma)
+}
+
+.subtitle {
+  font-family: $font-sans;
+  font-size: 1rem;
+  font-weight: $fw-light;        // 300
+  line-height: 1.5;
+  color: #ddedff;                 // Backgrounds/Blue from Figma
+  opacity: 0.9;
+  margin-bottom: 5rem;            // ~80px gap before body (Figma ~100px, adjusted)
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;                  // 6px between paragraphs
+}
+
+.bodyLine {
+  font-family: $font-sans;
+  font-size: 1rem;
+  font-weight: $fw-light;
+  line-height: 1.6;
+  color: #9c9ea0;                 // neutrals/grey-60 from Figma
+}
+
+// Bold / highlighted words
+.highlight {
+  color: $color-text;
+  font-weight: $fw-regular;
+}

@@ -1,0 +1,170 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// PROJECTS GALLERY — horizontal scroll gallery (gsproductions style)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// ─── Outer container — creates vertical scroll distance ──────────────────────
+.container {
+  position: relative;
+  width: 100%;
+  // height set via inline style (300vh for enough scroll room)
+}
+
+// ─── Sticky viewport — stays in view during scroll ───────────────────────────
+.sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end; // cards align to bottom
+  padding-bottom: 5rem;
+
+  @include respond-to(md) {
+    padding-bottom: 3rem;
+  }
+}
+
+// ─── Horizontal track ────────────────────────────────────────────────────────
+.track {
+  display: flex;
+  gap: 1.5rem; // 24px between cards
+  align-items: flex-end; // base alignment
+  height: calc(100% - 5rem); // leave space at top for nav
+  padding-left: 3.125rem;
+  padding-right: 5rem;
+  will-change: transform;
+  // Smooth interpolation (Lenis scroll drives this smoothly)
+  transition: transform 0.05s linear;
+
+  @include respond-to(md) {
+    padding-left: $gutter;
+    padding-right: 3rem;
+    gap: 1rem;
+  }
+}
+
+// ─── Card ────────────────────────────────────────────────────────────────────
+.card {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  text-decoration: none;
+  cursor: pointer;
+
+  // Entry animation
+  opacity: 0;
+  animation: card-enter 0.8s $ease-out-quart forwards;
+
+  @for $i from 1 through 9 {
+    &:nth-child(#{$i}) {
+      animation-delay: #{0.1 + $i * 0.08}s;
+    }
+  }
+}
+
+// ─── Card media — color placeholder ──────────────────────────────────────────
+.cardMedia {
+  width: clamp(300px, 28vw, 465px);
+  // 4:5 aspect ratio for tall cards (portrait feel)
+  aspect-ratio: 4 / 5;
+  border-radius: 3px;
+  overflow: hidden;
+  transition: transform 0.6s $ease-out-quart;
+  will-change: transform;
+
+  @include respond-to(lg) {
+    width: clamp(240px, 32vw, 380px);
+  }
+  @include respond-to(sm) {
+    width: 260px;
+  }
+}
+
+// ─── Card info ───────────────────────────────────────────────────────────────
+.cardInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  padding-left: 2px;
+}
+
+.cardClient {
+  font-family: $font-mono;
+  font-size: 0.5625rem; // 9px
+  font-weight: $fw-regular;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: $color-text-muted;
+  transition: color 0.3s $ease-out-quart;
+
+  .card:hover & {
+    color: $color-text-mid;
+  }
+}
+
+.cardTitle {
+  font-family: $font-sans;
+  font-size: 0.875rem; // 14px
+  font-weight: $fw-light;
+  letter-spacing: -0.01em;
+  color: $color-text;
+  opacity: 0.7;
+  transition: opacity 0.3s $ease-out-quart;
+
+  .card:hover & {
+    opacity: 1;
+  }
+}
+
+// ─── Page title overlay — fixed bottom-left ──────────────────────────────────
+.pageTitle {
+  position: absolute;
+  bottom: 1.5rem;
+  left: 3.125rem;
+  display: flex;
+  align-items: center;
+  gap: $space-4;
+  z-index: 2;
+  pointer-events: none;
+
+  @include respond-to(md) {
+    left: $gutter;
+    bottom: 1rem;
+  }
+}
+
+.pageTitleLabel {
+  font-family: $font-mono;
+  font-size: 0.625rem;
+  font-weight: $fw-regular;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: $color-text;
+  opacity: 0.5;
+}
+
+.pageTitleCount {
+  font-family: $font-mono;
+  font-size: 0.625rem;
+  font-weight: $fw-regular;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: $color-text-muted;
+}
+
+// ─── Card enter animation ────────────────────────────────────────────────────
+@keyframes card-enter {
+  0% {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

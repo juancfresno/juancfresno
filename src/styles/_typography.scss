@@ -1,0 +1,63 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+// ─── Base typography ─────────────────────────────────────────────────────────
+body {
+  font-size: $fs-base;
+  font-weight: $fw-regular;
+  letter-spacing: $ls-normal;
+}
+
+// ─── Display headings ─────────────────────────────────────────────────────────
+.display-1 {
+  font-size: $fs-4xl;
+  @include heading-display;
+}
+
+.display-2 {
+  font-size: $fs-3xl;
+  @include heading-display;
+}
+
+h1, .h1 {
+  font-size: $fs-2xl;
+  @include heading-display;
+}
+
+h2, .h2 {
+  font-size: $fs-xl;
+  font-weight: $fw-semibold;
+  line-height: $lh-snug;
+  letter-spacing: $ls-tight;
+}
+
+h3, .h3 {
+  font-size: $fs-lg;
+  font-weight: $fw-semibold;
+  line-height: $lh-snug;
+}
+
+h4, .h4 {
+  font-size: $fs-md;
+  font-weight: $fw-medium;
+  line-height: $lh-normal;
+}
+
+// ─── Eyebrow / label ──────────────────────────────────────────────────────────
+.label {
+  @include text-mono;
+  color: $color-text-muted;
+}
+
+// ─── Body copy ────────────────────────────────────────────────────────────────
+.body-lg {
+  font-size: $fs-md;
+  line-height: $lh-relaxed;
+  color: $color-text-mid;
+}
+
+.body-sm {
+  font-size: $fs-sm;
+  line-height: $lh-normal;
+  color: $color-text-muted;
+}
