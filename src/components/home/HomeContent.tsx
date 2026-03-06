@@ -18,138 +18,151 @@ const CATEGORY_IMAGES = [
   '/images/carousel-6.jpg', // Develop
 ]
 
-const DEFAULT_IMAGE = '/images/hero-poster.jpg'
+// ─── Mouse parallax hook ──────────────────────────────────────────────────────
+// Sets --mx and --my CSS custom properties on the target element.
+// The parallax wrapper reads these to smoothly follow the cursor.
+function useMouseParallax(
+  ref: React.RefObject<HTMLElement | null>,
+  strength = 15,
+) {
+  const rafRef = useRef(0)
 
-// ─── Pixel decompose/recompose transition via Canvas ─────────────────────────
-// Captures the old image on a canvas, progressively pixelates it (scaling down
-// with imageSmoothingEnabled=false then scaling back up), then fades out the
-// canvas to reveal the new <Image> underneath.
-function usePixelTransition(canvasRef: React.RefObject<HTMLCanvasElement | null>) {
-  const animRef = useRef<number>(0)
-
-  const run = useCallback((oldSrc: string) => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
-
-    // Cancel any running animation
-    if (animRef.current) cancelAnimationFrame(animRef.current)
-
-    const img = new window.Image()
-    img.crossOrigin = 'anonymous'
-    img.src = oldSrc
-
-    img.onload = () => {
-      // Size canvas to the displayed image size
-      const rect = canvas.parentElement?.getBoundingClientRect()
-      const w = rect?.width || img.naturalWidth
-      const h = rect?.height || img.naturalHeight
-      canvas.width = w
-      canvas.height = h
-      canvas.style.opacity = '1'
-
-      // Draw original image
-      ctx.drawImage(img, 0, 0, w, h)
-
-      // Animation: progressive pixelation + fade
-      const TOTAL_FRAMES = 14
-      let frame = 0
-
-      const tick = () => {
-        frame++
-        const progress = frame / TOTAL_FRAMES
-
-        // Pixelation: draw at smaller and smaller sizes
-        const pixelSize = Math.max(1, Math.floor(w * Math.max(0.02, 1 - progress * 2.5)))
-
-        ctx.clearRect(0, 0, w, h)
-        ctx.save()
-        ctx.imageSmoothingEnabled = false
-
-        // Draw image at tiny size into a corner
-        ctx.drawImage(img, 0, 0, pixelSize, Math.max(1, Math.floor(h * (pixelSize / w))))
-        // Scale back up — creates blocky pixel effect
-        ctx.drawImage(
-          canvas,
-          0, 0, pixelSize, Math.max(1, Math.floor(h * (pixelSize / w))),
-          0, 0, w, h,
-        )
-
-        ctx.restore()
-
-        // Fade out
-        canvas.style.opacity = String(Math.max(0, 1 - progress * 1.3))
-
-        if (frame < TOTAL_FRAMES) {
-          animRef.current = requestAnimationFrame(tick)
-        } else {
-          // Done — hide canvas
-          canvas.style.opacity = '0'
-          ctx.clearRect(0, 0, w, h)
-        }
-      }
-
-      animRef.current = requestAnimationFrame(tick)
-    }
-
-    // If image fails to load, just hide canvas
-    img.onerror = () => {
-      canvas.style.opacity = '0'
-    }
-  }, [canvasRef])
-
-  // Cleanup
   useEffect(() => {
+    const el = ref.current
+    if (!el) return
+
+    const handleMove = (e: MouseEvent) => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current)
+      rafRef.current = requestAnimationFrame(() => {
+        const rect = el.getBoundingClientRect()
+        const x = ((e.clientX - rect.left) / rect.width - 0.5) * 2
+        const y = ((e.clientY - rect.top) / rect.height - 0.5) * 2
+        el.style.setProperty('--mx', `${x * strength}px`)
+        el.style.setProperty('--my', `${y * strength}px`)
+      })
+    }
+
+    const handleLeave = () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current)
+      rafRef.current = requestAnimationFrame(() => {
+        el.style.setProperty('--mx', '0px')
+        el.style.setProperty('--my', '0px')
+      })
+    }
+
+    window.addEventListener('mousemove', handleMove)
+    el.addEventListener('mouseleave', handleLeave)
+
     return () => {
-      if (animRef.current) cancelAnimationFrame(animRef.current)
+      window.removeEventListener('mousemove', handleMove)
+      el.removeEventListener('mouseleave', handleLeave)
+      if (rafRef.current) cancelAnimationFrame(rafRef.current)
+    }
+  }, [ref, strength])
+}
+
+// ─── Component ────────────────────────────────────────────────────────────────
+export default function HomeContent({ feedItems }: { feedItems: FeedItem[] }) {
+  const [hoveredCat, setHoveredCat] = useState<number | null>(null)
+  const [displayedImg, setDisplayedImg] = useState<string | null>(null)
+  const [isGlitching, setIsGlitching] = useState(false)
+  const mediaRef = useRef<HTMLDivElement>(null)
+  const prevImgRef = useRef<string | null>(null)
+  const swapTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
+  const endTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
+
+  // Parallax effect on the media column
+  useMouseParallax(mediaRef)
+
+  // Handle category hover → glitch transition → swap image
+  const handleCategoryHover = useCallback((index: number | null) => {
+    setHoveredCat(index)
+    const nextImg = index !== null ? CATEGORY_IMAGES[index] : null
+
+    if (nextImg !== prevImgRef.current) {
+      prevImgRef.current = nextImg
+
+      // Clear pending timers
+      if (swapTimerRef.current) clearTimeout(swapTimerRef.current)
+      if (endTimerRef.current) clearTimeout(endTimerRef.current)
+
+      // 1. Start glitch
+      setIsGlitching(true)
+
+      // 2. Swap image mid-glitch (at ~120ms — aligns with opacity-0 keyframe)
+      swapTimerRef.current = setTimeout(() => {
+        setDisplayedImg(nextImg)
+      }, 120)
+
+      // 3. End glitch (at ~450ms)
+      endTimerRef.current = setTimeout(() => {
+        setIsGlitching(false)
+      }, 450)
     }
   }, [])
 
-  return run
-}
-
-// ─── Component ───────────────────────────────────────────────────────────────
-export default function HomeContent({ feedItems }: { feedItems: FeedItem[] }) {
-  const [hoveredCat, setHoveredCat] = useState<number | null>(null)
-  const currentImage = hoveredCat !== null ? CATEGORY_IMAGES[hoveredCat] : DEFAULT_IMAGE
-  const prevImageRef = useRef(currentImage)
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-  const runPixel = usePixelTransition(canvasRef)
-
-  // When image source changes, trigger pixel decompose on the old image
+  // Cleanup timers on unmount
   useEffect(() => {
-    if (currentImage !== prevImageRef.current) {
-      runPixel(prevImageRef.current)
-      prevImageRef.current = currentImage
+    return () => {
+      if (swapTimerRef.current) clearTimeout(swapTimerRef.current)
+      if (endTimerRef.current) clearTimeout(endTimerRef.current)
     }
-  }, [currentImage, runPixel])
+  }, [])
+
+  const showVideo = hoveredCat === null
 
   return (
     <div className={s.homePage}>
-      {/* Text content column */}
-      <div className={s.content}>
-        <HeroIntro />
-        <HeroCategories onCategoryHover={setHoveredCat} />
+      {/* ── Hero: 50 / 50 grid ──────────────────────────────── */}
+      <div className={s.heroGrid}>
+        {/* Left — text content */}
+        <div className={s.textCol}>
+          <HeroIntro />
+          <HeroCategories onCategoryHover={handleCategoryHover} />
+        </div>
+
+        {/* Right — media (video default / category images on hover) */}
+        <div className={s.mediaCol} ref={mediaRef}>
+          <div className={s.mediaParallax}>
+            <div
+              className={`${s.mediaFrame} ${isGlitching ? s.glitching : ''}`}
+            >
+              {/* Default state: video showreel (poster fallback if no .mp4) */}
+              <video
+                className={`${s.video} ${showVideo ? s.visible : ''}`}
+                src="/videos/hero-reel.mp4"
+                poster="/images/hero-poster.jpg"
+                autoPlay
+                loop
+                muted
+                playsInline
+              />
+
+              {/* Hovered category image */}
+              {displayedImg && (
+                <div className={`${s.imgWrap} ${!showVideo ? s.visible : ''}`}>
+                  <Image
+                    src={displayedImg}
+                    alt="Selected category"
+                    fill
+                    sizes="50vw"
+                    className={s.img}
+                    priority
+                  />
+                </div>
+              )}
+
+              {/* Scanlines — subtle CRT overlay */}
+              <div className={s.scanlines} aria-hidden="true" />
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Poster image — absolutely positioned top-right */}
-      <div className={s.posterWrap}>
-        <Image
-          src={currentImage}
-          alt="Juan C. Fresno"
-          width={358}
-          height={239}
-          className={s.posterImg}
-          priority
-        />
-        {/* Canvas overlay for pixel transition */}
-        <canvas ref={canvasRef} className={s.pixelCanvas} />
+      {/* ── Dribbble carousel — full width, pushed to bottom ── */}
+      <div className={s.feedWrap}>
+        <SocialFeed items={feedItems} />
       </div>
-
-      {/* Carousel at bottom */}
-      <SocialFeed items={feedItems} />
     </div>
   )
 }

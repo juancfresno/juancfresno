@@ -70,10 +70,11 @@ const SOCIALS = [
 // ─── Component ────────────────────────────────────────────────────────────────
 export default function Footer() {
   const pathname = usePathname()
+  const isHome = pathname === '/'
   const isLight = pathname === '/contact'
 
   return (
-    <footer className={`${s.footer} ${isLight ? s.light : ''}`}>
+    <footer className={`${s.footer} ${isLight ? s.light : ''} ${isHome ? s.homeFooter : ''}`}>
       <div className={s.inner}>
 
         {/* Social wordmarks */}

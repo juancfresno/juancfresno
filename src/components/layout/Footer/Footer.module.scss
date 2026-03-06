@@ -6,6 +6,11 @@
   width: 100%;
 }
 
+// ── Home page: footer sticks to bottom, no extra scroll ─────────────────────
+.homeFooter {
+  flex-shrink: 0;
+}
+
 .inner {
   padding: 0 1.25rem 1.5rem;
 }

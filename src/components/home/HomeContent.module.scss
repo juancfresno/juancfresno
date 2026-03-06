@@ -1,58 +1,186 @@
 @use '../../styles/variables' as *;
 @use '../../styles/mixins' as *;
 
-// ── Liquid home wrapper ──────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════════
+// HOME PAGE
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// ── Page wrapper — flex column, fills viewport ──────────────────────────────
 .homePage {
   position: relative;
   display: flex;
   flex-direction: column;
-  min-height: calc(100dvh - 2rem);
-  padding: 7.5rem 3.125rem 1rem; // 120px top (clears nav), 50px sides
+  min-height: calc(100dvh - 8rem); // leave room for footer
+  padding: 7.5rem 3.125rem 3.125rem; // 120px top (nav clear), 50px sides, 50px bottom (footer gap)
 
   @include respond-to(md) {
-    padding: 7rem $gutter 1rem;
+    padding: 7rem $gutter 2rem;
+    min-height: auto;
   }
 }
 
-// ── Text content (name + subtitle + year + categories) ───────────────────────
-.content {
-  position: relative;
+// ── Hero: 50/50 grid (6 + 6 columns) ────────────────────────────────────────
+.heroGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  flex: 1;
+  align-items: center;
+
+  @include respond-to(lg) {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+}
+
+// ── Text column (left 50%) ──────────────────────────────────────────────────
+.textCol {
   display: flex;
   flex-direction: column;
-  gap: 2.5rem; // 40px between header and categories (from Figma)
-  padding-right: clamp(0px, 25vw, 400px); // make room for poster on right
-
-  @include respond-to(md) {
-    padding-right: 0;
-  }
+  gap: 2.5rem;
 }
 
-// ── Poster image — absolutely positioned top-right ───────────────────────────
-.posterWrap {
-  position: absolute;
-  top: 7.5rem; // align with content top (120px)
-  right: 3.125rem;
-  z-index: 1;
+// ── Media column (right 50%) ────────────────────────────────────────────────
+.mediaCol {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden; // clip parallax overflow
+  border-radius: 2px;
+  --mx: 0px;
+  --my: 0px;
 
-  @include respond-to(md) {
+  @include respond-to(lg) {
     display: none;
   }
 }
 
-// ── Poster image ─────────────────────────────────────────────────────────────
-.posterImg {
-  width: clamp(200px, 21.3vw, 358px);
-  height: auto;
-  object-fit: cover;
-  display: block;
+// ── Parallax wrapper — smooth mouse follow via custom properties ────────────
+.mediaParallax {
+  position: absolute;
+  inset: -20px; // oversized to avoid edge gaps during parallax
+  transform: translate(var(--mx), var(--my));
+  transition: transform 0.6s $ease-out-quart;
+  will-change: transform;
 }
 
-// ── Pixel canvas overlay for decompose/recompose effect ──────────────────────
-.pixelCanvas {
+// ── Media frame — clips content, receives glitch animation ──────────────────
+.mediaFrame {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+// ── Video (default state) ───────────────────────────────────────────────────
+.video {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.5s $ease-out-quart;
   pointer-events: none;
-  image-rendering: pixelated;
+}
+
+// ── Category image ──────────────────────────────────────────────────────────
+.imgWrap {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.5s $ease-out-quart;
+}
+
+.img {
+  object-fit: cover;
+}
+
+// ── Visible state (shared) ──────────────────────────────────────────────────
+.visible {
+  opacity: 1;
+}
+
+// ── Scanlines — subtle CRT effect ──────────────────────────────────────────
+.scanlines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 2px,
+    rgba(0, 0, 0, 0.03) 2px,
+    rgba(0, 0, 0, 0.03) 4px
+  );
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// GLITCH EFFECT — triggered on image transitions
+// ═══════════════════════════════════════════════════════════════════════════════
+
+.glitching {
+  animation: glitch-shake 0.45s steps(2) forwards;
+
+  // Show scanlines during glitch
+  .scanlines {
+    opacity: 1;
+  }
+
+  // Filter distortion on media content
+  .video,
+  .imgWrap {
+    animation: glitch-flicker 0.45s steps(1) forwards;
+  }
+}
+
+// ── Container shake — jitter + skew ─────────────────────────────────────────
+@keyframes glitch-shake {
+  0%   { transform: translate(0, 0); }
+  8%   { transform: translate(8px, -2px) skewX(-2deg); }
+  16%  { transform: translate(-5px, 1px) skewX(1.5deg); }
+  24%  { transform: translate(12px, 0) skewX(-3.5deg); }
+  32%  { transform: translate(-3px, -1px); }
+  40%  { transform: translate(6px, 0) skewX(2deg); }
+  48%  { transform: translate(-10px, 2px) skewX(-1.5deg); }
+  56%  { transform: translate(4px, -1px); }
+  64%  { transform: translate(-2px, 0) skewX(0.5deg); }
+  72%  { transform: translate(3px, 0); }
+  80%  { transform: translate(-1px, 0); }
+  90%  { transform: translate(0, 0); }
+  100% { transform: translate(0, 0); }
+}
+
+// ── Content flicker — saturation / brightness / hue pulses ──────────────────
+@keyframes glitch-flicker {
+  0%   { filter: brightness(1) saturate(1) hue-rotate(0deg); opacity: 1; }
+  10%  { filter: brightness(1.5) saturate(3) hue-rotate(15deg); opacity: 1; }
+  20%  { filter: brightness(2) saturate(4) hue-rotate(30deg); opacity: 0; }
+  30%  { filter: brightness(0.4) saturate(0.3) hue-rotate(-10deg); opacity: 0.5; }
+  40%  { filter: brightness(1.6) saturate(2) hue-rotate(20deg); opacity: 0.8; }
+  50%  { filter: brightness(0.7) saturate(0.5) hue-rotate(-5deg); opacity: 1; }
+  60%  { filter: brightness(1.3) saturate(1.5) hue-rotate(8deg); opacity: 0.9; }
+  70%  { filter: brightness(0.95) saturate(1.1) hue-rotate(0deg); opacity: 1; }
+  80%  { filter: brightness(1.05) saturate(1) hue-rotate(0deg); opacity: 1; }
+  100% { filter: brightness(1) saturate(1) hue-rotate(0deg); opacity: 1; }
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// FEED WRAPPER — breaks out of page padding for full-width carousel
+// ═══════════════════════════════════════════════════════════════════════════════
+
+.feedWrap {
+  margin-top: auto; // push carousel to bottom of flex column
+  margin-left: -3.125rem;
+  margin-right: -3.125rem;
+
+  @include respond-to(md) {
+    margin-left: calc(-1 * $gutter);
+    margin-right: calc(-1 * $gutter);
+  }
 }
