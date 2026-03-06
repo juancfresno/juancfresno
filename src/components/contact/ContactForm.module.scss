@@ -2,13 +2,19 @@
 @use '../../styles/mixins' as *;
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// CONTACT PAGE
+// CONTACT PAGE — Light background variant
 // ═══════════════════════════════════════════════════════════════════════════════
+
+// ── Dark text colors for light background ────────────────────────────────────
+$_text:       #10100e;
+$_text-mid:   rgba(16, 16, 14, 0.6);
+$_text-muted: rgba(16, 16, 14, 0.35);
+$_border:     rgba(16, 16, 14, 0.12);
 
 .page {
   padding: 7.5rem 3.125rem 6rem;
-  max-width: $max-width;
-  margin: 0 auto;
+  background: $color-text; // light pearl background (#fcfcf7)
+  min-height: 100dvh;
 
   @include respond-to(md) {
     padding: 7rem $gutter 4rem;
@@ -38,7 +44,7 @@
   font-weight: $fw-regular;
   letter-spacing: 0.03em;
   text-transform: uppercase;
-  color: $color-text;
+  color: $_text;
   opacity: 0.5;
   margin-bottom: 1rem;
 }
@@ -49,13 +55,13 @@
   font-weight: $fw-light;
   letter-spacing: -0.03em;
   line-height: 1.1;
-  color: $color-text;
+  color: $_text;
   margin: 0;
 }
 
 .divider {
   width: 100%;
-  color: $color-border;
+  color: $_border;
   margin: 2.5rem 0;
 }
 
@@ -86,7 +92,7 @@
   font-weight: $fw-light;
   line-height: 1.5;
   letter-spacing: -0.02em;
-  color: #c6dbf9;
+  color: #3a5a8a; // muted blue on light bg
   margin: 0 0 2.5rem;
 }
 
@@ -100,7 +106,7 @@
   font-family: $font-sans;
   font-size: 0.875rem;
   font-weight: $fw-regular;
-  color: $color-text;
+  color: $_text;
   text-decoration: none;
   transition: opacity 0.3s $ease-out-quart;
 
@@ -114,7 +120,7 @@
   font-size: 0.625rem;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: $color-text-muted;
+  color: $_text-muted;
 }
 
 // ── Form (right) ─────────────────────────────────────────────────────────────
@@ -140,28 +146,28 @@
   font-weight: $fw-regular;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: $color-text-muted;
+  color: $_text-muted;
 }
 
 .fieldInput {
   background: transparent;
   border: none;
-  border-bottom: 1px solid $color-border;
+  border-bottom: 1px solid $_border;
   padding: 0.625rem 0;
   font-family: $font-sans;
   font-size: 1rem;
   font-weight: $fw-light;
-  color: $color-text;
+  color: $_text;
   outline: none;
   border-radius: 0;
   transition: border-color 0.4s $ease-out-quart;
 
   &:focus {
-    border-color: rgba(252, 252, 247, 0.4);
+    border-color: rgba(16, 16, 14, 0.4);
   }
 
   &::placeholder {
-    color: $color-text-muted;
+    color: $_text-muted;
   }
 }
 
@@ -177,13 +183,13 @@
   margin-top: 0.5rem;
   padding: 0.75rem 2rem;
   background: transparent;
-  border: 1px solid rgba(252, 252, 247, 0.2);
+  border: 1px solid $_border;
   font-family: $font-sans;
   font-size: 0.875rem;
   font-weight: $fw-regular;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: $color-text;
+  color: $_text;
   cursor: pointer;
   transition:
     background 0.4s $ease-out-quart,
@@ -191,9 +197,9 @@
     border-color 0.4s $ease-out-quart;
 
   &:hover {
-    background: $color-text;
-    color: $color-bg;
-    border-color: $color-text;
+    background: $_text;
+    color: $color-text;
+    border-color: $_text;
   }
 }
 
@@ -211,7 +217,7 @@
     font-family: $font-sans;
     font-size: 1rem;
     font-weight: $fw-light;
-    color: $color-text;
+    color: $_text;
     opacity: 0.8;
   }
 }
@@ -223,7 +229,7 @@
   width: 3rem;
   height: 3rem;
   border-radius: 50%;
-  border: 1px solid rgba(141, 248, 205, 0.4);
+  border: 1px solid rgba(0, 120, 80, 0.4);
   font-size: 1.25rem;
-  color: #8df8cd;
+  color: #007850;
 }

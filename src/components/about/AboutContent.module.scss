@@ -8,8 +8,7 @@
 // --- Page layout -------------------------------------------------------------
 .page {
   padding: 7.5rem 3.125rem 6rem; // 120px top, 50px sides
-  max-width: $max-width;
-  margin: 0 auto;
+  // No max-width — liquid full-width layout
 
   @include respond-to(md) {
     padding: 7rem $gutter 4rem;
@@ -113,7 +112,7 @@
 .bio {
   position: relative;
   margin-bottom: 5rem;
-  max-width: 56.25rem; // 900px
+  // No max-width — liquid layout, text fills available space
 }
 
 .bioInner {

@@ -15,24 +15,7 @@
   position: relative;
   width: 100%;
   overflow: hidden;
-
-  // Fade-out edges for seamless feeling
-  mask-image:
-    linear-gradient(
-      to right,
-      transparent 0%,
-      black 3%,
-      black 97%,
-      transparent 100%
-    );
-  -webkit-mask-image:
-    linear-gradient(
-      to right,
-      transparent 0%,
-      black 3%,
-      black 97%,
-      transparent 100%
-    );
+  // Hard cut edges — no fade/blur
 }
 
 // ─── Track — infinite scroll animation ───────────────────────────────────────

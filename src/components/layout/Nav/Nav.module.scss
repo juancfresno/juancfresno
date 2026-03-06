@@ -43,6 +43,7 @@
   display: block;
   flex-shrink: 0;
   outline-offset: 4px;
+  mix-blend-mode: difference; // visible when overlapping images
 
   @include focus-ring;
 
@@ -235,6 +236,7 @@
   display: block;
   flex-shrink: 0;
   color: $color-text;
+  mix-blend-mode: difference; // visible when overlapping images
 
   &:hover {
     .glMain {
