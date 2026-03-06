@@ -3,40 +3,11 @@
 
 // ─── Section ─────────────────────────────────────────────────────────────────
 .section {
-  padding: 6rem 0 4rem;
+  padding: 0;
   overflow: hidden;
   width: 100%;
-}
-
-// ─── Header — label row ─────────────────────────────────────────────────────
-.header {
-  display: flex;
-  align-items: center;
-  gap: $space-4;
-  padding: 0 3.125rem 1.5rem;
-
-  @include respond-to(md) {
-    padding: 0 $gutter 1.25rem;
-  }
-}
-
-.label {
-  font-family: $font-mono;
-  font-size: 0.625rem; // 10px — matches Figma Nav/Mini
-  font-weight: $fw-regular;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  color: $color-text;
-  opacity: 0.5;
-}
-
-.sublabel {
-  font-family: $font-mono;
-  font-size: 0.625rem;
-  font-weight: $fw-regular;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  color: $color-text-muted;
+  flex-shrink: 0;
+  margin-top: auto; // push carousel to bottom of liquid layout
 }
 
 // ─── Marquee container ───────────────────────────────────────────────────────
@@ -50,16 +21,16 @@
     linear-gradient(
       to right,
       transparent 0%,
-      black 4%,
-      black 96%,
+      black 3%,
+      black 97%,
       transparent 100%
     );
   -webkit-mask-image:
     linear-gradient(
       to right,
       transparent 0%,
-      black 4%,
-      black 96%,
+      black 3%,
+      black 97%,
       transparent 100%
     );
 }
@@ -67,18 +38,16 @@
 // ─── Track — infinite scroll animation ───────────────────────────────────────
 .track {
   display: flex;
-  gap: 0.75rem; // 12px between cards
+  gap: 0.5rem; // 8px (from Figma)
   width: max-content;
-  animation: marquee-scroll 45s linear infinite;
+  animation: marquee-scroll 40s linear infinite;
   will-change: transform;
 }
 
 // ─── Card ────────────────────────────────────────────────────────────────────
 .card {
   flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  display: block;
   text-decoration: none;
   cursor: pointer;
 
@@ -86,37 +55,57 @@
     transform: scale(1.03);
   }
 
-  &:hover .cardLabel {
+  &:hover .sourceBadge {
     opacity: 1;
-    color: $color-text;
   }
 }
 
 .cardInner {
-  width: clamp(200px, 16vw, 280px);
-  height: 160px;
+  position: relative;
+  overflow: hidden;
+  // Match Figma: 240×160 with fluid scaling
+  width: clamp(180px, 14.3vw, 240px);
+  height: clamp(120px, 9.5vw, 160px);
   border-radius: 4px;
   transition: transform 0.5s $ease-out-quart;
   will-change: transform;
-
-  @include respond-to(sm) {
-    width: 180px;
-    height: 130px;
-  }
 }
 
-.cardLabel {
+// ─── Image (remote via next/image) ───────────────────────────────────────────
+.cardImage {
+  object-fit: cover;
+}
+
+// ─── Image (local, standard img) ─────────────────────────────────────────────
+.cardImageLocal {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+// ─── Gradient fallback ───────────────────────────────────────────────────────
+.cardGradient {
+  width: 100%;
+  height: 100%;
+}
+
+// ─── Source badge (IG / DR) ──────────────────────────────────────────────────
+.sourceBadge {
+  position: absolute;
+  top: 6px;
+  right: 6px;
   font-family: $font-mono;
-  font-size: 0.5625rem; // 9px
-  font-weight: $fw-regular;
-  letter-spacing: 0.04em;
+  font-size: 0.5rem;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: $color-text-muted;
+  color: rgba(255, 255, 255, 0.65);
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(4px);
+  padding: 2px 5px;
+  border-radius: 2px;
   opacity: 0;
-  transition:
-    opacity 0.3s $ease-out-quart,
-    color   0.3s $ease-out-quart;
-  padding-left: 2px;
+  transition: opacity 0.3s $ease-out-quart;
 }
 
 // ─── Marquee keyframe ────────────────────────────────────────────────────────
@@ -125,7 +114,6 @@
     transform: translateX(0);
   }
   100% {
-    // Move by exactly half (since we duplicated the items)
     transform: translateX(-50%);
   }
 }

@@ -1,0 +1,81 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// PLAYGROUND — Infinite draggable gallery
+// ═══════════════════════════════════════════════════════════════════════════════
+
+.canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 10; // sit above footer but below nav ($z-nav: 100)
+  overflow: hidden;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  background: $color-bg;
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+// ── Card ─────────────────────────────────────────────────────────────────────
+.card {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  will-change: transform;
+  pointer-events: none; // let canvas handle drag
+}
+
+.cardMedia {
+  width: 100%;
+  height: 100%;
+  border-radius: 3px;
+  transition: filter 0.4s $ease-out-quart;
+
+  .card:hover & {
+    filter: brightness(1.1);
+  }
+}
+
+.cardLabel {
+  font-family: $font-mono;
+  font-size: 0.5625rem;
+  font-weight: $fw-regular;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: $color-text-muted;
+  padding-left: 2px;
+}
+
+// ── Hint ─────────────────────────────────────────────────────────────────────
+.hint {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  pointer-events: none;
+
+  span {
+    font-family: $font-mono;
+    font-size: 0.625rem;
+    font-weight: $fw-regular;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: $color-text;
+    opacity: 0.4;
+    animation: hintPulse 3s ease-in-out infinite;
+  }
+}
+
+@keyframes hintPulse {
+  0%, 100% { opacity: 0.4; }
+  50%      { opacity: 0.15; }
+}

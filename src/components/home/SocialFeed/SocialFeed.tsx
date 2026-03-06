@@ -1,32 +1,79 @@
 'use client'
 
 import { useRef, useEffect, useState } from 'react'
+import Image from 'next/image'
 import s from './SocialFeed.module.scss'
+import type { FeedItem } from '@/lib/feeds/types'
 
-// ─── Mock feed data — simulates Dribbble shots ──────────────────────────────────
-// Each item has a gradient that mimics a real shot thumbnail.
-// Replace with real API data (Dribbble/Instagram) when ready.
-const FEED_ITEMS = [
-  { id: 1,  gradient: 'linear-gradient(135deg, #003dff 0%, #0066ff 50%, #00aaff 100%)', label: 'Brand Identity System' },
-  { id: 2,  gradient: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)', label: 'Dashboard UI' },
-  { id: 3,  gradient: 'linear-gradient(135deg, #8df8cd 0%, #6ee7b7 50%, #34d399 100%)', label: 'Mobile App Concept' },
-  { id: 4,  gradient: 'linear-gradient(135deg, #ff6b6b 0%, #ee5a24 50%, #f0932b 100%)', label: 'Visual Direction' },
-  { id: 5,  gradient: 'linear-gradient(135deg, #d5f936 0%, #a8e063 50%, #56ab2f 100%)', label: 'Interaction Design' },
-  { id: 6,  gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)', label: 'Web Experience' },
-  { id: 7,  gradient: 'linear-gradient(135deg, #ffffe6 0%, #ffd93d 50%, #ff9f43 100%)', label: 'Typography Exploration' },
-  { id: 8,  gradient: 'linear-gradient(135deg, #003dff 0%, #6c5ce7 50%, #a29bfe 100%)', label: 'Art Direction' },
-  { id: 9,  gradient: 'linear-gradient(135deg, #2d3436 0%, #636e72 50%, #b2bec3 100%)', label: 'Product Design' },
-  { id: 10, gradient: 'linear-gradient(135deg, #00b894 0%, #00cec9 50%, #0984e3 100%)', label: 'Visual System' },
-  { id: 11, gradient: 'linear-gradient(135deg, #e17055 0%, #d63031 50%, #b71540 100%)', label: 'Editorial Design' },
-  { id: 12, gradient: 'linear-gradient(135deg, #fdcb6e 0%, #f39c12 50%, #e74c3c 100%)', label: 'Campaign Creative' },
+// ─── Fallback items using local carousel images ─────────────────────────────
+const FALLBACK_ITEMS: FeedItem[] = [
+  { id: 'fb-1',  source: 'dribbble',  imageUrl: '/images/carousel-1.jpg', permalink: 'https://dribbble.com/juancfresno', label: 'Visual Design',       date: '' },
+  { id: 'fb-2',  source: 'dribbble',  imageUrl: '/images/carousel-2.jpg', permalink: 'https://dribbble.com/juancfresno', label: 'Brand Identity',      date: '' },
+  { id: 'fb-3',  source: 'dribbble',  imageUrl: '/images/carousel-3.jpg', permalink: 'https://dribbble.com/juancfresno', label: 'Interaction Design',  date: '' },
+  { id: 'fb-4',  source: 'dribbble',  imageUrl: '/images/carousel-4.jpg', permalink: 'https://dribbble.com/juancfresno', label: 'Art Direction',       date: '' },
+  { id: 'fb-5',  source: 'dribbble',  imageUrl: '/images/carousel-5.jpg', permalink: 'https://dribbble.com/juancfresno', label: 'Product Design',      date: '' },
+  { id: 'fb-6',  source: 'dribbble',  imageUrl: '/images/carousel-6.jpg', permalink: 'https://dribbble.com/juancfresno', label: 'Web Experience',      date: '' },
+  { id: 'fb-7',  source: 'dribbble',  imageUrl: '/images/carousel-7.jpg', permalink: 'https://dribbble.com/juancfresno', label: 'Campaign Creative',   date: '' },
 ]
 
-// ─── Component ───────────────────────────────────────────────────────────────────
-export default function SocialFeed() {
+// ─── Feed card with image ────────────────────────────────────────────────────
+function FeedCard({ item }: { item: FeedItem }) {
+  const [imgError, setImgError] = useState(false)
+  const hasImage = item.imageUrl && !imgError
+  const isLocal = item.imageUrl?.startsWith('/images/')
+
+  return (
+    <a
+      href={item.permalink}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={s.card}
+      aria-label={item.label}
+    >
+      <div className={s.cardInner}>
+        {hasImage ? (
+          isLocal ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={item.imageUrl}
+              alt={item.label}
+              className={s.cardImageLocal}
+              loading="lazy"
+            />
+          ) : (
+            <Image
+              src={item.imageUrl}
+              alt={item.label}
+              fill
+              sizes="240px"
+              className={s.cardImage}
+              onError={() => setImgError(true)}
+              loading="lazy"
+            />
+          )
+        ) : (
+          <div
+            className={s.cardGradient}
+            style={{ background: 'linear-gradient(135deg, #003dff 0%, #00aaff 100%)' }}
+          />
+        )}
+        <span className={s.sourceBadge}>
+          {item.source === 'instagram' ? 'IG' : 'DR'}
+        </span>
+      </div>
+    </a>
+  )
+}
+
+// ─── Component ───────────────────────────────────────────────────────────────
+interface SocialFeedProps {
+  items?: FeedItem[]
+}
+
+export default function SocialFeed({ items }: SocialFeedProps) {
   const trackRef = useRef<HTMLDivElement>(null)
   const [paused, setPaused] = useState(false)
 
-  // ── Pause on hover, resume on leave ─────────────────────────────────────────
   useEffect(() => {
     const el = trackRef.current
     if (!el) return
@@ -42,38 +89,21 @@ export default function SocialFeed() {
     }
   }, [])
 
-  // Duplicate items for seamless infinite loop
-  const items = [...FEED_ITEMS, ...FEED_ITEMS]
+  // Use provided items, fallback to local images if empty
+  const feedItems = items && items.length > 0 ? items : FALLBACK_ITEMS
+
+  // Duplicate for seamless infinite loop
+  const displayItems = [...feedItems, ...feedItems]
 
   return (
     <section className={s.section}>
-      {/* Label */}
-      <div className={s.header}>
-        <span className={s.label}>{'{ últimos trabajos }'}</span>
-        <span className={s.sublabel}>Dribbble & Instagram</span>
-      </div>
-
-      {/* Marquee track */}
       <div className={s.marquee} ref={trackRef}>
         <div
           className={s.track}
           style={{ animationPlayState: paused ? 'paused' : 'running' }}
         >
-          {items.map((item, i) => (
-            <a
-              key={`${item.id}-${i}`}
-              href="https://dribbble.com/my-playbook"
-              target="_blank"
-              rel="noopener noreferrer"
-              className={s.card}
-              aria-label={item.label}
-            >
-              <div
-                className={s.cardInner}
-                style={{ background: item.gradient }}
-              />
-              <span className={s.cardLabel}>{item.label}</span>
-            </a>
+          {displayItems.map((item, i) => (
+            <FeedCard key={`${item.id}-${i}`} item={item} />
           ))}
         </div>
       </div>

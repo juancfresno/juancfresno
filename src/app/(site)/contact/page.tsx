@@ -1,18 +1,10 @@
-'use client'
+import ContactForm from '@/components/contact/ContactForm'
 
-import { useEffect } from 'react'
+export const metadata = {
+  title: 'Contact',
+  description: 'Get in touch with Juan C. Fresno — Art Direction, Digital Design & Brand Identity.',
+}
 
 export default function ContactPage() {
-  // Switch body background for this light page
-  useEffect(() => {
-    const prev = document.body.style.backgroundColor
-    document.body.style.backgroundColor = '#F2F8FC'
-    return () => { document.body.style.backgroundColor = prev }
-  }, [])
-
-  return (
-    <main style={{ minHeight: '100vh' }}>
-      {/* Contact — content coming soon */}
-    </main>
-  )
+  return <ContactForm />
 }

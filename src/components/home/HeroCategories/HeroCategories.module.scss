@@ -3,22 +3,18 @@
 
 // ─── Section container ───────────────────────────────────────────────────────
 .section {
-  padding: 3rem 3.125rem 0; // ~50px lateral (matches Figma left:50px)
+  padding: 2.5rem 0 2rem; // 40px top gap from hero text, compact bottom
   width: 100%;
-
-  @include respond-to(md) {
-    padding: 2rem $gutter 0;
-  }
 }
 
 // ─── Categories line ─────────────────────────────────────────────────────────
 .categories {
   font-family: $font-sans;
-  // Fluid size: 40px @ 1680px → scales down proportionally
-  font-size: clamp(1.125rem, 2.4vw, 2.5rem); // 18px → 40px
+  // Fluid: 28px at 1680px viewport
+  font-size: clamp(1rem, 1.67vw, 1.75rem);
   font-weight: $fw-regular;
-  line-height: 1.15;
-  letter-spacing: -0.02em; // -0.8px @ 40px
+  line-height: 1.2;
+  letter-spacing: -0.02em;
   color: #ddedff;
   opacity: 0.9;
 }
@@ -44,24 +40,24 @@
   display: inline-block;
   cursor: default;
   opacity: 0;
-  transition: opacity 0.15s $ease-out-quart; // quick fade-in then scramble takes over visually
+  transition: opacity 0.15s $ease-out-quart;
 }
 
 .categoryVisible {
   opacity: 1;
 }
 
-// ─── VHS Glitch — wrapper y layers (same pattern as Footer social icons) ─────
+// ─── VHS Glitch — wrapper y layers ───────────────────────────────────────────
 .glWrap {
   position: relative;
-  display: inline-block; // inline for text flow
+  display: inline-block;
 }
 
 .glLayer {
   display: inline-block;
 }
 
-// Capa principal — body shake + flicker (activated on .category:hover)
+// Capa principal — body shake + flicker
 .glMain {
   position: relative;
   z-index: 3;
@@ -95,28 +91,9 @@
   .glB { animation: vhs-b 0.57s steps(1) infinite 0.09s; }
 }
 
-// ─── Video placeholder — blue rect, hidden by default ────────────────────────
-.placeholder {
-  margin-top: 3rem;
-  width: clamp(260px, 27vw, 448px);
-  aspect-ratio: 448 / 299;
-  background: #003dff;
-  will-change: transform;
-
-  // Hidden by default — only shows on category hover
-  opacity: 0;
-  transition: opacity 0.35s $ease-out-quart;
-  pointer-events: none;
-}
-
-.placeholderVisible {
-  opacity: 1;
-}
-
 
 // ══════════════════════════════════════════════════════════════════════════════
-// VHS GLITCH KEYFRAMES — duplicados aquí para que estén disponibles
-// en este módulo CSS (CSS Modules escopa los keyframes por archivo)
+// VHS GLITCH KEYFRAMES
 // ══════════════════════════════════════════════════════════════════════════════
 
 @keyframes vhs-r {

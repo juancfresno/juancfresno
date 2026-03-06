@@ -153,7 +153,7 @@ const NavArrow = () => (
 
 // ─── Nav links data ───────────────────────────────────────────────────────────
 const NAV_LINKS = [
-  { label: 'About me',   href: '/about'      },
+  { label: 'About',     href: '/about'      },
   { label: 'Projects',   href: '/projects'   },
   { label: 'Contact',    href: '/contact'    },
   { label: 'Playground', href: '/playground' },

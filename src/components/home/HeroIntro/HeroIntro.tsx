@@ -1,50 +1,23 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Image from 'next/image'
 import s from './HeroIntro.module.scss'
 
-// ─── Text content (from Figma node 6254:599-602) ────────────────────────────────
+// ─── Text content (from Figma node 6235-511) ────────────────────────────────
 const NAME = 'Juan C. Fresno'
-const SUBTITLE = 'Independent Art Director & Digital Designer'
+const SUBTITLE = 'Independent Designer — Art Direction, Brand, Interactive'
+const YEAR = '2012 — 2026'
 
-interface BodyLine {
-  segments: { text: string; bold?: boolean }[]
-}
-
-const BODY: BodyLine[] = [
-  {
-    segments: [
-      { text: 'Trabajo de forma independiente colaborando con marcas, agencias y equipos para dar forma a ' },
-      { text: 'productos y experiencias digitales, desde la direcci\u00f3n visual hasta la interacci\u00f3n.', bold: true },
-    ],
-  },
-  {
-    segments: [
-      { text: 'Me interesa ' },
-      { text: 'el proceso, la claridad visual y la interacci\u00f3n bien pensada.', bold: true },
-    ],
-  },
-  {
-    segments: [
-      { text: 'Lo justo, bien hecho.' },
-    ],
-  },
-]
-
-// ─── Helpers ─────────────────────────────────────────────────────────────────────
-/** Split into individual characters (preserving spaces) */
+// ─── Helpers ─────────────────────────────────────────────────────────────────
 const chars = (text: string) => [...text]
-
-/** Split into words keeping trailing whitespace attached */
 const words = (text: string) => text.match(/\S+\s?/g) || []
 
-// ─── Animation speeds (ms) ───────────────────────────────────────────────────────
-const CHAR_SPEED = 35   // per character (name)
-const WORD_SPEED_SUB = 55 // per word (subtitle)
-const WORD_SPEED_BODY = 30 // per word (body)
-const SECTION_GAP = 200  // gap between sections
+// ─── Animation speeds (ms) ───────────────────────────────────────────────────
+const CHAR_SPEED = 35
+const WORD_SPEED_SUB = 55
 
-// ─── Component ───────────────────────────────────────────────────────────────────
+// ─── Component ───────────────────────────────────────────────────────────────
 export default function HeroIntro() {
   const [revealed, setRevealed] = useState(false)
 
@@ -53,76 +26,68 @@ export default function HeroIntro() {
     return () => clearTimeout(id)
   }, [])
 
-  // ── Pre-compute all delays ─────────────────────────────────────────────────────
+  // ── Pre-compute all delays ─────────────────────────────────────────────────
   let cursor = 0
 
   // Name — char by char
   const nameChars = chars(NAME)
   const nameDelays = nameChars.map((_, i) => i * CHAR_SPEED)
-  cursor = nameChars.length * CHAR_SPEED + SECTION_GAP
+  cursor = nameChars.length * CHAR_SPEED + 200
 
   // Subtitle — word by word
   const subtitleWords = words(SUBTITLE)
   const subtitleDelays = subtitleWords.map((_, i) => cursor + i * WORD_SPEED_SUB)
-  cursor += subtitleWords.length * WORD_SPEED_SUB + SECTION_GAP * 2
+  cursor += subtitleWords.length * WORD_SPEED_SUB + 200
 
-  // Body — word by word across all lines & segments
-  const bodyLines = BODY.map(line => {
-    const lineWords: { text: string; delay: number; bold?: boolean }[] = []
-    line.segments.forEach(seg => {
-      words(seg.text).forEach(w => {
-        lineWords.push({ text: w, delay: cursor, bold: seg.bold })
-        cursor += WORD_SPEED_BODY
-      })
-    })
-    cursor += SECTION_GAP / 2 // small pause between paragraphs
-    return lineWords
-  })
+  // Year — simple fade-in after subtitle
+  const yearDelay = cursor
 
-  // ── Render ─────────────────────────────────────────────────────────────────────
   return (
     <section className={`${s.hero} ${revealed ? s.revealed : ''}`}>
-      {/* Name */}
-      <p className={s.name}>
-        {nameChars.map((ch, i) => (
-          <span
-            key={i}
-            className={s.char}
-            style={{ transitionDelay: `${nameDelays[i]}ms` }}
-          >
-            {ch === ' ' ? '\u00A0' : ch}
-          </span>
-        ))}
-      </p>
+      {/* Left text column */}
+      <div className={s.textCol}>
+        <p className={s.name}>
+          {nameChars.map((ch, i) => (
+            <span
+              key={i}
+              className={s.char}
+              style={{ transitionDelay: `${nameDelays[i]}ms` }}
+            >
+              {ch === ' ' ? '\u00A0' : ch}
+            </span>
+          ))}
+        </p>
 
-      {/* Subtitle */}
-      <p className={s.subtitle}>
-        {subtitleWords.map((w, i) => (
-          <span
-            key={i}
-            className={s.word}
-            style={{ transitionDelay: `${subtitleDelays[i]}ms` }}
-          >
-            {w}
-          </span>
-        ))}
-      </p>
+        <p className={s.subtitle}>
+          {subtitleWords.map((w, i) => (
+            <span
+              key={i}
+              className={s.word}
+              style={{ transitionDelay: `${subtitleDelays[i]}ms` }}
+            >
+              {w}
+            </span>
+          ))}
+        </p>
 
-      {/* Body */}
-      <div className={s.body}>
-        {bodyLines.map((line, li) => (
-          <p key={li} className={s.bodyLine}>
-            {line.map((item, wi) => (
-              <span
-                key={wi}
-                className={`${s.word}${item.bold ? ` ${s.highlight}` : ''}`}
-                style={{ transitionDelay: `${item.delay}ms` }}
-              >
-                {item.text}
-              </span>
-            ))}
-          </p>
-        ))}
+        <p
+          className={`${s.year} ${s.word}`}
+          style={{ transitionDelay: `${yearDelay}ms` }}
+        >
+          {YEAR}
+        </p>
+      </div>
+
+      {/* Right poster image */}
+      <div className={s.imageCol}>
+        <Image
+          src="/images/hero-poster.jpg"
+          alt="Juan C. Fresno — poster"
+          width={358}
+          height={239}
+          className={s.posterImg}
+          priority
+        />
       </div>
     </section>
   )

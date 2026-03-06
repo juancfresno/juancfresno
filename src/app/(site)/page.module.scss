@@ -1,0 +1,9 @@
+// ─── Liquid home page wrapper — fills viewport height ────────────────────────
+.homePage {
+  display: flex;
+  flex-direction: column;
+  // Full viewport minus footer (~7rem) — everything fits on one screen
+  min-height: calc(100dvh - 7rem);
+  // 20px padding all around, extra top to clear fixed nav
+  padding: 2.5rem 1.25rem 1rem;
+}
