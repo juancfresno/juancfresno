@@ -1,0 +1,44 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+// ── Liquid home wrapper ──────────────────────────────────────────────────────
+.homePage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100dvh - 7rem);
+  padding: 2.5rem 1.25rem 1rem;
+}
+
+// ── Text content (name + subtitle + year + categories) ───────────────────────
+.content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem; // 40px between header and categories (from Figma)
+  padding-right: clamp(0px, 25vw, 400px); // make room for poster on right
+
+  @include respond-to(md) {
+    padding-right: 0;
+  }
+}
+
+// ── Poster image — absolutely positioned top-right ───────────────────────────
+.posterWrap {
+  position: absolute;
+  top: 2.5rem; // align with content top
+  right: 1.25rem;
+  z-index: 1;
+
+  @include respond-to(md) {
+    display: none;
+  }
+}
+
+.posterImg {
+  width: clamp(200px, 21.3vw, 358px);
+  height: auto;
+  object-fit: cover;
+  display: block;
+  transition: opacity 0.3s $ease-out-quart;
+}

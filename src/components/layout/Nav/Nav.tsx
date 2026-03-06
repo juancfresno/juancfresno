@@ -159,6 +159,15 @@ const NAV_LINKS = [
   { label: 'Playground', href: '/playground' },
 ] as const
 
+// ─── Mobile bottom tab bar links (includes Home) ────────────────────────────
+const MOBILE_LINKS = [
+  { label: 'Home',       href: '/'           },
+  { label: 'About',      href: '/about'      },
+  { label: 'Projects',   href: '/projects'   },
+  { label: 'Contact',    href: '/contact'    },
+  { label: 'Playground', href: '/playground' },
+] as const
+
 // ─── NavLinkItem — scramble + chip + transition ───────────────────────────────
 function NavLinkItem({
   label,
@@ -220,54 +229,77 @@ export default function Nav() {
   const isLight = pathname === '/contact'
 
   return (
-    <header className={clsx(s.nav, hidden && s.hidden, scrolled && s.scrolled, isLight && s.light)}>
-      <div className={s.inner}>
+    <>
+      <header className={clsx(s.nav, hidden && s.hidden, scrolled && s.scrolled, isLight && s.light)}>
+        <div className={s.inner}>
 
-        {/* ── Left cluster: face + nav menu ── */}
-        <div className={s.left}>
+          {/* ── Left cluster: face + nav menu ── */}
+          <div className={s.left}>
+            <a
+              href="/"
+              className={s.face}
+              aria-label="Ir a inicio"
+              onClick={(e) => {
+                if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
+                e.preventDefault()
+                navigate('/')
+              }}
+            >
+              <GlitchFace />
+            </a>
+
+            <nav className={s.navMenu} aria-label="Navegación principal">
+              {NAV_LINKS.map(({ label, href }) => (
+                <NavLinkItem
+                  key={href}
+                  label={label}
+                  href={href}
+                  active={pathname === href}
+                />
+              ))}
+            </nav>
+          </div>
+
+          {/* ── Right: wordmark ── */}
           <a
             href="/"
-            className={s.face}
-            aria-label="Ir a inicio"
+            className={s.logo}
+            aria-label="Fresno — ir a inicio"
             onClick={(e) => {
               if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
               e.preventDefault()
               navigate('/')
             }}
           >
-            <GlitchFace />
+            <GlitchLogo />
           </a>
 
-          <nav className={s.navMenu} aria-label="Navegación principal">
-            {NAV_LINKS.map(({ label, href }) => (
-              <NavLinkItem
-                key={href}
-                label={label}
-                href={href}
-                active={pathname === href}
-              />
-            ))}
-          </nav>
         </div>
+        <div className={s.lineWrap}>
+          <ElasticLine className={s.line} />
+        </div>
+      </header>
 
-        {/* ── Right: wordmark ── */}
-        <a
-          href="/"
-          className={s.logo}
-          aria-label="Fresno — ir a inicio"
-          onClick={(e) => {
-            if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
-            e.preventDefault()
-            navigate('/')
-          }}
-        >
-          <GlitchLogo />
-        </a>
-
-      </div>
-      <div className={s.lineWrap}>
-        <ElasticLine className={s.line} />
-      </div>
-    </header>
+      {/* ── Mobile bottom tab bar ── */}
+      <nav className={clsx(s.bottomBar, isLight && s.bottomBarLight)} aria-label="Navegación móvil">
+        {MOBILE_LINKS.map(({ label, href }) => {
+          const isActive = pathname === href
+          return (
+            <a
+              key={href}
+              href={href}
+              className={clsx(s.bottomTab, isActive && s.bottomTabActive)}
+              onClick={(e) => {
+                if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
+                e.preventDefault()
+                navigate(href)
+              }}
+            >
+              {label}
+            </a>
+          )
+        })}
+      </nav>
+    </>
   )
 }

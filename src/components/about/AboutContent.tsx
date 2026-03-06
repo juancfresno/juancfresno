@@ -240,7 +240,9 @@ export default function AboutContent() {
             Independent Designer &mdash; Art Direction, Brand, Interactive
           </span>
         </div>
-        <PixelCharacter />
+        <div className={s.pixelFlip}>
+          <PixelCharacter />
+        </div>
       </Reveal>
 
       <ElasticLine className={s.divider} />
@@ -255,20 +257,22 @@ export default function AboutContent() {
             className={s.bioInner}
             onMouseMove={handleBioMouseMove}
           >
-            <p className={`${s.bioLine} ${s.bioBright}`}>
-              Desde 2012 trabajo de forma independiente como Art Director &amp;
-              Digital Designer, colaborando con marcas, agencias y equipos en
-              proyectos digitales de distinta escala.{' '}
-            </p>
-            <p className={`${s.bioLine} ${s.bioMedium}`}>
-              Trabajo desde Valencia, Espana, adaptandome a diferentes contextos,
-              ritmos y formas de trabajo, tanto con clientes pequenos como con
-              grandes organizaciones.{' '}
-            </p>
-            <p className={`${s.bioLine} ${s.bioDark}`}>
-              Mi foco esta en definir lineas visuales claras, cuidar la
-              interaccion y construir productos digitales que no solo se vean
-              bien, sino que funcionen con sentido.
+            <p className={s.bioText}>
+              <span className={s.bioBright}>
+                Desde 2012 trabajo de forma independiente como Art Director &amp;
+                Digital Designer, colaborando con marcas, agencias y equipos en
+                proyectos digitales de distinta escala.{' '}
+              </span>
+              <span className={s.bioMedium}>
+                Trabajo desde Valencia, Espana, adaptandome a diferentes contextos,
+                ritmos y formas de trabajo, tanto con clientes pequenos como con
+                grandes organizaciones.{' '}
+              </span>
+              <span className={s.bioDark}>
+                Mi foco esta en definir lineas visuales claras, cuidar la
+                interaccion y construir productos digitales que no solo se vean
+                bien, sino que funcionen con sentido.
+              </span>
             </p>
             <div className={s.bioGlow} />
           </div>

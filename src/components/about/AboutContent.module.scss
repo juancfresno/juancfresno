@@ -76,6 +76,12 @@
   color: #ddedff;
 }
 
+// --- Pixel character flip wrapper (inverted per Figma) -----------------------
+.pixelFlip {
+  flex-shrink: 0;
+  transform: scaleY(-1); // upside-down per Figma design
+}
+
 // --- Pixel character ---------------------------------------------------------
 .pixelCharacter {
   position: relative;
@@ -116,14 +122,14 @@
   --glow-y: 50%;
 }
 
-.bioLine {
+// Single paragraph with 3 color spans (per Figma)
+.bioText {
   font-family: $font-sans;
   font-size: 1.75rem; // 28px
   font-weight: $fw-regular;
   line-height: 2.125rem; // 34px
   letter-spacing: -0.56px;
   margin: 0;
-  display: inline;
 }
 
 .bioBright {
@@ -326,10 +332,10 @@
 .processList {
   display: flex;
   flex-direction: column;
+  gap: 3.125rem; // 50px per Figma
 }
 
 .processItem {
-  padding: 1rem 0;
   padding-left: 0;
   transition: padding-left 0.5s $ease-out-quart;
 
@@ -378,6 +384,11 @@
 .processRight {
   max-width: 28rem;
   flex-shrink: 0;
+  text-align: right; // per Figma — descriptions aligned right
+
+  @include respond-to(md) {
+    text-align: left;
+  }
 }
 
 .processDesc {
@@ -405,7 +416,7 @@
   width: 100%;
   height: 1px;
   background: rgba(16, 16, 14, 0.15);
-  margin-top: 1rem;
+  margin-top: 1.5rem;
   position: relative;
   overflow: hidden;
 

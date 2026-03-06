@@ -15,6 +15,11 @@
 
   &.hidden {
     transform: translateY(-110%);
+
+    // On mobile, top bar NEVER hides — only face + logo visible
+    @include respond-to(md) {
+      transform: translateY(0);
+    }
   }
 }
 
@@ -95,6 +100,11 @@
   display: flex;
   align-items: center;
   gap: 1.625rem;                    // 26px — de Figma entre links
+
+  // Hidden on mobile — bottom bar takes over
+  @include respond-to(md) {
+    display: none;
+  }
 }
 
 // ─── Nav link ─────────────────────────────────────────────────────────────────
@@ -283,6 +293,79 @@
 
 .line {
   color: $color-border;
+}
+
+
+// ══════════════════════════════════════════════════════════════════════════════
+// MOBILE BOTTOM TAB BAR
+// ══════════════════════════════════════════════════════════════════════════════
+
+.bottomBar {
+  display: none; // Hidden on desktop
+
+  @include respond-to(md) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: $z-nav;
+
+    padding: 0.5rem 0.75rem;
+    padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));
+    background: rgba(16, 16, 14, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid $color-border;
+  }
+}
+
+.bottomTab {
+  font-family: $font-mono;
+  font-size: 10px;
+  font-weight: $fw-regular;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  text-decoration: none;
+
+  color: $color-text-mid;
+  padding: 0.375rem 0.75rem;
+  border-radius: 100px; // pill shape
+  transition:
+    color      $duration-fast $ease-out-quart,
+    background $duration-fast $ease-out-quart;
+
+  &:hover {
+    color: $color-text;
+  }
+}
+
+.bottomTabActive {
+  color: $color-bg;
+  background: #c6dbf9;
+}
+
+// Light variant for bottom bar
+.bottomBarLight {
+  background: rgba(252, 252, 247, 0.85);
+  border-top-color: rgba(16, 16, 14, 0.1);
+
+  .bottomTab {
+    color: rgba(16, 16, 14, 0.5);
+
+    &:hover {
+      color: #10100e;
+    }
+  }
+
+  .bottomTabActive {
+    color: $color-bg;
+    background: #c6dbf9;
+  }
 }
 
 

@@ -48,6 +48,14 @@ html.lenis, html.lenis body {
   overflow: hidden;
 }
 
+// ─── Mobile bottom bar spacing ─────────────────────────────────────────────
+// Ensure content isn't hidden behind the fixed bottom tab bar on mobile
+@include respond-to(md) {
+  body {
+    padding-bottom: calc(3.25rem + env(safe-area-inset-bottom));
+  }
+}
+
 // ─── Utility ──────────────────────────────────────────────────────────────────
 .visually-hidden {
   @include visually-hidden;

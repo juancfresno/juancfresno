@@ -1,44 +1,15 @@
 @use '../../../styles/variables' as *;
 @use '../../../styles/mixins' as *;
 
-// ─── Hero intro — text + poster image ────────────────────────────────────────
-.hero {
-  position: relative;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 2rem;
-}
-
-// ─── Left text column ─────────────────────────────────────────────────────────
-.textCol {
+// ── Hero intro — text only (image is in HomeContent) ─────────────────────────
+.intro {
   display: flex;
   flex-direction: column;
-  max-width: 65%;
-
-  @include respond-to(md) {
-    max-width: 100%;
-  }
+  gap: 0.5rem; // 8px between lines (from Figma gap-[8px])
+  max-width: 860px; // from Figma w-[860px]
 }
 
-// ─── Right image column ──────────────────────────────────────────────────────
-.imageCol {
-  flex-shrink: 0;
-  align-self: flex-start;
-
-  @include respond-to(md) {
-    display: none; // hide poster on small screens
-  }
-}
-
-.posterImg {
-  width: clamp(200px, 21.3vw, 358px);
-  height: auto;
-  object-fit: cover;
-  display: block;
-}
-
-// ─── Character spans (name) ──────────────────────────────────────────────────
+// ── Character spans (name) ───────────────────────────────────────────────────
 .char {
   display: inline-block;
   opacity: 0;
@@ -50,7 +21,7 @@
     transform 0.5s $ease-out-quart;
 }
 
-// ─── Word spans (subtitle + year) ────────────────────────────────────────────
+// ── Word spans (subtitle + year) ─────────────────────────────────────────────
 .word {
   opacity: 0;
   filter: blur(4px);
@@ -59,7 +30,7 @@
     filter  0.45s $ease-out-quart;
 }
 
-// ─── Reveal state — triggered via JS className toggle ────────────────────────
+// ── Reveal state ─────────────────────────────────────────────────────────────
 .revealed {
   .char {
     opacity: 1;
@@ -72,14 +43,14 @@
   }
 }
 
-// ─── Typography — matching Figma spec ────────────────────────────────────────
+// ── Typography ───────────────────────────────────────────────────────────────
 .name {
   font-family: $font-sans;
-  font-size: 1rem;              // 16px
+  font-size: 1rem;
   font-weight: $fw-regular;
   line-height: 1.5;
-  color: $color-text;
-  margin-bottom: 0.25rem;       // 4px
+  color: white;
+  opacity: 0.9;
 }
 
 .subtitle {
@@ -88,15 +59,15 @@
   font-weight: $fw-light;
   line-height: 1.5;
   color: #ddedff;
-  margin-bottom: 0.5rem;        // 8px
+  opacity: 0.9;
 }
 
 .year {
   font-family: $font-mono;
-  font-size: 0.6875rem;         // 11px
+  font-size: 0.6875rem;
   font-weight: $fw-regular;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: #ddedff;
-  opacity: 0.7;
+  opacity: 0.9;
 }

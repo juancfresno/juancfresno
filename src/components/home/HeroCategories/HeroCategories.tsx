@@ -96,8 +96,13 @@ function ScrambleCategory({
   )
 }
 
+// ─── Props ────────────────────────────────────────────────────────────────────
+interface HeroCategoriesProps {
+  onCategoryHover?: (index: number | null) => void
+}
+
 // ─── Component ───────────────────────────────────────────────────────────────
-export default function HeroCategories() {
+export default function HeroCategories({ onCategoryHover }: HeroCategoriesProps) {
   const [revealed, setRevealed] = useState(false)
 
   // ── Reveal after HeroIntro finishes (~3.5s from page load) ─────────────────
@@ -110,7 +115,12 @@ export default function HeroCategories() {
     <section className={s.section}>
       <p className={s.categories}>
         {CATEGORIES.map((cat, i) => (
-          <span key={cat} className={s.catWrap}>
+          <span
+            key={cat}
+            className={s.catWrap}
+            onMouseEnter={() => onCategoryHover?.(i)}
+            onMouseLeave={() => onCategoryHover?.(null)}
+          >
             {i > 0 && (
               <span
                 className={`${s.dash} ${revealed ? s.dashVisible : ''}`}
