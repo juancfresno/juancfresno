@@ -18,9 +18,12 @@ const CATEGORY_IMAGES = [
   '/images/carousel-6.jpg', // Develop
 ]
 
-// ─── Mouse parallax hook ──────────────────────────────────────────────────────
-// Sets --mx and --my CSS custom properties on the target element.
-// The parallax wrapper reads these to smoothly follow the cursor.
+// ─── Edge distortion threshold (fraction from edge where effect activates) ──
+const EDGE_ZONE = 0.15 // 15% from each edge
+
+// ─── Mouse parallax + edge distortion hook ──────────────────────────────────
+// Sets --mx, --my (parallax), --edge-x, --edge-y (edge proximity 0→1),
+// and --edge-active (0 or 1) CSS custom properties.
 function useMouseParallax(
   ref: React.RefObject<HTMLElement | null>,
   strength = 15,
@@ -35,10 +38,24 @@ function useMouseParallax(
       if (rafRef.current) cancelAnimationFrame(rafRef.current)
       rafRef.current = requestAnimationFrame(() => {
         const rect = el.getBoundingClientRect()
-        const x = ((e.clientX - rect.left) / rect.width - 0.5) * 2
-        const y = ((e.clientY - rect.top) / rect.height - 0.5) * 2
+        const nx = (e.clientX - rect.left) / rect.width   // 0 → 1
+        const ny = (e.clientY - rect.top) / rect.height    // 0 → 1
+        const x = (nx - 0.5) * 2  // -1 → 1
+        const y = (ny - 0.5) * 2
+
+        // Parallax
         el.style.setProperty('--mx', `${x * strength}px`)
         el.style.setProperty('--my', `${y * strength}px`)
+
+        // Edge proximity: 0 at center → 1 at very edge
+        const edgeX = Math.max(0, Math.max((EDGE_ZONE - nx) / EDGE_ZONE, (nx - (1 - EDGE_ZONE)) / EDGE_ZONE))
+        const edgeY = Math.max(0, Math.max((EDGE_ZONE - ny) / EDGE_ZONE, (ny - (1 - EDGE_ZONE)) / EDGE_ZONE))
+        const edgeStrength = Math.min(1, Math.max(edgeX, edgeY))
+
+        el.style.setProperty('--edge-x', edgeX.toFixed(3))
+        el.style.setProperty('--edge-y', edgeY.toFixed(3))
+        el.style.setProperty('--edge-active', edgeStrength > 0 ? '1' : '0')
+        el.style.setProperty('--edge-strength', edgeStrength.toFixed(3))
       })
     }
 
@@ -47,6 +64,10 @@ function useMouseParallax(
       rafRef.current = requestAnimationFrame(() => {
         el.style.setProperty('--mx', '0px')
         el.style.setProperty('--my', '0px')
+        el.style.setProperty('--edge-x', '0')
+        el.style.setProperty('--edge-y', '0')
+        el.style.setProperty('--edge-active', '0')
+        el.style.setProperty('--edge-strength', '0')
       })
     }
 
@@ -154,6 +175,9 @@ export default function HomeContent({ feedItems }: { feedItems: FeedItem[] }) {
 
               {/* Scanlines — subtle CRT overlay */}
               <div className={s.scanlines} aria-hidden="true" />
+
+              {/* Edge distortion — noise/grain intensifies near edges */}
+              <div className={s.edgeDistortion} aria-hidden="true" />
             </div>
           </div>
         </div>

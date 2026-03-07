@@ -49,6 +49,10 @@
   border-radius: 2px;
   --mx: 0px;
   --my: 0px;
+  --edge-x: 0;
+  --edge-y: 0;
+  --edge-active: 0;
+  --edge-strength: 0;
 
   @include respond-to(lg) {
     display: none;
@@ -101,7 +105,7 @@
   opacity: 1;
 }
 
-// ── Scanlines — subtle CRT effect ──────────────────────────────────────────
+// ── Scanlines — subtle CRT effect, intensifies near edges ───────────────────
 .scanlines {
   position: absolute;
   inset: 0;
@@ -114,8 +118,39 @@
     rgba(0, 0, 0, 0.03) 2px,
     rgba(0, 0, 0, 0.03) 4px
   );
-  opacity: 0;
-  transition: opacity 0.3s;
+  // Edge proximity amplifies scanlines: 0 at center → 0.5 near edges
+  opacity: calc(var(--edge-strength) * 0.5);
+  transition: opacity 0.15s linear;
+}
+
+// ── Edge distortion — noise/chromatic aberration near borders ────────────────
+.edgeDistortion {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 6;
+  // Radial vignette that darkens edges
+  background: radial-gradient(
+    ellipse at center,
+    transparent 50%,
+    rgba(0, 0, 0, 0.4) 100%
+  );
+  // Only visible when mouse is near edges
+  opacity: calc(var(--edge-strength) * 0.7);
+  transition: opacity 0.15s linear;
+
+  // Chromatic aberration shimmer via box-shadow insets
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 2px solid transparent;
+    // RGB edge glow — red on one side, cyan on other
+    box-shadow:
+      inset calc(var(--edge-x) * 4px) 0 8px rgba(255, 0, 60, calc(var(--edge-strength) * 0.35)),
+      inset calc(var(--edge-x) * -4px) 0 8px rgba(0, 200, 255, calc(var(--edge-strength) * 0.35));
+    transition: box-shadow 0.1s linear;
+  }
 }
 
 
