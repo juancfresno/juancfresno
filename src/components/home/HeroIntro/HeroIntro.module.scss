@@ -55,9 +55,10 @@
   font-size: 1rem;
   font-weight: $fw-regular;
   line-height: 1.5;
-  color: white;
+  color: var(--hero-name-color, white);
   opacity: 0.9;
   cursor: default;
+  transition: color 0.3s $ease-out-quart;
 }
 
 .subtitle {
@@ -65,9 +66,10 @@
   font-size: 1rem;
   font-weight: $fw-light;
   line-height: 1.5;
-  color: #ddedff;
+  color: var(--hero-text-color, #ddedff);
   opacity: 0.9;
   cursor: default;
+  transition: color 0.3s $ease-out-quart;
 }
 
 .year {
@@ -76,8 +78,9 @@
   font-weight: $fw-regular;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: #ddedff;
+  color: var(--hero-text-color, #ddedff);
   opacity: 0.9;
+  transition: color 0.3s $ease-out-quart;
 }
 
 

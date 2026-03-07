@@ -206,6 +206,75 @@
 
 
 // ═══════════════════════════════════════════════════════════════════════════════
+// COLOR DOTS — theme switcher with pixel expansion
+// ═══════════════════════════════════════════════════════════════════════════════
+
+.colorDots {
+  display: flex;
+  gap: 0.5rem; // 8px between dots
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
+.colorDot {
+  width: 8px;
+  height: 8px;
+  border: none;
+  padding: 0;
+  background: var(--dot-color);
+  cursor: pointer;
+  transition:
+    width   0.35s $ease-out-quart,
+    opacity 0.3s  $ease-out-quart;
+  opacity: 0.7;
+  flex-shrink: 0;
+
+  &:hover {
+    width: 16px;
+    opacity: 1;
+  }
+
+  // Active state — stays expanded
+  &.colorDotActive {
+    width: 16px;
+    opacity: 1;
+  }
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// PIXEL CANVAS — fullscreen overlay for the pixel expansion effect
+// ═══════════════════════════════════════════════════════════════════════════════
+
+.pixelCanvas {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: $z-overlay;
+  pointer-events: none;
+  display: block;
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// THEMED STATE — inverted colors when a color dot is active
+// ═══════════════════════════════════════════════════════════════════════════════
+
+.themed {
+  background-color: var(--theme-bg);
+  transition: background-color 0s; // instant — canvas handles the visual transition
+
+  // Invert all text to dark for readability on light bg
+  color: var(--theme-text);
+
+  // Override text colors in child components via CSS custom properties
+  --hero-name-color: var(--theme-text);
+  --hero-text-color: var(--theme-text);
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // FEED WRAPPER — breaks out of page padding for full-width carousel
 // ═══════════════════════════════════════════════════════════════════════════════
 

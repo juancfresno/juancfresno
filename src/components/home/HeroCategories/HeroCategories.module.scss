@@ -14,8 +14,9 @@
   font-weight: $fw-regular;
   line-height: 1.2;
   letter-spacing: -0.02em;
-  color: #ddedff;
+  color: var(--hero-text-color, #ddedff);
   opacity: 0.9;
+  transition: color 0.3s $ease-out-quart;
 }
 
 // ─── Category wrapper (keeps dash + word inline) ─────────────────────────────
