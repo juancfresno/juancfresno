@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback, type MouseEvent as ReactMouseEvent } from 'react'
+import { createPortal } from 'react-dom'
 import Image from 'next/image'
 import HeroIntro from '@/components/home/HeroIntro/HeroIntro'
 import HeroCategories from '@/components/home/HeroCategories/HeroCategories'
@@ -19,7 +20,9 @@ const CATEGORY_IMAGES = [
 ]
 
 // ─── Color dot themes ───────────────────────────────────────────────────────
+// Dot 0 = default dark, Dot 1 = light blue, Dot 2 = mint green
 const COLOR_DOTS = [
+  { color: '#10100e', textColor: '#fcfcf7' },  // Default dark
   { color: '#C6DBF9', textColor: '#10100e' },  // Light blue
   { color: '#8DF8CD', textColor: '#10100e' },  // Mint green
 ] as const
@@ -132,7 +135,8 @@ export default function HomeContent({ feedItems }: { feedItems: FeedItem[] }) {
   const [hoveredCat, setHoveredCat] = useState<number | null>(null)
   const [displayedImg, setDisplayedImg] = useState<string | null>(null)
   const [isGlitching, setIsGlitching] = useState(false)
-  const [activeTheme, setActiveTheme] = useState<number | null>(null) // index into COLOR_DOTS or null
+  const [activeTheme, setActiveTheme] = useState<number | null>(null) // null = default dark (dot 0)
+  const [mounted, setMounted] = useState(false)
   const mediaRef = useRef<HTMLDivElement>(null)
   const prevImgRef = useRef<string | null>(null)
   const swapTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
@@ -140,6 +144,9 @@ export default function HomeContent({ feedItems }: { feedItems: FeedItem[] }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const busyRef = useRef(false)
   const rafRef2 = useRef<number>(undefined)
+
+  // Mount flag for portal
+  useEffect(() => setMounted(true), [])
 
   // Parallax effect on the media column
   useMouseParallax(mediaRef)
@@ -201,10 +208,40 @@ export default function HomeContent({ feedItems }: { feedItems: FeedItem[] }) {
     []
   )
 
+  // ── Sync theme to body bg + html data attribute for Nav/Footer ───────────
+  useEffect(() => {
+    const isLight = activeTheme !== null && activeTheme > 0
+    const dot = activeTheme !== null ? COLOR_DOTS[activeTheme] : COLOR_DOTS[0]
+
+    // Body bg covers full viewport (including behind footer)
+    document.body.style.backgroundColor = dot.color
+    document.body.style.transition = 'background-color 0s'
+
+    // Data attribute drives Nav/Footer CSS inversion
+    if (isLight) {
+      document.documentElement.dataset.homeTheme = 'light'
+    } else {
+      delete document.documentElement.dataset.homeTheme
+    }
+
+    return () => {
+      document.body.style.backgroundColor = ''
+      document.body.style.transition = ''
+      delete document.documentElement.dataset.homeTheme
+    }
+  }, [activeTheme])
+
   // ── Handle dot click → pixel expand from dot, switch theme ────────────────
   const handleDotClick = useCallback(
     async (dotIndex: number, e: ReactMouseEvent<HTMLButtonElement>) => {
       if (busyRef.current) return
+
+      // Clicking dark dot when already in default → nothing
+      if (dotIndex === 0 && activeTheme === null) return
+
+      // Determine if we're collapsing back to dark
+      const isCollapsing = dotIndex === 0 || activeTheme === dotIndex
+
       busyRef.current = true
 
       const cvs = canvasRef.current
@@ -223,24 +260,22 @@ export default function HomeContent({ feedItems }: { feedItems: FeedItem[] }) {
       const originX = rect.left + rect.width / 2
       const originY = rect.top + rect.height / 2
 
-      if (activeTheme === dotIndex) {
-        // Same dot → collapse back to default (dark theme)
+      if (isCollapsing) {
+        // Collapse back to default dark — fill canvas with current color, then clear
         const cells = getCellsFromPoint(W, H, originX, originY)
-        // First fill with current color, then clear
-        ctx.fillStyle = COLOR_DOTS[dotIndex].color
+        const currentColor = activeTheme !== null ? COLOR_DOTS[activeTheme].color : COLOR_DOTS[0].color
+        ctx.fillStyle = currentColor
         ctx.fillRect(0, 0, W, H)
         setActiveTheme(null)
         await animatePixels(ctx, shuffle(cells), COLLAPSE_MS, 'clear', '')
         cvs.style.pointerEvents = 'none'
       } else {
-        // New dot → expand with new color
+        // Expand with new color
         const cells = getCellsFromPoint(W, H, originX, originY)
         const { color } = COLOR_DOTS[dotIndex]
         await animatePixels(ctx, cells, EXPAND_MS, 'fill', color)
         setActiveTheme(dotIndex)
-        // Keep canvas filled — it's the new bg
-        // After state update, the CSS theme class handles the actual bg,
-        // so we can clear the canvas
+        // Brief pause to let React re-render (theme class + body bg)
         await new Promise(r => setTimeout(r, 60))
         ctx.clearRect(0, 0, W, H)
         cvs.style.pointerEvents = 'none'
@@ -295,90 +330,106 @@ export default function HomeContent({ feedItems }: { feedItems: FeedItem[] }) {
 
   const showVideo = hoveredCat === null
 
-  // Active theme class + CSS custom properties for color inversion
-  const themeClass = activeTheme !== null ? s.themed : ''
-  const themeStyle = activeTheme !== null
+  // Light theme active (not default dark)
+  const isLightTheme = activeTheme !== null && activeTheme > 0
+  const themeClass = isLightTheme ? s.themed : ''
+  const themeStyle = isLightTheme
     ? {
         '--theme-bg': COLOR_DOTS[activeTheme].color,
         '--theme-text': COLOR_DOTS[activeTheme].textColor,
       } as React.CSSProperties
     : undefined
 
+  // Active dot: dot 0 is active when no theme (default dark)
+  const activeDotIndex = activeTheme ?? 0
+
+  // Border color for active dot — must contrast with current background
+  const dotBorderColor = isLightTheme ? COLOR_DOTS[activeTheme].textColor : '#fcfcf7'
+
   return (
-    <div className={`${s.homePage} ${themeClass}`} style={themeStyle}>
-      {/* ── Hero: 50 / 50 grid ──────────────────────────────── */}
-      <div className={s.heroGrid}>
-        {/* Left — text content */}
-        <div className={s.textCol}>
-          <HeroIntro />
-          <HeroCategories onCategoryHover={handleCategoryHover} />
+    <>
+      <div className={`${s.homePage} ${themeClass}`} style={themeStyle}>
+        {/* ── Hero: 50 / 50 grid ──────────────────────────────── */}
+        <div className={s.heroGrid}>
+          {/* Left — text content */}
+          <div className={s.textCol}>
+            <HeroIntro />
+            <HeroCategories onCategoryHover={handleCategoryHover} />
 
-          {/* ── Color dots ── */}
-          <div className={s.colorDots}>
-            {COLOR_DOTS.map((dot, i) => (
-              <button
-                key={dot.color}
-                className={`${s.colorDot} ${activeTheme === i ? s.colorDotActive : ''}`}
-                style={{ '--dot-color': dot.color } as React.CSSProperties}
-                onClick={(e) => handleDotClick(i, e)}
-                aria-label={`Switch to ${dot.color} theme`}
-              />
-            ))}
+            {/* ── Color dots ── */}
+            <div className={s.colorDots}>
+              {COLOR_DOTS.map((dot, i) => (
+                <button
+                  key={dot.color}
+                  className={`${s.colorDot} ${activeDotIndex === i ? s.colorDotActive : ''}`}
+                  style={{
+                    '--dot-color': dot.color,
+                    '--dot-border': dotBorderColor,
+                  } as React.CSSProperties}
+                  onClick={(e) => handleDotClick(i, e)}
+                  aria-label={`Switch to ${dot.color} theme`}
+                />
+              ))}
+            </div>
           </div>
-        </div>
 
-        {/* Right — media (video default / category images on hover) */}
-        <div className={s.mediaCol} ref={mediaRef}>
-          <div className={s.mediaParallax}>
-            <div
-              className={`${s.mediaFrame} ${isGlitching ? s.glitching : ''}`}
-            >
-              {/* Default state: video showreel (poster fallback if no .mp4) */}
-              <video
-                className={`${s.video} ${showVideo ? s.visible : ''}`}
-                src="/videos/hero-reel.mp4"
-                poster="/images/hero-poster.jpg"
-                autoPlay
-                loop
-                muted
-                playsInline
-              />
+          {/* Right — media (video default / category images on hover) */}
+          <div className={s.mediaCol} ref={mediaRef}>
+            <div className={s.mediaParallax}>
+              <div
+                className={`${s.mediaFrame} ${isGlitching ? s.glitching : ''}`}
+              >
+                {/* Default state: video showreel (poster fallback if no .mp4) */}
+                <video
+                  className={`${s.video} ${showVideo ? s.visible : ''}`}
+                  src="/videos/hero-reel.mp4"
+                  poster="/images/hero-poster.jpg"
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                />
 
-              {/* Hovered category image */}
-              {displayedImg && (
-                <div className={`${s.imgWrap} ${!showVideo ? s.visible : ''}`}>
-                  <Image
-                    src={displayedImg}
-                    alt="Selected category"
-                    fill
-                    sizes="50vw"
-                    className={s.img}
-                    priority
-                  />
-                </div>
-              )}
+                {/* Hovered category image */}
+                {displayedImg && (
+                  <div className={`${s.imgWrap} ${!showVideo ? s.visible : ''}`}>
+                    <Image
+                      src={displayedImg}
+                      alt="Selected category"
+                      fill
+                      sizes="50vw"
+                      className={s.img}
+                      priority
+                    />
+                  </div>
+                )}
 
-              {/* Scanlines — subtle CRT overlay */}
-              <div className={s.scanlines} aria-hidden="true" />
+                {/* Scanlines — subtle CRT overlay */}
+                <div className={s.scanlines} aria-hidden="true" />
 
-              {/* Edge distortion — noise/grain intensifies near edges */}
-              <div className={s.edgeDistortion} aria-hidden="true" />
+                {/* Edge distortion — noise/grain intensifies near edges */}
+                <div className={s.edgeDistortion} aria-hidden="true" />
+              </div>
             </div>
           </div>
         </div>
+
+        {/* ── Dribbble carousel — full width, pushed to bottom ── */}
+        <div className={s.feedWrap}>
+          <SocialFeed items={feedItems} />
+        </div>
       </div>
 
-      {/* ── Dribbble carousel — full width, pushed to bottom ── */}
-      <div className={s.feedWrap}>
-        <SocialFeed items={feedItems} />
-      </div>
-
-      {/* ── Pixel expansion canvas (sits on top during transition) ── */}
-      <canvas
-        ref={canvasRef}
-        aria-hidden="true"
-        className={s.pixelCanvas}
-      />
-    </div>
+      {/* ── Pixel canvas — portaled to body for correct z-stacking ── */}
+      {/* Must be BEHIND content (z-index: 5) but ABOVE body bg */}
+      {mounted && createPortal(
+        <canvas
+          ref={canvasRef}
+          aria-hidden="true"
+          className={s.pixelCanvas}
+        />,
+        document.body
+      )}
+    </>
   )
 }

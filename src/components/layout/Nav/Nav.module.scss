@@ -396,6 +396,38 @@
 
 
 // ══════════════════════════════════════════════════════════════════════════════
+// HOME THEME VARIANT — when a light color dot is active on the home page
+// Uses html[data-home-theme] set by HomeContent via JS
+// ══════════════════════════════════════════════════════════════════════════════
+
+:global(html[data-home-theme="light"]) {
+  .navLink {
+    color: rgba(16, 16, 14, 0.55);
+  }
+
+  .glMain { color: $color-bg; }
+
+  .faceGlitchWrap { filter: brightness(0.08); }
+
+  .line { color: rgba(16, 16, 14, 0.12); }
+
+  // Mobile bottom bar
+  .bottomBar {
+    background: rgba(252, 252, 247, 0.85);
+    border-top-color: rgba(16, 16, 14, 0.1);
+  }
+
+  .bottomTab {
+    color: rgba(16, 16, 14, 0.5);
+
+    &:hover {
+      color: #10100e;
+    }
+  }
+}
+
+
+// ══════════════════════════════════════════════════════════════════════════════
 // VHS GLITCH KEYFRAMES
 // ══════════════════════════════════════════════════════════════════════════════
 

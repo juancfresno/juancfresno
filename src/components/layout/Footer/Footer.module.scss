@@ -4,6 +4,8 @@
 // ─── Footer wrapper ───────────────────────────────────────────────────────────
 .footer {
   width: 100%;
+  position: relative;
+  z-index: 10; // Above pixel canvas (z-index: 5)
 }
 
 // ── Home page: footer sticks to bottom, no extra scroll ─────────────────────
@@ -230,6 +232,34 @@
   }
 
   // LiveClock
+  .metaRight time {
+    color: rgba(16, 16, 14, 0.55);
+  }
+}
+
+
+// ══════════════════════════════════════════════════════════════════════════════
+// HOME THEME VARIANT — when a light color dot is active on the home page
+// Uses html[data-home-theme] set by HomeContent via JS
+// ══════════════════════════════════════════════════════════════════════════════
+
+:global(html[data-home-theme="light"]) {
+  .socialLink {
+    color: $color-bg;
+  }
+
+  .line {
+    color: rgba(16, 16, 14, 0.12);
+  }
+
+  .copyright {
+    color: $color-bg;
+  }
+
+  .location {
+    color: rgba(16, 16, 14, 0.55);
+  }
+
   .metaRight time {
     color: rgba(16, 16, 14, 0.55);
   }

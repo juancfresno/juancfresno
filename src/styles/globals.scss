@@ -56,6 +56,12 @@ html.lenis, html.lenis body {
   }
 }
 
+// ─── Main content — above pixel canvas (z-index: 5) ─────────────────────────
+main {
+  position: relative;
+  z-index: 10;
+}
+
 // ─── Utility ──────────────────────────────────────────────────────────────────
 .visually-hidden {
   @include visually-hidden;
