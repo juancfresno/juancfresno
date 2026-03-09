@@ -19,6 +19,62 @@ const BIO_DARK =
 const FULL_BIO_LEN = BIO_BRIGHT.length + BIO_MEDIUM.length + BIO_DARK.length
 
 // =============================================================================
+// Scramble text hook (glitch effect — same as Nav)
+// =============================================================================
+const SCRAMBLE_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%?'
+
+function useScramble(text: string, active: boolean): string {
+  const [display, setDisplay] = useState(text)
+  const rafRef = useRef<number>(undefined)
+  const t0Ref = useRef<number | null>(null)
+
+  useEffect(() => {
+    if (!active) {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current)
+      t0Ref.current = null
+      setDisplay(text)
+      return
+    }
+
+    const DURATION = 420
+
+    const frame = (ts: number) => {
+      if (!t0Ref.current) t0Ref.current = ts
+      const elapsed = ts - t0Ref.current
+      const progress = Math.min(elapsed / DURATION, 1)
+      const resolved = Math.floor(progress * text.length)
+
+      setDisplay(
+        text
+          .split('')
+          .map((ch, i) => {
+            if (ch === ' ') return ' '
+            if (i < resolved) return ch
+            return SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)]
+          })
+          .join('')
+      )
+
+      if (progress < 1) {
+        rafRef.current = requestAnimationFrame(frame)
+      } else {
+        setDisplay(text)
+        t0Ref.current = null
+      }
+    }
+
+    t0Ref.current = null
+    rafRef.current = requestAnimationFrame(frame)
+
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current)
+    }
+  }, [active, text])
+
+  return display
+}
+
+// =============================================================================
 // Reusable scroll-reveal wrapper
 // =============================================================================
 function Reveal({
@@ -102,25 +158,21 @@ const SERVICES = [
     title: 'Direccion Creativa & Arte',
     desc: 'Defino la direccion visual de marcas y productos digitales, estableciendo un criterio claro y coherente desde el concepto hasta la ejecucion.',
     tags: 'Art direction \u00b7 Visual direction \u00b7 Concept development \u00b7 Visual systems \u00b7 Creative guidance',
-    tagColor: '#ddedff',
   },
   {
     title: 'Producto Digital',
     desc: 'Diseno productos y experiencias digitales claras, funcionales y bien pensadas, cuidando tanto la estructura como la interaccion y el detalle visual.',
     tags: 'UI design \u00b7 Interaction design \u00b7 Product thinking \u00b7 Prototyping \u00b7 User flows \u00b7 Design systems',
-    tagColor: '#8df8cd',
   },
   {
     title: 'Branding',
     desc: 'Creo y desarrollo identidades visuales solidas que funcionan en contextos digitales y se adaptan a distintos formatos y necesidades.',
     tags: 'Brand identity \u00b7 Rebranding \u00b7 Logo design \u00b7 Visual identity \u00b7 Brand systems \u00b7 Guidelines',
-    tagColor: '#ddedff',
   },
   {
     title: 'Desarrollo web',
     desc: 'Desarrollo webs funcionales y bien ejecutadas, colaborando con perfiles tecnicos para llevar el diseno a produccion con fidelidad y calidad.',
     tags: 'Frontend collaboration \u00b7 Web implementation \u00b7 Framer \u00b7 CMS \u00b7 Developer handoff \u00b7 QA visual',
-    tagColor: '#ddedff',
   },
 ]
 
@@ -158,6 +210,43 @@ function FresnoLogo({ className }: { className?: string }) {
         fill="currentColor"
       />
     </svg>
+  )
+}
+
+// =============================================================================
+// Service item with scramble title + green divider
+// =============================================================================
+function ServiceItem({
+  title,
+  desc,
+  tags,
+  onMouseEnter,
+}: {
+  title: string
+  desc: string
+  tags: string
+  onMouseEnter: () => void
+}) {
+  const [hovered, setHovered] = useState(false)
+  const scrambled = useScramble(title, hovered)
+
+  return (
+    <div
+      className={s.serviceItem}
+      onMouseEnter={() => {
+        setHovered(true)
+        onMouseEnter()
+      }}
+      onMouseLeave={() => setHovered(false)}
+    >
+      <h3 className={s.serviceTitle}>{scrambled}</h3>
+      <p className={s.serviceDesc}>{desc}</p>
+      <div className={s.serviceTags}>
+        <span className={s.serviceTagText}>{tags}</span>
+        <span className={s.serviceTagFill}>{tags}</span>
+      </div>
+      <div className={s.serviceDivider} />
+    </div>
   )
 }
 
@@ -392,18 +481,12 @@ export default function AboutContent() {
           >
             {SERVICES.map((srv, i) => (
               <Reveal key={i} delay={i * 60}>
-                <div
-                  className={s.serviceItem}
+                <ServiceItem
+                  title={srv.title}
+                  desc={srv.desc}
+                  tags={srv.tags}
                   onMouseEnter={() => handleServiceHover(i)}
-                >
-                  <h3 className={s.serviceTitle}>{srv.title}</h3>
-                  <p className={s.serviceDesc}>{srv.desc}</p>
-                  <div className={s.serviceTags} style={{ color: srv.tagColor }}>
-                    <span className={s.serviceTagText}>{srv.tags}</span>
-                    <span className={s.serviceTagFill}>{srv.tags}</span>
-                  </div>
-                  <ElasticLine className={s.divider} />
-                </div>
+                />
               </Reveal>
             ))}
           </div>
