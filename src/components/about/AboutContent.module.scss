@@ -553,6 +553,11 @@
   &.processItemIndented {
     padding-left: 1.5rem; // 24px
   }
+
+  // Hover indent — slides 50px to the right
+  &:hover {
+    padding-left: 3.125rem; // 50px
+  }
 }
 
 .processRow {
