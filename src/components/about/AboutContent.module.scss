@@ -116,6 +116,7 @@
 }
 
 .bioInner {
+  position: relative;
   // The radial gradient mask that follows the mouse
   --glow-x: 50%;
   --glow-y: 50%;
@@ -143,22 +144,61 @@
   color: #4d5257;
 }
 
-// Glow overlay — radial gradient that brightens nearby text
-.bioGlow {
+// ── Typewriter cursor ──
+.bioCursor {
+  display: inline-block;
+  width: 2px;
+  height: 1.1em;
+  vertical-align: text-bottom;
+  background: #c6dbf9;
+  margin-left: 1px;
+  animation: blink-cursor 0.6s step-end infinite;
+}
+
+@keyframes blink-cursor {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0; }
+}
+
+// ── Rest text fade-in ──
+.bioRestHidden {
+  opacity: 0;
+  transition: opacity 0.6s $ease-out-quart;
+}
+
+.bioRestVisible {
+  opacity: 1;
+  transition: opacity 0.6s $ease-out-quart;
+}
+
+// ── Glow overlay — text-masked radial gradient ──
+.bioTextGlow {
   position: absolute;
   inset: 0;
+  margin: 0;
   pointer-events: none;
+  font-family: $font-sans;
+  font-size: 1.75rem;
+  font-weight: $fw-regular;
+  line-height: 2.125rem;
+  letter-spacing: -0.56px;
+
+  // Paint gradient, clip to text shape
   background: radial-gradient(
     280px circle at var(--glow-x) var(--glow-y),
-    rgba(198, 219, 249, 0.2) 0%,
+    rgba(198, 219, 249, 0.45) 0%,
     transparent 100%
   );
-  mix-blend-mode: screen;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+
   opacity: 0;
   transition: opacity 0.3s ease;
 }
 
-.bioInner:hover .bioGlow {
+.bioInner:hover .bioTextGlow {
   opacity: 1;
 }
 

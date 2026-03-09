@@ -7,6 +7,16 @@ import ElasticLine from '@/components/ui/ElasticLine/ElasticLine'
 import s from './AboutContent.module.scss'
 
 // =============================================================================
+// Bio text constants (used for typewriter + glow overlay)
+// =============================================================================
+const BIO_BRIGHT =
+  'Desde 2012 trabajo de forma independiente como Art Director & Digital Designer, colaborando con marcas, agencias y equipos en proyectos digitales de distinta escala. '
+const BIO_MEDIUM =
+  'Trabajo desde Valencia, Espana, adaptandome a diferentes contextos, ritmos y formas de trabajo, tanto con clientes pequenos como con grandes organizaciones. '
+const BIO_DARK =
+  'Mi foco esta en definir lineas visuales claras, cuidar la interaccion y construir productos digitales que no solo se vean bien, sino que funcionen con sentido.'
+
+// =============================================================================
 // Reusable scroll-reveal wrapper
 // =============================================================================
 function Reveal({
@@ -153,9 +163,67 @@ function FresnoLogo({ className }: { className?: string }) {
 // Main Component
 // =============================================================================
 export default function AboutContent() {
-  // ---- Bio glow effect (mouse follow) ----
+  // ---- Bio: intersection observer (reuse bioRef) ----
   const bioRef = useRef<HTMLDivElement>(null)
+  const [bioInView, setBioInView] = useState(false)
 
+  useEffect(() => {
+    const el = bioRef.current
+    if (!el) return
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setBioInView(true)
+          observer.disconnect()
+        }
+      },
+      { threshold: 0.15 }
+    )
+
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+
+  // ---- Bio: typewriter ----
+  const [typedLength, setTypedLength] = useState(0)
+  const [typingDone, setTypingDone] = useState(false)
+  const [restVisible, setRestVisible] = useState(false)
+
+  useEffect(() => {
+    if (!bioInView || typingDone) return
+
+    const CHAR_MS = 22 // ms per character
+    let start: number | null = null
+    let raf: number
+
+    const frame = (ts: number) => {
+      if (!start) start = ts
+      const chars = Math.min(
+        Math.floor((ts - start) / CHAR_MS),
+        BIO_BRIGHT.length
+      )
+      setTypedLength(chars)
+
+      if (chars < BIO_BRIGHT.length) {
+        raf = requestAnimationFrame(frame)
+      } else {
+        setTypingDone(true)
+      }
+    }
+
+    raf = requestAnimationFrame(frame)
+    return () => cancelAnimationFrame(raf)
+  }, [bioInView, typingDone])
+
+  // Fade in rest after typing
+  useEffect(() => {
+    if (!typingDone) return
+    const timer = setTimeout(() => setRestVisible(true), 200)
+    return () => clearTimeout(timer)
+  }, [typingDone])
+
+  // ---- Bio glow effect (mouse follow) ----
   const handleBioMouseMove = useCallback((e: React.MouseEvent) => {
     const el = bioRef.current
     if (!el) return
@@ -248,36 +316,45 @@ export default function AboutContent() {
       <ElasticLine className={s.divider} />
 
       {/* ================================================================== */}
-      {/* 2. BIO TEXT with mouse-following glow                              */}
+      {/* 2. BIO TEXT — typewriter + text-masked glow                        */}
       {/* ================================================================== */}
-      <Reveal>
-        <section className={s.bio}>
-          <div
-            ref={bioRef}
-            className={s.bioInner}
-            onMouseMove={handleBioMouseMove}
-          >
-            <p className={s.bioText}>
-              <span className={s.bioBright}>
-                Desde 2012 trabajo de forma independiente como Art Director &amp;
-                Digital Designer, colaborando con marcas, agencias y equipos en
-                proyectos digitales de distinta escala.{' '}
-              </span>
-              <span className={s.bioMedium}>
-                Trabajo desde Valencia, Espana, adaptandome a diferentes contextos,
-                ritmos y formas de trabajo, tanto con clientes pequenos como con
-                grandes organizaciones.{' '}
-              </span>
-              <span className={s.bioDark}>
-                Mi foco esta en definir lineas visuales claras, cuidar la
-                interaccion y construir productos digitales que no solo se vean
-                bien, sino que funcionen con sentido.
-              </span>
+      <section className={s.bio}>
+        <div
+          ref={bioRef}
+          className={s.bioInner}
+          onMouseMove={handleBioMouseMove}
+        >
+          <p className={s.bioText}>
+            <span className={s.bioBright}>
+              {BIO_BRIGHT.substring(0, typedLength)}
+              {!typingDone && bioInView && <span className={s.bioCursor} />}
+            </span>
+            <span
+              className={`${s.bioMedium} ${
+                restVisible ? s.bioRestVisible : s.bioRestHidden
+              }`}
+            >
+              {BIO_MEDIUM}
+            </span>
+            <span
+              className={`${s.bioDark} ${
+                restVisible ? s.bioRestVisible : s.bioRestHidden
+              }`}
+            >
+              {BIO_DARK}
+            </span>
+          </p>
+
+          {/* Glow overlay — same text, gradient clipped to text shape */}
+          {restVisible && (
+            <p className={s.bioTextGlow} aria-hidden="true">
+              <span>{BIO_BRIGHT}</span>
+              <span>{BIO_MEDIUM}</span>
+              <span>{BIO_DARK}</span>
             </p>
-            <div className={s.bioGlow} />
-          </div>
-        </section>
-      </Reveal>
+          )}
+        </div>
+      </section>
 
       {/* ================================================================== */}
       {/* 3. SERVICES                                                       */}
