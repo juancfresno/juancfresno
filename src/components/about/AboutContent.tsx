@@ -360,6 +360,14 @@ export default function AboutContent() {
     return () => clearTimeout(timer)
   }, [typingDone])
 
+  // ---- Header: VHS glitch name + scramble role ----
+  const [nameHovered, setNameHovered] = useState(false)
+  const [roleHovered, setRoleHovered] = useState(false)
+  const scrambledRole = useScramble(
+    'Independent Designer \u2014 Art Direction, Brand, Interactive',
+    roleHovered
+  )
+
   // ---- Bio glow effect (mouse follow) ----
   const handleBioMouseMove = useCallback((e: React.MouseEvent) => {
     const el = bioRef.current
@@ -449,10 +457,36 @@ export default function AboutContent() {
       {/* ================================================================== */}
       <Reveal className={s.header}>
         <div className={s.headerLeft}>
-          <span className={s.headerName}>Juan C. Fresno</span>
-          <span className={s.headerRole}>
-            Independent Designer &mdash; Art Direction, Brand, Interactive
+          {/* Name: VHS glitch on hover (3-layer RGB split — same as Home) */}
+          <p
+            className={`${s.headerName} ${nameHovered ? s.nameGlitching : ''}`}
+            onMouseEnter={() => setNameHovered(true)}
+            onMouseLeave={() => setNameHovered(false)}
+          >
+            <span className={s.nameGlitchWrap}>
+              {/* Canal B — drifts left */}
+              <span className={`${s.nameGl} ${s.nameGlB}`} aria-hidden="true">
+                Juan C. Fresno
+              </span>
+              {/* Canal R — drifts right */}
+              <span className={`${s.nameGl} ${s.nameGlR}`} aria-hidden="true">
+                Juan C. Fresno
+              </span>
+              {/* Main layer */}
+              <span className={`${s.nameGl} ${s.nameGlMain}`}>
+                Juan C. Fresno
+              </span>
+            </span>
+          </p>
+          {/* Subtitle: scramble on hover */}
+          <span
+            className={s.headerRole}
+            onMouseEnter={() => setRoleHovered(true)}
+            onMouseLeave={() => setRoleHovered(false)}
+          >
+            {scrambledRole}
           </span>
+          <span className={s.headerYear}>2012 &mdash; 2026</span>
         </div>
         <div className={s.pixelFlip}>
           <PixelCharacter />
