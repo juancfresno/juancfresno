@@ -75,6 +75,52 @@ function useScramble(text: string, active: boolean): string {
 }
 
 // =============================================================================
+// Mouse parallax hook (cursor tracking — same principle as Home)
+// =============================================================================
+function useMouseParallax(
+  ref: React.RefObject<HTMLElement | null>,
+  strength = 12,
+) {
+  const rafRef = useRef(0)
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+
+    const handleMove = (e: MouseEvent) => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current)
+      rafRef.current = requestAnimationFrame(() => {
+        const rect = el.getBoundingClientRect()
+        const x = ((e.clientX - rect.left) / rect.width - 0.5) * 2
+        const y = ((e.clientY - rect.top) / rect.height - 0.5) * 2
+        el.style.setProperty('--mx', `${x * strength}px`)
+        el.style.setProperty('--my', `${y * strength}px`)
+      })
+    }
+
+    const handleLeave = () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current)
+      rafRef.current = requestAnimationFrame(() => {
+        el.style.setProperty('--mx', '0px')
+        el.style.setProperty('--my', '0px')
+      })
+    }
+
+    window.addEventListener('mousemove', handleMove)
+    el.addEventListener('mouseleave', handleLeave)
+
+    return () => {
+      window.removeEventListener('mousemove', handleMove)
+      el.removeEventListener('mouseleave', handleLeave)
+      if (rafRef.current) cancelAnimationFrame(rafRef.current)
+    }
+  }, [ref, strength])
+}
+
+// Color overlays per service (null = show image, string = solid color)
+const SERVICE_COLORS = [null, '#8df8cd', '#C6DBF9', '#ddedff'] as const
+
+// =============================================================================
 // Reusable scroll-reveal wrapper
 // =============================================================================
 function Reveal({
@@ -325,22 +371,14 @@ export default function AboutContent() {
     el.style.setProperty('--glow-y', `${y}px`)
   }, [])
 
-  // ---- Services hover (image pixelation) ----
+  // ---- Services hover + parallax ----
   const [activeService, setActiveService] = useState<number | null>(null)
-  const [imagePixelating, setImagePixelating] = useState(false)
-  const pixelTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const servicesMediaRef = useRef<HTMLDivElement>(null)
+  useMouseParallax(servicesMediaRef)
 
   const handleServiceHover = useCallback((index: number) => {
-    if (activeService !== null && activeService !== index) {
-      // Trigger pixelation effect
-      setImagePixelating(true)
-      if (pixelTimeoutRef.current) clearTimeout(pixelTimeoutRef.current)
-      pixelTimeoutRef.current = setTimeout(() => {
-        setImagePixelating(false)
-      }, 400)
-    }
     setActiveService(index)
-  }, [activeService])
+  }, [])
 
   const handleServiceLeave = useCallback(() => {
     setActiveService(null)
@@ -491,16 +529,33 @@ export default function AboutContent() {
             ))}
           </div>
 
-          {/* Right: image */}
+          {/* Right: image + color placeholders with cursor parallax */}
           <Reveal className={s.servicesImageWrap} delay={200}>
-            <Image
-              src="/images/about-services.jpg"
-              alt="Workspace"
-              width={565}
-              height={377}
-              className={`${s.servicesImage} ${imagePixelating ? s.servicesImagePixelating : ''}`}
-              priority
-            />
+            <div ref={servicesMediaRef} className={s.servicesMedia}>
+              <div className={s.servicesMediaParallax}>
+                <Image
+                  src="/images/about-services.jpg"
+                  alt="Workspace"
+                  width={565}
+                  height={377}
+                  className={s.servicesImage}
+                  priority
+                />
+                <div
+                  className={s.servicesColorOverlay}
+                  style={{
+                    backgroundColor:
+                      activeService !== null && SERVICE_COLORS[activeService]
+                        ? (SERVICE_COLORS[activeService] as string)
+                        : undefined,
+                    opacity:
+                      activeService !== null && SERVICE_COLORS[activeService]
+                        ? 1
+                        : 0,
+                  }}
+                />
+              </div>
+            </div>
           </Reveal>
         </div>
       </section>
