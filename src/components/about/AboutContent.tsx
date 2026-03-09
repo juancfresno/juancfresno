@@ -16,6 +16,8 @@ const BIO_MEDIUM =
 const BIO_DARK =
   'Mi foco esta en definir lineas visuales claras, cuidar la interaccion y construir productos digitales que no solo se vean bien, sino que funcionen con sentido.'
 
+const FULL_BIO_LEN = BIO_BRIGHT.length + BIO_MEDIUM.length + BIO_DARK.length
+
 // =============================================================================
 // Reusable scroll-reveal wrapper
 // =============================================================================
@@ -193,7 +195,7 @@ export default function AboutContent() {
   useEffect(() => {
     if (!bioInView || typingDone) return
 
-    const CHAR_MS = 22 // ms per character
+    const CHAR_MS = 14 // ms per character
     let start: number | null = null
     let raf: number
 
@@ -201,11 +203,11 @@ export default function AboutContent() {
       if (!start) start = ts
       const chars = Math.min(
         Math.floor((ts - start) / CHAR_MS),
-        BIO_BRIGHT.length
+        FULL_BIO_LEN
       )
       setTypedLength(chars)
 
-      if (chars < BIO_BRIGHT.length) {
+      if (chars < FULL_BIO_LEN) {
         raf = requestAnimationFrame(frame)
       } else {
         setTypingDone(true)
@@ -296,6 +298,23 @@ export default function AboutContent() {
     threshold: 0.2,
   })
 
+  // ---- Bio typewriter: per-span visible chars ----
+  const brightChars = Math.min(typedLength, BIO_BRIGHT.length)
+  const mediumChars = Math.min(
+    Math.max(typedLength - BIO_BRIGHT.length, 0),
+    BIO_MEDIUM.length
+  )
+  const darkChars = Math.min(
+    Math.max(typedLength - BIO_BRIGHT.length - BIO_MEDIUM.length, 0),
+    BIO_DARK.length
+  )
+  const cursorSpan =
+    typedLength <= BIO_BRIGHT.length
+      ? 'bright'
+      : typedLength <= BIO_BRIGHT.length + BIO_MEDIUM.length
+        ? 'medium'
+        : 'dark'
+
   return (
     <div className={s.page}>
       {/* ================================================================== */}
@@ -326,22 +345,22 @@ export default function AboutContent() {
         >
           <p className={s.bioText}>
             <span className={s.bioBright}>
-              {BIO_BRIGHT.substring(0, typedLength)}
-              {!typingDone && bioInView && <span className={s.bioCursor} />}
+              {BIO_BRIGHT.substring(0, brightChars)}
+              {!typingDone && bioInView && cursorSpan === 'bright' && (
+                <span className={s.bioCursor} />
+              )}
             </span>
-            <span
-              className={`${s.bioMedium} ${
-                restVisible ? s.bioRestVisible : s.bioRestHidden
-              }`}
-            >
-              {BIO_MEDIUM}
+            <span className={s.bioMedium}>
+              {BIO_MEDIUM.substring(0, mediumChars)}
+              {!typingDone && bioInView && cursorSpan === 'medium' && (
+                <span className={s.bioCursor} />
+              )}
             </span>
-            <span
-              className={`${s.bioDark} ${
-                restVisible ? s.bioRestVisible : s.bioRestHidden
-              }`}
-            >
-              {BIO_DARK}
+            <span className={s.bioDark}>
+              {BIO_DARK.substring(0, darkChars)}
+              {!typingDone && bioInView && cursorSpan === 'dark' && (
+                <span className={s.bioCursor} />
+              )}
             </span>
           </p>
 
@@ -356,6 +375,7 @@ export default function AboutContent() {
         </div>
       </section>
 
+      <div className={`${s.afterBio} ${typingDone ? s.afterBioVisible : ''}`}>
       {/* ================================================================== */}
       {/* 3. SERVICES                                                       */}
       {/* ================================================================== */}
@@ -478,6 +498,7 @@ export default function AboutContent() {
           <FresnoLogo className={s.logoSvg} />
         </div>
       </section>
+      </div>{/* /afterBio */}
     </div>
   )
 }
