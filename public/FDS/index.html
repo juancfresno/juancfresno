@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="es" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>FDS — Fresno Design System</title>
+<link rel="preconnect" href="https://api.fontshare.com" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://api.fontshare.com/v2/css?f[]=switzer@400,500,600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+/* ============ FDS TOKENS ============ */
+:root, [data-theme="light"]{
+  --text-primary:#141414; --text-secondary:#4a4d4b; --text-tertiary:#636965;
+  --text-inverse-primary:#f4f2ea; --text-brand:#344e9b;
+  --bg-page:#ecebe6; --bg-surface:#f4f2ea; --bg-subtle:#c9c5bd; --bg-inverse-surface:#242625;
+  --bg-brand:#c6dbf9; --bg-brand-subtle:#dce8fc;
+  --border-default:#c9c5bd; --border-subtle:#dad8d2; --border-strong:#a9aea9; --border-strongest:#141414;
+  --feedback-success:#38ae7a; --feedback-warning:#e0ac3a; --feedback-error:#e0655a; --feedback-info:#5a82d2;
+  --logo-accent:#003dff;
+  --shadow:0 8px 24px rgba(20,20,20,.10); --shadow-sm:0 4px 14px rgba(20,20,20,.08);
+}
+[data-theme="dark"]{
+  --text-primary:#f4f2ea; --text-secondary:#c9c5bd; --text-tertiary:#a9aea9;
+  --text-inverse-primary:#141414; --text-brand:#a3c3f3;
+  --bg-page:#242625; --bg-surface:#141414; --bg-subtle:#373737; --bg-inverse-surface:#ecebe6;
+  --bg-brand:#c6dbf9; --bg-brand-subtle:#1a2340;
+  --border-default:#4a4d4b; --border-subtle:#373737; --border-strong:#636965; --border-strongest:#f4f2ea;
+  --feedback-success:#38ae7a; --feedback-warning:#e0ac3a; --feedback-error:#e0655a; --feedback-info:#5a82d2;
+  --logo-accent:#003dff;
+  --shadow:0 8px 28px rgba(0,0,0,.5); --shadow-sm:0 4px 16px rgba(0,0,0,.4);
+}
+/* scales (mode-independent) */
+:root{
+  --space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:20px;--space-6:24px;--space-8:32px;--space-10:40px;--space-12:48px;--space-16:64px;--space-20:80px;
+  --radius-sm:8px;--radius-md:12px;--radius-lg:16px;--radius-full:999px;
+  --font-body:'Switzer',-apple-system,BlinkMacSystemFont,sans-serif;
+  --font-ui:'Geist Mono',ui-monospace,monospace;
+  --font-editorial:'Instrument Serif',Georgia,serif;
+  --sidebar-w:280px;
+}
+/* ============ RESET ============ */
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+body{font-family:var(--font-body);background:var(--bg-page);color:var(--text-primary);line-height:1.5;
+  transition:background .35s ease,color .35s ease}
+a{color:inherit;text-decoration:none}
+::selection{background:var(--bg-brand);color:#141414}
+/* mono helpers */
+.mono{font-family:var(--font-ui);text-transform:uppercase;letter-spacing:.08em}
+.kicker{font-family:var(--font-ui);text-transform:uppercase;letter-spacing:.12em;font-size:11px;color:var(--text-tertiary)}
+
+/* ============ LAYOUT ============ */
+.app{display:flex;min-height:100vh}
+.sidebar{
+  width:var(--sidebar-w);flex:0 0 var(--sidebar-w);position:sticky;top:0;height:100vh;
+  background:var(--bg-surface);border-right:1px solid var(--border-subtle);
+  display:flex;flex-direction:column;overflow:hidden;transition:background .35s ease,border-color .35s ease}
+.brand{padding:24px 24px 18px;border-bottom:1px solid var(--border-subtle);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand .lock{font-family:var(--font-ui);font-weight:500;font-size:18px;letter-spacing:.02em;color:var(--text-primary)}
+.brand .lock b{color:var(--text-primary)}
+.brand .ver{font-family:var(--font-ui);font-size:10px;letter-spacing:.1em;color:var(--text-tertiary);text-transform:uppercase}
+.nav{flex:1;overflow-y:auto;padding:14px 12px 28px}
+.nav::-webkit-scrollbar{width:8px}
+.nav::-webkit-scrollbar-thumb{background:var(--border-default);border-radius:8px}
+.nav-group{margin-top:18px}
+.nav-group:first-child{margin-top:4px}
+.nav-group > .glabel{font-family:var(--font-ui);text-transform:uppercase;letter-spacing:.12em;font-size:10px;color:var(--text-tertiary);padding:6px 12px 8px}
+.nav-sub{font-family:var(--font-ui);text-transform:uppercase;letter-spacing:.1em;font-size:9.5px;color:var(--text-tertiary);padding:12px 12px 4px;opacity:.85}
+.nav a{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:var(--radius-sm);font-size:14px;color:var(--text-secondary);
+  transition:background .15s ease,color .15s ease;cursor:pointer;position:relative}
+.nav a:hover{background:var(--bg-page);color:var(--text-primary)}
+.nav a.active{background:var(--bg-inverse-surface);color:var(--text-inverse-primary)}
+.nav a.active .dot{background:var(--text-inverse-primary)}
+.sidebar-foot{padding:16px;border-top:1px solid var(--border-subtle)}
+
+/* theme switch — segmented control, FDS style */
+.seg{display:flex;background:var(--bg-page);border:1px solid var(--border-subtle);border-radius:var(--radius-full);padding:3px;width:100%}
+.seg button{flex:1;border:0;background:transparent;cursor:pointer;font-family:var(--font-ui);text-transform:uppercase;letter-spacing:.1em;font-size:10px;
+  color:var(--text-secondary);padding:7px 0;border-radius:var(--radius-full);display:flex;align-items:center;justify-content:center;gap:6px;transition:all .2s ease}
+.seg button.on{background:var(--bg-inverse-surface);color:var(--text-inverse-primary)}
+.seg svg{width:13px;height:13px}
+
+/* ============ MAIN ============ */
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+.topbar{position:sticky;top:0;z-index:5;height:60px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 40px;background:color-mix(in srgb,var(--bg-page) 86%,transparent);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--border-subtle);transition:background .35s ease,border-color .35s ease}
+.topbar .crumbs{font-family:var(--font-ui);text-transform:uppercase;letter-spacing:.1em;font-size:11px;color:var(--text-tertiary)}
+.topbar .crumbs b{color:var(--text-primary)}
+.content{padding:64px 40px 120px;max-width:1100px;width:100%}
+@media(max-width:1100px){.content{padding:48px 28px 100px}}
+
+/* section */
+.section{display:none;animation:fade .4s ease}
+.section.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.sec-head{margin-bottom:48px}
+.sec-head .kicker{display:block;margin-bottom:14px}
+.sec-title{font-family:var(--font-ui);font-weight:500;font-size:clamp(34px,5vw,56px);letter-spacing:-.01em;line-height:1;color:var(--text-primary)}
+.sec-title .br{color:var(--text-tertiary);font-weight:400}
+.sec-lede{font-size:18px;color:var(--text-secondary);max-width:60ch;margin-top:22px;line-height:1.6}
+
+/* prose */
+.prose h3{font-family:var(--font-body);font-weight:600;font-size:22px;margin:44px 0 14px;letter-spacing:-.01em}
+.prose p{color:var(--text-secondary);max-width:68ch;margin-bottom:14px}
+.prose strong{color:var(--text-primary);font-weight:600}
+.prose code{font-family:var(--font-ui);font-size:.86em;background:var(--bg-subtle);padding:2px 6px;border-radius:6px;color:var(--text-primary)}
+
+/* principle cards */
+.grid{display:grid;gap:16px}
+.cols-3{grid-template-columns:repeat(3,1fr)}
+.cols-2{grid-template-columns:repeat(2,1fr)}
+@media(max-width:900px){.cols-3,.cols-2{grid-template-columns:1fr}}
+.panel{background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:24px;transition:background .35s ease,border-color .35s ease}
+.panel .num{font-family:var(--font-ui);font-size:11px;letter-spacing:.1em;color:var(--text-tertiary);margin-bottom:14px}
+.panel h4{font-weight:600;font-size:16px;margin-bottom:8px}
+.panel p{font-size:14px;color:var(--text-secondary);line-height:1.55}
+
+/* token tiers */
+.tiers{display:flex;flex-direction:column;gap:0;border:1px solid var(--border-subtle);border-radius:var(--radius-lg);overflow:hidden;margin-top:8px}
+.tier{display:grid;grid-template-columns:160px 1fr;gap:24px;padding:22px 24px;background:var(--bg-surface);border-bottom:1px solid var(--border-subtle);align-items:start}
+.tier:last-child{border-bottom:0}
+.tier .t-name{font-family:var(--font-ui);text-transform:uppercase;letter-spacing:.08em;font-size:13px;color:var(--text-primary)}
+.tier .t-name span{display:block;color:var(--text-tertiary);font-size:10px;margin-top:6px}
+.tier .t-desc{font-size:14px;color:var(--text-secondary)}
+.tier .t-desc code{font-family:var(--font-ui);font-size:12px;color:var(--text-brand);background:var(--bg-brand-subtle);padding:2px 7px;border-radius:6px}
+.tier .arrow{color:var(--text-tertiary)}
+
+/* placeholder */
+.placeholder{border:1px dashed var(--border-strong);border-radius:var(--radius-lg);padding:64px 32px;text-align:center;color:var(--text-tertiary);
+  font-family:var(--font-ui);text-transform:uppercase;letter-spacing:.1em;font-size:12px;background:var(--bg-surface)}
+.placeholder b{display:block;color:var(--text-secondary);margin-bottom:6px}
+
+.foot{margin-top:80px;padding-top:24px;border-top:1px solid var(--border-subtle);font-family:var(--font-ui);text-transform:uppercase;letter-spacing:.1em;font-size:10px;color:var(--text-tertiary);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+
+/* mobile sidebar toggle */
+.menu-btn{display:none}
+@media(max-width:840px){
+  .sidebar{position:fixed;left:0;top:0;z-index:50;transform:translateX(-100%);transition:transform .3s ease}
+  .sidebar.open{transform:none;box-shadow:var(--shadow)}
+  .menu-btn{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border:1px solid var(--border-default);background:var(--bg-surface);border-radius:var(--radius-sm);cursor:pointer}
+  .menu-btn svg{width:18px;height:18px;color:var(--text-primary)}
+}
+.scrim{display:none}
+@media(max-width:840px){.scrim.show{display:block;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:40}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="lock">{ <b>FDS</b> }</div>
+      <div class="ver">v0.1</div>
+    </div>
+    <nav class="nav" id="nav"></nav>
+    <div class="sidebar-foot">
+      <div class="seg" role="tablist" aria-label="Theme">
+        <button id="btn-light" class="on" onclick="setTheme('light')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19"/></svg>Light
+        </button>
+        <button id="btn-dark" onclick="setTheme('dark')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>Dark
+        </button>
+      </div>
+    </div>
+  </aside>
+  <div class="scrim" id="scrim" onclick="closeNav()"></div>
+
+  <div class="main">
+    <div class="topbar">
+      <button class="menu-btn" onclick="openNav()" aria-label="Menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+      <div class="crumbs">FRESNO© DESIGN SYSTEM / <b id="crumb">OVERVIEW</b></div>
+      <div class="ver mono" style="font-size:10px;color:var(--text-tertiary)">FDS</div>
+    </div>
+    <div class="content" id="content"></div>
+  </div>
+</div>
+
+<script>
+/* ============ NAV MODEL ============ */
+const NAV=[
+  {items:[{id:'overview',label:'Overview'}]},
+  {label:'Foundations',items:[
+    {id:'color',label:'Color'},{id:'typography',label:'Typography'},{id:'spacing',label:'Spacing'},
+    {id:'radius',label:'Radius'},{id:'elevation',label:'Elevation'},{id:'icons',label:'Icons'}
+  ]},
+  {label:'Components',subs:[
+    {label:'Actions',items:[{id:'button',label:'Button'},{id:'icon-button',label:'Icon button'},{id:'fab',label:'FAB'}]},
+    {label:'Forms',items:[{id:'input',label:'Input'},{id:'textarea',label:'Textarea'},{id:'select',label:'Select'},{id:'search-field',label:'Search field'},{id:'checkbox',label:'Checkbox'},{id:'radio',label:'Radio'},{id:'toggle',label:'Toggle'},{id:'slider',label:'Slider'},{id:'stepper',label:'Stepper'},{id:'segmented-control',label:'Segmented control'},{id:'rating',label:'Rating'}]},
+    {label:'Feedback',items:[{id:'banner',label:'Banner'},{id:'toast',label:'Toast'},{id:'tooltip',label:'Tooltip'},{id:'modal',label:'Modal'},{id:'badge',label:'Badge'},{id:'progress',label:'Progress'},{id:'spinner',label:'Spinner'},{id:'skeleton',label:'Skeleton'}]},
+    {label:'Navigation',items:[{id:'top-bar',label:'Top bar'},{id:'tab-bar',label:'Tab bar'},{id:'tabs',label:'Tabs'},{id:'breadcrumb',label:'Breadcrumb'},{id:'pagination',label:'Pagination'},{id:'menu',label:'Menu'}]},
+    {label:'Data display',items:[{id:'card',label:'Card'},{id:'table',label:'Table'},{id:'stat',label:'Stat'},{id:'list-item',label:'List item'},{id:'avatar',label:'Avatar'},{id:'tag',label:'Tag'},{id:'chip',label:'Chip'},{id:'divider',label:'Divider'}]},
+    {label:'Misc',items:[{id:'empty-state',label:'Empty state'}]}
+  ]},
+  {items:[{id:'changelog',label:'Changelog'}]}
+];
+
+/* flat index of id -> label */
+const LABELS={};
+NAV.forEach(g=>{(g.items||[]).forEach(i=>LABELS[i.id]=i.label);(g.subs||[]).forEach(s=>s.items.forEach(i=>LABELS[i.id]=i.label));});
+
+/* ============ RENDERERS ============ */
+const R={};
+
+R.overview=()=>`
+  <div class="sec-head">
+    <span class="kicker">Fresno© Design System</span>
+    <h1 class="sec-title"><span class="br">{</span> Overview <span class="br">}</span></h1>
+    <p class="sec-lede">FDS is the foundational design system for the Fresno brand — a single, mode-aware source of truth spanning web, apps and editorial surfaces. Built on a strict three-tier token architecture and a three-family type system.</p>
+  </div>
+  <div class="prose">
+    <h3>Principles</h3>
+  </div>
+  <div class="grid cols-3" style="margin-top:18px">
+    <div class="panel"><div class="num">01</div><h4>Token-driven</h4><p>Every color, space and radius is a token. No hardcoded values. Semantic tokens alias primitives, never raw hex.</p></div>
+    <div class="panel"><div class="num">02</div><h4>Mode-aware</h4><p>Light and dark are two modes of the same semantic layer. Switch the mode, the whole system follows — including this page.</p></div>
+    <div class="panel"><div class="num">03</div><h4>Tailwind-aligned</h4><p>Naming and scales follow Tailwind conventions. Everything is English kebab-case, predictable and portable to code.</p></div>
+  </div>
+  <div class="prose">
+    <h3>Token architecture</h3>
+    <p>Three tiers, each referencing the one above. Components never touch primitives directly.</p>
+  </div>
+  <div class="tiers">
+    <div class="tier"><div class="t-name">Primitives<span>raw values</span></div><div class="t-desc">The palette and scales. Literal values: <code>blue-200 · #c6dbf9</code>, <code>space-4 · 16px</code>. Never used directly in components.</div></div>
+    <div class="tier"><div class="t-name">Semantic<span>intent · mode-aware</span></div><div class="t-desc">Role-based aliases that carry light/dark: <code>text/primary</code>, <code>bg/surface</code>, <code>border/subtle</code>. The layer designers reach for.</div></div>
+    <div class="tier"><div class="t-name">Component<span>scoped</span></div><div class="t-desc">Per-component tokens that alias semantics: <code>button/bg/primary</code>, <code>chip/text/selected</code>. Local control without breaking the system.</div></div>
+  </div>
+  <div class="prose">
+    <h3>Type system</h3>
+    <p><strong>Switzer</strong> carries body and headings. <strong>Geist Mono</strong> (uppercase, tracked) handles display statements, UI, nav and labels. <strong>Instrument Serif</strong> covers editorial and quotes. This page uses all three.</p>
+  </div>
+  <div class="foot"><span>Fresno© — FDS</span><span>Private · juancfresno.com</span></div>
+`;
+
+function placeholder(id){
+  return `
+  <div class="sec-head">
+    <span class="kicker">${LABELS[id]||id}</span>
+    <h1 class="sec-title"><span class="br">{</span> ${LABELS[id]||id} <span class="br">}</span></h1>
+  </div>
+  <div class="placeholder"><b>Sección en construcción</b>El contenido de “${LABELS[id]||id}” llega en la siguiente fase.</div>`;
+}
+
+/* ============ SIDEBAR BUILD ============ */
+function buildNav(){
+  const nav=document.getElementById('nav');
+  let html='';
+  NAV.forEach(g=>{
+    html+='<div class="nav-group">';
+    if(g.label) html+=`<div class="glabel">${g.label}</div>`;
+    if(g.items) g.items.forEach(i=>{ html+=link(i); });
+    if(g.subs) g.subs.forEach(s=>{ html+=`<div class="nav-sub">${s.label}</div>`; s.items.forEach(i=>{ html+=link(i); }); });
+    html+='</div>';
+  });
+  nav.innerHTML=html;
+}
+function link(i){ return `<a data-id="${i.id}" href="#${i.id}" onclick="closeNav()">${i.label}</a>`; }
+
+/* ============ ROUTING ============ */
+function render(id){
+  if(!LABELS[id]&&id!=='overview') id='overview';
+  const content=document.getElementById('content');
+  content.innerHTML=`<section class="section active" id="sec-${id}">${(R[id]?R[id]():placeholder(id))}</section>`;
+  document.querySelectorAll('.nav a').forEach(a=>a.classList.toggle('active',a.dataset.id===id));
+  document.getElementById('crumb').textContent=(LABELS[id]||id).toUpperCase();
+  document.title=`FDS — ${LABELS[id]||id}`;
+  content.scrollTop=0; window.scrollTo(0,0);
+}
+function route(){ const id=(location.hash||'#overview').slice(1); render(id); }
+window.addEventListener('hashchange',route);
+
+/* ============ THEME ============ */
+function setTheme(t){
+  document.documentElement.setAttribute('data-theme',t);
+  document.getElementById('btn-light').classList.toggle('on',t==='light');
+  document.getElementById('btn-dark').classList.toggle('on',t==='dark');
+  try{localStorage.setItem('fds-theme',t)}catch(e){}
+}
+function initTheme(){ let t='light'; try{t=localStorage.getItem('fds-theme')||'light'}catch(e){} setTheme(t); }
+
+/* mobile nav */
+function openNav(){document.getElementById('sidebar').classList.add('open');document.getElementById('scrim').classList.add('show')}
+function closeNav(){document.getElementById('sidebar').classList.remove('open');document.getElementById('scrim').classList.remove('show')}
+
+/* init */
+buildNav(); initTheme(); route();
+</script>
+</body>
+</html>
