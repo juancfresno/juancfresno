@@ -4,5 +4,13 @@
       "path": "/api/cron/refresh-ig",
       "schedule": "0 3 */14 * *"
     }
+  ],
+  "headers": [
+    {
+      "source": "/FDS/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
+      ]
+    }
   ]
 }
