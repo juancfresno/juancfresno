@@ -20,6 +20,7 @@
   --border-default:#c9c5bd; --border-subtle:#dad8d2; --border-strong:#a9aea9; --border-strongest:#141414;
   --feedback-success:#38ae7a; --feedback-warning:#e0ac3a; --feedback-error:#e0655a; --feedback-info:#5a82d2;
   --logo-accent:#003dff;
+  --icon-default:#141414; --icon-muted:#636965; --icon-disabled:#a9aea9; --icon-inverse:#f4f2ea;
   --shadow:0 8px 24px rgba(20,20,20,.10); --shadow-sm:0 4px 14px rgba(20,20,20,.08);
 }
 [data-theme="dark"]{
@@ -30,6 +31,7 @@
   --border-default:#4a4d4b; --border-subtle:#373737; --border-strong:#636965; --border-strongest:#f4f2ea;
   --feedback-success:#38ae7a; --feedback-warning:#e0ac3a; --feedback-error:#e0655a; --feedback-info:#5a82d2;
   --logo-accent:#003dff;
+  --icon-default:#f4f2ea; --icon-muted:#a9aea9; --icon-disabled:#636965; --icon-inverse:#141414;
   --shadow:0 8px 28px rgba(0,0,0,.5); --shadow-sm:0 4px 16px rgba(0,0,0,.4);
 }
 /* scales (mode-independent) */
@@ -59,18 +61,19 @@ a{color:inherit;text-decoration:none}
   background:var(--bg-surface);border-right:1px solid var(--border-subtle);
   display:flex;flex-direction:column;overflow:hidden;transition:background .35s ease,border-color .35s ease}
 .brand{padding:24px 24px 18px;border-bottom:1px solid var(--border-subtle);display:flex;align-items:center;justify-content:space-between;gap:12px}
-.brand .lock{font-family:var(--font-ui);font-weight:500;font-size:18px;letter-spacing:.02em;color:var(--text-primary)}
-.brand .lock b{color:var(--text-primary)}
+.brand .lock{display:flex;align-items:center;color:var(--text-primary)}
+.brand .logo{height:15px;width:auto;display:block;color:var(--text-primary)}
 .brand .ver{font-family:var(--font-ui);font-size:10px;letter-spacing:.1em;color:var(--text-tertiary);text-transform:uppercase}
-.nav{flex:1;overflow-y:auto;padding:14px 12px 28px}
+.nav{flex:1;overflow-y:auto;padding:10px 0 28px}
 .nav::-webkit-scrollbar{width:8px}
 .nav::-webkit-scrollbar-thumb{background:var(--border-default);border-radius:8px}
-.nav-group{margin-top:18px}
-.nav-group:first-child{margin-top:4px}
-.nav-group > .glabel{font-family:var(--font-ui);text-transform:uppercase;letter-spacing:.12em;font-size:10px;color:var(--text-tertiary);padding:6px 12px 8px}
-.nav-sub{font-family:var(--font-ui);text-transform:uppercase;letter-spacing:.1em;font-size:9.5px;color:var(--text-tertiary);padding:12px 12px 4px;opacity:.85}
-.nav a{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:var(--radius-sm);font-size:14px;color:var(--text-secondary);
-  transition:background .15s ease,color .15s ease;cursor:pointer;position:relative}
+.nav-group{margin-top:0}
+.nav-group:not(:first-child){border-top:1px solid var(--border-subtle);margin-top:0}
+.nav-group:first-child{margin-top:2px}
+.nav-group > .glabel{font-family:var(--font-ui);text-transform:uppercase;letter-spacing:.13em;font-size:10px;color:var(--text-tertiary);padding:16px 24px 8px}
+.nav-sub{font-family:var(--font-ui);text-transform:uppercase;letter-spacing:.11em;font-size:9px;color:var(--text-tertiary);padding:14px 24px 4px;opacity:.7}
+.nav a{display:flex;align-items:center;gap:10px;padding:9px 24px;font-family:var(--font-ui);font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--text-secondary);
+  transition:background .14s ease,color .14s ease;cursor:pointer;position:relative}
 .nav a:hover{background:var(--bg-page);color:var(--text-primary)}
 .nav a.active{background:var(--bg-inverse-surface);color:var(--text-inverse-primary)}
 .nav a.active .dot{background:var(--text-inverse-primary)}
@@ -88,8 +91,13 @@ a{color:inherit;text-decoration:none}
 .topbar{position:sticky;top:0;z-index:5;height:60px;display:flex;align-items:center;justify-content:space-between;
   padding:0 40px;background:color-mix(in srgb,var(--bg-page) 86%,transparent);backdrop-filter:blur(10px);
   border-bottom:1px solid var(--border-subtle);transition:background .35s ease,border-color .35s ease}
-.topbar .crumbs{font-family:var(--font-ui);text-transform:uppercase;letter-spacing:.1em;font-size:11px;color:var(--text-tertiary)}
-.topbar .crumbs b{color:var(--text-primary)}
+.topbar .crumbs{display:flex;align-items:center;gap:8px;font-family:var(--font-ui);text-transform:uppercase;letter-spacing:.1em;font-size:11px;color:var(--text-tertiary)}
+.topbar .crumbs .clink{color:var(--text-secondary);cursor:pointer;transition:color .14s ease}
+.topbar .crumbs .clink:hover{color:var(--text-primary)}
+.topbar .crumbs .cmid{color:var(--text-tertiary)}
+.topbar .crumbs .cur{color:var(--text-primary)}
+.topbar .crumbs .csep{display:inline-flex;align-items:center;color:var(--text-tertiary)}
+.topbar .crumbs .csep svg{width:13px;height:13px}
 .content{padding:64px 40px 120px;max-width:1100px;width:100%}
 @media(max-width:1100px){.content{padding:48px 28px 100px}}
 
@@ -134,6 +142,62 @@ a{color:inherit;text-decoration:none}
   font-family:var(--font-ui);text-transform:uppercase;letter-spacing:.1em;font-size:12px;background:var(--bg-surface)}
 .placeholder b{display:block;color:var(--text-secondary);margin-bottom:6px}
 
+/* color */
+.grp-label{font-family:var(--font-ui);text-transform:uppercase;letter-spacing:.1em;font-size:11px;color:var(--text-tertiary);margin:36px 0 14px}
+.swatch-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.swatch{border:1px solid var(--border-subtle);border-radius:var(--radius-md);overflow:hidden;background:var(--bg-surface);cursor:pointer;transition:transform .12s ease,box-shadow .12s ease}
+.swatch:hover{transform:translateY(-2px);box-shadow:var(--shadow-sm)}
+.swatch .chip{height:72px;border-bottom:1px solid var(--border-subtle)}
+.swatch .meta{padding:10px 12px}
+.swatch .tname{font-family:var(--font-ui);font-size:11px;color:var(--text-primary);word-break:break-all;line-height:1.4}
+.swatch .thex{font-family:var(--font-ui);font-size:10px;color:var(--text-tertiary);text-transform:uppercase;margin-top:3px}
+.sem-table{border:1px solid var(--border-subtle);border-radius:var(--radius-lg);overflow:hidden}
+.sem-row{display:grid;grid-template-columns:36px 1fr 130px 130px;gap:16px;align-items:center;padding:13px 18px;border-bottom:1px solid var(--border-subtle);background:var(--bg-surface);cursor:pointer;transition:background .12s ease}
+.sem-row:last-child{border-bottom:0}
+.sem-row:hover{background:var(--bg-page)}
+.sem-row .sc{width:28px;height:28px;border-radius:8px;border:1px solid var(--border-default)}
+.sem-row .sn{font-family:var(--font-ui);font-size:13px;color:var(--text-primary)}
+.sem-row .sh{font-family:var(--font-ui);font-size:11px;color:var(--text-tertiary);text-transform:uppercase}
+.sem-row .sh b{color:var(--text-secondary);font-weight:400}
+.copyhint{font-family:var(--font-ui);font-size:10px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.08em;margin-top:10px}
+@media(max-width:720px){.sem-row{grid-template-columns:32px 1fr}.sem-row .sh{display:none}}
+.toast-copy{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--bg-inverse-surface);color:var(--text-inverse-primary);font-family:var(--font-ui);font-size:11px;text-transform:uppercase;letter-spacing:.08em;padding:10px 18px;border-radius:var(--radius-full);opacity:0;transition:all .25s ease;pointer-events:none;z-index:100}
+.toast-copy.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* typography */
+.type-card{border:1px solid var(--border-subtle);border-radius:var(--radius-lg);background:var(--bg-surface);padding:28px;margin-bottom:16px}
+.type-card .role{font-family:var(--font-ui);text-transform:uppercase;letter-spacing:.1em;font-size:11px;color:var(--text-tertiary);margin-bottom:6px}
+.type-card .fam{font-family:var(--font-ui);font-size:12px;color:var(--text-brand);margin-bottom:20px}
+.type-card .big{color:var(--text-primary);line-height:1.05;margin-bottom:16px}
+.type-card .sample{color:var(--text-secondary);max-width:60ch}
+.scale-table{border:1px solid var(--border-subtle);border-radius:var(--radius-lg);overflow:hidden;margin-top:8px}
+.scale-row{display:grid;grid-template-columns:1fr 190px;gap:24px;align-items:baseline;padding:18px;border-bottom:1px solid var(--border-subtle);background:var(--bg-surface)}
+.scale-row:last-child{border-bottom:0}
+.scale-row .smp{color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.scale-row .lbl{font-family:var(--font-ui);font-size:11px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.06em;text-align:right}
+/* spacing */
+.space-list{border:1px solid var(--border-subtle);border-radius:var(--radius-lg);background:var(--bg-surface);padding:8px 20px}
+.space-row{display:grid;grid-template-columns:120px 1fr 60px;gap:20px;align-items:center;padding:9px 0;border-bottom:1px solid var(--border-subtle)}
+.space-row:last-child{border-bottom:0}
+.space-row .lbl{font-family:var(--font-ui);font-size:12px;color:var(--text-primary)}
+.space-bar{height:18px;background:var(--bg-brand);border-radius:4px}
+.space-row .px{font-family:var(--font-ui);font-size:11px;color:var(--text-tertiary);text-align:right}
+/* radius */
+.radius-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:18px}
+.radius-box{height:110px;background:var(--bg-brand-subtle);border:1.5px solid var(--text-brand)}
+.radius-cap{font-family:var(--font-ui);font-size:11px;color:var(--text-tertiary);text-transform:uppercase;margin-top:10px}
+.radius-cap b{color:var(--text-primary);font-weight:400}
+/* elevation */
+.elev-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:28px;margin-top:8px}
+.elev-card{height:130px;background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+.elev-card .en{font-family:var(--font-ui);font-size:12px;color:var(--text-primary);text-transform:uppercase;letter-spacing:.06em}
+.elev-card .ed{font-size:12px;color:var(--text-tertiary)}
+/* icons */
+.icon-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(116px,1fr));gap:12px}
+.icon-cell{border:1px solid var(--border-subtle);border-radius:var(--radius-md);background:var(--bg-surface);padding:20px 10px;display:flex;flex-direction:column;align-items:center;gap:14px;color:var(--icon-default)}
+.icon-cell svg{width:24px;height:24px}
+.icon-cell .inm{font-family:var(--font-ui);font-size:10px;color:var(--text-tertiary)}
+
 .foot{margin-top:80px;padding-top:24px;border-top:1px solid var(--border-subtle);font-family:var(--font-ui);text-transform:uppercase;letter-spacing:.1em;font-size:10px;color:var(--text-tertiary);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
 
 /* mobile sidebar toggle */
@@ -152,8 +216,8 @@ a{color:inherit;text-decoration:none}
 <div class="app">
   <aside class="sidebar" id="sidebar">
     <div class="brand">
-      <div class="lock">{ <b>FDS</b> }</div>
-      <div class="ver">v0.1</div>
+      <div class="lock"><svg class="logo" viewBox="0 0 234 28" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Fresno"><path d="M223.381 15.7711C217.072 15.7711 213.231 12.7787 213.231 7.86535C213.231 2.95204 217.072 0 223.381 0C229.71 0 233.511 2.95204 233.511 7.86535C233.511 12.7787 229.71 15.7711 223.381 15.7711ZM223.381 13.7492C228.638 13.7492 231.125 11.6059 231.125 7.84513C231.125 4.12476 228.638 1.9815 223.381 1.9815C218.164 1.9815 215.617 4.12476 215.617 7.84513C215.617 11.6059 218.164 13.7492 223.381 13.7492ZM223.442 12.7382C219.721 12.7382 216.992 11.1207 216.992 7.86535C216.992 4.65047 219.721 2.99247 223.442 2.99247C227.02 2.99247 229.427 4.42805 229.77 6.91504H226.899C226.414 5.88385 225.342 5.11551 223.462 5.11551C221.137 5.11551 219.903 6.3489 219.903 7.86535C219.903 9.42225 221.137 10.6354 223.462 10.6354C225.302 10.6354 226.434 9.90751 226.899 8.8561H229.77C229.447 11.2824 227.02 12.7382 223.442 12.7382Z" fill="currentColor"/><path d="M189.041 28C176.979 28 169.836 23.0462 169.836 14V13.9641C169.836 4.88205 176.979 0 189.041 0C201.102 0 208.246 4.88205 208.246 13.9641V14C208.246 23.0462 201.102 28 189.041 28ZM189.041 21.359C194.677 21.359 198.482 18.6308 198.482 14V13.9641C198.482 9.29744 194.677 6.60513 189.041 6.60513C183.405 6.60513 179.6 9.15385 179.6 13.9641V14C179.6 18.7744 183.405 21.359 189.041 21.359Z" fill="currentColor"/><path d="M139.809 27.282H130.906V0.610229H140.922L158.153 17.0154L158.44 17.3384V0.610229H167.342V27.282H157.363L140.024 10.841L139.809 10.6256V27.282Z" fill="currentColor"/><path d="M112.67 28C101.183 28 96.6241 23.4051 96.4087 18.1282H105.598C105.742 20.5333 107.465 21.7897 112.742 21.7897C117.229 21.7897 118.845 20.9282 118.845 19.4564C118.845 18.2359 118.342 17.6615 111.557 16.9436C99.5318 15.7949 97.4497 12.4564 97.4497 8.07692C97.4497 3.94872 100.896 0 111.988 0C122.829 0 127.137 4.2 127.604 9.8H118.773C118.45 7.89744 117.122 6.17436 112.347 6.17436C108.327 6.17436 106.963 6.9641 106.963 8.25641C106.963 9.26154 107.25 10.1949 112.491 10.6974C126.886 12.0615 128.357 15.5795 128.357 19.2051C128.357 25.1641 122.973 28 112.67 28Z" fill="currentColor"/><path d="M95.7788 27.282H66.5224V0.610229H95.4199V7.14356H76.1788V10.7692H93.8763V16.5128H76.1788V20.7487H95.7788V27.282Z" fill="currentColor"/><path d="M40.3936 27.282H30.7372V0.610229H50.05C60.1013 0.610229 63.691 4.09228 63.691 8.75895C63.691 12.4923 61.25 15.0051 57.05 15.8307V15.8666C60.1372 16.6564 61.3936 17.6615 62.291 21.682L62.65 23.1538C63.0808 25.0923 63.4397 26.0256 63.9782 27.282H54.1064C53.7474 26.6 53.532 25.882 53.0295 23.5846L52.6705 22.0051C52.3115 20.3179 50.9115 19.5282 46.9987 19.5282H40.3936V27.282ZM40.3936 7.14356V13.3538H49.4756C52.4551 13.3538 54.0705 12.1333 54.0705 10.0513C54.0705 8.11279 52.4551 7.14356 49.4756 7.14356H40.3936Z" fill="currentColor"/><path d="M9.65641 27.282H0V0.610229H28.6821V7.17946H9.65641V11.4872H26.959V17.8769H9.65641V27.282Z" fill="currentColor"/></svg></div>
+      <div class="ver">DS · v0.1</div>
     </div>
     <nav class="nav" id="nav"></nav>
     <div class="sidebar-foot">
@@ -168,11 +232,12 @@ a{color:inherit;text-decoration:none}
     </div>
   </aside>
   <div class="scrim" id="scrim" onclick="closeNav()"></div>
+  <div class="toast-copy" id="toastCopy"></div>
 
   <div class="main">
     <div class="topbar">
       <button class="menu-btn" onclick="openNav()" aria-label="Menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
-      <div class="crumbs">FRESNO© DESIGN SYSTEM / <b id="crumb">OVERVIEW</b></div>
+      <div class="crumbs" id="crumbs"></div>
       <div class="ver mono" style="font-size:10px;color:var(--text-tertiary)">FDS</div>
     </div>
     <div class="content" id="content"></div>
@@ -199,8 +264,15 @@ const NAV=[
 ];
 
 /* flat index of id -> label */
-const LABELS={};
-NAV.forEach(g=>{(g.items||[]).forEach(i=>LABELS[i.id]=i.label);(g.subs||[]).forEach(s=>s.items.forEach(i=>LABELS[i.id]=i.label));});
+const LABELS={}; const CRUMB_MID={};
+NAV.forEach(g=>{(g.items||[]).forEach(i=>{LABELS[i.id]=i.label; if(g.label) CRUMB_MID[i.id]=g.label;});(g.subs||[]).forEach(s=>s.items.forEach(i=>{LABELS[i.id]=i.label; CRUMB_MID[i.id]=s.label;}));});
+function buildCrumb(id){
+  const sep=`<span class="csep"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></svg></span>`;
+  const parts=[`<a class="clink" href="#overview">FDS</a>`];
+  if(CRUMB_MID[id]) parts.push(`<span class="cmid">${CRUMB_MID[id]}</span>`);
+  parts.push(`<span class="cur">${LABELS[id]||id}</span>`);
+  return parts.join(sep);
+}
 
 /* ============ RENDERERS ============ */
 const R={};
@@ -235,6 +307,147 @@ R.overview=()=>`
   <div class="foot"><span>Fresno© — FDS</span><span>Private · juancfresno.com</span></div>
 `;
 
+/* color data */
+const PRIMITIVES=[
+ {g:'Neutral',items:[['color/neutral/50','#f4f2ea'],['color/neutral/100','#ecebe6'],['color/neutral/200','#dad8d2'],['color/neutral/300','#c9c5bd'],['color/neutral/400','#a9aea9'],['color/neutral/500','#8a918d'],['color/neutral/600','#636965'],['color/neutral/700','#4a4d4b'],['color/neutral/800','#373737'],['color/neutral/900','#242625'],['color/neutral/950','#141414']]},
+ {g:'Brand blue',items:[['color/brand/blue/50','#f0f5fe'],['color/brand/blue/100','#dce8fc'],['color/brand/blue/200','#c6dbf9'],['color/brand/blue/300','#a3c3f3'],['color/brand/blue/400','#7ba1e8'],['color/brand/blue/500','#557fdb'],['color/brand/blue/600','#4063c2'],['color/brand/blue/700','#344e9b'],['color/brand/blue/800','#2e4178'],['color/brand/blue/900','#29375e'],['color/brand/blue/950','#1a2340']]},
+ {g:'Feedback',items:[['color/green/500','#38ae7a'],['color/amber/500','#e0ac3a'],['color/red/500','#e0655a'],['color/blue/500','#5a82d2']]},
+ {g:'Brand pop',items:[['color/brand/blue/200','#c6dbf9'],['color/brand/green','#8df8cd'],['color/brand/yellow','#ffffe6']]},
+ {g:'Surfaces',items:[['color/surface/marble','#f2f8fc'],['color/surface/ivory','#fffff0'],['color/surface/pearl','#fcfcf7'],['color/surface/lavender','#f4f1f8'],['color/surface/cold-steel','#f8f7f4']]},
+ {g:'Accent',items:[['color/accent/electric','#003dff']]}
+];
+const SEMANTICS=[
+ {g:'Text',items:[['text/primary','#141414','#f4f2ea'],['text/secondary','#4a4d4b','#c9c5bd'],['text/tertiary','#636965','#a9aea9'],['text/inverse-primary','#f4f2ea','#141414'],['text/brand','#344e9b','#a3c3f3']]},
+ {g:'Background',items:[['bg/page','#ecebe6','#242625'],['bg/surface','#f4f2ea','#141414'],['bg/subtle','#c9c5bd','#373737'],['bg/inverse-surface','#242625','#ecebe6'],['bg/brand','#c6dbf9','#c6dbf9'],['bg/brand-subtle','#dce8fc','#1a2340']]},
+ {g:'Border',items:[['border/default','#c9c5bd','#4a4d4b'],['border/subtle','#dad8d2','#373737'],['border/strong','#a9aea9','#636965'],['border/strongest','#141414','#f4f2ea']]},
+ {g:'Feedback',items:[['feedback/success','#38ae7a','#38ae7a'],['feedback/warning','#e0ac3a','#e0ac3a'],['feedback/error','#e0655a','#e0655a'],['feedback/info','#5a82d2','#5a82d2']]},
+ {g:'Icon',items:[['icon/default','#141414','#f4f2ea'],['icon/muted','#636965','#a9aea9'],['icon/disabled','#a9aea9','#636965'],['icon/inverse','#f4f2ea','#141414']]}
+];
+
+R.color=()=>{
+  const prim=PRIMITIVES.map(grp=>`<div class="grp-label">${grp.g}</div><div class="swatch-grid">${grp.items.map(([n,h])=>`<div class="swatch" onclick="copyToken('${n}')"><div class="chip" style="background:${h}"></div><div class="meta"><div class="tname">${n}</div><div class="thex">${h}</div></div></div>`).join('')}</div>`).join('');
+  const sem=SEMANTICS.map(grp=>`<div class="grp-label">${grp.g}</div><div class="sem-table">${grp.items.map(([n,l,d])=>{const cv='--'+n.replace(/\//g,'-');return `<div class="sem-row" onclick="copyToken('${n}')"><div class="sc" style="background:var(${cv})"></div><div class="sn">${n}</div><div class="sh">L <b>${l}</b></div><div class="sh">D <b>${d}</b></div></div>`;}).join('')}</div>`).join('');
+  return `
+  <div class="sec-head">
+    <span class="kicker">Foundations</span>
+    <h1 class="sec-title"><span class="br">{</span> Color <span class="br">}</span></h1>
+    <p class="sec-lede">Two layers. Primitives are the raw palette — literal values, never used directly. Semantic tokens alias them with intent and carry both modes; flip the toggle and every semantic chip below updates live.</p>
+  </div>
+  <div class="prose"><h3>Semantic</h3><p>The mode-aware layer designers build with. Each chip reflects the current theme; <strong>L</strong> / <strong>D</strong> show the resolved light and dark values.</p></div>
+  ${sem}
+  <div class="copyhint">Tip — click any token to copy its name</div>
+  <div class="prose"><h3>Primitives</h3><p>The raw palette. Reference only — components alias semantics, never these.</p></div>
+  ${prim}
+  <div class="foot"><span>Fresno© — FDS</span><span>Color</span></div>`;
+};
+
+R.typography=()=>`
+  <div class="sec-head">
+    <span class="kicker">Foundations</span>
+    <h1 class="sec-title"><span class="br">{</span> Typography <span class="br">}</span></h1>
+    <p class="sec-lede">Three families, each with a job. Switzer carries reading text and headings, Geist Mono handles display statements and all UI/labels, Instrument Serif covers editorial moments.</p>
+  </div>
+  <div class="prose"><h3>Families</h3></div>
+  <div class="type-card">
+    <div class="role">Body &amp; headings</div>
+    <div class="big" style="font-family:var(--font-body);font-size:72px">Ag</div>
+    <div class="fam">Switzer · var(--font-body) · var(--font-heading)</div>
+    <div class="sample" style="font-family:var(--font-body);font-size:17px">The quick brown fox jumps over the lazy dog. Clean, neutral, highly legible — the workhorse for body copy and headings across web and apps.</div>
+  </div>
+  <div class="type-card">
+    <div class="role">Display · UI · labels</div>
+    <div class="big" style="font-family:var(--font-ui);font-size:56px;letter-spacing:.02em">FDS</div>
+    <div class="fam">Geist Mono · var(--font-ui)</div>
+    <div class="sample" style="font-family:var(--font-ui);font-size:13px;text-transform:uppercase;letter-spacing:.08em">Uppercase · tracked · used for kickers, labels, nav, code and metric values</div>
+  </div>
+  <div class="type-card">
+    <div class="role">Editorial</div>
+    <div class="big" style="font-family:var(--font-editorial);font-size:60px;font-style:italic">Aa</div>
+    <div class="fam">Instrument Serif · var(--font-editorial)</div>
+    <div class="sample" style="font-family:var(--font-editorial);font-size:22px;line-height:1.4">For pull quotes and editorial flourishes — a touch of warmth against the geometric base.</div>
+  </div>
+  <div class="prose"><h3>Scale</h3><p>Representative steps. Headings and body in Switzer, display and UI in Geist Mono.</p></div>
+  <div class="scale-table">
+    <div class="scale-row"><div class="smp" style="font-family:var(--font-ui);font-size:30px">Display</div><div class="lbl">mono · 30 / 36</div></div>
+    <div class="scale-row"><div class="smp" style="font-family:var(--font-body);font-size:32px">Heading large</div><div class="lbl">switzer · 32 / 40</div></div>
+    <div class="scale-row"><div class="smp" style="font-family:var(--font-body);font-size:24px">Heading medium</div><div class="lbl">switzer · 24 / 32</div></div>
+    <div class="scale-row"><div class="smp" style="font-family:var(--font-body);font-size:20px">Heading small</div><div class="lbl">switzer · 20 / 28</div></div>
+    <div class="scale-row"><div class="smp" style="font-family:var(--font-body);font-size:16px">Body medium — default reading size</div><div class="lbl">switzer · 16 / 24</div></div>
+    <div class="scale-row"><div class="smp" style="font-family:var(--font-body);font-size:14px">Body small — secondary copy</div><div class="lbl">switzer · 14 / 20</div></div>
+    <div class="scale-row"><div class="smp" style="font-family:var(--font-ui);font-size:12px;text-transform:uppercase;letter-spacing:.06em">UI medium label</div><div class="lbl">mono · 12</div></div>
+    <div class="scale-row"><div class="smp" style="font-family:var(--font-ui);font-size:11px;text-transform:uppercase;letter-spacing:.08em">UI small label</div><div class="lbl">mono · 11</div></div>
+  </div>
+  <div class="foot"><span>Fresno© — FDS</span><span>Typography</span></div>`;
+
+const SPACE=[[1,4],[2,8],[3,12],[4,16],[5,20],[6,24],[8,32],[10,40],[12,48],[16,64],[20,80]];
+R.spacing=()=>`
+  <div class="sec-head">
+    <span class="kicker">Foundations</span>
+    <h1 class="sec-title"><span class="br">{</span> Spacing <span class="br">}</span></h1>
+    <p class="sec-lede">A 4px base grid, Tailwind-aligned. Tokens are named by their pixel value for designer legibility — <code style="font-family:var(--font-ui);font-size:.85em">space/4</code> is 16px.</p>
+  </div>
+  <div class="space-list">${SPACE.map(([n,px])=>`<div class="space-row"><div class="lbl">space/${n}</div><div class="space-bar" style="width:${px}px"></div><div class="px">${px}px</div></div>`).join('')}</div>
+  <div class="foot"><span>Fresno© — FDS</span><span>Spacing</span></div>`;
+
+const RADII=[['sm',8],['md',12],['lg',16],['full',999]];
+R.radius=()=>`
+  <div class="sec-head">
+    <span class="kicker">Foundations</span>
+    <h1 class="sec-title"><span class="br">{</span> Radius <span class="br">}</span></h1>
+    <p class="sec-lede">Four steps. <code style="font-family:var(--font-ui);font-size:.85em">sm</code> for inputs and small chips, <code style="font-family:var(--font-ui);font-size:.85em">md</code> for buttons and cards, <code style="font-family:var(--font-ui);font-size:.85em">lg</code> for panels and modals, <code style="font-family:var(--font-ui);font-size:.85em">full</code> for pills and avatars.</p>
+  </div>
+  <div class="radius-grid">${RADII.map(([n,px])=>`<div><div class="radius-box" style="border-radius:${px}px"></div><div class="radius-cap">radius/${n} · <b>${px===999?'full':px+'px'}</b></div></div>`).join('')}</div>
+  <div class="foot"><span>Fresno© — FDS</span><span>Radius</span></div>`;
+
+R.elevation=()=>`
+  <div class="sec-head">
+    <span class="kicker">Foundations</span>
+    <h1 class="sec-title"><span class="br">{</span> Elevation <span class="br">}</span></h1>
+    <p class="sec-lede">Restrained shadows for layering. Two steps cover the system — a subtle lift for resting surfaces and a stronger one for overlays.</p>
+  </div>
+  <div class="elev-grid">
+    <div class="elev-card" style="box-shadow:var(--shadow-sm)"><div class="en">shadow-sm</div><div class="ed">cards · dropdowns · toasts</div></div>
+    <div class="elev-card" style="box-shadow:var(--shadow)"><div class="en">shadow</div><div class="ed">modals · popovers · menus</div></div>
+  </div>
+  <div class="prose"><p style="margin-top:24px">Surfaces also separate by token alone — <code style="font-family:var(--font-ui);font-size:.85em">bg/surface</code> over <code style="font-family:var(--font-ui);font-size:.85em">bg/page</code> with a <code style="font-family:var(--font-ui);font-size:.85em">border/subtle</code> — so elevation is used sparingly, mostly for floating UI.</p></div>
+  <div class="foot"><span>Fresno© — FDS</span><span>Elevation</span></div>`;
+
+const ICONS=[
+ ['home','<path d="M5 12l-2 0l9 -9l9 9l-2 0"/><path d="M5 12v7a1 1 0 0 0 1 1h12a1 1 0 0 0 1 -1v-7"/><path d="M9 21v-6a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v6"/>'],
+ ['search','<circle cx="10" cy="10" r="7"/><path d="M21 21l-6 -6"/>'],
+ ['user','<circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6 -6h4a6 6 0 0 1 6 6v1"/>'],
+ ['settings','<circle cx="12" cy="12" r="3"/><path d="M12 2.5l1.3 2.2l2.5 -.4l.4 2.5l2.2 1.3l-1.2 2.2l1.2 2.2l-2.2 1.3l-.4 2.5l-2.5 -.4l-1.3 2.2l-1.3 -2.2l-2.5 .4l-.4 -2.5l-2.2 -1.3l1.2 -2.2l-1.2 -2.2l2.2 -1.3l.4 -2.5l2.5 .4z"/>'],
+ ['bell','<path d="M10 5a2 2 0 1 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6"/><path d="M9 17v1a3 3 0 0 0 6 0v-1"/>'],
+ ['heart','<path d="M19.5 12.6l-7.5 7.4l-7.5 -7.4a5 5 0 1 1 7.5 -6.6a5 5 0 1 1 7.5 6.6"/>'],
+ ['star','<path d="M12 3l2.6 5.3l5.9 .9l-4.2 4.1l1 5.9l-5.3 -2.8l-5.3 2.8l1 -5.9l-4.2 -4.1l5.9 -.9z"/>'],
+ ['eye','<circle cx="12" cy="12" r="2.2"/><path d="M2 12s3.5 -7 10 -7s10 7 10 7s-3.5 7 -10 7s-10 -7 -10 -7"/>'],
+ ['mail','<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3.5 7l8.5 6l8.5 -6"/>'],
+ ['calendar','<rect x="4" y="5" width="16" height="16" rx="2"/><path d="M16 3v4M8 3v4M4 11h16"/>'],
+ ['trash','<path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2 -2l1 -12M9 7v-3h6v3"/>'],
+ ['bookmark','<path d="M6 4h12v17l-6 -4l-6 4z"/>'],
+ ['plus','<path d="M12 5v14M5 12h14"/>'],
+ ['check','<path d="M5 12l5 5l9 -9"/>'],
+ ['x','<path d="M6 6l12 12M18 6l-12 12"/>'],
+ ['chevron-right','<path d="M9 6l6 6l-6 6"/>'],
+ ['arrow-right','<path d="M5 12h14M13 6l6 6l-6 6"/>'],
+ ['external-link','<path d="M12 6h-5a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-5"/><path d="M14 4h6v6M20 4l-9 9"/>']
+];
+R.icons=()=>`
+  <div class="sec-head">
+    <span class="kicker">Foundations</span>
+    <h1 class="sec-title"><span class="br">{</span> Icons <span class="br">}</span></h1>
+    <p class="sec-lede">The full Tabler set — 6,146 stroke icons on a 24px grid, 2px stroke. Every icon is bound to <code style="font-family:var(--font-ui);font-size:.85em">icon/*</code> tokens, so it adapts to theme and context. A sample below.</p>
+  </div>
+  <div class="icon-grid">${ICONS.map(([n,svg])=>`<div class="icon-cell"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${svg}</svg><div class="inm">${n}</div></div>`).join('')}</div>
+  <div class="prose"><p style="margin-top:24px">Recolor by binding the icon to a semantic token — <code style="font-family:var(--font-ui);font-size:.85em">icon/default</code>, <code style="font-family:var(--font-ui);font-size:.85em">icon/muted</code>, or a feedback color for status. Inside components icons inherit the text token of their context.</p></div>
+  <div class="foot"><span>Fresno© — FDS</span><span>Icons</span></div>`;
+
+function copyToken(name){
+  try{navigator.clipboard.writeText(name);}catch(e){}
+  const t=document.getElementById('toastCopy'); t.textContent='Copied · '+name; t.classList.add('show');
+  clearTimeout(window.__ct); window.__ct=setTimeout(()=>t.classList.remove('show'),1400);
+}
+
 function placeholder(id){
   return `
   <div class="sec-head">
@@ -265,7 +478,7 @@ function render(id){
   const content=document.getElementById('content');
   content.innerHTML=`<section class="section active" id="sec-${id}">${(R[id]?R[id]():placeholder(id))}</section>`;
   document.querySelectorAll('.nav a').forEach(a=>a.classList.toggle('active',a.dataset.id===id));
-  document.getElementById('crumb').textContent=(LABELS[id]||id).toUpperCase();
+  document.getElementById('crumbs').innerHTML=buildCrumb(id);
   document.title=`FDS — ${LABELS[id]||id}`;
   content.scrollTop=0; window.scrollTo(0,0);
 }
