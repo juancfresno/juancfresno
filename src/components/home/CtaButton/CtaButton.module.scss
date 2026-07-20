@@ -1,0 +1,56 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.cta {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.75rem;
+  border-radius: 0.5rem;
+  font-family: $font-mono;
+  font-size: 0.6875rem; // 11px
+  font-weight: $fw-regular;
+  letter-spacing: $ls-wide;
+  text-transform: uppercase;
+  text-decoration: none;
+  background-color: #141414; // button/bg/neutral — Figma Cta6
+  color: #f4f2ea; // button/text/neutral
+  overflow: hidden; // clip the flip motion to the button box
+  perspective: 240px;
+  transition: transform $duration-fast $ease-out-quart;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+
+  @include focus-ring;
+}
+
+// ── Flip — two stacked identical text layers rotated 180° apart on the X
+// axis; rotating the group 180° on hover swaps which one faces the viewer. ──
+.flip {
+  position: relative;
+  display: block;
+  transform-style: preserve-3d;
+  transition: transform 0.5s $ease-out-quart;
+}
+
+.cta:hover .flip {
+  transform: rotateX(180deg);
+}
+
+.face {
+  display: block;
+  backface-visibility: hidden;
+}
+
+.faceFront {
+  position: relative;
+}
+
+.faceBack {
+  position: absolute;
+  inset: 0;
+  transform: rotateX(180deg);
+}

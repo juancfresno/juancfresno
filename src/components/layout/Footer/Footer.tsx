@@ -5,22 +5,7 @@ import s from './Footer.module.scss'
 import ElasticLine from '@/components/ui/ElasticLine/ElasticLine'
 import LiveClock from '@/components/ui/LiveClock/LiveClock'
 import { BehanceLogo, InstagramLogo, DribbbleLogo, LinkedInLogo } from '@/components/ui/SocialLogos/SocialLogos'
-
-// ─── White VHS glitch wrapper — 3 capas del mismo color (blanco) ──────────────
-// Sin split de color: los channels R/B son blancos como el main.
-// El efecto es desplazamiento horizontal de bandas en blanco — "cinta VHS blanca".
-function GlitchSocialIcon({ Icon }: { Icon: () => React.JSX.Element }) {
-  return (
-    <span className={s.socialGlWrap}>
-      {/* Canal B — desplaza izquierda con clip-path */}
-      <span className={`${s.socialGlLayer} ${s.socialGlB}`}><Icon /></span>
-      {/* Canal R — desplaza derecha con clip-path */}
-      <span className={`${s.socialGlLayer} ${s.socialGlR}`}><Icon /></span>
-      {/* Capa principal — shake + flicker */}
-      <span className={`${s.socialGlLayer} ${s.socialGlMain}`}><Icon /></span>
-    </span>
-  )
-}
+import GlitchSocialIcon from '@/components/ui/GlitchSocialIcon/GlitchSocialIcon'
 
 // ─── Social links data ─────────────────────────────────────────────────────────
 const SOCIALS = [
@@ -44,16 +29,13 @@ export default function Footer() {
         {!isHome && (
           <nav className={s.social} aria-label="Redes sociales">
             {SOCIALS.map(({ id, label, href, Icon }) => (
-              <a
+              <GlitchSocialIcon
                 key={id}
                 href={href}
-                target="_blank"
-                rel="noopener noreferrer"
+                label={label}
+                icon={<Icon />}
                 className={s.socialLink}
-                aria-label={label}
-              >
-                <GlitchSocialIcon Icon={Icon} />
-              </a>
+              />
             ))}
           </nav>
         )}
