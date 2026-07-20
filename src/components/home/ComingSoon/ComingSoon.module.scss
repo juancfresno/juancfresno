@@ -12,14 +12,28 @@ $_text-primary:  #141414; // text/primary
 $_text-secondary: #4a4d4b; // text/secondary
 $_icon-muted:    #636965; // icon/muted
 
+// ── CTA color-cycle palette ──────────────────────────────────────────────────
+$_cta-mint:      #8df8cd;
+$_cta-maroon:    #7a2e2e;
+$_cta-olive:     #5c5a32;
+$_cta-text-dark: #141414;
+$_cta-text-light: #f4f2ea;
+
 .page {
   position: relative;
   display: flex;
   flex: 1; // grow to fill <main> exactly (main is now a column flex container) — footer sits right after, no gap
   background: $_bg;
+
+  // Stack content above the reel on mobile instead of hiding it
+  @include respond-to(lg) {
+    flex-direction: column;
+  }
 }
 
 // ── Reel — full-height photo, fixed so it extends behind the footer too ─────
+// Below `lg` it drops out of fixed positioning and becomes a normal full-width
+// block sitting after the text content (DOM order: content, then reel).
 .reel {
   position: fixed;
   top: 0;
@@ -29,7 +43,12 @@ $_icon-muted:    #636965; // icon/muted
   z-index: 0;
 
   @include respond-to(lg) {
-    display: none;
+    position: relative;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    width: 100%;
+    aspect-ratio: 630 / 1024;
   }
 }
 
@@ -55,8 +74,11 @@ $_icon-muted:    #636965; // icon/muted
   }
 }
 
-.glyph {
+// Animated pixel character (SMIL) — native 72x252, scale only in whole
+// multiples if resized, and keep pixelated rendering so it stays crisp.
+.character {
   display: block;
+  image-rendering: pixelated;
 }
 
 // ── Content intro — headline + tagline ───────────────────────────────────────
@@ -105,15 +127,35 @@ $_icon-muted:    #636965; // icon/muted
   color: $_icon-muted;
 }
 
-.socialLink {
-  display: block;
-  color: inherit;
-  opacity: 1;
-  transition: opacity $duration-fast $ease-out-quart;
+// ── CTA — email pill button, ambient looping color-cycle (always on, not
+// gated behind hover) — hard color swap every ~1.8s, no crossfade. ──────────
+.cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.75rem;
+  border-radius: 0.5rem;
+  font-family: $font-mono;
+  font-size: 0.6875rem; // 11px
+  font-weight: $fw-regular;
+  letter-spacing: $ls-wide;
+  text-transform: uppercase;
+  text-decoration: none;
+  background-color: $_cta-mint;
+  color: $_cta-text-dark;
+  animation: ctaColorCycle 5.4s linear infinite;
+  transition: transform $duration-fast $ease-out-quart;
 
   &:hover {
-    opacity: 0.65;
+    transform: translateY(-2px);
   }
 
   @include focus-ring;
+}
+
+@keyframes ctaColorCycle {
+  0%, 32%     { background-color: $_cta-mint;   color: $_cta-text-dark;  }
+  33%, 65%    { background-color: $_cta-maroon; color: $_cta-text-light; }
+  66%, 98%    { background-color: $_cta-olive;  color: $_cta-text-light; }
+  99%, 100%   { background-color: $_cta-mint;   color: $_cta-text-dark;  }
 }
