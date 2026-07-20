@@ -226,80 +226,99 @@ export default function Nav() {
   }, [])
 
   // ── Light pages get inverted (dark) nav ────────────────────────────────────
-  const isLight = pathname === '/contact'
+  const isHome  = pathname === '/'
+  const isLight = pathname === '/contact' || isHome
+
+  const logoLink = (
+    <a
+      href="/"
+      className={s.logo}
+      aria-label="Fresno — ir a inicio"
+      onClick={(e) => {
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
+        e.preventDefault()
+        navigate('/')
+      }}
+    >
+      <GlitchLogo />
+    </a>
+  )
+
+  const faceLink = (
+    <a
+      href="/"
+      className={s.face}
+      aria-label="Ir a inicio"
+      onClick={(e) => {
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
+        e.preventDefault()
+        navigate('/')
+      }}
+    >
+      <GlitchFace />
+    </a>
+  )
 
   return (
     <>
       <header className={clsx(s.nav, hidden && s.hidden, scrolled && s.scrolled, isLight && s.light)}>
         <div className={s.inner}>
+          {isHome ? (
+            // ── Home: minimal chrome — wordmark left, face right, no menu ──
+            <>
+              {logoLink}
+              {faceLink}
+            </>
+          ) : (
+            <>
+              {/* ── Left cluster: face + nav menu ── */}
+              <div className={s.left}>
+                {faceLink}
 
-          {/* ── Left cluster: face + nav menu ── */}
-          <div className={s.left}>
-            <a
-              href="/"
-              className={s.face}
-              aria-label="Ir a inicio"
-              onClick={(e) => {
-                if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
-                e.preventDefault()
-                navigate('/')
-              }}
-            >
-              <GlitchFace />
-            </a>
+                <nav className={s.navMenu} aria-label="Navegación principal">
+                  {NAV_LINKS.map(({ label, href }) => (
+                    <NavLinkItem
+                      key={href}
+                      label={label}
+                      href={href}
+                      active={pathname === href}
+                    />
+                  ))}
+                </nav>
+              </div>
 
-            <nav className={s.navMenu} aria-label="Navegación principal">
-              {NAV_LINKS.map(({ label, href }) => (
-                <NavLinkItem
-                  key={href}
-                  label={label}
-                  href={href}
-                  active={pathname === href}
-                />
-              ))}
-            </nav>
-          </div>
-
-          {/* ── Right: wordmark ── */}
-          <a
-            href="/"
-            className={s.logo}
-            aria-label="Fresno — ir a inicio"
-            onClick={(e) => {
-              if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
-              e.preventDefault()
-              navigate('/')
-            }}
-          >
-            <GlitchLogo />
-          </a>
-
+              {/* ── Right: wordmark ── */}
+              {logoLink}
+            </>
+          )}
         </div>
         <div className={s.lineWrap}>
           <ElasticLine className={s.line} />
         </div>
       </header>
 
-      {/* ── Mobile bottom tab bar ── */}
-      <nav className={clsx(s.bottomBar, isLight && s.bottomBarLight)} aria-label="Navegación móvil">
-        {MOBILE_LINKS.map(({ label, href }) => {
-          const isActive = pathname === href
-          return (
-            <a
-              key={href}
-              href={href}
-              className={clsx(s.bottomTab, isActive && s.bottomTabActive)}
-              onClick={(e) => {
-                if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
-                e.preventDefault()
-                navigate(href)
-              }}
-            >
-              {label}
-            </a>
-          )
-        })}
-      </nav>
+      {/* ── Mobile bottom tab bar — hidden on home's minimal chrome ── */}
+      {!isHome && (
+        <nav className={clsx(s.bottomBar, isLight && s.bottomBarLight)} aria-label="Navegación móvil">
+          {MOBILE_LINKS.map(({ label, href }) => {
+            const isActive = pathname === href
+            return (
+              <a
+                key={href}
+                href={href}
+                className={clsx(s.bottomTab, isActive && s.bottomTabActive)}
+                onClick={(e) => {
+                  if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
+                  e.preventDefault()
+                  navigate(href)
+                }}
+              >
+                {label}
+              </a>
+            )
+          })}
+        </nav>
+      )}
     </>
   )
 }

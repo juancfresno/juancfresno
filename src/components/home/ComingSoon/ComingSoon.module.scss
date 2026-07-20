@@ -1,0 +1,119 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// HOME — Figma node 9:170 · file 0ycaVZcPchp6EejZFSBRt1
+// Light "bg/subtle" background, dark text, full-height reel photo on the right.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// ── Figma tokens (page-local — this page uses a light bg unlike the rest of the site) ──
+$_bg:            #c9c5bd; // bg/subtle
+$_text-primary:  #141414; // text/primary
+$_text-secondary: #4a4d4b; // text/secondary
+$_icon-muted:    #636965; // icon/muted
+
+.page {
+  position: relative;
+  display: flex;
+  flex: 1; // grow to fill <main> exactly (main is now a column flex container) — footer sits right after, no gap
+  background: $_bg;
+}
+
+// ── Reel — full-height photo, fixed so it extends behind the footer too ─────
+.reel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 38%;
+  z-index: 0;
+
+  @include respond-to(lg) {
+    display: none;
+  }
+}
+
+.reelImg {
+  object-fit: cover;
+}
+
+// ── Main content column ──────────────────────────────────────────────────────
+.content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2.5rem; // 40px — space/10
+  width: 62%;
+  padding: 8.5rem 2.5rem 2.5rem; // 136px top (nav 72px + space/16 64px), 40px sides
+  color: $_text-primary;
+
+  @include respond-to(lg) {
+    width: 100%;
+    padding: 7rem $gutter 2.5rem;
+  }
+}
+
+.glyph {
+  display: block;
+}
+
+// ── Content intro — headline + tagline ───────────────────────────────────────
+.intro {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem; // 12px — space/3
+}
+
+.headline {
+  font-family: $font-body;
+  font-weight: $fw-regular;
+  font-size: 1.5rem; // 24px — Desktop/body/xl
+  line-height: 1.4;
+  opacity: 0.9;
+  margin: 0;
+}
+
+.tagline {
+  font-family: $font-mono;
+  font-weight: $fw-regular;
+  font-size: 0.6875rem; // 11px — Desktop/ui/sm
+  line-height: 1.4;
+  letter-spacing: $ls-wide;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.description {
+  font-family: $font-body;
+  font-weight: $fw-light; // Switzer Light — Desktop/body/md-light
+  font-size: 1rem; // 16px
+  line-height: 1.4;
+  opacity: 0.9;
+  color: $_text-secondary;
+  margin: 0;
+  max-width: 40rem;
+}
+
+// ── Social links ───────────────────────────────────────────────────────────
+.social {
+  display: flex;
+  align-items: center;
+  gap: 1.5625rem; // 25px
+  flex-wrap: wrap;
+  color: $_icon-muted;
+}
+
+.socialLink {
+  display: block;
+  color: inherit;
+  opacity: 1;
+  transition: opacity $duration-fast $ease-out-quart;
+
+  &:hover {
+    opacity: 0.65;
+  }
+
+  @include focus-ring;
+}

@@ -1,17 +1,28 @@
-import HomeContent from '@/components/home/HomeContent'
-import {
-  fetchInstagramFeed,
-  fetchDribbbleFeed,
-  mergeFeedItems,
-} from '@/lib/feeds'
+import type { Metadata } from 'next'
+import ComingSoon from '@/components/home/ComingSoon/ComingSoon'
 
-export default async function HomePage() {
-  const [instagramItems, dribbbleItems] = await Promise.all([
-    fetchInstagramFeed(12),
-    fetchDribbbleFeed(12),
-  ])
+const TITLE = 'Juan C. Fresno — Independent Product Designer & Digital Art Director'
+const DESCRIPTION =
+  'Diseño productos digitales, interfaces y sistemas visuales para marcas, agencias y equipos que necesitan una dirección clara. La nueva web está en proceso.'
 
-  const feedItems = mergeFeedItems(instagramItems, dribbbleItems)
+export const metadata: Metadata = {
+  title: { absolute: TITLE },
+  description: DESCRIPTION,
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    title: TITLE,
+    description: DESCRIPTION,
+    url: '/',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: TITLE,
+    description: DESCRIPTION,
+  },
+}
 
-  return <HomeContent feedItems={feedItems} />
+export default function HomePage() {
+  return <ComingSoon />
 }

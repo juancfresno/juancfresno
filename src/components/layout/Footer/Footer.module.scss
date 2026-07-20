@@ -264,3 +264,31 @@
     color: rgba(16, 16, 14, 0.55);
   }
 }
+
+
+// ══════════════════════════════════════════════════════════════════════════════
+// HOME REEL VARIANT — coordinates/clock sit over the full-height reel photo
+// on the right, so they need light text while copyright (over the light
+// page bg on the left) stays dark from the .light variant above.
+// ══════════════════════════════════════════════════════════════════════════════
+
+.homeReel {
+  // The page's light bg ends where <main> ends — paint it again here so the
+  // footer isn't sitting on the site's default dark body background. Right
+  // 38% stays transparent so the fixed reel photo shows through underneath.
+  background: linear-gradient(to right, #c9c5bd 0% 62%, transparent 62% 100%);
+
+  .location,
+  .metaRight time {
+    color: rgba(244, 242, 234, 0.75); // text/inverse-primary — over the dark reel image
+  }
+
+  @include respond-to(lg) {
+    background: #c9c5bd; // reel is hidden below the breakpoint — solid fill
+
+    .location,
+    .metaRight time {
+      color: rgba(16, 16, 14, 0.55); // back to dark — no reel image behind it here
+    }
+  }
+}
