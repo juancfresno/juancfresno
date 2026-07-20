@@ -10,7 +10,7 @@ import GlitchSocialIcon from '@/components/ui/GlitchSocialIcon/GlitchSocialIcon'
 // ─── Social links data ─────────────────────────────────────────────────────────
 const SOCIALS = [
   { id: 'behance',   label: 'Behance',   href: 'https://www.behance.net/juancfresno',    Icon: BehanceLogo  },
-  { id: 'instagram', label: 'Instagram', href: 'https://instagram.com/juancfresno',      Icon: InstagramLogo },
+  { id: 'instagram', label: 'Instagram', href: 'https://instagram.com/juanc.fresno',     Icon: InstagramLogo },
   { id: 'dribbble',  label: 'Dribbble',  href: 'https://dribbble.com/my-playbook',       Icon: DribbbleLogo  },
   { id: 'linkedin',  label: 'LinkedIn',  href: 'https://www.linkedin.com/in/juancfresno', Icon: LinkedInLogo },
 ]

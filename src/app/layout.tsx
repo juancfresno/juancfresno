@@ -48,7 +48,7 @@ const personJsonLd = {
     'https://www.linkedin.com/in/juancfresno',
     'https://www.behance.net/juancfresno',
     'https://dribbble.com/my-playbook',
-    'https://instagram.com/juancfresno',
+    'https://instagram.com/juanc.fresno',
   ],
 }
 
