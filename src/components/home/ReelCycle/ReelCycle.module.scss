@@ -3,28 +3,11 @@
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background: #000; // shows through the discarded (curved-away) corners
+  background: #000; // shows through while the current frame is faded out
 }
 
-.canvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-
-// Brief white flash on the cut — plays once per mount (re-keyed on every index change)
-.flash {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  background: #fff;
-  pointer-events: none;
-  animation: reelFlash 100ms ease-out forwards;
-}
-
-@keyframes reelFlash {
-  0%   { opacity: 1; }
-  100% { opacity: 0; }
+.frame {
+  object-fit: cover;
+  transition-property: opacity;
+  transition-timing-function: ease;
 }
