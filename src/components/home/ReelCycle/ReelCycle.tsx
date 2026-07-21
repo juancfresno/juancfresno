@@ -10,23 +10,31 @@ const DEFAULT_IMAGES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 1
   (n) => `/images/${String(n).padStart(2, '0')}.webp`
 )
 
-const DEFAULT_INTERVAL_MS = 1200 // full per-image cycle time, including the fade/hold below
-const FADE_MS = 350 // fade-to-black and fade-from-black duration
-const HOLD_MS = 125 // hold on solid black between the two fades
+// Named separately (not derived from one "interval") so the timing is
+// explicit and can't quietly regress into a strobe again. Total cycle per
+// image = VISIBLE_MS + FADE_MS + HOLD_MS + FADE_MS = 2500+400+150+400 = 3450ms.
+const DEFAULT_VISIBLE_MS = 2500 // how long each image stays fully visible before it starts fading
+const DEFAULT_FADE_MS = 400 // fade-to-black and fade-from-black duration, each
+const DEFAULT_HOLD_MS = 150 // hold on solid black between the two fades
 
 interface Props {
   images?: string[]
-  intervalMs?: number
+  visibleMs?: number
+  fadeMs?: number
+  holdMs?: number
   sizes?: string
 }
 
-// ─── ReelCycle — crossfades each image to solid black, holds briefly, then
-// fades the next one in from black (old channel-change energy). Loops back
-// to the first image after the last. Respects prefers-reduced-motion by
-// freezing on the first image with no cycling or fading at all. ────────────
+// ─── ReelCycle — each image holds fully visible, then crossfades to solid
+// black, holds briefly, then the next fades in from black (slow, calm old
+// channel-change — not a strobe). Loops back to the first image after the
+// last. Respects prefers-reduced-motion by freezing on the first image with
+// no cycling or fading at all. ───────────────────────────────────────────
 export default function ReelCycle({
   images = DEFAULT_IMAGES,
-  intervalMs = DEFAULT_INTERVAL_MS,
+  visibleMs = DEFAULT_VISIBLE_MS,
+  fadeMs = DEFAULT_FADE_MS,
+  holdMs = DEFAULT_HOLD_MS,
   sizes = '(max-width: 1024px) 100vw, 38vw',
 }: Props) {
   const [index, setIndex] = useState(0)
@@ -46,22 +54,24 @@ export default function ReelCycle({
   useEffect(() => {
     if (!canCycle) return
 
-    const visibleMs = Math.max(100, intervalMs - FADE_MS * 2 - HOLD_MS)
     let cancelled = false
     let visibleTimer: ReturnType<typeof setTimeout>
     let swapTimer: ReturnType<typeof setTimeout>
 
     const cycle = () => {
+      // Phase 1: hold fully visible for `visibleMs`
       visibleTimer = setTimeout(() => {
         if (cancelled) return
-        setVisible(false) // begin fade to black
+        setVisible(false) // Phase 2: begin fade to black (`fadeMs`)
 
         swapTimer = setTimeout(() => {
           if (cancelled) return
-          setIndex((i) => (i + 1) % images.length) // swap while hidden
-          setVisible(true) // begin fade in from black
+          // `fadeMs` (fade-out) + `holdMs` (black hold) have now elapsed —
+          // swap the image while it's invisible, then fade it back in
+          setIndex((i) => (i + 1) % images.length)
+          setVisible(true) // Phase 4: fade in from black (`fadeMs`)
           cycle()
-        }, FADE_MS + HOLD_MS)
+        }, fadeMs + holdMs)
       }, visibleMs)
     }
 
@@ -71,7 +81,7 @@ export default function ReelCycle({
       clearTimeout(visibleTimer)
       clearTimeout(swapTimer)
     }
-  }, [canCycle, images.length, intervalMs])
+  }, [canCycle, images.length, visibleMs, fadeMs, holdMs])
 
   // Warm the browser cache for the next frame ahead of its turn
   useEffect(() => {
@@ -90,7 +100,7 @@ export default function ReelCycle({
         sizes={sizes}
         priority
         className={s.frame}
-        style={{ opacity: visible ? 1 : 0, transitionDuration: `${FADE_MS}ms` }}
+        style={{ opacity: visible ? 1 : 0, transitionDuration: `${fadeMs}ms` }}
       />
     </div>
   )
