@@ -568,10 +568,10 @@ export default function AboutContent() {
             <div ref={servicesMediaRef} className={s.servicesMedia}>
               <div className={s.servicesMediaParallax}>
                 <Image
-                  src="/images/about-services.jpg"
+                  src="/images/08.webp"
                   alt="Workspace"
-                  width={565}
-                  height={377}
+                  width={1080}
+                  height={1920}
                   className={s.servicesImage}
                   priority
                 />

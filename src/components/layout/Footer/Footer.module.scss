@@ -17,6 +17,16 @@
   padding: 0 1.25rem 1.5rem;
 }
 
+// Home: left edge matches the nav wordmark + content column (2.5rem,
+// switching to the fluid $gutter below `lg` same as ComingSoon's .content)
+.innerHome {
+  padding-left: 2.5rem;
+
+  @include respond-to(lg) {
+    padding-left: $gutter;
+  }
+}
+
 // ─── Social row ───────────────────────────────────────────────────────────────
 .social {
   display: flex;

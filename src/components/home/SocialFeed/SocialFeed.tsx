@@ -7,13 +7,13 @@ import type { FeedItem } from '@/lib/feeds/types'
 
 // ─── Fallback items using local carousel images ─────────────────────────────
 const FALLBACK_ITEMS: FeedItem[] = [
-  { id: 'fb-1',  source: 'dribbble',  imageUrl: '/images/carousel-1.jpg', permalink: 'https://dribbble.com/juancfresno', label: 'Visual Design',       date: '' },
-  { id: 'fb-2',  source: 'dribbble',  imageUrl: '/images/carousel-2.jpg', permalink: 'https://dribbble.com/juancfresno', label: 'Brand Identity',      date: '' },
-  { id: 'fb-3',  source: 'dribbble',  imageUrl: '/images/carousel-3.jpg', permalink: 'https://dribbble.com/juancfresno', label: 'Interaction Design',  date: '' },
-  { id: 'fb-4',  source: 'dribbble',  imageUrl: '/images/carousel-4.jpg', permalink: 'https://dribbble.com/juancfresno', label: 'Art Direction',       date: '' },
-  { id: 'fb-5',  source: 'dribbble',  imageUrl: '/images/carousel-5.jpg', permalink: 'https://dribbble.com/juancfresno', label: 'Product Design',      date: '' },
-  { id: 'fb-6',  source: 'dribbble',  imageUrl: '/images/carousel-6.jpg', permalink: 'https://dribbble.com/juancfresno', label: 'Web Experience',      date: '' },
-  { id: 'fb-7',  source: 'dribbble',  imageUrl: '/images/carousel-7.jpg', permalink: 'https://dribbble.com/juancfresno', label: 'Campaign Creative',   date: '' },
+  { id: 'fb-1',  source: 'dribbble',  imageUrl: '/images/01.webp', permalink: 'https://dribbble.com/juancfresno', label: 'Visual Design',       date: '' },
+  { id: 'fb-2',  source: 'dribbble',  imageUrl: '/images/02.webp', permalink: 'https://dribbble.com/juancfresno', label: 'Brand Identity',      date: '' },
+  { id: 'fb-3',  source: 'dribbble',  imageUrl: '/images/03.webp', permalink: 'https://dribbble.com/juancfresno', label: 'Interaction Design',  date: '' },
+  { id: 'fb-4',  source: 'dribbble',  imageUrl: '/images/04.webp', permalink: 'https://dribbble.com/juancfresno', label: 'Art Direction',       date: '' },
+  { id: 'fb-5',  source: 'dribbble',  imageUrl: '/images/05.webp', permalink: 'https://dribbble.com/juancfresno', label: 'Product Design',      date: '' },
+  { id: 'fb-6',  source: 'dribbble',  imageUrl: '/images/06.webp', permalink: 'https://dribbble.com/juancfresno', label: 'Web Experience',      date: '' },
+  { id: 'fb-7',  source: 'dribbble',  imageUrl: '/images/07.webp', permalink: 'https://dribbble.com/juancfresno', label: 'Campaign Creative',   date: '' },
 ]
 
 // ─── Feed card with image ────────────────────────────────────────────────────

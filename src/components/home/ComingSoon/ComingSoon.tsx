@@ -1,10 +1,8 @@
-import Image from 'next/image'
 import { BehanceLogo, InstagramLogo, DribbbleLogo, LinkedInLogo } from '@/components/ui/SocialLogos/SocialLogos'
 import GlitchSocialIcon from '@/components/ui/GlitchSocialIcon/GlitchSocialIcon'
 import CtaButton from '@/components/home/CtaButton/CtaButton'
+import ReelCycle from '@/components/home/ReelCycle/ReelCycle'
 import s from './ComingSoon.module.scss'
-
-const REEL_IMAGE = '/images/reel.jpg'
 
 // ─── Social links — mirrors Footer.tsx SOCIALS ───────────────────────────────
 const SOCIALS = [
@@ -65,14 +63,7 @@ export default function ComingSoon() {
       </div>
 
       <div className={s.reel}>
-        <Image
-          src={REEL_IMAGE}
-          alt=""
-          fill
-          sizes="(max-width: 1024px) 100vw, 38vw"
-          className={s.reelImg}
-          priority
-        />
+        <ReelCycle />
       </div>
     </div>
   )

@@ -11,12 +11,12 @@ import s from './HomeContent.module.scss'
 
 // Map each category index to a carousel image
 const CATEGORY_IMAGES = [
-  '/images/carousel-1.jpg', // Art direction
-  '/images/carousel-2.jpg', // Visual Design
-  '/images/carousel-3.jpg', // Interaction
-  '/images/carousel-4.jpg', // Brand Identity
-  '/images/carousel-5.jpg', // Strategy
-  '/images/carousel-6.jpg', // Develop
+  '/images/01.webp', // Art direction
+  '/images/02.webp', // Visual Design
+  '/images/03.webp', // Interaction
+  '/images/04.webp', // Brand Identity
+  '/images/05.webp', // Strategy
+  '/images/06.webp', // Develop
 ]
 
 // ─── Color dot themes ───────────────────────────────────────────────────────
@@ -383,7 +383,6 @@ export default function HomeContent({ feedItems }: { feedItems: FeedItem[] }) {
                 <video
                   className={`${s.video} ${showVideo ? s.visible : ''}`}
                   src="/videos/hero-reel.mp4"
-                  poster="/images/hero-poster.jpg"
                   autoPlay
                   loop
                   muted

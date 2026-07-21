@@ -41,12 +41,8 @@ $_icon-muted:    #636965; // icon/muted
     right: auto;
     bottom: auto;
     width: 100%;
-    aspect-ratio: 630 / 1024;
+    aspect-ratio: 9 / 16; // matches the cycling images' native ratio
   }
-}
-
-.reelImg {
-  object-fit: cover;
 }
 
 // ── Main content column ──────────────────────────────────────────────────────

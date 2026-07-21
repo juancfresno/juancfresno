@@ -1,6 +1,7 @@
 'use client'
 
 import { usePathname } from 'next/navigation'
+import clsx from 'clsx'
 import s from './Footer.module.scss'
 import ElasticLine from '@/components/ui/ElasticLine/ElasticLine'
 import LiveClock from '@/components/ui/LiveClock/LiveClock'
@@ -23,7 +24,7 @@ export default function Footer() {
 
   return (
     <footer className={`${s.footer} ${isLight ? s.light : ''} ${isHome ? `${s.homeFooter} ${s.homeReel}` : ''}`}>
-      <div className={s.inner}>
+      <div className={clsx(s.inner, isHome && s.innerHome)}>
 
         {/* Social wordmarks — omitted on home, already inline in the hero copy */}
         {!isHome && (

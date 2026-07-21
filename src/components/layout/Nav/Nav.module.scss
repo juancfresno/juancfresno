@@ -8,7 +8,11 @@
   left: 0;
   right: 0;
   z-index: $z-nav;
-  transform: translateY(0);
+  // No base `transform` here (was a no-op translateY(0)) — any non-`none`
+  // transform creates a new stacking context that isolates mix-blend-mode
+  // inside it, which silently broke .face's blend against page content
+  // behind the fixed nav. `.hidden` below still applies its own transform
+  // for the scroll-hide animation exactly as before.
   transition:
     transform  $duration-slow  $ease-out-expo,
     opacity    $duration-base  $ease-out-quart;
@@ -29,6 +33,16 @@
   align-items: center;              // centro vertical — face (32px) vs texto (13px)
   justify-content: space-between;
   padding: 1.25rem;
+}
+
+// Home: left edge matches the content column + footer copyright (2.5rem,
+// switching to the fluid $gutter below `lg` same as ComingSoon's .content)
+.innerHome {
+  padding-left: 2.5rem;
+
+  @include respond-to(lg) {
+    padding-left: $gutter;
+  }
 }
 
 // ─── Left cluster: face + nav menu ───────────────────────────────────────────
@@ -291,6 +305,11 @@
 // ─── Separator line ───────────────────────────────────────────────────────────
 .lineWrap {
   padding: 0 1.25rem;
+}
+
+// Home: line spans truly edge-to-edge, flush with the full-bleed reel panel
+.lineWrapHome {
+  padding: 0;
 }
 
 .line {

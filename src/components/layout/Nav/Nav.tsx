@@ -262,7 +262,7 @@ export default function Nav() {
   return (
     <>
       <header className={clsx(s.nav, hidden && s.hidden, scrolled && s.scrolled, isLight && s.light)}>
-        <div className={s.inner}>
+        <div className={clsx(s.inner, isHome && s.innerHome)}>
           {isHome ? (
             // ── Home: minimal chrome — wordmark left, face right, no menu ──
             <>
@@ -292,7 +292,7 @@ export default function Nav() {
             </>
           )}
         </div>
-        <div className={s.lineWrap}>
+        <div className={clsx(s.lineWrap, isHome && s.lineWrapHome)}>
           <ElasticLine className={s.line} />
         </div>
       </header>
