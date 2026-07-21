@@ -3,25 +3,15 @@
   width: 100%;
   height: 100%;
   overflow: hidden;
+  background: #000; // shows through the discarded (curved-away) corners
 }
 
-// Wraps just the cycling image content — gets the barrel-warp filter.
-// Scanlines/vignette/grain live outside this so they stay flat/unwarped.
-.warpLayer {
+.canvas {
   position: absolute;
   inset: 0;
-  filter: url(#reelCrtBarrel);
-}
-
-.frame {
-  object-fit: cover;
-}
-
-// Off-screen preload — same box, invisible, still fetched/decoded by the browser
-.preload {
-  object-fit: cover;
-  opacity: 0;
-  pointer-events: none;
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
 // Brief white flash on the cut — plays once per mount (re-keyed on every index change)
@@ -37,52 +27,4 @@
 @keyframes reelFlash {
   0%   { opacity: 1; }
   100% { opacity: 0; }
-}
-
-// ══════════════════════════════════════════════════════════════════════════════
-// CRT SCREEN TREATMENT — persistent, static-per-frame (no animation), stays
-// on under prefers-reduced-motion since it isn't the thing motion-sickness
-// guidance is about — only the auto-advance/flash above respects that.
-// ══════════════════════════════════════════════════════════════════════════════
-
-// Thin horizontal lines repeating across the panel
-.scanlines {
-  position: absolute;
-  inset: 0;
-  z-index: 3;
-  background-image: repeating-linear-gradient(
-    to bottom,
-    rgba(0, 0, 0, 0.14) 0px,
-    rgba(0, 0, 0, 0.14) 1px,
-    transparent 1px,
-    transparent 3px
-  );
-  pointer-events: none;
-}
-
-// Darkened corners/edges — reinforces the curved-glass read from the warp
-.vignette {
-  position: absolute;
-  inset: 0;
-  z-index: 4;
-  background: radial-gradient(
-    ellipse at center,
-    transparent 55%,
-    rgba(0, 0, 0, 0.45) 100%
-  );
-  pointer-events: none;
-}
-
-// Static noise texture, desaturated/muted wash — no canvas, no per-frame
-// regeneration, purely a tiled SVG feTurbulence texture at low opacity
-.grain {
-  position: absolute;
-  inset: 0;
-  z-index: 5;
-  background-color: rgba(120, 120, 115, 0.1); // grey wash — muted, washed-out read
-  background-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-repeat: repeat;
-  opacity: 0.18;
-  mix-blend-mode: overlay;
-  pointer-events: none;
 }
