@@ -406,11 +406,18 @@
   // Logo wordmark
   .glMain { color: $color-bg; }
 
-  // Face — invert to dark
-  .faceGlitchWrap { filter: brightness(0.08); }
-
   // Separator
   .line { color: rgba(16, 16, 14, 0.12); }
+}
+
+// Static light pages (e.g. /contact) only — no dynamic background behind
+// the face icon there, so force it dark directly. Home deliberately does
+// NOT get this: the reel panel cycles through both light and dark images,
+// so the face icon needs mix-blend-mode: difference (set on .face) to
+// stay legible on its own — a hardcoded filter here would lock it to one
+// color and defeat that.
+.lightStatic {
+  .faceGlitchWrap { filter: brightness(0.08); }
 }
 
 

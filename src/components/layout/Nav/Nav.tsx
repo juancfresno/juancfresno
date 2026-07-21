@@ -228,6 +228,9 @@ export default function Nav() {
   // ── Light pages get inverted (dark) nav ────────────────────────────────────
   const isHome  = pathname === '/'
   const isLight = pathname === '/contact' || isHome
+  // Static light pages force the face icon dark directly; home relies on
+  // mix-blend-mode instead since its background changes under the icon
+  const isLightStatic = pathname === '/contact'
 
   const logoLink = (
     <a
@@ -261,7 +264,7 @@ export default function Nav() {
 
   return (
     <>
-      <header className={clsx(s.nav, hidden && s.hidden, scrolled && s.scrolled, isLight && s.light)}>
+      <header className={clsx(s.nav, hidden && s.hidden, scrolled && s.scrolled, isLight && s.light, isLightStatic && s.lightStatic)}>
         <div className={clsx(s.inner, isHome && s.innerHome)}>
           {isHome ? (
             // ── Home: minimal chrome — wordmark left, face right, no menu ──
