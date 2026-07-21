@@ -32,15 +32,12 @@ export default function ComingSoon() {
           <p className={s.headline}>
             Juan C. Fresno — Independent Product Designer &amp; Digital Art Director
           </p>
-          <p className={s.tagline}>
-            Product Design — Digital Art Direction — Brand Systems — Interaction
-          </p>
         </div>
 
         <p className={s.description}>
-          Diseño productos digitales, interfaces y sistemas visuales para marcas, agencias y equipos que necesitan una dirección clara.
+          Creo productos digitales, webs e identidades visuales pensadas para destacar, funcionar y crecer.
           <br />
-          Trabajo entre producto, marca e interacción, conectando estructura, identidad visual y experiencia en un mismo sistema.
+          Combino estrategia, dirección visual, diseño y tecnología para transformar ideas en experiencias útiles, coherentes y reconocibles.
         </p>
 
         <p className={s.description}>

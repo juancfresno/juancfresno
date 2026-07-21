@@ -87,16 +87,6 @@ $_icon-muted:    #636965; // icon/muted
   margin: 0;
 }
 
-.tagline {
-  font-family: $font-mono;
-  font-weight: $fw-regular;
-  font-size: 0.6875rem; // 11px — Desktop/ui/sm
-  line-height: 1.4;
-  letter-spacing: $ls-wide;
-  text-transform: uppercase;
-  margin: 0;
-}
-
 .description {
   font-family: $font-body;
   font-weight: $fw-light; // Switzer Light — Desktop/body/md-light
