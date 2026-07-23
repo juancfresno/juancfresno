@@ -11,6 +11,11 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'cdn.dribbble.com' },
     ],
   },
+  async rewrites() {
+    return [
+      { source: '/medida/privacidad', destination: '/medida/privacidad/index.html' },
+    ]
+  },
 }
 
 export default nextConfig

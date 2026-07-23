@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Política de privacidad — Medida</title>
+<meta name="description" content="Política de privacidad de Medida. Medida no recoge, almacena ni transmite ningún dato personal.">
+<meta name="robots" content="index,follow">
+<style>
+  @font-face {
+    font-family: 'Doto';
+    src: url('fonts/doto-variable.woff2') format('woff2');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'Geist Mono';
+    src: url('fonts/GeistMono-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'Geist Mono';
+    src: url('fonts/GeistMono-Medium.woff2') format('woff2');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #e2e2d6;
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+    font-family: 'Geist Mono', monospace;
+  }
+
+  .page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 47px;
+    width: 100%;
+    padding: 73px 40px;
+    overflow: clip;
+  }
+
+  /* ── Header: app icon + wordmark ── */
+  .masthead {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    width: 100%;
+  }
+
+  .app-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    border-radius: 9px;
+    background: #141414;
+    overflow: clip;
+  }
+
+  .app-icon svg {
+    width: 25.125px;
+    height: 25.125px;
+    image-rendering: pixelated;
+  }
+
+  .wordmark {
+    margin: 0;
+    font-family: 'Doto', monospace;
+    font-weight: 900;
+    font-variation-settings: 'ROND' 0;
+    font-size: 20px;
+    line-height: 1.4;
+    color: #141414;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  /* ── Intro: title + lead paragraph ── */
+  .intro {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+  }
+
+  h1 {
+    margin: 0;
+    font-family: 'Doto', monospace;
+    font-weight: 800;
+    font-variation-settings: 'ROND' 0;
+    font-size: 40px;
+    line-height: normal;
+    color: #141414;
+    text-transform: uppercase;
+    width: 100%;
+  }
+
+  .lead {
+    margin: 0;
+    font-family: 'Geist Mono', monospace;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 1.7;
+    color: rgba(20, 20, 20, 0.75);
+    width: 100%;
+    white-space: pre-wrap;
+  }
+
+  /* ── Policy sections ── */
+  .sections {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    overflow: clip;
+  }
+
+  .divider {
+    flex-shrink: 0;
+    width: 100%;
+    height: 1px;
+    background: rgba(20, 20, 20, 0.15);
+  }
+
+  .section {
+    display: flex;
+    align-items: flex-start;
+    gap: 64px;
+    width: 100%;
+    padding: 40px 0;
+    font-size: 12px;
+  }
+
+  .section .label {
+    flex-shrink: 0;
+    width: 280px;
+    margin: 0;
+    font-family: 'Geist Mono', monospace;
+    font-weight: 500;
+    color: rgba(20, 20, 20, 0.5);
+    letter-spacing: 0.96px;
+  }
+
+  .section .body {
+    flex: 1 0 0;
+    min-width: 0;
+    margin: 0;
+    font-family: 'Geist Mono', monospace;
+    font-weight: 400;
+    line-height: 1.7;
+    color: rgba(20, 20, 20, 0.8);
+  }
+
+  /* ── Mascot: pixel character + floor lines ── */
+  .mascot {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+  }
+
+  .avatar {
+    flex-shrink: 0;
+    width: 41.6397px;
+    height: 142.4998px;
+  }
+
+  .avatar svg { image-rendering: pixelated; }
+
+  .floor-line {
+    flex-shrink: 0;
+    width: 100%;
+    height: 1px;
+    background: rgba(0, 0, 0, 0.3);
+  }
+
+  .floor-line--short {
+    width: 21px;
+  }
+
+  /* ── Sello: dark footer strip ── */
+  .sello {
+    display: flex;
+    align-items: center;
+    gap: 23px;
+    height: 134px;
+    width: 100%;
+    padding: 40px;
+    background: #141414;
+  }
+
+  .face {
+    position: relative;
+    flex-shrink: 0;
+    width: 43.333px;
+    height: 52px;
+  }
+
+  .face-lines {
+    position: absolute;
+    top: 0;
+    right: 9.43%;
+    bottom: 0;
+    left: 9.23%;
+  }
+
+  .face-lines svg {
+    position: absolute;
+    top: -1.2%;
+    right: -1.77%;
+    bottom: -1.2%;
+    left: -1.77%;
+    width: 100%;
+    height: 100%;
+  }
+
+  .face-band {
+    position: absolute;
+    top: 43.99%;
+    right: 0;
+    bottom: 42.14%;
+    left: 0;
+    background: rgba(0, 61, 255, 0.9);
+  }
+
+  .vline {
+    flex-shrink: 0;
+    width: 1px;
+    height: 52px;
+    background: #636965;
+  }
+
+  .credits {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1 0 0;
+    min-width: 0;
+    font-family: 'Doto', monospace;
+    font-weight: 700;
+    font-variation-settings: 'ROND' 0;
+    font-size: 10px;
+    line-height: 1.4;
+    color: #f4f2ea;
+    text-transform: uppercase;
+  }
+
+  .credits p { margin: 0; }
+
+  .credits .regular {
+    font-weight: 400;
+  }
+
+  /* ── Responsive: collapse sections to single column below ~768px ── */
+  @media (max-width: 768px) {
+    .page {
+      padding: 48px 24px;
+      gap: 36px;
+    }
+
+    h1 {
+      font-size: 28px;
+    }
+
+    .section {
+      flex-direction: column;
+      gap: 12px;
+      padding: 28px 0;
+    }
+
+    .section .label {
+      width: 100%;
+    }
+
+    .sello {
+      height: auto;
+      flex-wrap: wrap;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="masthead">
+    <div class="app-icon" aria-hidden="true">
+      <svg viewBox="0 0 25.125 25.125" fill="none" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+        <path d="M2.53125 0H22.5938V2.53125H2.53125V0ZM2.53125 22.5938H22.5938V25.125H2.53125V22.5938ZM0 2.53125H2.53125V22.5938H0V2.53125ZM22.5938 2.53125H25.125V22.5938H22.5938V2.53125ZM6.29297 11.3086H18.832V13.8164H6.29297V11.3086Z" fill="#F4F2EA"/>
+        <path d="M11.3086 18.832V6.29297H13.8164V18.832H11.3086Z" fill="#F4F2EA"/>
+      </svg>
+    </div>
+    <p class="wordmark">medida</p>
+  </header>
+
+  <div class="intro">
+    <h1>Política de privacidad</h1>
+    <p class="lead">Medida no recoge, almacena ni transmite ningún dato personal. Todos tus datos viven en tu dispositivo. <br>Sin cuentas, sin servidores, sin analítica.</p>
+  </div>
+
+  <div class="sections">
+    <div class="divider"></div>
+    <div class="section">
+      <p class="label">01 — DATOS</p>
+      <p class="body">Todos los datos que introduces (gastos, categorías, presupuestos, cuentas) se guardan exclusivamente en tu dispositivo, usando el almacenamiento local de iOS. Nunca salen de él.</p>
+    </div>
+
+    <div class="divider"></div>
+    <div class="section">
+      <p class="label">02 — SIN CUENTAS</p>
+      <p class="body">Medida no requiere registro, email ni identificación de ningún tipo. No existe ningún perfil tuyo en ningún servidor porque no hay servidores.</p>
+    </div>
+
+    <div class="divider"></div>
+    <div class="section">
+      <p class="label">03 — SIN TERCEROS</p>
+      <p class="body">La app no integra SDKs de analítica, publicidad ni seguimiento. No se comparte información con terceros porque no se recoge información.</p>
+    </div>
+
+    <div class="divider"></div>
+    <div class="section">
+      <p class="label">04 — EXPORTACIÓN</p>
+      <p class="body">Puedes exportar tus datos en CSV en cualquier momento desde Ajustes. El archivo se genera en tu dispositivo y tú decides qué hacer con él.</p>
+    </div>
+
+    <div class="divider"></div>
+    <div class="section">
+      <p class="label">05 — CONTACTO</p>
+      <p class="body">Para cualquier duda sobre esta política: hola@juancfresno.com</p>
+    </div>
+  </div>
+
+  <div class="mascot">
+    <div class="avatar" aria-hidden="true">
+      <svg viewBox="0 0 41.6397 142.4998" fill="none" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+        <rect x="13.8799" y="68.951" width="4.6266" height="73.548" fill="#272727"/>
+        <rect x="18.5059" y="68.9515" width="4.6266" height="36.774" fill="#272727"/>
+        <rect x="23.1323" y="68.9515" width="4.6266" height="9.1935" fill="#272727"/>
+        <rect x="27.7588" y="68.9515" width="4.6266" height="73.548" fill="#272727"/>
+        <rect x="27.7588" y="137.903" width="4.6266" height="4.59675" fill="white"/>
+        <rect x="13.8794" y="137.903" width="4.6266" height="4.59675" fill="white"/>
+        <rect x="32.3853" y="68.9515" width="4.6266" height="32.1772" fill="#272727"/>
+        <rect x="23.1333" y="0" width="18.5064" height="22.9837" fill="#FFC9A9"/>
+        <rect x="23.1333" y="0" width="18.5064" height="4.59675" fill="black"/>
+        <rect x="27.7593" y="9.19299" width="4.6266" height="4.59675" fill="#997865"/>
+        <rect x="37.0127" y="9.19299" width="4.6266" height="4.59675" fill="#997865"/>
+        <rect x="23.1333" y="22.9838" width="9.2532" height="4.59675" fill="#FFC9A9"/>
+        <rect x="23.1333" y="27.58" width="4.6266" height="45.9675" fill="black"/>
+        <rect x="18.5068" y="22.9838" width="4.6266" height="50.5642" fill="black"/>
+        <rect x="27.7598" y="27.58" width="4.6266" height="45.9675" fill="black"/>
+        <rect x="13.8804" y="32.1774" width="4.6266" height="36.774" fill="black"/>
+        <rect x="0" y="59.7573" width="23.133" height="18.387" fill="#D8D8D8"/>
+        <rect x="18.5068" y="59.7573" width="4.6266" height="18.387" fill="black"/>
+        <rect x="9.25293" y="55.16" width="4.6266" height="27.5805" fill="#FFC9A9"/>
+        <rect x="9.25293" y="41.37" width="4.6266" height="36.774" fill="black"/>
+        <rect x="37.0127" y="78.1448" width="4.6266" height="9.1935" fill="#FFC9A9"/>
+        <rect x="37.0127" y="78.1448" width="4.6266" height="4.59675" fill="black"/>
+        <rect x="32.3862" y="32.1774" width="4.6266" height="36.774" fill="black"/>
+        <rect x="37.0127" y="36.7737" width="4.6266" height="13.7902" fill="black"/>
+        <rect x="37.0127" y="50.5637" width="4.6266" height="27.5805" fill="black"/>
+        <rect x="37.0127" y="59.7573" width="4.6266" height="18.387" fill="#1A1A1A"/>
+        <rect x="9.25293" y="55.16" width="4.6266" height="22.9837" fill="#1A1A1A"/>
+      </svg>
+    </div>
+    <div class="floor-line"></div>
+    <div class="floor-line floor-line--short"></div>
+  </div>
+
+  <footer class="sello">
+    <div class="face" aria-hidden="true">
+      <div class="face-lines">
+        <svg viewBox="0 0 36.4989 53.2499" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+          <path d="M15.0899 35.6264C15.0899 35.6264 16.0671 35.2249 16.3929 35.4256C16.7186 35.6264 17.6958 36.2957 18.4125 36.2957C19.3245 36.2957 20.2366 35.4926 20.7578 35.4926C21.279 35.4926 22.0608 35.7603 22.0608 35.7603C22.1259 35.6264 22.1259 35.4256 22.1259 35.2249C22.1259 34.5556 21.8653 34.0202 21.6699 33.351" stroke="white" stroke-width="1.25" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M11.0503 27.1939C11.0503 27.7962 11.5063 28.2647 12.0927 28.2647C12.679 28.2647 13.1351 27.7962 13.1351 27.1939C13.1351 26.5916 12.679 26.1231 12.0927 26.1231C11.5715 26.1231 11.0503 26.5916 11.0503 27.1939Z" fill="white"/>
+          <path d="M23.8852 27.1939C23.8852 27.7962 24.3412 28.2647 24.9275 28.2647C25.5139 28.2647 25.9699 27.7962 25.9699 27.1939C25.9699 26.5916 25.5139 26.1231 24.9275 26.1231C24.4063 26.1231 23.8852 26.5916 23.8852 27.1939Z" fill="white"/>
+          <path d="M22.3862 23.9815C23.4937 24.2492 25.9042 21.773 26.8814 21.773C27.7935 21.84 28.8358 23.58 28.8358 23.58" stroke="white" stroke-width="1.25" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M4.07973 27.9302C4.07973 27.7294 2.45103 25.7886 1.66925 26.1902C0.952621 26.5248 0.626878 29.871 0.626878 30.4064C0.56173 30.9418 2.12529 33.2172 2.38588 34.2211C2.64647 35.2249 2.58133 37.768 4.66607 37.5673" stroke="white" stroke-width="1.25" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M32.4192 27.9302C32.4192 27.7294 34.0479 25.7886 34.8296 26.1902C35.5463 26.5248 35.872 29.871 35.872 30.4064C35.9372 30.9418 34.3736 33.2172 34.113 34.2211C33.8524 35.2249 33.9176 37.768 31.8328 37.5673" stroke="white" stroke-width="1.25" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M5.05686 37.2324C5.05686 37.2324 9.68239 44.5941 11.9626 44.8618C12.3535 44.9287 10.9202 42.9879 12.0277 41.2479C12.6792 40.244 14.3731 38.7717 18.2168 38.7717C20.6273 38.7717 24.2756 39.7755 24.9271 41.0471C25.6437 42.3856 24.9271 44.661 24.9271 44.661C24.9271 44.661 30.7904 40.7125 31.5722 36.5632" stroke="white" stroke-width="1.25" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M32.419 27.7961C32.419 27.7961 31.8979 38.8385 30.9858 41.5155C30.5949 42.7202 29.2919 46.6687 25.0573 49.2787C25.0573 49.2787 24.9921 49.2787 24.9921 49.3457C23.624 50.1487 22.3211 52.6249 18.4773 52.6249C18.347 52.6249 18.2167 52.6249 18.0864 52.6249C17.9561 52.6249 17.8258 52.6249 17.6955 52.6249C13.8518 52.6249 13.3958 50.2157 12.0277 49.4126C12.0277 49.4126 11.9625 49.4126 11.9625 49.3457C7.72787 46.7356 6.6855 42.5194 6.03402 41.4486C4.7962 39.3739 4.07957 27.7961 4.07957 27.7961" stroke="white" stroke-width="1.25" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M15.0247 24.7177L10.0083 23.6469C10.0083 23.6469 8.2493 24.383 7.59782 25.7885" stroke="white" stroke-width="1.25" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M16.8491 26.3909C17.1097 26.9932 17.4354 27.5286 17.4354 28.2648C17.4354 28.6663 16.7839 29.5363 16.7839 30.0717C16.7839 30.741 16.5885 31.611 17.1097 32.2802" stroke="white" stroke-width="1.25" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M14.8944 41.9172C15.8717 42.051 13.9172 42.2518 21.0835 41.9841C21.279 41.9841 21.6047 41.9172 21.735 41.7833" stroke="white" stroke-width="1.25" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M3.16779 26.3239C2.97235 20.033 3.10264 20.3007 3.23294 13.2067C3.29809 9.25822 7.20698 6.24663 12.0931 4.70738L13.6567 1.02655L17.2398 2.23118L21.6699 0.625001C21.6699 0.625001 26.1 1.36117 25.3833 3.03427C25.253 3.36889 33.2011 7.04972 33.5269 10.4629C34.0481 15.4152 33.9829 26.4577 33.9829 26.4577" stroke="white" stroke-width="1.25" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M4.01454 27.6624C4.01454 27.6624 4.27513 25.3869 6.62047 20.8361C8.70521 16.8206 5.5781 14.746 8.90065 11.1321C8.90065 11.1321 12.4838 9.92745 14.3731 11.7344C16.3276 13.4744 18.6077 12.939 21.0834 12.6713" stroke="white" stroke-width="1.25" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M32.4191 27.3946C32.4191 27.3946 32.6146 24.1154 29.9435 19.7653C27.3376 15.4152 32.8752 14.8798 25.318 10.9313C25.318 10.9313 24.6013 11.8013 21.0833 12.7382" stroke="white" stroke-width="1.25" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M16.3277 45.5311C16.3277 45.5311 17.1746 44.7949 18.2821 44.9288C19.3896 45.1295 19.7154 45.5311 19.7154 45.5311" stroke="white" stroke-width="1.25" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M19.3248 36.6972C19.3248 37.2326 18.8688 37.7011 18.3476 37.7011C17.8264 37.7011 17.3704 37.2326 17.3704 36.6972C17.3704 36.1618 18.3476 36.3626 18.3476 36.3626C18.3476 36.3626 19.3248 36.1618 19.3248 36.6972Z" stroke="white" stroke-width="0.623823" stroke-miterlimit="10"/>
+        </svg>
+      </div>
+      <div class="face-band"></div>
+    </div>
+    <div class="vline"></div>
+    <div class="credits">
+      <p><strong>Medida 1.0 - </strong><span class="regular">ÚLTIMA ACTUALIZACIÓN · JUL 2026</span></p>
+      <p>Hecho por juanc. fresno</p>
+      <p>www.juancfresno.com</p>
+    </div>
+  </footer>
+
+</div>
+</body>
+</html>
