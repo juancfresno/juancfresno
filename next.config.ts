@@ -14,6 +14,7 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [
       { source: '/medida/privacidad', destination: '/medida/privacidad/index.html' },
+      { source: '/glyf/privacy', destination: '/glyf/privacy/index.html' },
     ]
   },
 }
