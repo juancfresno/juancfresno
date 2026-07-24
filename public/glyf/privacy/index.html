@@ -50,7 +50,6 @@
     align-items: center;
     gap: 47px;
     width: 100%;
-    min-height: 100vh;
     padding: 73px 40px;
     overflow: clip;
   }
@@ -159,12 +158,16 @@
     text-underline-offset: from-font;
   }
 
-  /* ── Visual: globe mark + camera device ── */
+  /* ── Visual: globe mark + camera device — centered on screen, 72px above the footer ── */
   .visual {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    width: 100%;
+    width: 145.581px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: auto;
+    margin-bottom: 72px;
   }
 
   .globe {
@@ -192,7 +195,6 @@
     width: 100%;
     padding: 40px;
     background: #141414;
-    margin-top: auto;
   }
 
   .face {
@@ -329,13 +331,14 @@
       <p class="body">For any questions about this policy: <a href="mailto:hello@juancfresno.com">hello@juancfresno.com</a></p>
     </div>
   </div>
+</div>
 
-  <div class="visual">
-    <img class="globe" src="/glyf/assets/glyf-globe.svg" alt="" aria-hidden="true" width="145.581" height="71.25">
-    <img class="camera" src="/glyf/assets/glyf-camera.png" alt="" aria-hidden="true" width="130.5" height="37.7531">
-  </div>
+<div class="visual">
+  <img class="globe" src="/glyf/assets/glyf-globe.svg" alt="" aria-hidden="true" width="145.581" height="71.25">
+  <img class="camera" src="/glyf/assets/glyf-camera.png" alt="" aria-hidden="true" width="130.5" height="37.7531">
+</div>
 
-  <footer class="sello">
+<footer class="sello">
     <div class="face" aria-hidden="true">
       <div class="face-lines">
         <svg viewBox="0 0 36.4989 53.2499" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
@@ -367,6 +370,5 @@
     </div>
   </footer>
 
-</div>
 </body>
 </html>
