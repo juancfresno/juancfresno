@@ -20,7 +20,7 @@
   --border-default:#c9c5bd; --border-subtle:#dad8d2; --border-strong:#a9aea9; --border-strongest:#141414;
   --feedback-success:#38ae7a; --feedback-warning:#e0ac3a; --feedback-error:#e0655a; --feedback-info:#5a82d2;
   --logo-accent:#003dff;
-  --icon-default:#141414; --icon-muted:#636965; --icon-disabled:#a9aea9; --icon-inverse:#f4f2ea;
+  --icon-default:#141414; --icon-muted:#636965; --icon-disabled:#a9aea9; --icon-inverse:#f4f2ea; --btn-focus:#4063c2;
   --shadow:0 8px 24px rgba(20,20,20,.10); --shadow-sm:0 4px 14px rgba(20,20,20,.08);
 }
 [data-theme="dark"]{
@@ -31,7 +31,7 @@
   --border-default:#4a4d4b; --border-subtle:#373737; --border-strong:#636965; --border-strongest:#f4f2ea;
   --feedback-success:#38ae7a; --feedback-warning:#e0ac3a; --feedback-error:#e0655a; --feedback-info:#5a82d2;
   --logo-accent:#003dff;
-  --icon-default:#f4f2ea; --icon-muted:#a9aea9; --icon-disabled:#636965; --icon-inverse:#141414;
+  --icon-default:#f4f2ea; --icon-muted:#a9aea9; --icon-disabled:#636965; --icon-inverse:#141414; --btn-focus:#a3c3f3;
   --shadow:0 8px 28px rgba(0,0,0,.5); --shadow-sm:0 4px 16px rgba(0,0,0,.4);
 }
 /* scales (mode-independent) */
@@ -197,6 +197,90 @@ a{color:inherit;text-decoration:none}
 .icon-cell{border:1px solid var(--border-subtle);border-radius:var(--radius-md);background:var(--bg-surface);padding:20px 10px;display:flex;flex-direction:column;align-items:center;gap:14px;color:var(--icon-default)}
 .icon-cell svg{width:24px;height:24px}
 .icon-cell .inm{font-family:var(--font-ui);font-size:10px;color:var(--text-tertiary)}
+
+/* type scale */
+.ts-row{display:grid;grid-template-columns:1fr 220px;gap:24px;align-items:baseline;padding:16px 18px;border-bottom:1px solid var(--border-subtle);background:var(--bg-surface)}
+.ts-row:last-child{border-bottom:0}
+.ts-row .smp{color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.ts-row .meta{text-align:right}
+.ts-row .tn{font-family:var(--font-ui);font-size:12px;color:var(--text-primary)}
+.ts-row .tm{font-family:var(--font-ui);font-size:10px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.04em;margin-top:4px;white-space:nowrap}
+@media(max-width:720px){.ts-row{grid-template-columns:1fr 104px}.ts-row .tm{white-space:normal}}
+
+/* changelog */
+.cl-entry{border-left:2px solid var(--border-default);padding-left:24px;margin-bottom:34px}
+.cl-ver{display:flex;align-items:baseline;gap:12px;margin-bottom:6px}
+.cl-ver h3{font-family:var(--font-ui);font-size:17px;color:var(--text-primary)}
+.cl-date{font-family:var(--font-ui);font-size:11px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.06em}
+.cl-note{color:var(--text-secondary);margin-bottom:14px}
+.cl-item{display:flex;gap:12px;align-items:flex-start;padding:6px 0}
+.cl-tag{font-family:var(--font-ui);font-size:9px;text-transform:uppercase;letter-spacing:.07em;padding:3px 8px;border-radius:999px;flex-shrink:0;margin-top:2px;min-width:42px;text-align:center}
+.cl-tag.add{background:rgba(56,174,122,.15);color:var(--feedback-success)}
+.cl-tag.chg{background:rgba(90,130,210,.15);color:var(--feedback-info)}
+.cl-tag.brk{background:rgba(224,101,90,.15);color:var(--feedback-error)}
+.cl-item .txt{color:var(--text-secondary);font-size:14px;line-height:1.5}
+
+/* component docs */
+.cdoc-status{display:inline-flex;align-items:center;gap:7px;font-family:var(--font-ui);font-size:10px;text-transform:uppercase;letter-spacing:.08em;padding:5px 11px;border-radius:999px;margin-bottom:4px}
+.cdoc-status.stable{background:rgba(56,174,122,.15);color:var(--feedback-success)}
+.cdoc-status.draft{background:rgba(224,172,58,.15);color:var(--feedback-warning)}
+.cdoc-status .d{width:6px;height:6px;border-radius:999px;background:currentColor}
+.demo{border:1px solid var(--border-subtle);border-radius:var(--radius-lg);background:var(--bg-surface);padding:32px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;margin-top:8px}
+.demo.dark-surface{background:var(--bg-inverse-surface)}
+.demo-label{font-family:var(--font-ui);font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-tertiary);margin:24px 0 8px}
+.props{border:1px solid var(--border-subtle);border-radius:var(--radius-lg);overflow:hidden;margin-top:8px;font-family:var(--font-ui)}
+.props .ph,.props .pr{display:grid;grid-template-columns:1.1fr 1.4fr 1fr;gap:16px;padding:12px 18px;font-size:12px}
+.props .ph{background:var(--bg-page);color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.06em;font-size:10px}
+.props .pr{border-top:1px solid var(--border-subtle);color:var(--text-secondary)}
+.props .pr b{color:var(--text-primary);font-weight:400}
+.dodont{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:8px}
+@media(max-width:720px){.dodont{grid-template-columns:1fr}}
+.dd{border:1px solid var(--border-subtle);border-radius:var(--radius-lg);overflow:hidden}
+.dd .ddh{font-family:var(--font-ui);font-size:11px;text-transform:uppercase;letter-spacing:.07em;padding:10px 16px;color:#fff}
+.dd.do .ddh{background:var(--feedback-success)}
+.dd.dont .ddh{background:var(--feedback-error)}
+.dd .ddb{padding:18px 16px;background:var(--bg-surface);color:var(--text-secondary);font-size:14px;line-height:1.55}
+.tokens-used{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.tok{font-family:var(--font-ui);font-size:11px;color:var(--text-secondary);background:var(--bg-page);border:1px solid var(--border-subtle);border-radius:999px;padding:5px 11px}
+
+/* buttons */
+.fbtn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-family:var(--font-ui);font-size:12px;text-transform:uppercase;letter-spacing:.06em;border:1px solid transparent;border-radius:var(--radius-md);padding:11px 18px;cursor:pointer;transition:all .14s ease;white-space:nowrap}
+.fbtn.sm{padding:8px 13px;font-size:11px}
+.fbtn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2}
+.fbtn-primary{background:#c6dbf9;color:#141414}
+.fbtn-primary:hover{background:#a3c3f3}
+.fbtn-primary:active{background:#7ba1e8}
+.fbtn-neutral{background:#141414;color:#f4f2ea}
+.fbtn-neutral:hover{background:#373737}
+.fbtn-neutral:active{background:#4a4d4b}
+.fbtn-outline{background:transparent;border-color:#141414;color:#141414}
+.fbtn-outline:hover{background:#ecebe6}
+.fbtn-outline:active{background:#dad8d2}
+.fbtn:disabled{background:var(--border-subtle);color:var(--icon-disabled);border-color:transparent;cursor:not-allowed}
+.fbtn.focus{box-shadow:0 0 0 3px var(--btn-focus)}
+.fbtn-neutral-inv{background:#f4f2ea;color:#141414}
+.fbtn-neutral-inv:hover{background:#ecebe6}
+.fbtn-outline-inv{background:transparent;border-color:#f4f2ea;color:#f4f2ea}
+.fbtn-outline-inv:hover{background:rgba(244,242,234,.12)}
+/* icon button */
+.ibtn{display:inline-flex;align-items:center;justify-content:center;border-radius:var(--radius-md);width:40px;height:40px;cursor:pointer;border:1px solid transparent;transition:all .14s ease}
+.ibtn.sm{width:32px;height:32px}
+.ibtn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2}
+.ibtn.sm svg{width:15px;height:15px}
+.ibtn-primary{background:#c6dbf9;color:#141414}
+.ibtn-primary:hover{background:#a3c3f3}
+.ibtn-neutral{background:#141414;color:#f4f2ea}
+.ibtn-neutral:hover{background:#373737}
+.ibtn-ghost{background:transparent;color:var(--icon-default)}
+.ibtn-ghost:hover{background:var(--bg-page)}
+.ibtn-outline{background:transparent;border-color:var(--border-strong);color:var(--icon-default)}
+.ibtn-outline:hover{background:var(--bg-page)}
+/* fab */
+.fab{display:inline-flex;align-items:center;justify-content:center;gap:10px;background:#141414;color:#f4f2ea;border:none;border-radius:999px;cursor:pointer;box-shadow:var(--shadow);transition:all .14s ease;font-family:var(--font-ui);font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+.fab.circle{width:56px;height:56px;padding:0}
+.fab.extended{padding:0 22px;height:56px}
+.fab:hover{background:#373737}
+.fab svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2}
 
 .foot{margin-top:80px;padding-top:24px;border-top:1px solid var(--border-subtle);font-family:var(--font-ui);text-transform:uppercase;letter-spacing:.1em;font-size:10px;color:var(--text-tertiary);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
 
@@ -499,6 +583,122 @@ function openNav(){document.getElementById('sidebar').classList.add('open');docu
 function closeNav(){document.getElementById('sidebar').classList.remove('open');document.getElementById('scrim').classList.remove('show')}
 
 /* init */
+/* ---- full type scale (Desktop + Mobile from Figma) ---- */
+const TYPESCALE=[
+ {g:'Display — Geist Mono · 100%', font:'var(--font-ui)', rows:[
+   ['display/xl',88,48,'100%','Fresno'],['display/lg',72,40,'100%','Fresno'],
+   ['display/md',48,32,'100%','Fresno'],['display/sm',36,26,'100%','Fresno']]},
+ {g:'Heading — Switzer · 110%', font:'var(--font-body)', rows:[
+   ['heading/1',40,30,'110%','Heading one'],['heading/2',32,26,'110%','Heading two'],
+   ['heading/3',24,22,'110%','Heading three'],['heading/4',20,18,'110%','Heading four']]},
+ {g:'Body — Switzer · 140%', font:'var(--font-body)', rows:[
+   ['body/xl',24,20,'140%','The quick brown fox jumps'],['body/lg',18,17,'140%','The quick brown fox jumps over'],
+   ['body/md',16,16,'140%','The quick brown fox jumps over the lazy dog'],['body/sm',14,14,'140%','The quick brown fox jumps over the lazy dog'],
+   ['body/xs',12,12,'140%','The quick brown fox jumps over the lazy dog']]},
+ {g:'UI — Geist Mono · 140%', font:'var(--font-ui)', upper:true, rows:[
+   ['ui/md',12,12,'140%','UI label medium'],['ui/sm',11,11,'140%','UI label small']]},
+ {g:'Editorial — Instrument Serif · 140%', font:'var(--font-editorial)', rows:[
+   ['editorial/lg',24,20,'140%','An editorial flourish'],['editorial/md',18,16,'140%','An editorial flourish']]}
+];
+R.typography=()=>{
+  const scale=TYPESCALE.map(grp=>`<div class="grp-label">${grp.g}</div><div class="scale-table">${grp.rows.map(([n,d,m,line,smp])=>`<div class="ts-row"><div class="smp" style="font-family:${grp.font};font-size:${Math.min(d,52)}px;line-height:1.1;${grp.upper?'text-transform:uppercase;letter-spacing:.06em':''}">${smp}</div><div class="meta"><div class="tn">${n}</div><div class="tm">D ${d} · M ${m} · ${line}</div></div></div>`).join('')}</div>`).join('');
+  return `
+  <div class="sec-head"><span class="kicker">Foundations</span><h1 class="sec-title"><span class="br">{</span> Typography <span class="br">}</span></h1>
+    <p class="sec-lede">Three families, two breakpoints. Switzer carries reading text and headings, Geist Mono handles display statements and all UI/labels, Instrument Serif covers editorial moments. Every style is defined for <strong>Desktop</strong> and <strong>Mobile</strong>.</p></div>
+  <div class="prose"><h3>Families</h3></div>
+  <div class="type-card"><div class="role">Body &amp; headings</div><div class="big" style="font-family:var(--font-body);font-size:72px">Ag</div><div class="fam">Switzer · var(--font-body) · var(--font-heading)</div><div class="sample" style="font-family:var(--font-body);font-size:17px">The quick brown fox jumps over the lazy dog. Clean, neutral, highly legible — the workhorse for body copy and headings.</div></div>
+  <div class="type-card"><div class="role">Display · UI · labels</div><div class="big" style="font-family:var(--font-ui);font-size:56px;letter-spacing:.02em">FDS</div><div class="fam">Geist Mono · var(--font-ui)</div><div class="sample" style="font-family:var(--font-ui);font-size:13px;text-transform:uppercase;letter-spacing:.08em">Uppercase · tracked · kickers, labels, nav, code, metric values</div></div>
+  <div class="type-card"><div class="role">Editorial</div><div class="big" style="font-family:var(--font-editorial);font-size:60px;font-style:italic">Aa</div><div class="fam">Instrument Serif · var(--font-editorial)</div><div class="sample" style="font-family:var(--font-editorial);font-size:22px;line-height:1.4">For pull quotes and editorial flourishes — warmth against the geometric base.</div></div>
+  <div class="prose"><h3>Type scale</h3><p>Sizes in px, line-height as percentage. <strong>D</strong> = Desktop, <strong>M</strong> = Mobile. Headings and body each also ship a <code style="font-family:var(--font-ui);font-size:.85em">-light</code> cut (Switzer Light).</p></div>
+  ${scale}
+  <div class="foot"><span>Fresno© — FDS</span><span>Typography</span></div>`;
+};
+
+/* ---- changelog (newest first) ---- */
+const CHANGELOG=[
+ {v:'0.1.0', date:'2026-06-28', note:'First public cut of the FDS styleguide — foundations complete, Actions components shipped.', items:[
+   ['add','Styleguide shell — sidebar, hash routing, live light/dark toggle built from FDS tokens'],
+   ['add','Foundations · Color — semantic tokens (live, mode-aware) + full primitive palette, click-to-copy'],
+   ['add','Foundations · Typography — three families + full type scale across Desktop &amp; Mobile breakpoints'],
+   ['add','Foundations · Spacing (4px grid), Radius, Elevation, Icons (Tabler)'],
+   ['add','Components · Actions — Button, Icon button, FAB with variants, sizes, states and usage guidance'],
+   ['add','Sidebar — Fresno wordmark, mono uppercase nav, group separators, full-bleed active item'],
+   ['add','Breadcrumb component pattern in the top bar'],
+   ['add','Deploy — served at /FDS with CDN no-cache headers'],
+ ]}
+];
+R.changelog=()=>{
+  const entries=CHANGELOG.map(e=>`<div class="cl-entry"><div class="cl-ver"><h3>v${e.v}</h3><span class="cl-date">${e.date}</span></div>${e.note?`<div class="cl-note">${e.note}</div>`:''}${e.items.map(([t,txt])=>`<div class="cl-item"><span class="cl-tag ${t}">${t}</span><span class="txt">${txt}</span></div>`).join('')}</div>`).join('');
+  return `<div class="sec-head"><span class="kicker">Reference</span><h1 class="sec-title"><span class="br">{</span> Changelog <span class="br">}</span></h1><p class="sec-lede">Every token, component and decision logged with a semver tag. <strong>Add</strong> new · <strong>Chg</strong> changed · <strong>Brk</strong> breaking. Newest first.</p></div>${entries}<div class="foot"><span>Fresno© — FDS</span><span>Changelog</span></div>`;
+};
+
+/* ---- icon helper for component demos ---- */
+function ic(name){const f=ICONS.find(i=>i[0]===name);return f?`<svg viewBox="0 0 24 24">${f[1]}</svg>`:'';}
+
+/* ---- Actions components ---- */
+R.button=()=>`
+  <div class="sec-head"><span class="kicker">Components · Actions</span><h1 class="sec-title"><span class="br">{</span> Button <span class="br">}</span></h1><p class="sec-lede">The primary action trigger. Three fixed variants chosen by surface context, two sizes, full interaction states, optional leading/trailing icons.</p></div>
+  <span class="cdoc-status stable"><span class="d"></span>Stable</span>
+  <div class="prose"><h3>Variants</h3><p>Variants are <strong>explicit-choice</strong> tokens — you pick by surface, they don't auto-flip. Primary for the main action, neutral for strong secondary, outline for low emphasis.</p></div>
+  <div class="demo"><button class="fbtn fbtn-primary">Primary</button><button class="fbtn fbtn-neutral">Neutral</button><button class="fbtn fbtn-outline">Outline</button></div>
+  <div class="demo-label">On dark surfaces — inverse variants</div>
+  <div class="demo dark-surface"><button class="fbtn fbtn-primary">Primary</button><button class="fbtn fbtn-neutral-inv">Neutral</button><button class="fbtn fbtn-outline-inv">Outline</button></div>
+  <div class="prose"><h3>Sizes</h3></div>
+  <div class="demo"><button class="fbtn fbtn-primary">Medium</button><button class="fbtn fbtn-primary sm">Small</button></div>
+  <div class="prose"><h3>States</h3></div>
+  <div class="demo"><button class="fbtn fbtn-primary">Default</button><button class="fbtn fbtn-primary" style="background:#a3c3f3">Hover</button><button class="fbtn fbtn-primary" style="background:#7ba1e8">Active</button><button class="fbtn fbtn-primary focus">Focus</button><button class="fbtn fbtn-primary" disabled>Disabled</button></div>
+  <div class="prose"><h3>With icons</h3><p>Hidden leading/trailing slots toggle via boolean props.</p></div>
+  <div class="demo"><button class="fbtn fbtn-primary">${ic('plus')} Leading</button><button class="fbtn fbtn-neutral">Trailing ${ic('arrow-right')}</button><button class="fbtn fbtn-outline">${ic('check')} Confirm</button></div>
+  <div class="prose"><h3>Props</h3></div>
+  <div class="props"><div class="ph"><span>Prop</span><span>Options</span><span>Default</span></div>
+    <div class="pr"><b>variant</b><span>primary · neutral · outline</span><span>primary</span></div>
+    <div class="pr"><b>size</b><span>md · sm</span><span>md</span></div>
+    <div class="pr"><b>leading-icon</b><span>boolean</span><span>false</span></div>
+    <div class="pr"><b>trailing-icon</b><span>boolean</span><span>false</span></div>
+    <div class="pr"><b>state</b><span>default · hover · active · focus · disabled</span><span>default</span></div></div>
+  <div class="prose"><h3>Do &amp; don't</h3></div>
+  <div class="dodont"><div class="dd do"><div class="ddh">Do</div><div class="ddb">One primary per view. Lead with the main action; demote the rest to neutral or outline.</div></div>
+    <div class="dd dont"><div class="ddh">Don't</div><div class="ddb">Stack multiple primaries side by side — it flattens the hierarchy and the main path gets lost.</div></div></div>
+  <div class="prose"><h3>Tokens</h3></div>
+  <div class="tokens-used"><span class="tok">button/bg/primary</span><span class="tok">button/text/primary</span><span class="tok">button/bg/neutral</span><span class="tok">button/text/neutral</span><span class="tok">button/border/outline</span><span class="tok">button/border/focus</span><span class="tok">radius/md</span></div>
+  <div class="foot"><span>Fresno© — FDS</span><span>Button</span></div>`;
+
+R['icon-button']=()=>`
+  <div class="sec-head"><span class="kicker">Components · Actions</span><h1 class="sec-title"><span class="br">{</span> Icon button <span class="br">}</span></h1><p class="sec-lede">Compact, icon-only trigger for toolbars and dense UI. Square footprint, four variants. Always ships an aria-label for accessibility.</p></div>
+  <span class="cdoc-status stable"><span class="d"></span>Stable</span>
+  <div class="prose"><h3>Variants</h3></div>
+  <div class="demo"><button class="ibtn ibtn-primary">${ic('plus')}</button><button class="ibtn ibtn-neutral">${ic('check')}</button><button class="ibtn ibtn-outline">${ic('settings')}</button><button class="ibtn ibtn-ghost">${ic('search')}</button></div>
+  <div class="prose"><h3>Sizes</h3></div>
+  <div class="demo"><button class="ibtn ibtn-outline">${ic('bell')}</button><button class="ibtn ibtn-outline sm">${ic('bell')}</button></div>
+  <div class="prose"><h3>Props</h3></div>
+  <div class="props"><div class="ph"><span>Prop</span><span>Options</span><span>Default</span></div>
+    <div class="pr"><b>variant</b><span>primary · neutral · outline · ghost</span><span>ghost</span></div>
+    <div class="pr"><b>size</b><span>md (40) · sm (32)</span><span>md</span></div>
+    <div class="pr"><b>aria-label</b><span>string (required)</span><span>—</span></div></div>
+  <div class="prose"><h3>Do &amp; don't</h3></div>
+  <div class="dodont"><div class="dd do"><div class="ddh">Do</div><div class="ddb">Use for universally understood icons (close, search, more). Always label it for screen readers.</div></div>
+    <div class="dd dont"><div class="ddh">Don't</div><div class="ddb">Use an icon button for an action whose icon is ambiguous — use a labelled button instead.</div></div></div>
+  <div class="prose"><h3>Tokens</h3></div>
+  <div class="tokens-used"><span class="tok">button/bg/primary</span><span class="tok">icon/default</span><span class="tok">border/strong</span><span class="tok">bg/page</span><span class="tok">radius/md</span></div>
+  <div class="foot"><span>Fresno© — FDS</span><span>Icon button</span></div>`;
+
+R.fab=()=>`
+  <div class="sec-head"><span class="kicker">Components · Actions</span><h1 class="sec-title"><span class="br">{</span> FAB <span class="br">}</span></h1><p class="sec-lede">Floating action button — one persistent primary action anchored above the UI. Circular for a single icon, extended when it needs a label.</p></div>
+  <span class="cdoc-status stable"><span class="d"></span>Stable</span>
+  <div class="prose"><h3>Types</h3></div>
+  <div class="demo"><button class="fab circle">${ic('plus')}</button><button class="fab extended">${ic('plus')} New</button></div>
+  <div class="prose"><h3>Props</h3></div>
+  <div class="props"><div class="ph"><span>Prop</span><span>Options</span><span>Default</span></div>
+    <div class="pr"><b>type</b><span>circle · extended</span><span>circle</span></div>
+    <div class="pr"><b>icon</b><span>instance-swap</span><span>plus</span></div>
+    <div class="pr"><b>label</b><span>string (extended only)</span><span>—</span></div></div>
+  <div class="prose"><h3>Do &amp; don't</h3></div>
+  <div class="dodont"><div class="dd do"><div class="ddh">Do</div><div class="ddb">Reserve the FAB for the single most important action on a screen (compose, add, create).</div></div>
+    <div class="dd dont"><div class="ddh">Don't</div><div class="ddb">Float more than one FAB, or use it for destructive or secondary actions.</div></div></div>
+  <div class="prose"><h3>Tokens</h3></div>
+  <div class="tokens-used"><span class="tok">button/bg/neutral</span><span class="tok">button/text/neutral</span><span class="tok">shadow</span><span class="tok">radius/full</span></div>
+  <div class="foot"><span>Fresno© — FDS</span><span>FAB</span></div>`;
+
 buildNav(); initTheme(); route();
 </script>
 </body>
