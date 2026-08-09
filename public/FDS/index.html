@@ -13,31 +13,52 @@
 <style>
 /* ============ FDS TOKENS ============ */
 :root, [data-theme="light"]{
-  --text-primary:#141414; --text-secondary:#4a4d4b; --text-tertiary:#636965;
-  --text-inverse-primary:#f4f2ea; --text-brand:#344e9b;
-  --bg-page:#ecebe6; --bg-surface:#f4f2ea; --bg-subtle:#c9c5bd; --bg-inverse-surface:#242625;
+  --text-primary:#141414; --text-secondary:#373737; --text-tertiary:#4a4d4b;
+  --text-inverse-primary:#f4f2ea; --text-inverse-secondary:#c9c5bd; --text-inverse-tertiary:#a9aea9; --text-brand:#344e9b;
+  --bg-page:#ecebe6; --bg-surface:#f4f2ea; --bg-subtle:#c9c5bd; --bg-inverse-surface:#242625; --bg-inverse-subtle:#373737;
   --bg-brand:#c6dbf9; --bg-brand-subtle:#dce8fc;
   --border-default:#c9c5bd; --border-subtle:#dad8d2; --border-strong:#a9aea9; --border-strongest:#141414;
-  --feedback-success:#38ae7a; --feedback-warning:#e0ac3a; --feedback-error:#e0655a; --feedback-info:#5a82d2;
+  --feedback-success:#38ae7a; --feedback-warning:#e0ac3a; --feedback-error:#a6423b; --feedback-info:#5a82d2;
   --logo-accent:#003dff;
   --icon-default:#141414; --icon-muted:#636965; --icon-disabled:#a9aea9; --icon-inverse:#f4f2ea; --btn-focus:#4063c2;
-  --shadow:0 8px 24px rgba(20,20,20,.10); --shadow-sm:0 4px 14px rgba(20,20,20,.08);
+  --button-bg-primary:#c6dbf9; --button-bg-primary-hover:#a3c3f3; --button-bg-primary-active:#7ba1e8; --button-text-primary:#141414;
+  --button-bg-neutral:#141414; --button-bg-neutral-hover:#373737; --button-bg-neutral-active:#4a4d4b; --button-text-neutral:#f4f2ea;
+  --button-border-outline:#141414; --button-bg-outline-hover:#ecebe6; --button-bg-outline-active:#dad8d2;
+  --button-bg-disabled:#dad8d2; --button-text-disabled:#a9aea9; --button-border-outline-disabled:#c9c5bd; --button-border-focus:#4063c2;
+  --shadow-xs:0 1px 2px rgba(24,26,25,.05);
+  --shadow-sm:0 1px 3px rgba(24,26,25,.1),0 1px 2px -1px rgba(24,26,25,.1);
+  --shadow-md:0 4px 6px -1px rgba(24,26,25,.1),0 2px 4px -2px rgba(24,26,25,.1);
+  --shadow-lg:0 10px 15px -3px rgba(24,26,25,.1),0 4px 6px -4px rgba(24,26,25,.1);
+  --shadow-xl:0 20px 25px -5px rgba(24,26,25,.1),0 8px 10px -6px rgba(24,26,25,.1);
+  --shadow-2xl:0 25px 50px -12px rgba(24,26,25,.25);
+  --shadow:var(--shadow-lg);
 }
 [data-theme="dark"]{
   --text-primary:#f4f2ea; --text-secondary:#c9c5bd; --text-tertiary:#a9aea9;
-  --text-inverse-primary:#141414; --text-brand:#a3c3f3;
-  --bg-page:#242625; --bg-surface:#141414; --bg-subtle:#373737; --bg-inverse-surface:#ecebe6;
+  --text-inverse-primary:#141414; --text-inverse-secondary:#4a4d4b; --text-inverse-tertiary:#636965; --text-brand:#a3c3f3;
+  --bg-page:#242625; --bg-surface:#141414; --bg-subtle:#373737; --bg-inverse-surface:#ecebe6; --bg-inverse-subtle:#dad8d2;
   --bg-brand:#c6dbf9; --bg-brand-subtle:#1a2340;
   --border-default:#4a4d4b; --border-subtle:#373737; --border-strong:#636965; --border-strongest:#f4f2ea;
-  --feedback-success:#38ae7a; --feedback-warning:#e0ac3a; --feedback-error:#e0655a; --feedback-info:#5a82d2;
+  --feedback-success:#38ae7a; --feedback-warning:#e0ac3a; --feedback-error:#e2685d; --feedback-info:#5a82d2;
   --logo-accent:#003dff;
   --icon-default:#f4f2ea; --icon-muted:#a9aea9; --icon-disabled:#636965; --icon-inverse:#141414; --btn-focus:#a3c3f3;
-  --shadow:0 8px 28px rgba(0,0,0,.5); --shadow-sm:0 4px 16px rgba(0,0,0,.4);
+  --button-bg-primary:#c6dbf9; --button-bg-primary-hover:#dce8fc; --button-bg-primary-active:#f0f5fe; --button-text-primary:#141414;
+  --button-bg-neutral:#f4f2ea; --button-bg-neutral-hover:#ecebe6; --button-bg-neutral-active:#dad8d2; --button-text-neutral:#141414;
+  --button-border-outline:#f4f2ea; --button-bg-outline-hover:rgba(244,242,234,.12); --button-bg-outline-active:rgba(244,242,234,.2);
+  --button-bg-disabled:#373737; --button-text-disabled:#636965; --button-border-outline-disabled:#4a4d4b; --button-border-focus:#a3c3f3;
+  --shadow-xs:0 1px 2px rgba(0,0,0,.4);
+  --shadow-sm:0 1px 3px rgba(0,0,0,.5),0 1px 2px -1px rgba(0,0,0,.5);
+  --shadow-md:0 4px 6px -1px rgba(0,0,0,.5),0 2px 4px -2px rgba(0,0,0,.5);
+  --shadow-lg:0 10px 15px -3px rgba(0,0,0,.55),0 4px 6px -4px rgba(0,0,0,.55);
+  --shadow-xl:0 20px 25px -5px rgba(0,0,0,.6),0 8px 10px -6px rgba(0,0,0,.6);
+  --shadow-2xl:0 25px 50px -12px rgba(0,0,0,.7);
+  --shadow:var(--shadow-lg);
 }
 /* scales (mode-independent) */
 :root{
-  --space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:20px;--space-6:24px;--space-8:32px;--space-10:40px;--space-12:48px;--space-16:64px;--space-20:80px;
-  --radius-sm:8px;--radius-md:12px;--radius-lg:16px;--radius-full:999px;
+  --space-0:0;--space-px:1px;--space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:20px;--space-6:24px;--space-7:28px;--space-8:32px;--space-9:36px;--space-10:40px;--space-11:44px;--space-12:48px;--space-14:56px;--space-16:64px;--space-20:80px;--space-24:96px;--space-28:112px;--space-32:128px;--space-36:144px;--space-40:160px;--space-48:192px;--space-50:200px;--space-56:224px;--space-64:256px;
+  --radius-sm:4px;--radius-md:6px;--radius-lg:8px;--radius-xl:12px;--radius-full:9999px;
+  --target-web:24px;--target-touch:44px;
   --font-body:'Switzer',-apple-system,BlinkMacSystemFont,sans-serif;
   --font-ui:'Geist Mono',ui-monospace,monospace;
   --font-editorial:'Instrument Serif',Georgia,serif;
@@ -226,7 +247,7 @@ a{color:inherit;text-decoration:none}
 .cdoc-status.draft{background:rgba(224,172,58,.15);color:var(--feedback-warning)}
 .cdoc-status .d{width:6px;height:6px;border-radius:999px;background:currentColor}
 .demo{border:1px solid var(--border-subtle);border-radius:var(--radius-lg);background:var(--bg-surface);padding:32px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;margin-top:8px}
-.demo.dark-surface{background:var(--bg-inverse-surface)}
+.demo.dark-surface{background:var(--bg-surface);border-color:var(--border-subtle)}
 .demo-label{font-family:var(--font-ui);font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-tertiary);margin:24px 0 8px}
 .props{border:1px solid var(--border-subtle);border-radius:var(--radius-lg);overflow:hidden;margin-top:8px;font-family:var(--font-ui)}
 .props .ph,.props .pr{display:grid;grid-template-columns:1.1fr 1.4fr 1fr;gap:16px;padding:12px 18px;font-size:12px}
@@ -247,21 +268,17 @@ a{color:inherit;text-decoration:none}
 .fbtn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-family:var(--font-ui);font-size:12px;text-transform:uppercase;letter-spacing:.06em;border:1px solid transparent;border-radius:var(--radius-md);padding:11px 18px;cursor:pointer;transition:all .14s ease;white-space:nowrap}
 .fbtn.sm{padding:8px 13px;font-size:11px}
 .fbtn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2}
-.fbtn-primary{background:#c6dbf9;color:#141414}
-.fbtn-primary:hover{background:#a3c3f3}
-.fbtn-primary:active{background:#7ba1e8}
-.fbtn-neutral{background:#141414;color:#f4f2ea}
-.fbtn-neutral:hover{background:#373737}
-.fbtn-neutral:active{background:#4a4d4b}
-.fbtn-outline{background:transparent;border-color:#141414;color:#141414}
-.fbtn-outline:hover{background:#ecebe6}
-.fbtn-outline:active{background:#dad8d2}
-.fbtn:disabled{background:var(--border-subtle);color:var(--icon-disabled);border-color:transparent;cursor:not-allowed}
-.fbtn.focus{box-shadow:0 0 0 3px var(--btn-focus)}
-.fbtn-neutral-inv{background:#f4f2ea;color:#141414}
-.fbtn-neutral-inv:hover{background:#ecebe6}
-.fbtn-outline-inv{background:transparent;border-color:#f4f2ea;color:#f4f2ea}
-.fbtn-outline-inv:hover{background:rgba(244,242,234,.12)}
+.fbtn-primary{background:var(--button-bg-primary);color:var(--button-text-primary)}
+.fbtn-primary:hover{background:var(--button-bg-primary-hover)}
+.fbtn-primary:active{background:var(--button-bg-primary-active)}
+.fbtn-neutral{background:var(--button-bg-neutral);color:var(--button-text-neutral)}
+.fbtn-neutral:hover{background:var(--button-bg-neutral-hover)}
+.fbtn-neutral:active{background:var(--button-bg-neutral-active)}
+.fbtn-outline{background:transparent;border-color:var(--button-border-outline);color:var(--button-border-outline)}
+.fbtn-outline:hover{background:var(--button-bg-outline-hover)}
+.fbtn-outline:active{background:var(--button-bg-outline-active)}
+.fbtn:disabled{background:var(--button-bg-disabled);color:var(--button-text-disabled);border-color:transparent;cursor:not-allowed}
+.fbtn.focus{box-shadow:0 0 0 3px var(--button-border-focus)}
 /* icon button */
 .ibtn{display:inline-flex;align-items:center;justify-content:center;border-radius:var(--radius-md);width:40px;height:40px;cursor:pointer;border:1px solid transparent;transition:all .14s ease}
 .ibtn.sm{width:32px;height:32px}
@@ -271,18 +288,162 @@ a{color:inherit;text-decoration:none}
 .ibtn-primary:hover{background:#a3c3f3}
 .ibtn-neutral{background:#141414;color:#f4f2ea}
 .ibtn-neutral:hover{background:#373737}
-.ibtn-ghost{background:transparent;color:var(--icon-default)}
-.ibtn-ghost:hover{background:var(--bg-page)}
 .ibtn-outline{background:transparent;border-color:var(--border-strong);color:var(--icon-default)}
 .ibtn-outline:hover{background:var(--bg-page)}
 /* fab */
-.fab{display:inline-flex;align-items:center;justify-content:center;gap:10px;background:#141414;color:#f4f2ea;border:none;border-radius:999px;cursor:pointer;box-shadow:var(--shadow);transition:all .14s ease;font-family:var(--font-ui);font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+.fab{display:inline-flex;align-items:center;justify-content:center;gap:10px;background:var(--bg-inverse-surface);color:var(--text-inverse-primary);border:none;border-radius:var(--radius-full);cursor:pointer;box-shadow:var(--shadow-2xl);transition:all .14s ease;font-family:var(--font-ui);font-size:12px;text-transform:uppercase;letter-spacing:.06em}
 .fab.circle{width:56px;height:56px;padding:0}
-.fab.extended{padding:0 22px;height:56px}
-.fab:hover{background:#373737}
+.fab:hover{background:var(--bg-inverse-subtle)}
 .fab svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2}
 
 .foot{margin-top:80px;padding-top:24px;border-top:1px solid var(--border-subtle);font-family:var(--font-ui);text-transform:uppercase;letter-spacing:.1em;font-size:10px;color:var(--text-tertiary);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+
+/* ============ v1.0.0 — Forms ============ */
+.field{display:flex;flex-direction:column;gap:6px;width:240px}
+.field-label{font-family:var(--font-ui);font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--text-tertiary)}
+.field-input{border:1.5px solid var(--border-strong);border-radius:var(--radius-md);padding:10px 14px;background:var(--bg-surface);color:var(--text-primary);font-family:var(--font-body);font-size:14px;width:100%;display:flex;align-items:center;gap:8px}
+.field-input.focus{border-color:var(--text-primary);box-shadow:0 0 0 3px var(--btn-focus)}
+.field-input.filled{border-color:var(--border-default)}
+.field-input.error{border-color:var(--feedback-error)}
+.field-input.disabled{border-color:var(--border-subtle);background:var(--bg-subtle);color:var(--text-tertiary)}
+.field-hint{font-size:12px;color:var(--text-tertiary)}
+.field-hint.error{color:var(--feedback-error)}
+.field-input textarea,.field-input input{border:0;background:transparent;font:inherit;color:inherit;width:100%;outline:0}
+textarea.field-input{align-items:flex-start;height:84px}
+.field-input svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0;color:var(--icon-muted)}
+.select-input{justify-content:space-between;cursor:pointer}
+.check-row{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text-primary)}
+.checkbox,.radio{width:18px;height:18px;border:1.5px solid var(--border-strong);flex-shrink:0;display:flex;align-items:center;justify-content:center;color:var(--bg-surface)}
+.checkbox{border-radius:var(--radius-sm)}
+.radio{border-radius:var(--radius-full)}
+.checkbox svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:3}
+.checkbox.checked,.radio.selected{background:var(--bg-inverse-surface);border-color:transparent}
+.radio .dot{width:8px;height:8px;border-radius:var(--radius-full);background:var(--bg-inverse-surface)}
+.checkbox.disabled,.radio.disabled{border-color:var(--border-subtle);background:var(--bg-subtle)}
+.toggle{width:44px;height:24px;border-radius:var(--radius-full);background:var(--border-default);padding:3px;cursor:pointer;transition:background .15s ease;display:inline-flex;align-items:center;flex-shrink:0}
+.toggle.on{background:var(--bg-inverse-surface)}
+.toggle.disabled{background:var(--bg-subtle);cursor:not-allowed}
+.toggle .thumb{width:18px;height:18px;border-radius:var(--radius-full);background:var(--bg-surface);transition:transform .15s ease}
+.toggle.on .thumb{transform:translateX(20px)}
+.slider-wrap{width:240px}
+.slider-track{width:100%;height:4px;border-radius:var(--radius-full);background:var(--bg-subtle);position:relative}
+.slider-fill{height:4px;border-radius:var(--radius-full);background:var(--bg-inverse-surface);position:absolute;left:0;top:0}
+.slider-thumb{width:16px;height:16px;border-radius:var(--radius-full);background:var(--bg-surface);border:2px solid var(--bg-inverse-surface);position:absolute;top:-6px}
+.slider-wrap.disabled .slider-fill{background:var(--border-strong)}
+.slider-wrap.disabled .slider-thumb{border-color:var(--border-strong)}
+.stepper{display:inline-flex;align-items:stretch;border:1px solid var(--border-default);border-radius:var(--radius-md);overflow:hidden}
+.stepper button{width:36px;background:var(--bg-surface);border:0;cursor:pointer;color:var(--text-primary);display:flex;align-items:center;justify-content:center}
+.stepper button svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2}
+.stepper .val{width:44px;text-align:center;font-family:var(--font-ui);font-size:13px;border-left:1px solid var(--border-default);border-right:1px solid var(--border-default);display:flex;align-items:center;justify-content:center;color:var(--text-primary)}
+.segctl{display:inline-flex;background:var(--bg-page);border:1px solid var(--border-subtle);border-radius:var(--radius-full);padding:3px;gap:2px}
+.segctl button{border:0;background:transparent;font-family:var(--font-ui);font-size:11px;text-transform:uppercase;letter-spacing:.07em;padding:8px 18px;border-radius:var(--radius-full);cursor:pointer;color:var(--text-secondary)}
+.segctl button.on{background:var(--bg-inverse-surface);color:var(--text-inverse-primary)}
+.rating-row{display:flex;gap:4px}
+.rating-row svg{width:20px;height:20px;stroke:var(--border-strong);fill:none;stroke-width:1.5}
+.rating-row svg.filled{fill:var(--feedback-warning);stroke:var(--feedback-warning)}
+
+/* ============ v1.0.0 — Feedback ============ */
+.banner{display:flex;gap:12px;align-items:flex-start;padding:14px;border-radius:var(--radius-md);border-left:3px solid;background:var(--bg-surface);border-top:1px solid var(--border-subtle);border-right:1px solid var(--border-subtle);border-bottom:1px solid var(--border-subtle);max-width:480px}
+.banner svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0}
+.banner .btitle{font-weight:600;font-size:14px;color:var(--text-primary);margin-bottom:2px}
+.banner .btext{font-size:13px;color:var(--text-secondary)}
+.banner.info{border-left-color:var(--feedback-info);color:var(--feedback-info)}
+.banner.success{border-left-color:var(--feedback-success);color:var(--feedback-success)}
+.banner.warning{border-left-color:var(--feedback-warning);color:var(--feedback-warning)}
+.banner.error{border-left-color:var(--feedback-error);color:var(--feedback-error)}
+.toast-demo{display:inline-flex;align-items:center;gap:10px;background:var(--bg-inverse-surface);color:var(--text-inverse-primary);padding:12px 18px;border-radius:var(--radius-md);font-size:13px;box-shadow:var(--shadow-lg)}
+.toast-demo svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2}
+.tooltip-demo{display:inline-block;background:var(--bg-inverse-surface);color:var(--text-inverse-primary);padding:7px 12px;border-radius:var(--radius-sm);font-size:12px;font-family:var(--font-ui)}
+.modal-demo{border:1px solid var(--border-subtle);border-radius:var(--radius-lg);background:var(--bg-surface);padding:24px;max-width:340px;box-shadow:var(--shadow-xl)}
+.modal-demo h4{font-size:16px;font-weight:600;margin-bottom:8px}
+.modal-demo p{font-size:14px;color:var(--text-secondary);margin-bottom:20px}
+.modal-demo .mactions{display:flex;gap:10px;justify-content:flex-end}
+.badge-dot{width:8px;height:8px;border-radius:var(--radius-full);display:inline-block}
+.badge-count{min-width:19px;height:19px;padding:0 6px;border-radius:var(--radius-full);display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-family:var(--font-ui);color:var(--text-inverse-primary)}
+.badge-error{background:var(--feedback-error)}
+.badge-neutral{background:var(--bg-inverse-surface)}
+.progress-track{width:240px;height:8px;border-radius:var(--radius-full);background:var(--bg-subtle);overflow:hidden}
+.progress-fill{height:100%;border-radius:var(--radius-full);background:var(--bg-inverse-surface)}
+.spinner-el{width:24px;height:24px;border-radius:var(--radius-full);border:3px solid var(--bg-subtle);border-top-color:var(--bg-inverse-surface);animation:fds-spin .8s linear infinite}
+@keyframes fds-spin{to{transform:rotate(360deg)}}
+.skeleton-block{background:var(--bg-subtle);border-radius:var(--radius-sm);animation:fds-pulse 1.6s ease-in-out infinite}
+@keyframes fds-pulse{0%,100%{opacity:1}50%{opacity:.45}}
+
+/* ============ v1.0.0 — Navigation ============ */
+.topbar-demo{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border:1px solid var(--border-subtle);border-radius:var(--radius-md);background:var(--bg-surface);max-width:480px}
+.tabbar-demo{display:flex;border-top:1px solid var(--border-subtle);padding-top:8px;max-width:320px}
+.tabbar-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;font-family:var(--font-ui);font-size:9px;text-transform:uppercase;color:var(--text-tertiary);letter-spacing:.05em}
+.tabbar-item svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2}
+.tabbar-item.active{color:var(--text-primary)}
+.tabs-demo{display:flex;gap:28px;border-bottom:1px solid var(--border-subtle)}
+.tabs-tab{padding-bottom:12px;font-family:var(--font-ui);font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);border-bottom:2px solid transparent;cursor:pointer;background:none;border-left:0;border-right:0;border-top:0}
+.tabs-tab.active{color:var(--text-primary);border-bottom-color:var(--text-primary)}
+.tabs-tab.disabled{color:var(--border-strong);cursor:not-allowed}
+.pagination-demo{display:flex;gap:4px;align-items:center}
+.page-chip{min-width:32px;height:32px;padding:0 6px;display:flex;align-items:center;justify-content:center;border-radius:var(--radius-md);font-family:var(--font-ui);font-size:12px;color:var(--text-secondary);cursor:pointer}
+.page-chip.active{background:var(--bg-inverse-surface);color:var(--text-inverse-primary)}
+.page-nav{color:var(--text-tertiary)}
+.page-nav svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2}
+.menu-demo{border:1px solid var(--border-subtle);border-radius:var(--radius-md);background:var(--bg-surface);padding:6px;display:flex;flex-direction:column;gap:2px;width:210px;box-shadow:var(--shadow-lg)}
+.menu-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:var(--radius-sm);font-size:14px;color:var(--text-primary);cursor:pointer}
+.menu-item:hover{background:var(--bg-subtle)}
+.menu-item svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;color:var(--icon-muted)}
+.menu-item.destructive{color:var(--feedback-error)}
+.menu-item.destructive svg{color:var(--feedback-error)}
+.menu-divider{height:1px;background:var(--border-subtle);margin:4px 2px}
+
+/* ============ v1.0.0 — Data display ============ */
+.card-demo{border:1px solid var(--border-subtle);border-radius:var(--radius-lg);background:var(--bg-surface);overflow:hidden;max-width:300px}
+.card-media{height:140px;background:var(--bg-subtle)}
+.card-body{padding:20px}
+.card-meta{font-family:var(--font-ui);font-size:10px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px}
+.card-title{font-weight:600;font-size:16px;margin-bottom:8px;color:var(--text-primary)}
+.card-text{font-size:14px;color:var(--text-secondary);line-height:1.5}
+.table-demo{border:1px solid var(--border-subtle);border-radius:var(--radius-xl);overflow:hidden;background:var(--bg-surface)}
+.table-demo table{width:100%;border-collapse:collapse}
+.table-demo th{font-family:var(--font-ui);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);text-align:left;padding:14px 16px;background:var(--bg-page)}
+.table-demo td{padding:14px 16px;border-top:1px solid var(--border-subtle);font-size:14px;color:var(--text-primary);gap:6px}
+.status-pill{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-ui);font-size:11px;text-transform:uppercase}
+.status-pill .dot{width:6px;height:6px;border-radius:var(--radius-full)}
+.stat-card{border:1px solid var(--border-subtle);border-radius:var(--radius-xl);background:var(--bg-surface);padding:20px;width:200px}
+.stat-label{font-family:var(--font-ui);font-size:10px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.07em}
+.stat-value{font-family:var(--font-ui);font-size:32px;margin:8px 0;color:var(--text-primary)}
+.stat-delta{display:flex;align-items:center;gap:6px;font-size:12px}
+.stat-delta svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}
+.stat-delta.up{color:var(--feedback-success)}
+.stat-delta.down{color:var(--feedback-error)}
+.stat-delta .vs{color:var(--text-tertiary)}
+.list-item-demo{display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:var(--radius-md);width:320px;cursor:pointer;color:var(--text-primary);font-size:14px}
+.list-item-demo:hover{background:var(--bg-page)}
+.list-item-demo.selected{background:var(--bg-brand-subtle)}
+.list-item-demo.disabled{color:var(--text-tertiary);cursor:not-allowed}
+.list-item-demo svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;color:var(--icon-muted);flex-shrink:0}
+.list-item-demo .lbl{flex:1}
+.avatar{border-radius:var(--radius-full);background:var(--bg-brand-subtle);color:var(--text-brand);display:inline-flex;align-items:center;justify-content:center;font-family:var(--font-ui);flex-shrink:0}
+.avatar.sm{width:24px;height:24px;font-size:10px}
+.avatar.md{width:32px;height:32px;font-size:12px}
+.avatar.lg{width:40px;height:40px;font-size:14px}
+.avatar-group{display:inline-flex}
+.avatar-group .avatar{margin-left:-8px;border:2px solid var(--bg-surface)}
+.avatar-group .avatar:first-child{margin-left:0}
+.tag-pill{display:inline-flex;align-items:center;padding:4px 12px;border-radius:var(--radius-full);border:1px solid;font-family:var(--font-ui);font-size:11px;text-transform:uppercase;letter-spacing:.05em}
+.chip-el{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:var(--radius-full);border:1px solid var(--border-default);font-family:var(--font-ui);font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-secondary);cursor:pointer}
+.chip-el.selected{background:var(--bg-inverse-surface);color:var(--text-inverse-primary);border-color:transparent}
+.chip-el.disabled{color:var(--text-tertiary);border-color:var(--border-subtle);cursor:not-allowed}
+.divider-h{height:1px;background:var(--border-default);width:100%}
+.divider-v{width:1px;height:60px;background:var(--border-default)}
+.empty-state-demo{display:flex;flex-direction:column;align-items:center;text-align:center;padding:56px 32px;border:1px solid var(--border-subtle);border-radius:var(--radius-lg);background:var(--bg-surface);max-width:340px}
+.empty-state-demo svg{width:32px;height:32px;stroke:var(--icon-muted);fill:none;stroke-width:1.5;margin-bottom:18px}
+.empty-state-demo h4{font-size:16px;font-weight:600;margin-bottom:6px}
+.empty-state-demo p{font-size:14px;color:var(--text-secondary);margin-bottom:20px}
+.link-demo{font-size:14px;text-decoration:underline;text-underline-offset:3px}
+.accordion-demo{border:1px solid var(--border-subtle);border-radius:var(--radius-lg);overflow:hidden;background:var(--bg-surface);max-width:400px}
+.accordion-header{display:flex;justify-content:space-between;align-items:center;padding:16px 18px;cursor:pointer;font-weight:500;font-size:14px;color:var(--text-primary)}
+.accordion-header svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;transition:transform .2s ease}
+.accordion-item.expanded .accordion-header svg{transform:rotate(180deg)}
+.accordion-body{padding:0 18px 18px;color:var(--text-secondary);font-size:14px;line-height:1.5;border-top:1px solid var(--border-subtle);padding-top:14px}
+.accordion-item:not(.expanded) .accordion-body{display:none}
+.accordion-item+.accordion-item{border-top:1px solid var(--border-subtle)}
 
 /* mobile sidebar toggle */
 .menu-btn{display:none}
@@ -301,7 +462,7 @@ a{color:inherit;text-decoration:none}
   <aside class="sidebar" id="sidebar">
     <div class="brand">
       <div class="lock"><svg class="logo" viewBox="0 0 234 28" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Fresno"><path d="M223.381 15.7711C217.072 15.7711 213.231 12.7787 213.231 7.86535C213.231 2.95204 217.072 0 223.381 0C229.71 0 233.511 2.95204 233.511 7.86535C233.511 12.7787 229.71 15.7711 223.381 15.7711ZM223.381 13.7492C228.638 13.7492 231.125 11.6059 231.125 7.84513C231.125 4.12476 228.638 1.9815 223.381 1.9815C218.164 1.9815 215.617 4.12476 215.617 7.84513C215.617 11.6059 218.164 13.7492 223.381 13.7492ZM223.442 12.7382C219.721 12.7382 216.992 11.1207 216.992 7.86535C216.992 4.65047 219.721 2.99247 223.442 2.99247C227.02 2.99247 229.427 4.42805 229.77 6.91504H226.899C226.414 5.88385 225.342 5.11551 223.462 5.11551C221.137 5.11551 219.903 6.3489 219.903 7.86535C219.903 9.42225 221.137 10.6354 223.462 10.6354C225.302 10.6354 226.434 9.90751 226.899 8.8561H229.77C229.447 11.2824 227.02 12.7382 223.442 12.7382Z" fill="currentColor"/><path d="M189.041 28C176.979 28 169.836 23.0462 169.836 14V13.9641C169.836 4.88205 176.979 0 189.041 0C201.102 0 208.246 4.88205 208.246 13.9641V14C208.246 23.0462 201.102 28 189.041 28ZM189.041 21.359C194.677 21.359 198.482 18.6308 198.482 14V13.9641C198.482 9.29744 194.677 6.60513 189.041 6.60513C183.405 6.60513 179.6 9.15385 179.6 13.9641V14C179.6 18.7744 183.405 21.359 189.041 21.359Z" fill="currentColor"/><path d="M139.809 27.282H130.906V0.610229H140.922L158.153 17.0154L158.44 17.3384V0.610229H167.342V27.282H157.363L140.024 10.841L139.809 10.6256V27.282Z" fill="currentColor"/><path d="M112.67 28C101.183 28 96.6241 23.4051 96.4087 18.1282H105.598C105.742 20.5333 107.465 21.7897 112.742 21.7897C117.229 21.7897 118.845 20.9282 118.845 19.4564C118.845 18.2359 118.342 17.6615 111.557 16.9436C99.5318 15.7949 97.4497 12.4564 97.4497 8.07692C97.4497 3.94872 100.896 0 111.988 0C122.829 0 127.137 4.2 127.604 9.8H118.773C118.45 7.89744 117.122 6.17436 112.347 6.17436C108.327 6.17436 106.963 6.9641 106.963 8.25641C106.963 9.26154 107.25 10.1949 112.491 10.6974C126.886 12.0615 128.357 15.5795 128.357 19.2051C128.357 25.1641 122.973 28 112.67 28Z" fill="currentColor"/><path d="M95.7788 27.282H66.5224V0.610229H95.4199V7.14356H76.1788V10.7692H93.8763V16.5128H76.1788V20.7487H95.7788V27.282Z" fill="currentColor"/><path d="M40.3936 27.282H30.7372V0.610229H50.05C60.1013 0.610229 63.691 4.09228 63.691 8.75895C63.691 12.4923 61.25 15.0051 57.05 15.8307V15.8666C60.1372 16.6564 61.3936 17.6615 62.291 21.682L62.65 23.1538C63.0808 25.0923 63.4397 26.0256 63.9782 27.282H54.1064C53.7474 26.6 53.532 25.882 53.0295 23.5846L52.6705 22.0051C52.3115 20.3179 50.9115 19.5282 46.9987 19.5282H40.3936V27.282ZM40.3936 7.14356V13.3538H49.4756C52.4551 13.3538 54.0705 12.1333 54.0705 10.0513C54.0705 8.11279 52.4551 7.14356 49.4756 7.14356H40.3936Z" fill="currentColor"/><path d="M9.65641 27.282H0V0.610229H28.6821V7.17946H9.65641V11.4872H26.959V17.8769H9.65641V27.282Z" fill="currentColor"/></svg></div>
-      <div class="ver">DS · v0.1</div>
+      <div class="ver">DS · v1.0.0</div>
     </div>
     <nav class="nav" id="nav"></nav>
     <div class="sidebar-foot">
@@ -333,6 +494,7 @@ a{color:inherit;text-decoration:none}
 const NAV=[
   {items:[{id:'overview',label:'Overview'}]},
   {label:'Foundations',items:[
+    {id:'token-architecture',label:'Token architecture'},{id:'brand',label:'Brand'},
     {id:'color',label:'Color'},{id:'typography',label:'Typography'},{id:'spacing',label:'Spacing'},
     {id:'radius',label:'Radius'},{id:'elevation',label:'Elevation'},{id:'icons',label:'Icons'}
   ]},
@@ -341,7 +503,7 @@ const NAV=[
     {label:'Forms',items:[{id:'input',label:'Input'},{id:'textarea',label:'Textarea'},{id:'select',label:'Select'},{id:'search-field',label:'Search field'},{id:'checkbox',label:'Checkbox'},{id:'radio',label:'Radio'},{id:'toggle',label:'Toggle'},{id:'slider',label:'Slider'},{id:'stepper',label:'Stepper'},{id:'segmented-control',label:'Segmented control'},{id:'rating',label:'Rating'}]},
     {label:'Feedback',items:[{id:'banner',label:'Banner'},{id:'toast',label:'Toast'},{id:'tooltip',label:'Tooltip'},{id:'modal',label:'Modal'},{id:'badge',label:'Badge'},{id:'progress',label:'Progress'},{id:'spinner',label:'Spinner'},{id:'skeleton',label:'Skeleton'}]},
     {label:'Navigation',items:[{id:'top-bar',label:'Top bar'},{id:'tab-bar',label:'Tab bar'},{id:'tabs',label:'Tabs'},{id:'breadcrumb',label:'Breadcrumb'},{id:'pagination',label:'Pagination'},{id:'menu',label:'Menu'}]},
-    {label:'Data display',items:[{id:'card',label:'Card'},{id:'table',label:'Table'},{id:'stat',label:'Stat'},{id:'list-item',label:'List item'},{id:'avatar',label:'Avatar'},{id:'tag',label:'Tag'},{id:'chip',label:'Chip'},{id:'divider',label:'Divider'}]},
+    {label:'Data display',items:[{id:'card',label:'Card'},{id:'table',label:'Table'},{id:'stat',label:'Stat'},{id:'list-item',label:'List item'},{id:'avatar',label:'Avatar'},{id:'tag',label:'Tag'},{id:'chip',label:'Chip'},{id:'divider',label:'Divider'},{id:'link',label:'Link'},{id:'accordion',label:'Accordion'}]},
     {label:'Misc',items:[{id:'empty-state',label:'Empty state'}]}
   ]},
   {items:[{id:'changelog',label:'Changelog'}]}
@@ -363,49 +525,108 @@ const R={};
 
 R.overview=()=>`
   <div class="sec-head">
-    <span class="kicker">Fresno© Design System</span>
+    <span class="kicker">Fresno© Design System · v1.0.0</span>
     <h1 class="sec-title"><span class="br">{</span> Overview <span class="br">}</span></h1>
-    <p class="sec-lede">FDS is the foundational design system for the Fresno brand — a single, mode-aware source of truth spanning web, apps and editorial surfaces. Built on a strict three-tier token architecture and a three-family type system.</p>
+    <p class="sec-lede">FDS is the shared design system for every Fresno© product — a single, mode-aware source of truth spanning web, apps and editorial surfaces. Built on a four-layer token architecture (Primitives → Brand → Semantic → Component), five brand contexts, and a three-family type system. v1.0.0 is a breaking release: see <a href="#changelog" style="text-decoration:underline">Changelog</a> for the full migration path.</p>
   </div>
   <div class="prose">
     <h3>Principles</h3>
   </div>
   <div class="grid cols-3" style="margin-top:18px">
     <div class="panel"><div class="num">01</div><h4>Token-driven</h4><p>Every color, space and radius is a token. No hardcoded values. Semantic tokens alias primitives, never raw hex.</p></div>
-    <div class="panel"><div class="num">02</div><h4>Mode-aware</h4><p>Light and dark are two modes of the same semantic layer. Switch the mode, the whole system follows — including this page.</p></div>
+    <div class="panel"><div class="num">02</div><h4>Mode-aware</h4><p>Light and dark are two modes of the same semantic layer. Switch the mode, the whole system follows — including this page. Brand is a separate, independent axis.</p></div>
     <div class="panel"><div class="num">03</div><h4>Tailwind-aligned</h4><p>Naming and scales follow Tailwind conventions. Everything is English kebab-case, predictable and portable to code.</p></div>
   </div>
   <div class="prose">
     <h3>Token architecture</h3>
-    <p>Three tiers, each referencing the one above. Components never touch primitives directly.</p>
+    <p>Four layers, each referencing the one above — see the full <a href="#token-architecture" style="text-decoration:underline">Token architecture</a> page for the mode matrix and migration notes. Components never touch primitives directly, and never expose a Theme prop.</p>
   </div>
   <div class="tiers">
     <div class="tier"><div class="t-name">Primitives<span>raw values</span></div><div class="t-desc">The palette and scales. Literal values: <code>blue-200 · #c6dbf9</code>, <code>space-4 · 16px</code>. Never used directly in components.</div></div>
-    <div class="tier"><div class="t-name">Semantic<span>intent · mode-aware</span></div><div class="t-desc">Role-based aliases that carry light/dark: <code>text/primary</code>, <code>bg/surface</code>, <code>border/subtle</code>. The layer designers reach for.</div></div>
-    <div class="tier"><div class="t-name">Component<span>scoped</span></div><div class="t-desc">Per-component tokens that alias semantics: <code>button/bg/primary</code>, <code>chip/text/selected</code>. Local control without breaking the system.</div></div>
+    <div class="tier"><div class="t-name">Brand<span>identity · 5 modes</span></div><div class="t-desc">Fresno · Biakone · GLYF · Medida · Forma. Changes identity values, never component anatomy. Independent from Theme.</div></div>
+    <div class="tier"><div class="t-name">Semantic<span>intent · mode-aware</span></div><div class="t-desc">Role-based aliases that carry light/dark: <code>text/primary</code>, <code>bg/surface</code>, <code>border/subtle</code>. The only Light/Dark switch, and the layer designers reach for.</div></div>
+    <div class="tier"><div class="t-name">Component<span>scoped</span></div><div class="t-desc">Per-component tokens that alias semantics: <code>button/bg-primary</code>, <code>chip/text-selected</code>. Local control without breaking the system.</div></div>
   </div>
   <div class="prose">
     <h3>Type system</h3>
-    <p><strong>Switzer</strong> carries body and headings. <strong>Geist Mono</strong> (uppercase, tracked) handles display statements, UI, nav and labels. <strong>Instrument Serif</strong> covers editorial and quotes. This page uses all three.</p>
+    <p><strong>Switzer</strong> carries body and headings, each in a Regular and a Light cut. <strong>Geist Mono</strong> (uppercase, tracked) handles display statements, UI, nav and labels. <strong>Instrument Serif</strong> covers editorial and quotes. This page uses all three.</p>
   </div>
   <div class="foot"><span>Fresno© — FDS</span><span>Private · juancfresno.com</span></div>
 `;
 
-/* color data */
+R['token-architecture']=()=>`
+  <div class="sec-head">
+    <span class="kicker">Foundations</span>
+    <h1 class="sec-title"><span class="br">{</span> Token architecture <span class="br">}</span></h1>
+    <p class="sec-lede">One source of truth. Brand and Theme are independent axes — Brand carries identity (Fresno · Biakone · GLYF · Medida · Forma), Semantic is the <strong>only</strong> Light/Dark switch. Components never expose a Theme prop.</p>
+  </div>
+  <div class="tiers">
+    <div class="tier"><div class="t-name">01 · Primitives<span>mode: Value</span></div><div class="t-desc">Raw values — color, spacing, radius, breakpoints, interaction targets. Literal, foundation-layer. Never used directly in components.</div></div>
+    <div class="tier"><div class="t-name">02 · Brand<span>modes: Fresno · Biakone · GLYF · Medida · Forma</span></div><div class="t-desc">Identity layer — logo, accent, typography roles per brand. Brand changes <em>values</em>, never component anatomy.</div></div>
+    <div class="tier"><div class="t-name">03 · Semantic<span>modes: Light · Dark</span></div><div class="t-desc">Contextual meaning — <code>text/*</code>, <code>bg/*</code>, <code>border/*</code>, <code>feedback/*</code>, font and logo roles. Semantic is the only Light/Dark switch in the system.</div></div>
+    <div class="tier"><div class="t-name">04 · Component<span>mode: Value</span></div><div class="t-desc">Implementation layer — button, controls, optical geometry (padding, gap, overlap). Component-specific public tokens live here; no Theme mode at this layer.</div></div>
+  </div>
+  <div class="prose"><p style="margin-top:8px">→ <strong>UI</strong> — the layer above Component, where products consume the tokens. Spacing/radius/breakpoints may bind straight to Primitives when they're invariant across Brand and Theme; optical exceptions live as Component tokens instead.</p></div>
+  <div class="prose"><h3>Mode matrix</h3></div>
+  <div class="props"><div class="ph"><span>Layer</span><span>Value</span><span>Note</span></div>
+    <div class="pr"><b>Primitives</b><span>Value</span><span>Raw system constants</span></div>
+    <div class="pr"><b>Brand</b><span>Fresno · Biakone · GLYF · Medida · Forma</span><span>Identity context</span></div>
+    <div class="pr"><b>Semantic</b><span>Light · Dark</span><span>Theme context</span></div>
+    <div class="pr"><b>Component</b><span>Value</span><span>Single implementation layer</span></div>
+    <div class="pr"><b>Interaction</b><span>24 web · 44 touch</span><span>Target baseline; visual glyph may be smaller</span></div>
+  </div>
+  <div class="prose"><h3>Component API migration</h3><p>Prior to v1.0.0, several components carried a component-level <code>Theme</code> variant. That axis is now removed from every canonical component — Light/Dark comes only from placing a component inside a Semantic context. Legacy Theme-based sets remain in Figma only as hidden, untokenized specimens kept for rollback reference — they are not part of the public API.</p></div>
+  <div class="foot"><span>Fresno© — FDS</span><span>Token architecture</span></div>`;
+
+const BRAND_LOGOS={fresno:`<svg viewBox="0 0 234 28" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Fresno" style="height:14px;width:auto"><path d="M223.381 15.7711C217.072 15.7711 213.231 12.7787 213.231 7.86535C213.231 2.95204 217.072 0 223.381 0C229.71 0 233.511 2.95204 233.511 7.86535C233.511 12.7787 229.71 15.7711 223.381 15.7711ZM223.381 13.7492C228.638 13.7492 231.125 11.6059 231.125 7.84513C231.125 4.12476 228.638 1.9815 223.381 1.9815C218.164 1.9815 215.617 4.12476 215.617 7.84513C215.617 11.6059 218.164 13.7492 223.381 13.7492ZM223.442 12.7382C219.721 12.7382 216.992 11.1207 216.992 7.86535C216.992 4.65047 219.721 2.99247 223.442 2.99247C227.02 2.99247 229.427 4.42805 229.77 6.91504H226.899C226.414 5.88385 225.342 5.11551 223.462 5.11551C221.137 5.11551 219.903 6.3489 219.903 7.86535C219.903 9.42225 221.137 10.6354 223.462 10.6354C225.302 10.6354 226.434 9.90751 226.899 8.8561H229.77C229.447 11.2824 227.02 12.7382 223.442 12.7382Z" fill="currentColor"/><path d="M189.041 28C176.979 28 169.836 23.0462 169.836 14V13.9641C169.836 4.88205 176.979 0 189.041 0C201.102 0 208.246 4.88205 208.246 13.9641V14C208.246 23.0462 201.102 28 189.041 28ZM189.041 21.359C194.677 21.359 198.482 18.6308 198.482 14V13.9641C198.482 9.29744 194.677 6.60513 189.041 6.60513C183.405 6.60513 179.6 9.15385 179.6 13.9641V14C179.6 18.7744 183.405 21.359 189.041 21.359Z" fill="currentColor"/><path d="M139.809 27.282H130.906V0.610229H140.922L158.153 17.0154L158.44 17.3384V0.610229H167.342V27.282H157.363L140.024 10.841L139.809 10.6256V27.282Z" fill="currentColor"/><path d="M112.67 28C101.183 28 96.6241 23.4051 96.4087 18.1282H105.598C105.742 20.5333 107.465 21.7897 112.742 21.7897C117.229 21.7897 118.845 20.9282 118.845 19.4564C118.845 18.2359 118.342 17.6615 111.557 16.9436C99.5318 15.7949 97.4497 12.4564 97.4497 8.07692C97.4497 3.94872 100.896 0 111.988 0C122.829 0 127.137 4.2 127.604 9.8H118.773C118.45 7.89744 117.122 6.17436 112.347 6.17436C108.327 6.17436 106.963 6.9641 106.963 8.25641C106.963 9.26154 107.25 10.1949 112.491 10.6974C126.886 12.0615 128.357 15.5795 128.357 19.2051C128.357 25.1641 122.973 28 112.67 28Z" fill="currentColor"/><path d="M95.7788 27.282H66.5224V0.610229H95.4199V7.14356H76.1788V10.7692H93.8763V16.5128H76.1788V20.7487H95.7788V27.282Z" fill="currentColor"/><path d="M40.3936 27.282H30.7372V0.610229H50.05C60.1013 0.610229 63.691 4.09228 63.691 8.75895C63.691 12.4923 61.25 15.0051 57.05 15.8307V15.8666C60.1372 16.6564 61.3936 17.6615 62.291 21.682L62.65 23.1538C63.0808 25.0923 63.4397 26.0256 63.9782 27.282H54.1064C53.7474 26.6 53.532 25.882 53.0295 23.5846L52.6705 22.0051C52.3115 20.3179 50.9115 19.5282 46.9987 19.5282H40.3936V27.282ZM40.3936 7.14356V13.3538H49.4756C52.4551 13.3538 54.0705 12.1333 54.0705 10.0513C54.0705 8.11279 52.4551 7.14356 49.4756 7.14356H40.3936Z" fill="currentColor"/><path d="M9.65641 27.282H0V0.610229H28.6821V7.17946H9.65641V11.4872H26.959V17.8769H9.65641V27.282Z" fill="currentColor"/></svg>`,
+ biakone:`<span style="font-family:var(--font-ui);font-size:13px;letter-spacing:.04em">BIAKO.</span>`};
+R.brand=()=>{
+  const cards=BRANDS.map(b=>`<div class="panel">
+      <div class="num">${b.logo?'ASSETS LIVE':'SLOT PREPARED'}</div>
+      <h4>${b.name}</h4>
+      <p style="margin-bottom:14px">${b.status}</p>
+      <div style="display:flex;gap:8px;margin-bottom:14px">
+        <div style="flex:1;height:44px;border-radius:var(--radius-md);background:${b.accent};border:1px solid var(--border-subtle)"></div>
+        <div style="flex:1;height:44px;border-radius:var(--radius-md);background:${b.subtle};border:1px solid var(--border-subtle)"></div>
+      </div>
+      <div style="height:40px;display:flex;align-items:center;color:var(--text-primary);margin-bottom:10px">${BRAND_LOGOS[b.id]||'<span class="mono" style="font-size:10px;color:var(--text-tertiary)">wordmark · SVG slot</span>'}</div>
+      <p style="font-size:13px">${b.note}</p>
+    </div>`).join('');
+  return `
+  <div class="sec-head">
+    <span class="kicker">Foundations</span>
+    <h1 class="sec-title"><span class="br">{</span> Brand <span class="br">}</span></h1>
+    <p class="sec-lede">Five identity contexts on one Brand collection axis, independent from Semantic Light/Dark. <strong>juancfresno.com is Brand = Fresno</strong> — not a separate brand context.</p>
+  </div>
+  <div class="grid cols-3">${cards}</div>
+  <div class="prose"><h3>Honest state</h3><p>Fresno is the only brand with a fully distinct accent today. Biakone ships real wordmark assets but resolves its accent/subtle swatches to the same neutral base as GLYF, Medida and Forma. GLYF's "Ink/Cream" identity is the intended direction, documented as a status label — its Brand-mode variables aren't split from the neutral base yet, and it has no logo assets in Figma. Medida and Forma are prepared slots only. None of this implies product code (Forma, Medida, GLYF, Biakone) is automatically consuming FDS — there is still no automated token export from Figma to any product codebase.</p></div>
+  <div class="foot"><span>Fresno© — FDS</span><span>Brand</span></div>`;
+};
+
+/* color data — Primitives + Brand + Semantic + Component, per Figma FDS v1.0.0 (file 7Uco2E5gV4JdqojI7J3kTX) */
 const PRIMITIVES=[
  {g:'Neutral',items:[['color/neutral/50','#f4f2ea'],['color/neutral/100','#ecebe6'],['color/neutral/200','#dad8d2'],['color/neutral/300','#c9c5bd'],['color/neutral/400','#a9aea9'],['color/neutral/500','#8a918d'],['color/neutral/600','#636965'],['color/neutral/700','#4a4d4b'],['color/neutral/800','#373737'],['color/neutral/900','#242625'],['color/neutral/950','#141414']]},
  {g:'Brand blue',items:[['color/brand/blue/50','#f0f5fe'],['color/brand/blue/100','#dce8fc'],['color/brand/blue/200','#c6dbf9'],['color/brand/blue/300','#a3c3f3'],['color/brand/blue/400','#7ba1e8'],['color/brand/blue/500','#557fdb'],['color/brand/blue/600','#4063c2'],['color/brand/blue/700','#344e9b'],['color/brand/blue/800','#2e4178'],['color/brand/blue/900','#29375e'],['color/brand/blue/950','#1a2340']]},
- {g:'Feedback',items:[['color/green/500','#38ae7a'],['color/amber/500','#e0ac3a'],['color/red/500','#e0655a'],['color/blue/500','#5a82d2']]},
+ {g:'Feedback — red',items:[['color/red/400','#e2685d'],['color/red/500','#e0655a'],['color/red/700','#a6423b']]},
+ {g:'Feedback — other',items:[['color/green/500','#38ae7a'],['color/amber/500','#e0ac3a'],['color/blue/500','#5a82d2']]},
  {g:'Brand pop',items:[['color/brand/blue/200','#c6dbf9'],['color/brand/green','#8df8cd'],['color/brand/yellow','#ffffe6']]},
  {g:'Surfaces',items:[['color/surface/marble','#f2f8fc'],['color/surface/ivory','#fffff0'],['color/surface/pearl','#fcfcf7'],['color/surface/lavender','#f4f1f8'],['color/surface/cold-steel','#f8f7f4']]},
  {g:'Accent',items:[['color/accent/electric','#003dff']]}
 ];
 const SEMANTICS=[
- {g:'Text',items:[['text/primary','#141414','#f4f2ea'],['text/secondary','#4a4d4b','#c9c5bd'],['text/tertiary','#636965','#a9aea9'],['text/inverse-primary','#f4f2ea','#141414'],['text/brand','#344e9b','#a3c3f3']]},
- {g:'Background',items:[['bg/page','#ecebe6','#242625'],['bg/surface','#f4f2ea','#141414'],['bg/subtle','#c9c5bd','#373737'],['bg/inverse-surface','#242625','#ecebe6'],['bg/brand','#c6dbf9','#c6dbf9'],['bg/brand-subtle','#dce8fc','#1a2340']]},
+ {g:'Text',items:[['text/primary','#141414','#f4f2ea'],['text/secondary','#373737','#c9c5bd'],['text/tertiary','#4a4d4b','#a9aea9'],['text/inverse-primary','#f4f2ea','#141414'],['text/inverse-secondary','#c9c5bd','#4a4d4b'],['text/inverse-tertiary','#a9aea9','#636965'],['text/brand','#344e9b','#a3c3f3']]},
+ {g:'Background',items:[['bg/page','#ecebe6','#242625'],['bg/surface','#f4f2ea','#141414'],['bg/subtle','#c9c5bd','#373737'],['bg/inverse-surface','#242625','#ecebe6'],['bg/inverse-subtle','#373737','#dad8d2'],['bg/brand','#c6dbf9','#c6dbf9'],['bg/brand-subtle','#dce8fc','#1a2340']]},
  {g:'Border',items:[['border/default','#c9c5bd','#4a4d4b'],['border/subtle','#dad8d2','#373737'],['border/strong','#a9aea9','#636965'],['border/strongest','#141414','#f4f2ea']]},
- {g:'Feedback',items:[['feedback/success','#38ae7a','#38ae7a'],['feedback/warning','#e0ac3a','#e0ac3a'],['feedback/error','#e0655a','#e0655a'],['feedback/info','#5a82d2','#5a82d2']]},
+ {g:'Feedback',items:[['feedback/success','#38ae7a','#38ae7a'],['feedback/warning','#e0ac3a','#e0ac3a'],['feedback/error','#a6423b','#e2685d'],['feedback/info','#5a82d2','#5a82d2']]},
  {g:'Icon',items:[['icon/default','#141414','#f4f2ea'],['icon/muted','#636965','#a9aea9'],['icon/disabled','#a9aea9','#636965'],['icon/inverse','#f4f2ea','#141414']]}
+];
+/* Brand collection — 5 identity contexts, mode = Brand (independent of Semantic Light/Dark) */
+const BRANDS=[
+ {id:'fresno',name:'Fresno',status:'Canonical FDS brand',accent:'#c6dbf9',subtle:'#dce8fc',logo:true,note:'The identity FDS itself is built around — full wordmark, face-mark and accent (logo/accent · #003dff) assets in place.'},
+ {id:'biakone',name:'Biakone',status:'Neutral base · ready for overrides',accent:'#141414',subtle:'#dad8d2',logo:true,note:'Wordmark lockups (horizontal + vertical) exist; accent/subtle still resolve to the neutral base until Biakone-specific colors are approved.'},
+ {id:'glyf',name:'GLYF',status:'Ink / Cream context',accent:'#141414',subtle:'#dad8d2',logo:false,note:'Intended as a distinct Ink/Cream identity, but the Brand-mode accent/subtle variables aren’t yet split from the neutral base — wordmark + app-icon slots are prepared, not filled.'},
+ {id:'medida',name:'Medida',status:'Neutral base · ready for overrides',accent:'#141414',subtle:'#dad8d2',logo:false,note:'Prepared wordmark + app-icon slot only. No Medida-specific assets or overrides yet.'},
+ {id:'forma',name:'Forma',status:'Neutral base · ready for overrides',accent:'#141414',subtle:'#dad8d2',logo:false,note:'Prepared wordmark + app-icon slot only. No Forma-specific assets or overrides yet.'}
 ];
 
 R.color=()=>{
@@ -463,36 +684,46 @@ R.typography=()=>`
   </div>
   <div class="foot"><span>Fresno© — FDS</span><span>Typography</span></div>`;
 
-const SPACE=[[1,4],[2,8],[3,12],[4,16],[5,20],[6,24],[8,32],[10,40],[12,48],[16,64],[20,80]];
+const SPACE=[[0,0],['px',1],[1,4],[2,8],[3,12],[4,16],[5,20],[6,24],[7,28],[8,32],[9,36],[10,40],[11,44],[12,48],[14,56],[16,64],[20,80],[24,96],[28,112],[32,128],[36,144],[40,160],[48,192],[50,200],[56,224],[64,256]];
 R.spacing=()=>`
   <div class="sec-head">
     <span class="kicker">Foundations</span>
     <h1 class="sec-title"><span class="br">{</span> Spacing <span class="br">}</span></h1>
-    <p class="sec-lede">A 4px base grid, Tailwind-aligned. Tokens are named by their pixel value for designer legibility — <code style="font-family:var(--font-ui);font-size:.85em">space/4</code> is 16px.</p>
+    <p class="sec-lede">Tailwind v4 scale, 4px base — always token, never a loose value. Tokens are named by their step for designer legibility — <code style="font-family:var(--font-ui);font-size:.85em">space/4</code> is 16px.</p>
   </div>
-  <div class="space-list">${SPACE.map(([n,px])=>`<div class="space-row"><div class="lbl">space/${n}</div><div class="space-bar" style="width:${px}px"></div><div class="px">${px}px</div></div>`).join('')}</div>
+  <div class="space-list">${SPACE.map(([n,px])=>`<div class="space-row"><div class="lbl">space/${n}</div><div class="space-bar" style="width:${Math.max(px,1)}px"></div><div class="px">${px}px</div></div>`).join('')}</div>
+  <div class="prose"><h3>Interaction targets</h3><p>Two structural primitives, invariant across Brand/Theme — minimum hit area, not visual glyph size. A compact icon can stay visually small as long as its tappable/clickable area meets the target.</p></div>
+  <div class="grid cols-2">
+    <div class="panel"><div class="num">WEB</div><h4>24px</h4><p><code style="font-family:var(--font-ui);font-size:.85em">interaction/target/min-web</code> — minimum interactive footprint for pointer input.</p></div>
+    <div class="panel"><div class="num">TOUCH</div><h4>44px</h4><p><code style="font-family:var(--font-ui);font-size:.85em">interaction/target/min-touch</code> — minimum interactive footprint for touch input.</p></div>
+  </div>
   <div class="foot"><span>Fresno© — FDS</span><span>Spacing</span></div>`;
 
-const RADII=[['sm',8],['md',12],['lg',16],['full',999]];
+const RADII=[['sm',4],['md',6],['lg',8],['xl',12],['full',9999]];
 R.radius=()=>`
   <div class="sec-head">
     <span class="kicker">Foundations</span>
     <h1 class="sec-title"><span class="br">{</span> Radius <span class="br">}</span></h1>
-    <p class="sec-lede">Four steps. <code style="font-family:var(--font-ui);font-size:.85em">sm</code> for inputs and small chips, <code style="font-family:var(--font-ui);font-size:.85em">md</code> for buttons and cards, <code style="font-family:var(--font-ui);font-size:.85em">lg</code> for panels and modals, <code style="font-family:var(--font-ui);font-size:.85em">full</code> for pills and avatars.</p>
+    <p class="sec-lede">Five steps. <code style="font-family:var(--font-ui);font-size:.85em">sm</code> for checkboxes and micro controls, <code style="font-family:var(--font-ui);font-size:.85em">md</code> for buttons, inputs and menus, <code style="font-family:var(--font-ui);font-size:.85em">lg</code> for cards and modals, <code style="font-family:var(--font-ui);font-size:.85em">xl</code> for tables and stat panels, <code style="font-family:var(--font-ui);font-size:.85em">full</code> for pills, tags and avatars.</p>
   </div>
-  <div class="radius-grid">${RADII.map(([n,px])=>`<div><div class="radius-box" style="border-radius:${px}px"></div><div class="radius-cap">radius/${n} · <b>${px===999?'full':px+'px'}</b></div></div>`).join('')}</div>
+  <div class="radius-grid">${RADII.map(([n,px])=>`<div><div class="radius-box" style="border-radius:${Math.min(px,64)}px"></div><div class="radius-cap">radius/${n} · <b>${px===9999?'full':px+'px'}</b></div></div>`).join('')}</div>
   <div class="foot"><span>Fresno© — FDS</span><span>Radius</span></div>`;
 
+const ELEVATIONS=[
+ ['shadow/xs','var(--shadow-xs)','Hairline lift — inline chips, subtle separation'],
+ ['shadow/sm','var(--shadow-sm)','Resting cards, list rows'],
+ ['shadow/md','var(--shadow-md)','Dropdowns, popovers'],
+ ['shadow/lg','var(--shadow-lg)','Menus, tooltips, floating toolbars'],
+ ['shadow/xl','var(--shadow-xl)','Modals, dialogs'],
+ ['shadow/2xl','var(--shadow-2xl)','FAB, top-level overlays']
+];
 R.elevation=()=>`
   <div class="sec-head">
     <span class="kicker">Foundations</span>
     <h1 class="sec-title"><span class="br">{</span> Elevation <span class="br">}</span></h1>
-    <p class="sec-lede">Restrained shadows for layering. Two steps cover the system — a subtle lift for resting surfaces and a stronger one for overlays.</p>
+    <p class="sec-lede">Tailwind v4 shadow scale, six multi-layer steps, tinted with neutral/950. Barely visible in dark mode by design — dark surfaces separate mainly through <code style="font-family:var(--font-ui);font-size:.85em">bg/surface</code>, not shadow.</p>
   </div>
-  <div class="elev-grid">
-    <div class="elev-card" style="box-shadow:var(--shadow-sm)"><div class="en">shadow-sm</div><div class="ed">cards · dropdowns · toasts</div></div>
-    <div class="elev-card" style="box-shadow:var(--shadow)"><div class="en">shadow</div><div class="ed">modals · popovers · menus</div></div>
-  </div>
+  <div class="elev-grid">${ELEVATIONS.map(([n,v,d])=>`<div class="elev-card" style="box-shadow:${v}"><div class="en">${n}</div><div class="ed">${d}</div></div>`).join('')}</div>
   <div class="prose"><p style="margin-top:24px">Surfaces also separate by token alone — <code style="font-family:var(--font-ui);font-size:.85em">bg/surface</code> over <code style="font-family:var(--font-ui);font-size:.85em">bg/page</code> with a <code style="font-family:var(--font-ui);font-size:.85em">border/subtle</code> — so elevation is used sparingly, mostly for floating UI.</p></div>
   <div class="foot"><span>Fresno© — FDS</span><span>Elevation</span></div>`;
 
@@ -514,7 +745,16 @@ const ICONS=[
  ['x','<path d="M6 6l12 12M18 6l-12 12"/>'],
  ['chevron-right','<path d="M9 6l6 6l-6 6"/>'],
  ['arrow-right','<path d="M5 12h14M13 6l6 6l-6 6"/>'],
- ['external-link','<path d="M12 6h-5a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-5"/><path d="M14 4h6v6M20 4l-9 9"/>']
+ ['external-link','<path d="M12 6h-5a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-5"/><path d="M14 4h6v6M20 4l-9 9"/>'],
+ ['chevron-down','<path d="M6 9l6 6l6 -6"/>'],
+ ['chevron-left','<path d="M15 6l-6 6l6 6"/>'],
+ ['minus','<path d="M5 12h14"/>'],
+ ['inbox','<path d="M4 12h4l2 3h4l2 -3h4"/><path d="M5.5 5h13l2.5 7v6a1 1 0 0 1 -1 1h-16a1 1 0 0 1 -1 -1v-6z"/>'],
+ ['arrow-up','<path d="M12 19V5M6 11l6 -6l6 6"/>'],
+ ['arrow-down','<path d="M12 5v14M18 13l-6 6l-6 -6"/>'],
+ ['alert-circle','<circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16v.01"/>'],
+ ['info-circle','<circle cx="12" cy="12" r="9"/><path d="M12 8v.01M12 11v5"/>'],
+ ['edit','<path d="M7 20h10M4.5 15.5l10-10a1.5 1.5 0 0 1 3 3l-10 10H4.5v-3z"/>']
 ];
 R.icons=()=>`
   <div class="sec-head">
@@ -588,23 +828,30 @@ const TYPESCALE=[
  {g:'Display — Geist Mono · 100%', font:'var(--font-ui)', rows:[
    ['display/xl',88,48,'100%','Fresno'],['display/lg',72,40,'100%','Fresno'],
    ['display/md',48,32,'100%','Fresno'],['display/sm',36,26,'100%','Fresno']]},
- {g:'Heading — Switzer · 110%', font:'var(--font-body)', rows:[
+ {g:'Heading — Switzer Regular · 110%', font:'var(--font-body)', rows:[
    ['heading/1',40,30,'110%','Heading one'],['heading/2',32,26,'110%','Heading two'],
    ['heading/3',24,22,'110%','Heading three'],['heading/4',20,18,'110%','Heading four']]},
- {g:'Body — Switzer · 140%', font:'var(--font-body)', rows:[
+ {g:'Heading — Switzer Light · 110%', font:'var(--font-body)', weight:300, rows:[
+   ['heading/1-light',40,30,'110%','Heading one'],['heading/2-light',32,26,'110%','Heading two'],
+   ['heading/3-light',24,22,'110%','Heading three'],['heading/4-light',20,18,'110%','Heading four']]},
+ {g:'Body — Switzer Regular · 140%', font:'var(--font-body)', rows:[
    ['body/xl',24,20,'140%','The quick brown fox jumps'],['body/lg',18,17,'140%','The quick brown fox jumps over'],
    ['body/md',16,16,'140%','The quick brown fox jumps over the lazy dog'],['body/sm',14,14,'140%','The quick brown fox jumps over the lazy dog'],
    ['body/xs',12,12,'140%','The quick brown fox jumps over the lazy dog']]},
+ {g:'Body — Switzer Light · 140%', font:'var(--font-body)', weight:300, rows:[
+   ['body/xl-light',24,20,'140%','The quick brown fox jumps'],['body/lg-light',18,17,'140%','The quick brown fox jumps over'],
+   ['body/md-light',16,16,'140%','The quick brown fox jumps over the lazy dog'],['body/sm-light',14,14,'140%','The quick brown fox jumps over the lazy dog'],
+   ['body/xs-light',12,12,'140%','The quick brown fox jumps over the lazy dog']]},
  {g:'UI — Geist Mono · 140%', font:'var(--font-ui)', upper:true, rows:[
    ['ui/md',12,12,'140%','UI label medium'],['ui/sm',11,11,'140%','UI label small']]},
  {g:'Editorial — Instrument Serif · 140%', font:'var(--font-editorial)', rows:[
    ['editorial/lg',24,20,'140%','An editorial flourish'],['editorial/md',18,16,'140%','An editorial flourish']]}
 ];
 R.typography=()=>{
-  const scale=TYPESCALE.map(grp=>`<div class="grp-label">${grp.g}</div><div class="scale-table">${grp.rows.map(([n,d,m,line,smp])=>`<div class="ts-row"><div class="smp" style="font-family:${grp.font};font-size:${Math.min(d,52)}px;line-height:1.1;${grp.upper?'text-transform:uppercase;letter-spacing:.06em':''}">${smp}</div><div class="meta"><div class="tn">${n}</div><div class="tm">D ${d} · M ${m} · ${line}</div></div></div>`).join('')}</div>`).join('');
+  const scale=TYPESCALE.map(grp=>`<div class="grp-label">${grp.g}</div><div class="scale-table">${grp.rows.map(([n,d,m,line,smp])=>`<div class="ts-row"><div class="smp" style="font-family:${grp.font};font-size:${Math.min(d,52)}px;font-weight:${grp.weight||400};line-height:1.1;${grp.upper?'text-transform:uppercase;letter-spacing:.06em':''}">${smp}</div><div class="meta"><div class="tn">${n}</div><div class="tm">D ${d} · M ${m} · ${line}</div></div></div>`).join('')}</div>`).join('');
   return `
   <div class="sec-head"><span class="kicker">Foundations</span><h1 class="sec-title"><span class="br">{</span> Typography <span class="br">}</span></h1>
-    <p class="sec-lede">Three families, two breakpoints. Switzer carries reading text and headings, Geist Mono handles display statements and all UI/labels, Instrument Serif covers editorial moments. Every style is defined for <strong>Desktop</strong> and <strong>Mobile</strong>.</p></div>
+    <p class="sec-lede">Three families, two breakpoints, 52 text styles total (26 Desktop + 26 Mobile). Switzer carries reading text and headings — each in a Regular and a Light cut — Geist Mono handles display statements and all UI/labels, Instrument Serif covers editorial moments.</p></div>
   <div class="prose"><h3>Families</h3></div>
   <div class="type-card"><div class="role">Body &amp; headings</div><div class="big" style="font-family:var(--font-body);font-size:72px">Ag</div><div class="fam">Switzer · var(--font-body) · var(--font-heading)</div><div class="sample" style="font-family:var(--font-body);font-size:17px">The quick brown fox jumps over the lazy dog. Clean, neutral, highly legible — the workhorse for body copy and headings.</div></div>
   <div class="type-card"><div class="role">Display · UI · labels</div><div class="big" style="font-family:var(--font-ui);font-size:56px;letter-spacing:.02em">FDS</div><div class="fam">Geist Mono · var(--font-ui)</div><div class="sample" style="font-family:var(--font-ui);font-size:13px;text-transform:uppercase;letter-spacing:.08em">Uppercase · tracked · kickers, labels, nav, code, metric values</div></div>
@@ -616,6 +863,25 @@ R.typography=()=>{
 
 /* ---- changelog (newest first) ---- */
 const CHANGELOG=[
+ {v:'1.0.0', date:'2026-08-09', note:'Breaking release — multibrand token architecture, component API cleanup (Theme removed), accessibility contrast fixes, and the full canonical component library replacing placeholder sections. Migration path below; nothing from v0.1.0 removed from this log.', items:[
+   ['brk','Components — removed public Theme variant axes from every canonical component; migrate to Semantic Light/Dark context instead.'],
+   ['brk','Button — removed neutral-inverse and outline-inverse; use canonical button/neutral and button/outline under Semantic Dark. Both inverse sets remain in Figma only as hidden, untokenized .legacy/* specimens for rollback.'],
+   ['brk','Component token ownership — component-specific public tokens now live in the Component collection; old Semantic component bridges are legacy/hidden.'],
+   ['brk','Radius scale renumbered — sm 8→4, md 12→6, lg 16→8, full 999→9999, plus a new xl step at 12. Any hardcoded old radius values are now wrong.'],
+   ['brk','feedback/error is mode-aware — Light now resolves to red/700 (#a6423b), Dark to red/400 (#e2685d), replacing the flat red/500 (#e0655a) single value.'],
+   ['add','Brand collection — 5 identity contexts (Fresno · Biakone · GLYF · Medida · Forma) documented as a new Foundations page, independent from Semantic Light/Dark.'],
+   ['add','Token Architecture foundation — the canonical 4-layer contract (Primitives → Brand → Semantic → Component → UI), with the mode matrix and migration notes.'],
+   ['add','Interaction target primitives — 24px minimum for web, 44px for touch.'],
+   ['add','Full canonical component library — 34 previously-placeholder sections replaced with real Figma-sourced documentation (Input, Textarea, Select, Search field, Checkbox, Radio, Toggle, Slider, Stepper, Segmented control, Rating, Banner, Toast, Tooltip, Modal, Badge, Progress, Spinner, Skeleton, Top bar, Tab bar, Tabs, Breadcrumb, Pagination, Menu, Card, Table, Stat, List item, Avatar, Tag, Chip, Divider, Empty state), plus Link and Accordion, which were not in the menu before.'],
+   ['chg','Component demos now consume semantic/component CSS variables instead of hardcoded per-state hex — including Button, Icon button and FAB.'],
+   ['chg','Spacing scale expanded from 11 to 26 steps (space/0 through space/64), matching the Tailwind v4-aligned scale actually in Figma.'],
+   ['chg','Elevation rebuilt as a 6-step layered shadow system (xs · sm · md · lg · xl · 2xl), replacing the old flat 2-step shadow.'],
+   ['chg','Typography — added the Switzer "-light" weight cut across Heading and Body, bringing the scale to its full 52 text styles (26 Desktop + 26 Mobile).'],
+   ['chg','Light text/secondary now resolves to neutral/800 (#373737, was neutral/700) and text/tertiary to neutral/700 (#4a4d4b, was neutral/600) — darker for stronger contrast.'],
+   ['chg','Icon button — dropped the undocumented "ghost" variant; Figma ships primary · neutral · outline only.'],
+   ['chg','FAB — dropped the "extended" variant; Figma ships a circular icon-only FAB only.'],
+   ['fix','Menu — destructive item (Delete) now documented against feedback/error rather than an assumed raw red.'],
+ ]},
  {v:'0.1.0', date:'2026-06-28', note:'First public cut of the FDS styleguide — foundations complete, Actions components shipped.', items:[
    ['add','Styleguide shell — sidebar, hash routing, live light/dark toggle built from FDS tokens'],
    ['add','Foundations · Color — semantic tokens (live, mode-aware) + full primitive palette, click-to-copy'],
@@ -637,67 +903,503 @@ function ic(name){const f=ICONS.find(i=>i[0]===name);return f?`<svg viewBox="0 0
 
 /* ---- Actions components ---- */
 R.button=()=>`
-  <div class="sec-head"><span class="kicker">Components · Actions</span><h1 class="sec-title"><span class="br">{</span> Button <span class="br">}</span></h1><p class="sec-lede">The primary action trigger. Three fixed variants chosen by surface context, two sizes, full interaction states, optional leading/trailing icons.</p></div>
+  <div class="sec-head"><span class="kicker">Components · Actions</span><h1 class="sec-title"><span class="br">{</span> Button <span class="br">}</span></h1><p class="sec-lede">The primary action trigger. Three canonical component sets chosen by surface context (Primary, Neutral, Outline), two sizes, full interaction states, optional leading/trailing icons.</p></div>
   <span class="cdoc-status stable"><span class="d"></span>Stable</span>
-  <div class="prose"><h3>Variants</h3><p>Variants are <strong>explicit-choice</strong> tokens — you pick by surface, they don't auto-flip. Primary for the main action, neutral for strong secondary, outline for low emphasis.</p></div>
+  <div class="prose"><h3>Variants</h3><p>Primary, Neutral and Outline are <strong>explicit-choice</strong> tokens — you pick by surface, they don't auto-flip. Primary for the main action, neutral for strong secondary, outline for low emphasis.</p></div>
   <div class="demo"><button class="fbtn fbtn-primary">Primary</button><button class="fbtn fbtn-neutral">Neutral</button><button class="fbtn fbtn-outline">Outline</button></div>
-  <div class="demo-label">On dark surfaces — inverse variants</div>
-  <div class="demo dark-surface"><button class="fbtn fbtn-primary">Primary</button><button class="fbtn fbtn-neutral-inv">Neutral</button><button class="fbtn fbtn-outline-inv">Outline</button></div>
+  <div class="demo-label">Same components, Semantic = Dark</div>
+  <div class="demo dark-surface" data-theme="dark"><button class="fbtn fbtn-primary">Primary</button><button class="fbtn fbtn-neutral">Neutral</button><button class="fbtn fbtn-outline">Outline</button></div>
+  <div class="prose"><p style="margin-top:8px"><strong>Breaking in v1.0.0</strong> — Button has no <code style="font-family:var(--font-ui);font-size:.85em">Theme</code> prop. The row above is the exact same <code style="font-family:var(--font-ui);font-size:.85em">button/neutral</code> and <code style="font-family:var(--font-ui);font-size:.85em">button/outline</code> components as the first row, just resolved under a Semantic = Dark context — not a separate variant.</p></div>
   <div class="prose"><h3>Sizes</h3></div>
   <div class="demo"><button class="fbtn fbtn-primary">Medium</button><button class="fbtn fbtn-primary sm">Small</button></div>
   <div class="prose"><h3>States</h3></div>
-  <div class="demo"><button class="fbtn fbtn-primary">Default</button><button class="fbtn fbtn-primary" style="background:#a3c3f3">Hover</button><button class="fbtn fbtn-primary" style="background:#7ba1e8">Active</button><button class="fbtn fbtn-primary focus">Focus</button><button class="fbtn fbtn-primary" disabled>Disabled</button></div>
+  <div class="demo"><button class="fbtn fbtn-primary">Default</button><button class="fbtn fbtn-primary" style="background:var(--button-bg-primary-hover)">Hover</button><button class="fbtn fbtn-primary" style="background:var(--button-bg-primary-active)">Active</button><button class="fbtn fbtn-primary focus">Focus</button><button class="fbtn fbtn-primary" disabled>Disabled</button></div>
   <div class="prose"><h3>With icons</h3><p>Hidden leading/trailing slots toggle via boolean props.</p></div>
   <div class="demo"><button class="fbtn fbtn-primary">${ic('plus')} Leading</button><button class="fbtn fbtn-neutral">Trailing ${ic('arrow-right')}</button><button class="fbtn fbtn-outline">${ic('check')} Confirm</button></div>
   <div class="prose"><h3>Props</h3></div>
   <div class="props"><div class="ph"><span>Prop</span><span>Options</span><span>Default</span></div>
-    <div class="pr"><b>variant</b><span>primary · neutral · outline</span><span>primary</span></div>
+    <div class="pr"><b>component</b><span>button/primary · button/neutral · button/outline</span><span>button/primary</span></div>
     <div class="pr"><b>size</b><span>md · sm</span><span>md</span></div>
     <div class="pr"><b>leading-icon</b><span>boolean</span><span>false</span></div>
     <div class="pr"><b>trailing-icon</b><span>boolean</span><span>false</span></div>
     <div class="pr"><b>state</b><span>default · hover · active · focus · disabled</span><span>default</span></div></div>
+  <div class="prose"><h3>Migration from v0.1.0</h3></div>
+  <div class="props"><div class="ph"><span>Before</span><span>After</span><span>Why</span></div>
+    <div class="pr"><b>Theme=Dark prop on any button</b><span>wrap the same component in a Semantic = Dark context</span><span>Theme removed from every canonical component</span></div>
+    <div class="pr"><b>button/neutral-inverse</b><span>button/neutral, Semantic = Dark</span><span>same component, mode-aware colors</span></div>
+    <div class="pr"><b>button/outline-inverse</b><span>button/outline, Semantic = Dark</span><span>same component, mode-aware colors</span></div></div>
+  <div class="prose"><p>The two inverse component sets still exist in Figma only as hidden, untokenized <code style="font-family:var(--font-ui);font-size:.85em">.legacy/button/*-inverse</code> specimens kept for rollback reference — they are not part of the public API and must not be used in new work.</p></div>
   <div class="prose"><h3>Do &amp; don't</h3></div>
   <div class="dodont"><div class="dd do"><div class="ddh">Do</div><div class="ddb">One primary per view. Lead with the main action; demote the rest to neutral or outline.</div></div>
     <div class="dd dont"><div class="ddh">Don't</div><div class="ddb">Stack multiple primaries side by side — it flattens the hierarchy and the main path gets lost.</div></div></div>
   <div class="prose"><h3>Tokens</h3></div>
-  <div class="tokens-used"><span class="tok">button/bg/primary</span><span class="tok">button/text/primary</span><span class="tok">button/bg/neutral</span><span class="tok">button/text/neutral</span><span class="tok">button/border/outline</span><span class="tok">button/border/focus</span><span class="tok">radius/md</span></div>
+  <div class="tokens-used"><span class="tok">button/bg-primary</span><span class="tok">button/text-primary</span><span class="tok">button/bg-neutral</span><span class="tok">button/text-neutral</span><span class="tok">button/border-outline</span><span class="tok">button/border-focus</span><span class="tok">radius/md</span></div>
   <div class="foot"><span>Fresno© — FDS</span><span>Button</span></div>`;
 
 R['icon-button']=()=>`
-  <div class="sec-head"><span class="kicker">Components · Actions</span><h1 class="sec-title"><span class="br">{</span> Icon button <span class="br">}</span></h1><p class="sec-lede">Compact, icon-only trigger for toolbars and dense UI. Square footprint, four variants. Always ships an aria-label for accessibility.</p></div>
+  <div class="sec-head"><span class="kicker">Components · Actions</span><h1 class="sec-title"><span class="br">{</span> Icon button <span class="br">}</span></h1><p class="sec-lede">Compact, icon-only trigger for toolbars and dense UI. Square footprint, three canonical variants. Always ships an aria-label for accessibility.</p></div>
   <span class="cdoc-status stable"><span class="d"></span>Stable</span>
-  <div class="prose"><h3>Variants</h3></div>
-  <div class="demo"><button class="ibtn ibtn-primary">${ic('plus')}</button><button class="ibtn ibtn-neutral">${ic('check')}</button><button class="ibtn ibtn-outline">${ic('settings')}</button><button class="ibtn ibtn-ghost">${ic('search')}</button></div>
+  <div class="prose"><h3>Variants</h3><p>Three canonical variants in Figma — <code style="font-family:var(--font-ui);font-size:.85em">primary · neutral · outline</code>. A fourth "ghost" variant was documented here previously but does not exist as a component in the current Figma file; removed rather than invented.</p></div>
+  <div class="demo"><button class="ibtn ibtn-primary">${ic('plus')}</button><button class="ibtn ibtn-neutral">${ic('check')}</button><button class="ibtn ibtn-outline">${ic('settings')}</button></div>
   <div class="prose"><h3>Sizes</h3></div>
   <div class="demo"><button class="ibtn ibtn-outline">${ic('bell')}</button><button class="ibtn ibtn-outline sm">${ic('bell')}</button></div>
   <div class="prose"><h3>Props</h3></div>
   <div class="props"><div class="ph"><span>Prop</span><span>Options</span><span>Default</span></div>
-    <div class="pr"><b>variant</b><span>primary · neutral · outline · ghost</span><span>ghost</span></div>
+    <div class="pr"><b>variant</b><span>primary · neutral · outline</span><span>outline</span></div>
     <div class="pr"><b>size</b><span>md (40) · sm (32)</span><span>md</span></div>
     <div class="pr"><b>aria-label</b><span>string (required)</span><span>—</span></div></div>
+  <div class="prose"><h3>Accessibility</h3><p>Ships no visible label — <code style="font-family:var(--font-ui);font-size:.85em">aria-label</code> is required on every instance. Minimum hit area follows <code style="font-family:var(--font-ui);font-size:.85em">interaction/target/min-web</code> (24px) / <code style="font-family:var(--font-ui);font-size:.85em">min-touch</code> (44px) even where the visual glyph is smaller.</p></div>
   <div class="prose"><h3>Do &amp; don't</h3></div>
   <div class="dodont"><div class="dd do"><div class="ddh">Do</div><div class="ddb">Use for universally understood icons (close, search, more). Always label it for screen readers.</div></div>
     <div class="dd dont"><div class="ddh">Don't</div><div class="ddb">Use an icon button for an action whose icon is ambiguous — use a labelled button instead.</div></div></div>
   <div class="prose"><h3>Tokens</h3></div>
-  <div class="tokens-used"><span class="tok">button/bg/primary</span><span class="tok">icon/default</span><span class="tok">border/strong</span><span class="tok">bg/page</span><span class="tok">radius/md</span></div>
+  <div class="tokens-used"><span class="tok">button/bg-primary</span><span class="tok">button/bg-neutral</span><span class="tok">button/border-outline</span><span class="tok">radius/md</span></div>
   <div class="foot"><span>Fresno© — FDS</span><span>Icon button</span></div>`;
 
 R.fab=()=>`
-  <div class="sec-head"><span class="kicker">Components · Actions</span><h1 class="sec-title"><span class="br">{</span> FAB <span class="br">}</span></h1><p class="sec-lede">Floating action button — one persistent primary action anchored above the UI. Circular for a single icon, extended when it needs a label.</p></div>
+  <div class="sec-head"><span class="kicker">Components · Actions</span><h1 class="sec-title"><span class="br">{</span> FAB <span class="br">}</span></h1><p class="sec-lede">Floating action button — one persistent primary action anchored above the UI. Circular, icon-only.</p></div>
   <span class="cdoc-status stable"><span class="d"></span>Stable</span>
-  <div class="prose"><h3>Types</h3></div>
-  <div class="demo"><button class="fab circle">${ic('plus')}</button><button class="fab extended">${ic('plus')} New</button></div>
+  <div class="prose"><h3>Type</h3><p>Only a circular icon FAB exists in the current Figma file. An "extended" label+icon variant was documented here previously but isn't built in Figma today — removed rather than invented; re-add once Figma ships it.</p></div>
+  <div class="demo"><button class="fab circle">${ic('plus')}</button></div>
+  <div class="prose"><p>Always resolves via <code style="font-family:var(--font-ui);font-size:.85em">bg/inverse-surface</code> — it contrasts against the page automatically in both Light and Dark, no Theme prop needed.</p></div>
   <div class="prose"><h3>Props</h3></div>
   <div class="props"><div class="ph"><span>Prop</span><span>Options</span><span>Default</span></div>
-    <div class="pr"><b>type</b><span>circle · extended</span><span>circle</span></div>
-    <div class="pr"><b>icon</b><span>instance-swap</span><span>plus</span></div>
-    <div class="pr"><b>label</b><span>string (extended only)</span><span>—</span></div></div>
+    <div class="pr"><b>icon</b><span>instance-swap</span><span>plus</span></div></div>
   <div class="prose"><h3>Do &amp; don't</h3></div>
   <div class="dodont"><div class="dd do"><div class="ddh">Do</div><div class="ddb">Reserve the FAB for the single most important action on a screen (compose, add, create).</div></div>
     <div class="dd dont"><div class="ddh">Don't</div><div class="ddb">Float more than one FAB, or use it for destructive or secondary actions.</div></div></div>
   <div class="prose"><h3>Tokens</h3></div>
-  <div class="tokens-used"><span class="tok">button/bg/neutral</span><span class="tok">button/text/neutral</span><span class="tok">shadow</span><span class="tok">radius/full</span></div>
+  <div class="tokens-used"><span class="tok">bg/inverse-surface</span><span class="tok">text/inverse-primary</span><span class="tok">shadow/2xl</span><span class="tok">radius/full</span></div>
   <div class="foot"><span>Fresno© — FDS</span><span>FAB</span></div>`;
+
+/* ---- Forms ---- */
+R.input=()=>`
+  <div class="sec-head"><span class="kicker">Components · Forms</span><h1 class="sec-title"><span class="br">{</span> Input <span class="br">}</span></h1><p class="sec-lede">Single-line text field. One canonical component, five states, no Theme prop — border and text tokens flip automatically under Semantic context.</p></div>
+  <span class="cdoc-status stable"><span class="d"></span>Stable</span>
+  <div class="prose"><h3>States</h3></div>
+  <div class="demo">
+    <div class="field"><span class="field-label">Default</span><div class="field-input">Placeholder</div></div>
+    <div class="field"><span class="field-label">Focus</span><div class="field-input focus">Editing…</div></div>
+    <div class="field"><span class="field-label">Filled</span><div class="field-input filled">hello@juancfresno.com</div></div>
+    <div class="field"><span class="field-label">Error</span><div class="field-input error">invalid</div><span class="field-hint error">Enter a valid value</span></div>
+    <div class="field"><span class="field-label">Disabled</span><div class="field-input disabled">Disabled</div></div>
+  </div>
+  <div class="prose"><h3>Props</h3></div>
+  <div class="props"><div class="ph"><span>Prop</span><span>Options</span><span>Default</span></div>
+    <div class="pr"><b>state</b><span>default · focus · filled · error · disabled</span><span>default</span></div>
+    <div class="pr"><b>label</b><span>string</span><span>—</span></div>
+    <div class="pr"><b>hint</b><span>string (error only)</span><span>—</span></div></div>
+  <div class="prose"><h3>Tokens</h3></div>
+  <div class="tokens-used"><span class="tok">text/tertiary</span><span class="tok">text/primary</span><span class="tok">border/strong</span><span class="tok">border/strongest</span><span class="tok">border/subtle</span><span class="tok">feedback/error</span><span class="tok">radius/md</span></div>
+  <div class="foot"><span>Fresno© — FDS</span><span>Input</span></div>`;
+
+R.textarea=()=>`
+  <div class="sec-head"><span class="kicker">Components · Forms</span><h1 class="sec-title"><span class="br">{</span> Textarea <span class="br">}</span></h1><p class="sec-lede">Multi-line text field, same token contract as Input.</p></div>
+  <span class="cdoc-status stable"><span class="d"></span>Stable</span>
+  <div class="prose"><h3>States</h3></div>
+  <div class="demo">
+    <div class="field"><span class="field-label">Default</span><div class="field-input" style="height:84px;align-items:flex-start">Write a message…</div></div>
+    <div class="field"><span class="field-label">Focus</span><div class="field-input focus" style="height:84px;align-items:flex-start">Editing…</div></div>
+    <div class="field"><span class="field-label">Disabled</span><div class="field-input disabled" style="height:84px;align-items:flex-start">Disabled</div></div>
+  </div>
+  <div class="prose"><h3>Props</h3></div>
+  <div class="props"><div class="ph"><span>Prop</span><span>Options</span><span>Default</span></div>
+    <div class="pr"><b>state</b><span>default · focus · filled · disabled</span><span>default</span></div></div>
+  <div class="prose"><h3>Tokens</h3></div>
+  <div class="tokens-used"><span class="tok">bg/surface</span><span class="tok">border/default</span><span class="tok">border/strong</span><span class="tok">border/subtle</span><span class="tok">text/primary</span><span class="tok">text/tertiary</span><span class="tok">radius/md</span></div>
+  <div class="foot"><span>Fresno© — FDS</span><span>Textarea</span></div>`;
+
+R.select=()=>`
+  <div class="sec-head"><span class="kicker">Components · Forms</span><h1 class="sec-title"><span class="br">{</span> Select <span class="br">}</span></h1><p class="sec-lede">Single-choice dropdown field.</p></div>
+  <span class="cdoc-status stable"><span class="d"></span>Stable</span>
+  <div class="prose"><h3>States</h3></div>
+  <div class="demo">
+    <div class="field"><span class="field-label">Default</span><div class="field-input select-input"><span>Choose an option</span>${ic('chevron-down')}</div></div>
+    <div class="field"><span class="field-label">Focus</span><div class="field-input select-input focus"><span>Choose an option</span>${ic('chevron-down')}</div></div>
+    <div class="field"><span class="field-label">Filled</span><div class="field-input select-input filled"><span>Option B</span>${ic('chevron-down')}</div></div>
+    <div class="field"><span class="field-label">Disabled</span><div class="field-input select-input disabled"><span>Disabled</span>${ic('chevron-down')}</div></div>
+  </div>
+  <div class="prose"><h3>Props</h3></div>
+  <div class="props"><div class="ph"><span>Prop</span><span>Options</span><span>Default</span></div>
+    <div class="pr"><b>state</b><span>default · filled · focus · disabled</span><span>default</span></div></div>
+  <div class="prose"><h3>Tokens</h3></div>
+  <div class="tokens-used"><span class="tok">border/strong</span><span class="tok">border/subtle</span><span class="tok">text/primary</span><span class="tok">icon/muted</span><span class="tok">radius/md</span></div>
+  <div class="foot"><span>Fresno© — FDS</span><span>Select</span></div>`;
+
+R['search-field']=()=>`
+  <div class="sec-head"><span class="kicker">Components · Forms</span><h1 class="sec-title"><span class="br">{</span> Search field <span class="br">}</span></h1><p class="sec-lede">Text input with a leading search icon.</p></div>
+  <span class="cdoc-status stable"><span class="d"></span>Stable</span>
+  <div class="prose"><h3>States</h3></div>
+  <div class="demo">
+    <div class="field"><span class="field-label">Default</span><div class="field-input">${ic('search')}<span>Search</span></div></div>
+    <div class="field"><span class="field-label">Focus</span><div class="field-input focus">${ic('search')}<span>Editing…</span></div></div>
+    <div class="field"><span class="field-label">Filled</span><div class="field-input filled">${ic('search')}<span>fresno</span></div></div>
+    <div class="field"><span class="field-label">Disabled</span><div class="field-input disabled">${ic('search')}<span>Disabled</span></div></div>
+  </div>
+  <div class="prose"><h3>Tokens</h3></div>
+  <div class="tokens-used"><span class="tok">icon/muted</span><span class="tok">border/strong</span><span class="tok">border/strongest</span><span class="tok">text/primary</span><span class="tok">radius/md</span></div>
+  <div class="foot"><span>Fresno© — FDS</span><span>Search field</span></div>`;
+
+R.checkbox=()=>`
+  <div class="sec-head"><span class="kicker">Components · Forms</span><h1 class="sec-title"><span class="br">{</span> Checkbox <span class="br">}</span></h1><p class="sec-lede">Multi-select control. Four states, no Theme prop.</p></div>
+  <span class="cdoc-status stable"><span class="d"></span>Stable</span>
+  <div class="prose"><h3>States</h3></div>
+  <div class="demo">
+    <label class="check-row"><span class="checkbox"></span>Unchecked</label>
+    <label class="check-row"><span class="checkbox checked">${ic('check')}</span>Checked</label>
+    <label class="check-row"><span class="checkbox checked">${ic('minus')}</span>Indeterminate</label>
+    <label class="check-row" style="color:var(--text-tertiary)"><span class="checkbox disabled"></span>Disabled</label>
+  </div>
+  <div class="prose"><h3>Props</h3></div>
+  <div class="props"><div class="ph"><span>Prop</span><span>Options</span><span>Default</span></div>
+    <div class="pr"><b>state</b><span>unchecked · checked · indeterminate · disabled</span><span>unchecked</span></div></div>
+  <div class="prose"><h3>Tokens</h3></div>
+  <div class="tokens-used"><span class="tok">border/strong</span><span class="tok">bg/inverse-surface</span><span class="tok">border/subtle</span><span class="tok">radius/sm</span></div>
+  <div class="foot"><span>Fresno© — FDS</span><span>Checkbox</span></div>`;
+
+R.radio=()=>`
+  <div class="sec-head"><span class="kicker">Components · Forms</span><h1 class="sec-title"><span class="br">{</span> Radio <span class="br">}</span></h1><p class="sec-lede">Single-select control within a group. Three states, no Theme prop.</p></div>
+  <span class="cdoc-status stable"><span class="d"></span>Stable</span>
+  <div class="prose"><h3>States</h3></div>
+  <div class="demo">
+    <label class="check-row"><span class="radio"></span>Unselected</label>
+    <label class="check-row"><span class="radio selected"><span class="dot"></span></span>Selected</label>
+    <label class="check-row" style="color:var(--text-tertiary)"><span class="radio disabled"></span>Disabled</label>
+  </div>
+  <div class="prose"><h3>Tokens</h3></div>
+  <div class="tokens-used"><span class="tok">border/strong</span><span class="tok">bg/inverse-surface</span><span class="tok">border/subtle</span><span class="tok">radius/full</span></div>
+  <div class="foot"><span>Fresno© — FDS</span><span>Radio</span></div>`;
+
+R.toggle=()=>`
+  <div class="sec-head"><span class="kicker">Components · Forms</span><h1 class="sec-title"><span class="br">{</span> Toggle <span class="br">}</span></h1><p class="sec-lede">Binary on/off switch. Three states, no Theme prop.</p></div>
+  <span class="cdoc-status stable"><span class="d"></span>Stable</span>
+  <div class="prose"><h3>States</h3></div>
+  <div class="demo">
+    <div class="toggle"><span class="thumb"></span></div>
+    <div class="toggle on"><span class="thumb"></span></div>
+    <div class="toggle disabled"><span class="thumb"></span></div>
+  </div>
+  <div class="prose"><h3>Component tokens</h3></div>
+  <div class="tokens-used"><span class="tok">toggle/padding · 3</span><span class="tok">bg/inverse-surface</span><span class="tok">border/default</span><span class="tok">bg/subtle</span><span class="tok">radius/full</span></div>
+  <div class="foot"><span>Fresno© — FDS</span><span>Toggle</span></div>`;
+
+R.slider=()=>`
+  <div class="sec-head"><span class="kicker">Components · Forms</span><h1 class="sec-title"><span class="br">{</span> Slider <span class="br">}</span></h1><p class="sec-lede">Range input, track + fill + thumb. Figma documents two states — no hover/focus variant beyond default and disabled.</p></div>
+  <span class="cdoc-status stable"><span class="d"></span>Stable</span>
+  <div class="prose"><h3>States</h3></div>
+  <div class="demo" style="flex-direction:column;align-items:flex-start;gap:24px">
+    <div class="slider-wrap"><div class="slider-track"><div class="slider-fill" style="width:40%"></div><div class="slider-thumb" style="left:calc(40% - 8px)"></div></div></div>
+    <div class="slider-wrap disabled"><div class="slider-track"><div class="slider-fill" style="width:40%"></div><div class="slider-thumb" style="left:calc(40% - 8px)"></div></div></div>
+  </div>
+  <div class="prose"><h3>Tokens</h3></div>
+  <div class="tokens-used"><span class="tok">bg/subtle</span><span class="tok">bg/inverse-surface</span><span class="tok">border/strong</span><span class="tok">radius/full</span></div>
+  <div class="foot"><span>Fresno© — FDS</span><span>Slider</span></div>`;
+
+R.stepper=()=>`
+  <div class="sec-head"><span class="kicker">Components · Forms</span><h1 class="sec-title"><span class="br">{</span> Stepper <span class="br">}</span></h1><p class="sec-lede">Numeric value, plus/minus controls either side.</p></div>
+  <span class="cdoc-status stable"><span class="d"></span>Stable</span>
+  <div class="demo"><div class="stepper"><button>${ic('minus')}</button><span class="val">1</span><button>${ic('plus')}</button></div></div>
+  <div class="prose"><h3>Tokens</h3></div>
+  <div class="tokens-used"><span class="tok">text/primary</span><span class="tok">border/default</span><span class="tok">bg/surface</span><span class="tok">radius/md</span></div>
+  <div class="foot"><span>Fresno© — FDS</span><span>Stepper</span></div>`;
+
+R['segmented-control']=()=>`
+  <div class="sec-head"><span class="kicker">Components · Forms</span><h1 class="sec-title"><span class="br">{</span> Segmented control <span class="br">}</span></h1><p class="sec-lede">Track of mutually-exclusive segments — this page's own Light/Dark switch in the sidebar is one. Segment sub-component takes a two-value State axis.</p></div>
+  <span class="cdoc-status stable"><span class="d"></span>Stable</span>
+  <div class="prose"><h3>Segmented control</h3></div>
+  <div class="demo"><div class="segctl"><button class="on">Day</button><button>Week</button><button>Month</button></div></div>
+  <div class="prose"><h3>Sub-component — segmented-control/segment</h3><p>State axis: <code style="font-family:var(--font-ui);font-size:.85em">default · selected</code>.</p></div>
+  <div class="prose"><h3>Tokens</h3></div>
+  <div class="tokens-used"><span class="tok">segmented/text-default</span><span class="tok">segmented/text-selected</span><span class="tok">segmented/bg-selected</span><span class="tok">segmented/bg-track</span><span class="tok">radius/sm</span></div>
+  <div class="foot"><span>Fresno© — FDS</span><span>Segmented control</span></div>`;
+
+R.rating=()=>{
+  const star=(filled)=>`<svg viewBox="0 0 24 24" class="${filled?'filled':''}"><path d="M12 3l2.6 5.3l5.9 .9l-4.2 4.1l1 5.9l-5.3 -2.8l-5.3 2.8l1 -5.9l-4.2 -4.1l5.9 -.9z"/></svg>`;
+  const row=(n)=>`<div class="rating-row">${Array.from({length:5},(_,i)=>star(i<n)).join('')}</div>`;
+  return `
+  <div class="sec-head"><span class="kicker">Components · Forms</span><h1 class="sec-title"><span class="br">{</span> Rating <span class="br">}</span></h1><p class="sec-lede">Five-star rating display. Figma documents Value = 5, 4, 3 — 0–2 aren't specimen'd yet, shown here by the same pattern rather than invented as distinct variants.</p></div>
+  <span class="cdoc-status stable"><span class="d"></span>Stable</span>
+  <div class="demo" style="flex-direction:column;align-items:flex-start;gap:14px">${row(5)}${row(4)}${row(3)}</div>
+  <div class="prose"><h3>Tokens</h3></div>
+  <div class="tokens-used"><span class="tok">feedback/warning</span><span class="tok">border/strong</span></div>
+  <div class="foot"><span>Fresno© — FDS</span><span>Rating</span></div>`;
+};
+
+/* ---- Feedback ---- */
+R.banner=()=>{
+  const b=(type,icon,title,text)=>`<div class="banner ${type}">${ic(icon)}<div><div class="btitle" style="color:var(--text-primary)">${title}</div><div class="btext">${text}</div></div></div>`;
+  return `
+  <div class="sec-head"><span class="kicker">Components · Feedback</span><h1 class="sec-title"><span class="br">{</span> Banner <span class="br">}</span></h1><p class="sec-lede">Page-level status message. One canonical component, four types, no Theme prop.</p></div>
+  <span class="cdoc-status stable"><span class="d"></span>Stable</span>
+  <div class="prose"><h3>Types</h3></div>
+  <div class="demo" style="flex-direction:column;align-items:flex-start;gap:14px">
+    ${b('info','info-circle','Heads up','A new version of FDS is available.')}
+    ${b('success','check','Saved','Your changes were published.')}
+    ${b('warning','alert-circle','Review needed','This component is still in draft.')}
+    ${b('error','alert-circle','Something went wrong','The destructive-treatment color comes from feedback/error.')}
+  </div>
+  <div class="prose"><h3>Props</h3></div>
+  <div class="props"><div class="ph"><span>Prop</span><span>Options</span><span>Default</span></div>
+    <div class="pr"><b>type</b><span>info · success · warning · error</span><span>info</span></div></div>
+  <div class="prose"><h3>Component tokens</h3></div>
+  <div class="tokens-used"><span class="tok">banner/padding · 14</span><span class="tok">feedback/info</span><span class="tok">feedback/success</span><span class="tok">feedback/warning</span><span class="tok">feedback/error</span><span class="tok">radius/md</span></div>
+  <div class="foot"><span>Fresno© — FDS</span><span>Banner</span></div>`;
+};
+
+R.toast=()=>`
+  <div class="sec-head"><span class="kicker">Components · Feedback</span><h1 class="sec-title"><span class="br">{</span> Toast <span class="br">}</span></h1><p class="sec-lede">Transient inverse-surface confirmation, dismissed automatically.</p></div>
+  <span class="cdoc-status draft"><span class="d"></span>Draft</span>
+  <div class="prose"><p>Figma still carries Toast only as a hidden, untokenized legacy Theme-based specimen — it hasn't been migrated to a live Theme-free canonical component yet like its siblings (Banner, Modal). The demo below follows the system's standard inverse-surface pattern for consistency, but treat it as provisional until Figma ships the canonical component.</p></div>
+  <div class="demo"><div class="toast-demo">${ic('check')}Changes saved</div></div>
+  <div class="prose"><h3>Tokens (provisional)</h3></div>
+  <div class="tokens-used"><span class="tok">bg/inverse-surface</span><span class="tok">text/inverse-primary</span><span class="tok">shadow/lg</span><span class="tok">radius/md</span></div>
+  <div class="foot"><span>Fresno© — FDS</span><span>Toast</span></div>`;
+
+R.tooltip=()=>`
+  <div class="sec-head"><span class="kicker">Components · Feedback</span><h1 class="sec-title"><span class="br">{</span> Tooltip <span class="br">}</span></h1><p class="sec-lede">Contextual label on hover/focus. Placement axis, no Theme prop.</p></div>
+  <span class="cdoc-status stable"><span class="d"></span>Stable</span>
+  <div class="prose"><h3>Placement</h3></div>
+  <div class="demo"><div class="tooltip-demo">Placement = top</div><div class="tooltip-demo">Placement = bottom</div></div>
+  <div class="prose"><h3>Accessibility</h3><p>Announces via <code style="font-family:var(--font-ui);font-size:.85em">aria-describedby</code> on the trigger; must be reachable on keyboard focus, not hover-only.</p></div>
+  <div class="prose"><h3>Tokens</h3></div>
+  <div class="tokens-used"><span class="tok">bg/inverse-surface</span><span class="tok">text/inverse-primary</span><span class="tok">radius/sm</span></div>
+  <div class="foot"><span>Fresno© — FDS</span><span>Tooltip</span></div>`;
+
+R.modal=()=>`
+  <div class="sec-head"><span class="kicker">Components · Feedback</span><h1 class="sec-title"><span class="br">{</span> Modal <span class="br">}</span></h1><p class="sec-lede">Focused, blocking dialog for a single decision.</p></div>
+  <span class="cdoc-status stable"><span class="d"></span>Stable</span>
+  <div class="prose"><p><strong>Breaking in v1.0.0</strong> — Modal no longer has a <code style="font-family:var(--font-ui);font-size:.85em">Theme</code> prop; Light/Dark comes from Semantic context around the same component.</p></div>
+  <div class="demo"><div class="modal-demo"><h4>Delete this item?</h4><p>This action can't be undone.</p><div class="mactions"><button class="fbtn fbtn-outline sm">Cancel</button><button class="fbtn fbtn-primary sm">Confirm</button></div></div></div>
+  <div class="prose"><h3>Accessibility</h3><p>Traps focus while open, restores it to the trigger on close, dismissible via <kbd style="font-family:var(--font-ui);font-size:.85em">Esc</kbd>.</p></div>
+  <div class="prose"><h3>Tokens</h3></div>
+  <div class="tokens-used"><span class="tok">bg/surface</span><span class="tok">border/subtle</span><span class="tok">button/bg-primary</span><span class="tok">button/border-outline</span><span class="tok">radius/lg</span></div>
+  <div class="foot"><span>Fresno© — FDS</span><span>Modal</span></div>`;
+
+R.badge=()=>`
+  <div class="sec-head"><span class="kicker">Components · Feedback</span><h1 class="sec-title"><span class="br">{</span> Badge <span class="br">}</span></h1><p class="sec-lede">Compact status indicator, anchored to another element. Dot or count.</p></div>
+  <span class="cdoc-status stable"><span class="d"></span>Stable</span>
+  <div class="prose"><h3>Type × Color</h3><p>Figma specimens confirm <code style="font-family:var(--font-ui);font-size:.85em">error</code> and <code style="font-family:var(--font-ui);font-size:.85em">neutral</code> colors on both Type values; other feedback colors aren't specimen'd yet.</p></div>
+  <div class="demo"><span class="badge-dot badge-error"></span><span class="badge-dot badge-neutral"></span><span class="badge-count badge-error">3</span><span class="badge-count badge-neutral">12</span></div>
+  <div class="prose"><h3>Component tokens</h3></div>
+  <div class="tokens-used"><span class="tok">badge/padding/x · 6</span><span class="tok">badge/padding/y · 2</span><span class="tok">feedback/error</span><span class="tok">bg/inverse-surface</span><span class="tok">radius/full</span></div>
+  <div class="foot"><span>Fresno© — FDS</span><span>Badge</span></div>`;
+
+R.progress=()=>`
+  <div class="sec-head"><span class="kicker">Components · Feedback</span><h1 class="sec-title"><span class="br">{</span> Progress <span class="br">}</span></h1><p class="sec-lede">Determinate progress track. No variant axis — fill width is set at the instance level.</p></div>
+  <span class="cdoc-status stable"><span class="d"></span>Stable</span>
+  <div class="demo"><div class="progress-track"><div class="progress-fill" style="width:55%"></div></div></div>
+  <div class="prose"><h3>Tokens</h3></div>
+  <div class="tokens-used"><span class="tok">bg/subtle</span><span class="tok">bg/inverse-surface</span><span class="tok">radius/full</span></div>
+  <div class="foot"><span>Fresno© — FDS</span><span>Progress</span></div>`;
+
+R.spinner=()=>`
+  <div class="sec-head"><span class="kicker">Components · Feedback</span><h1 class="sec-title"><span class="br">{</span> Spinner <span class="br">}</span></h1><p class="sec-lede">Indeterminate loading indicator. No variant axis in Figma — resize the instance for different sizes.</p></div>
+  <span class="cdoc-status stable"><span class="d"></span>Stable</span>
+  <div class="demo"><div class="spinner-el"></div></div>
+  <div class="prose"><h3>Tokens</h3></div>
+  <div class="tokens-used"><span class="tok">bg/subtle</span><span class="tok">bg/inverse-surface</span></div>
+  <div class="foot"><span>Fresno© — FDS</span><span>Spinner</span></div>`;
+
+R.skeleton=()=>`
+  <div class="sec-head"><span class="kicker">Components · Feedback</span><h1 class="sec-title"><span class="br">{</span> Skeleton <span class="br">}</span></h1><p class="sec-lede">Loading placeholder block. A single primitive — compose rows/avatars by arranging multiple instances, there's no compound "skeleton card" component in Figma.</p></div>
+  <span class="cdoc-status stable"><span class="d"></span>Stable</span>
+  <div class="demo" style="align-items:flex-start;gap:12px">
+    <div class="skeleton-block" style="width:48px;height:48px;border-radius:var(--radius-full)"></div>
+    <div style="display:flex;flex-direction:column;gap:8px;flex:1">
+      <div class="skeleton-block" style="height:14px;width:60%"></div>
+      <div class="skeleton-block" style="height:14px;width:90%"></div>
+    </div>
+  </div>
+  <div class="prose"><h3>Tokens</h3></div>
+  <div class="tokens-used"><span class="tok">bg/subtle</span><span class="tok">radius/sm</span></div>
+  <div class="foot"><span>Fresno© — FDS</span><span>Skeleton</span></div>`;
+
+/* ---- Navigation ---- */
+R['top-bar']=()=>`
+  <div class="sec-head"><span class="kicker">Components · Navigation</span><h1 class="sec-title"><span class="br">{</span> Top bar <span class="br">}</span></h1><p class="sec-lede">Persistent header row — this page's own topbar is one. No variant axis documented in Figma yet.</p></div>
+  <span class="cdoc-status stable"><span class="d"></span>Stable</span>
+  <div class="demo"><div class="topbar-demo" style="width:100%"><span style="display:flex;align-items:center;gap:10px;font-family:var(--font-ui);font-size:12px;text-transform:uppercase;letter-spacing:.06em">${ic('home')}Overview</span>${ic('settings')}</div></div>
+  <div class="prose"><h3>Tokens</h3></div>
+  <div class="tokens-used"><span class="tok">bg/surface</span><span class="tok">border/subtle</span><span class="tok">text/primary</span><span class="tok">icon/default</span></div>
+  <div class="foot"><span>Fresno© — FDS</span><span>Top bar</span></div>`;
+
+R['tab-bar']=()=>`
+  <div class="sec-head"><span class="kicker">Components · Navigation</span><h1 class="sec-title"><span class="br">{</span> Tab bar <span class="br">}</span></h1><p class="sec-lede">Bottom mobile navigation. Sub-component <code style="font-family:var(--font-ui);font-size:.85em">tab-bar/item</code> carries the State axis.</p></div>
+  <span class="cdoc-status stable"><span class="d"></span>Stable</span>
+  <div class="demo"><div class="tabbar-demo">
+    <div class="tabbar-item active">${ic('home')}Home</div>
+    <div class="tabbar-item">${ic('search')}Search</div>
+    <div class="tabbar-item">${ic('bell')}Alerts</div>
+    <div class="tabbar-item">${ic('user')}Profile</div>
+  </div></div>
+  <div class="prose"><h3>Sub-component — tab-bar/item</h3><p>State axis: <code style="font-family:var(--font-ui);font-size:.85em">default · active</code>.</p></div>
+  <div class="prose"><h3>Tokens</h3></div>
+  <div class="tokens-used"><span class="tok">text/primary</span><span class="tok">text/tertiary</span><span class="tok">border/subtle</span></div>
+  <div class="foot"><span>Fresno© — FDS</span><span>Tab bar</span></div>`;
+
+R.tabs=()=>`
+  <div class="sec-head"><span class="kicker">Components · Navigation</span><h1 class="sec-title"><span class="br">{</span> Tabs <span class="br">}</span></h1><p class="sec-lede">Content-switching row. Container assembles instances of the <code style="font-family:var(--font-ui);font-size:.85em">tabs/tab</code> sub-component.</p></div>
+  <span class="cdoc-status stable"><span class="d"></span>Stable</span>
+  <div class="demo"><div class="tabs-demo"><button class="tabs-tab active">Overview</button><button class="tabs-tab">Components</button><button class="tabs-tab">Changelog</button><button class="tabs-tab disabled">Archived</button></div></div>
+  <div class="prose"><h3>Sub-component — tabs/tab</h3><p>State axis: <code style="font-family:var(--font-ui);font-size:.85em">default · active · disabled</code>.</p></div>
+  <div class="prose"><h3>Tokens</h3></div>
+  <div class="tokens-used"><span class="tok">text/primary</span><span class="tok">text/secondary</span><span class="tok">text/tertiary</span><span class="tok">border/default</span></div>
+  <div class="foot"><span>Fresno© — FDS</span><span>Tabs</span></div>`;
+
+R.breadcrumb=()=>`
+  <div class="sec-head"><span class="kicker">Components · Navigation</span><h1 class="sec-title"><span class="br">{</span> Breadcrumb <span class="br">}</span></h1><p class="sec-lede">Hierarchical trail — the same pattern used in this page's own topbar.</p></div>
+  <span class="cdoc-status stable"><span class="d"></span>Stable</span>
+  <div class="demo"><div class="crumbs" style="position:static"><span class="clink">Home</span><span class="csep">${ic('chevron-right')}</span><span class="cmid">Library</span><span class="csep">${ic('chevron-right')}</span><span class="cur">Article</span></div></div>
+  <div class="prose"><h3>Tokens</h3></div>
+  <div class="tokens-used"><span class="tok">text/primary</span><span class="tok">text/secondary</span><span class="tok">text/tertiary</span></div>
+  <div class="foot"><span>Fresno© — FDS</span><span>Breadcrumb</span></div>`;
+
+R.pagination=()=>`
+  <div class="sec-head"><span class="kicker">Components · Navigation</span><h1 class="sec-title"><span class="br">{</span> Pagination <span class="br">}</span></h1><p class="sec-lede">Page navigation for long lists/tables.</p></div>
+  <span class="cdoc-status stable"><span class="d"></span>Stable</span>
+  <div class="demo"><div class="pagination-demo"><span class="page-nav">${ic('chevron-left')}</span><span class="page-chip">1</span><span class="page-chip active">2</span><span class="page-chip">3</span><span class="page-chip">4</span><span class="page-chip">5</span><span class="page-nav">${ic('chevron-right')}</span></div></div>
+  <div class="prose"><h3>Tokens</h3></div>
+  <div class="tokens-used"><span class="tok">bg/inverse-surface</span><span class="tok">text/inverse-primary</span><span class="tok">text/secondary</span><span class="tok">radius/md</span></div>
+  <div class="foot"><span>Fresno© — FDS</span><span>Pagination</span></div>`;
+
+R.menu=()=>`
+  <div class="sec-head"><span class="kicker">Components · Navigation</span><h1 class="sec-title"><span class="br">{</span> Menu <span class="br">}</span></h1><p class="sec-lede">Floating action list. Destructive items use <code style="font-family:var(--font-ui);font-size:.85em">feedback/error</code>, not a raw hex.</p></div>
+  <span class="cdoc-status stable"><span class="d"></span>Stable</span>
+  <div class="demo"><div class="menu-demo">
+    <div class="menu-item">${ic('user')}Profile</div>
+    <div class="menu-item">${ic('settings')}Settings</div>
+    <div class="menu-divider"></div>
+    <div class="menu-item destructive">${ic('trash')}Delete</div>
+  </div></div>
+  <div class="prose"><h3>Component tokens</h3></div>
+  <div class="tokens-used"><span class="tok">menu/gap · 2</span><span class="tok">menu/padding · 6</span><span class="tok">feedback/error</span><span class="tok">bg/subtle</span><span class="tok">radius/sm</span></div>
+  <div class="foot"><span>Fresno© — FDS</span><span>Menu</span></div>`;
+
+/* ---- Data display ---- */
+R.card=()=>`
+  <div class="sec-head"><span class="kicker">Components · Data display</span><h1 class="sec-title"><span class="br">{</span> Card <span class="br">}</span></h1><p class="sec-lede">Media + content composition. No variant axis — the Dark specimen is the exact same component placed on a dark surface.</p></div>
+  <span class="cdoc-status stable"><span class="d"></span>Stable</span>
+  <div class="demo"><div class="card-demo"><div class="card-media"></div><div class="card-body"><div class="card-meta">Article · 5 min</div><div class="card-title">Designing with restraint</div><div class="card-text">A short note on why fewer tokens make a stronger system.</div></div></div></div>
+  <div class="prose"><h3>Tokens</h3></div>
+  <div class="tokens-used"><span class="tok">bg/surface</span><span class="tok">bg/subtle</span><span class="tok">border/subtle</span><span class="tok">text/primary</span><span class="tok">text/secondary</span><span class="tok">text/tertiary</span><span class="tok">radius/lg</span></div>
+  <div class="foot"><span>Fresno© — FDS</span><span>Card</span></div>`;
+
+R.table=()=>`
+  <div class="sec-head"><span class="kicker">Components · Data display</span><h1 class="sec-title"><span class="br">{</span> Table <span class="br">}</span></h1><p class="sec-lede">Tabular data with a status column. No sub-component — rows are nested frames inside one canonical Table.</p></div>
+  <span class="cdoc-status stable"><span class="d"></span>Stable</span>
+  <div class="demo" style="display:block"><div class="table-demo"><table><thead><tr><th>Name</th><th>Status</th><th style="text-align:right">Amount</th></tr></thead><tbody>
+    <tr><td>Studio retainer</td><td><span class="status-pill"><span class="dot" style="background:var(--feedback-success)"></span>Active</span></td><td style="text-align:right">$4,200</td></tr>
+    <tr><td>FDS licence</td><td><span class="status-pill"><span class="dot" style="background:var(--feedback-warning)"></span>Pending</span></td><td style="text-align:right">$0</td></tr>
+    <tr><td>Onboarding</td><td><span class="status-pill"><span class="dot" style="background:var(--feedback-success)"></span>Active</span></td><td style="text-align:right">$1,850</td></tr>
+  </tbody></table></div></div>
+  <div class="prose"><h3>Component tokens</h3></div>
+  <div class="tokens-used"><span class="tok">table/padding/y · 14</span><span class="tok">table/gap · 6</span><span class="tok">bg/page</span><span class="tok">border/subtle</span><span class="tok">radius/xl</span></div>
+  <div class="foot"><span>Fresno© — FDS</span><span>Table</span></div>`;
+
+R.stat=()=>`
+  <div class="sec-head"><span class="kicker">Components · Data display</span><h1 class="sec-title"><span class="br">{</span> Stat <span class="br">}</span></h1><p class="sec-lede">Single metric with a trend delta. Trend axis: up · down.</p></div>
+  <span class="cdoc-status stable"><span class="d"></span>Stable</span>
+  <div class="demo">
+    <div class="stat-card"><div class="stat-label">Weekly active</div><div class="stat-value">2,481</div><div class="stat-delta up">${ic('arrow-up')}12% <span class="vs">vs last week</span></div></div>
+    <div class="stat-card"><div class="stat-label">Churn</div><div class="stat-value">3.1%</div><div class="stat-delta down">${ic('arrow-down')}0.4% <span class="vs">vs last week</span></div></div>
+  </div>
+  <div class="prose"><p>Trend=down currently reuses the generic <code style="font-family:var(--font-ui);font-size:.85em">feedback/error</code> token rather than a dedicated "trend-down" token — worth a dedicated token if Stat sees heavier use.</p></div>
+  <div class="prose"><h3>Tokens</h3></div>
+  <div class="tokens-used"><span class="tok">feedback/success</span><span class="tok">feedback/error</span><span class="tok">text/tertiary</span><span class="tok">radius/xl</span></div>
+  <div class="foot"><span>Fresno© — FDS</span><span>Stat</span></div>`;
+
+R['list-item']=()=>`
+  <div class="sec-head"><span class="kicker">Components · Data display</span><h1 class="sec-title"><span class="br">{</span> List item <span class="br">}</span></h1><p class="sec-lede">Row with leading icon, label and trailing chevron. Four states.</p></div>
+  <span class="cdoc-status stable"><span class="d"></span>Stable</span>
+  <div class="demo" style="flex-direction:column;align-items:stretch;gap:2px">
+    <div class="list-item-demo">${ic('user')}<span class="lbl">Account</span>${ic('chevron-right')}</div>
+    <div class="list-item-demo selected">${ic('bell')}<span class="lbl">Notifications</span>${ic('chevron-right')}</div>
+    <div class="list-item-demo disabled">${ic('settings')}<span class="lbl">Advanced (disabled)</span>${ic('chevron-right')}</div>
+  </div>
+  <div class="prose"><h3>Tokens</h3></div>
+  <div class="tokens-used"><span class="tok">icon/default</span><span class="tok">text/primary</span><span class="tok">text/tertiary</span><span class="tok">bg/page</span><span class="tok">bg/brand-subtle</span></div>
+  <div class="foot"><span>Fresno© — FDS</span><span>List item</span></div>`;
+
+R.avatar=()=>`
+  <div class="sec-head"><span class="kicker">Components · Data display</span><h1 class="sec-title"><span class="br">{</span> Avatar <span class="br">}</span></h1><p class="sec-lede">Identity glyph, initials on a brand-tinted field. Three sizes. The only component with no legacy Theme remnant in Figma — added clean, after the migration.</p></div>
+  <span class="cdoc-status stable"><span class="d"></span>Stable</span>
+  <div class="prose"><h3>Sizes</h3></div>
+  <div class="demo"><span class="avatar sm">JF</span><span class="avatar md">JF</span><span class="avatar lg">JF</span></div>
+  <div class="prose"><h3>Sub-component — avatar-group</h3><p>Fixed composition, not a variant set. Overlap is a Component token: <code style="font-family:var(--font-ui);font-size:.85em">avatar-group/overlap = -8</code>.</p></div>
+  <div class="demo"><div class="avatar-group"><span class="avatar md">JF</span><span class="avatar md">AR</span><span class="avatar md">MB</span></div></div>
+  <div class="prose"><h3>Tokens</h3></div>
+  <div class="tokens-used"><span class="tok">text/brand</span><span class="tok">bg/brand-subtle</span><span class="tok">avatar-group/overlap · -8</span><span class="tok">radius/full</span></div>
+  <div class="foot"><span>Fresno© — FDS</span><span>Avatar</span></div>`;
+
+R.tag=()=>`
+  <div class="sec-head"><span class="kicker">Components · Data display</span><h1 class="sec-title"><span class="br">{</span> Tag <span class="br">}</span></h1><p class="sec-lede">Static status pill. Color axis, no Theme prop — the old Theme-based set now lives hidden in Figma as <code style="font-family:var(--font-ui);font-size:.85em">.legacy/tag/status</code>.</p></div>
+  <span class="cdoc-status stable"><span class="d"></span>Stable</span>
+  <div class="demo">
+    <span class="tag-pill" style="color:var(--text-secondary);border-color:var(--border-default)">Neutral</span>
+    <span class="tag-pill" style="color:var(--text-brand);border-color:var(--bg-brand)">Brand</span>
+    <span class="tag-pill" style="color:var(--feedback-success);border-color:var(--feedback-success)">Success</span>
+    <span class="tag-pill" style="color:var(--feedback-warning);border-color:var(--feedback-warning)">Warning</span>
+    <span class="tag-pill" style="color:var(--feedback-error);border-color:var(--feedback-error)">Error</span>
+  </div>
+  <div class="prose"><h3>Tokens</h3></div>
+  <div class="tokens-used"><span class="tok">text/secondary</span><span class="tok">text/brand</span><span class="tok">feedback/success</span><span class="tok">feedback/warning</span><span class="tok">feedback/error</span><span class="tok">radius/full</span></div>
+  <div class="foot"><span>Fresno© — FDS</span><span>Tag</span></div>`;
+
+R.chip=()=>`
+  <div class="sec-head"><span class="kicker">Components · Data display</span><h1 class="sec-title"><span class="br">{</span> Chip <span class="br">}</span></h1><p class="sec-lede">Interactive filter pill. Four states, no Theme prop.</p></div>
+  <span class="cdoc-status stable"><span class="d"></span>Stable</span>
+  <div class="demo">
+    <span class="chip-el">Default</span>
+    <span class="chip-el selected">${ic('check')}Selected</span>
+    <span class="chip-el disabled">Disabled</span>
+  </div>
+  <div class="prose"><h3>Tokens</h3></div>
+  <div class="tokens-used"><span class="tok">chip/text-default</span><span class="tok">chip/border-default</span><span class="tok">chip/text-selected</span><span class="tok">chip/bg-selected</span><span class="tok">radius/full</span></div>
+  <div class="foot"><span>Fresno© — FDS</span><span>Chip</span></div>`;
+
+R.divider=()=>`
+  <div class="sec-head"><span class="kicker">Components · Data display</span><h1 class="sec-title"><span class="br">{</span> Divider <span class="br">}</span></h1><p class="sec-lede">Single-token separator line. Orientation axis: horizontal · vertical.</p></div>
+  <span class="cdoc-status stable"><span class="d"></span>Stable</span>
+  <div class="demo" style="flex-direction:column;gap:20px"><div class="divider-h"></div></div>
+  <div class="demo"><div class="divider-v"></div></div>
+  <div class="prose"><h3>Tokens</h3></div>
+  <div class="tokens-used"><span class="tok">border/default</span></div>
+  <div class="foot"><span>Fresno© — FDS</span><span>Divider</span></div>`;
+
+R.link=()=>`
+  <div class="sec-head"><span class="kicker">Components · Data display</span><h1 class="sec-title"><span class="br">{</span> Link <span class="br">}</span></h1><p class="sec-lede">Inline text link. State axis: default · hover · visited. Not previously documented — new to the published handoff in v1.0.0.</p></div>
+  <span class="cdoc-status stable"><span class="d"></span>Stable</span>
+  <div class="demo">
+    <a class="link-demo" style="color:var(--text-brand)">Default</a>
+    <a class="link-demo" style="color:var(--text-primary);font-weight:600">Hover</a>
+    <a class="link-demo" style="color:var(--text-tertiary)">Visited</a>
+    <a class="link-demo" style="color:var(--text-brand);display:inline-flex;align-items:center;gap:4px;text-decoration:none">External ${ic('external-link')}</a>
+  </div>
+  <div class="prose"><h3>Tokens</h3></div>
+  <div class="tokens-used"><span class="tok">text/brand</span><span class="tok">text/primary</span><span class="tok">text/tertiary</span></div>
+  <div class="foot"><span>Fresno© — FDS</span><span>Link</span></div>`;
+
+R.accordion=()=>`
+  <div class="sec-head"><span class="kicker">Components · Data display</span><h1 class="sec-title"><span class="br">{</span> Accordion <span class="br">}</span></h1><p class="sec-lede">Collapsible content section. State axis: collapsed · expanded. New to the published handoff in v1.0.0.</p></div>
+  <span class="cdoc-status stable"><span class="d"></span>Stable</span>
+  <div class="demo" style="display:block">
+    <div class="accordion-demo">
+      <div class="accordion-item expanded"><div class="accordion-header">What is FDS?<span>${ic('chevron-down')}</span></div><div class="accordion-body">Fresno's shared design system — tokens, foundations and components for every Fresno© product.</div></div>
+      <div class="accordion-item"><div class="accordion-header">Is Theme still a prop?<span>${ic('chevron-down')}</span></div><div class="accordion-body">No — removed in v1.0.0. Light/Dark comes from Semantic context.</div></div>
+    </div>
+  </div>
+  <div class="prose"><h3>Tokens</h3></div>
+  <div class="tokens-used"><span class="tok">text/primary</span><span class="tok">text/secondary</span><span class="tok">border/subtle</span><span class="tok">radius/lg</span></div>
+  <div class="foot"><span>Fresno© — FDS</span><span>Accordion</span></div>`;
+
+/* ---- Misc ---- */
+R['empty-state']=()=>`
+  <div class="sec-head"><span class="kicker">Components · Misc</span><h1 class="sec-title"><span class="br">{</span> Empty state <span class="br">}</span></h1><p class="sec-lede">Zero-data placeholder — icon, title, description, one action. No variant axis; fully token-driven across Light/Dark.</p></div>
+  <span class="cdoc-status stable"><span class="d"></span>Stable</span>
+  <div class="demo"><div class="empty-state-demo">${ic('inbox')}<h4>Nothing here yet</h4><p>Items you add will show up in this list.</p><button class="fbtn fbtn-primary sm">Add item</button></div></div>
+  <div class="prose"><h3>Tokens</h3></div>
+  <div class="tokens-used"><span class="tok">text/primary</span><span class="tok">text/secondary</span><span class="tok">text/tertiary</span><span class="tok">button/bg-primary</span><span class="tok">radius/lg</span></div>
+  <div class="foot"><span>Fresno© — FDS</span><span>Empty state</span></div>`;
 
 buildNav(); initTheme(); route();
 </script>
