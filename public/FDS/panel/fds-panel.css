@@ -1,6 +1,6 @@
 /* ==========================================================================
    Panel Fresno · FDS theme v1 — maps the Panel's alias layer to FDS tokens.
-   Requires fds-tokens.css (v1.2.0) loaded BEFORE app.css / views.css.
+   Requires fds-tokens.css (v1.3.0) loaded BEFORE app.css / views.css.
    Load this file LAST:
      <link rel="stylesheet" href="/fds-tokens.css?v=1">
      <link rel="stylesheet" href="/app.css?v=1">
@@ -45,7 +45,7 @@
   }
 }
 
-/* ---------- 2. Typography: Switzer Regular for reading, Geist Mono uppercase for UI ---------- */
+/* ---------- 2. Typography: Geist Regular for reading, Geist Mono uppercase for UI ---------- */
 body { font-size: var(--fds-type-body-sm); line-height: var(--fds-leading-body); font-weight: var(--fds-weight-regular); }
 
 h1, .ftitle, .gate-card h1 {

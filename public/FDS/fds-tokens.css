@@ -1,13 +1,12 @@
 /* ==========================================================================
-   FDS — Fresno Design System · Tokens v1.1.1 (adds bg/sunken)
+   FDS — Fresno Design System · Tokens v1.3.0 (Geist body)
    Generated from Figma "01 · FDS — Foundations" (7Uco2E5gV4JdqojI7J3kTX)
-   on 2026-10-29. Brand = Fresno. Do not edit by hand: Figma is the source.
+   on 2026-10-30. Brand = Fresno. Do not edit by hand: Figma is the source.
    Variable names = Figma WEB code syntax.
    Theme: set data-theme="light" | "dark" on <html>; defaults to OS preference.
    ========================================================================== */
 
-@import url("https://api.fontshare.com/v2/css?f[]=switzer@300,400&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400&family=Instrument+Serif:ital@0;1&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Geist:wght@300;400&family=Geist+Mono:wght@400&family=Instrument+Serif:ital@0;1&display=swap");
 
 /* ---------- Primitives (mode: Value) ---------- */
 :root {
@@ -100,6 +99,7 @@
   --fds-primitives-interaction-target-min-web: 24px;
   --fds-primitives-interaction-target-min-touch: 44px;
 
+  --fds-primitives-font-family-geist: "Geist";
   --fds-primitives-font-family-switzer: "Switzer";
   --fds-primitives-font-family-geist-mono: "Geist Mono";
   --fds-primitives-font-family-instrument-serif: "Instrument Serif";
@@ -124,7 +124,7 @@
   --fds-brand-color-logo-default: var(--fds-primitives-color-neutral-950);
   --fds-brand-color-logo-inverse: var(--fds-primitives-color-brand-yellow);
   --fds-brand-color-logo-accent: var(--fds-primitives-color-accent-electric);
-  --fds-brand-font-body: var(--fds-primitives-font-family-switzer), -apple-system, BlinkMacSystemFont, sans-serif;
+  --fds-brand-font-body: var(--fds-primitives-font-family-geist), -apple-system, BlinkMacSystemFont, sans-serif;
   --fds-brand-font-display: var(--fds-primitives-font-family-geist-mono), ui-monospace, monospace;
   --fds-brand-font-ui: var(--fds-primitives-font-family-geist-mono), ui-monospace, monospace;
   --fds-brand-font-editorial: var(--fds-primitives-font-family-instrument-serif), Georgia, serif;

@@ -7,7 +7,7 @@ Rule: visual only. No changes to structure, views, data or app.js.
 
 | File | URL | Role |
 |---|---|---|
-| fds-tokens.css | https://juancfresno.vercel.app/FDS/fds-tokens.css | FDS tokens v1.2.0 (Brand Fresno, Light/Dark). Source: Figma `01 · FDS — Foundations`. Do not edit. |
+| fds-tokens.css | https://juancfresno.vercel.app/FDS/fds-tokens.css | FDS tokens v1.3.0 (Brand Fresno, Light/Dark, Geist body). Source: Figma `01 · FDS — Foundations`. Do not edit. |
 | fds-panel.css | https://juancfresno.vercel.app/FDS/panel/fds-panel.css | Maps the Panel's alias layer (`--bg`, `--ink`, `--accent`…) to FDS tokens. No hex values. |
 
 Copy both into the Panel root (do not hot-link: the Panel CSP is `'self'`).
@@ -17,16 +17,14 @@ Copy both into the Panel root (do not hot-link: the Panel CSP is `'self'`).
 Replace the current Google Fonts link and stylesheets with:
 
 ```html
-<link rel="preconnect" href="https://api.fontshare.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400&family=Instrument+Serif:ital@0;1&display=swap">
-<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=switzer@300,400&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400&family=Geist+Mono:wght@400&family=Instrument+Serif:ital@0;1&display=swap">
 <link rel="stylesheet" href="/fds-tokens.css?v=1">
 <link rel="stylesheet" href="/app.css?v=1">
 <link rel="stylesheet" href="/views.css?v=2">
 <link rel="stylesheet" href="/fds-panel.css?v=1">
 ```
 
-Remove the two `@import` lines at the top of `fds-tokens.css` (fonts load from `<head>`).
+Remove the `@import` line at the top of `fds-tokens.css` (fonts load from `<head>`).
 
 theme-color:
 
@@ -37,12 +35,7 @@ theme-color:
 
 ## 2. vercel.json — CSP
 
-Switzer is served by Fontshare. In `Content-Security-Policy`:
-
-- `style-src`: add `https://api.fontshare.com`
-- `font-src`: add `https://cdn.fontshare.com`
-
-Without this Switzer is blocked and the Panel falls back to the system sans.
+No change needed. Geist and Geist Mono come from Google Fonts, already allowed (`fonts.googleapis.com` / `fonts.gstatic.com`). FDS v1.3.0 dropped Switzer.
 
 ## 3. Service worker
 
@@ -54,7 +47,7 @@ The PNG icons are generated at build time by `make-icons.js`. Keep them as they 
 
 ## What the theme does
 
-- Type: Switzer Regular for reading text and headings; Geist Mono uppercase for nav, labels, table heads and numbers. No bold — hierarchy by size and color.
+- Type: Geist Regular for reading text and headings; Geist Mono uppercase for nav, labels, table heads and numbers. No bold — hierarchy by size and color.
 - Color: FDS neutrals; brand blue only on the primary action (`.btn.pri`, active timer). Selected nav/pills use the inverse surface.
 - Radius, focus ring, checkbox, chips and toast from FDS component tokens.
 
