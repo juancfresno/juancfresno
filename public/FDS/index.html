@@ -15,8 +15,8 @@
 :root, [data-theme="light"]{
   --text-primary:#141414; --text-secondary:#373737; --text-tertiary:#4a4d4b;
   --text-inverse-primary:#f4f2ea; --text-inverse-secondary:#c9c5bd; --text-inverse-tertiary:#a9aea9; --text-brand:#344e9b;
-  --bg-page:#ecebe6; --bg-surface:#f4f2ea; --bg-subtle:#c9c5bd; --bg-inverse-surface:#242625; --bg-inverse-subtle:#373737;
-  --bg-brand:#c6dbf9; --bg-brand-subtle:#dce8fc;
+  --bg-page:#e2e2d6; --bg-surface:#f4f2ea; --bg-subtle:#c9c5bd; --bg-inverse-surface:#242625; --bg-inverse-subtle:#373737;
+  --bg-brand:#c6dbf9; --bg-brand-subtle:#dce8fc; --bg-sunken:#ecebe6;
   --border-default:#c9c5bd; --border-subtle:#dad8d2; --border-strong:#a9aea9; --border-strongest:#141414;
   --feedback-success:#38ae7a; --feedback-warning:#e0ac3a; --feedback-error:#a6423b; --feedback-info:#5a82d2;
   --logo-accent:#003dff;
@@ -37,7 +37,7 @@
   --text-primary:#f4f2ea; --text-secondary:#c9c5bd; --text-tertiary:#a9aea9;
   --text-inverse-primary:#141414; --text-inverse-secondary:#4a4d4b; --text-inverse-tertiary:#636965; --text-brand:#a3c3f3;
   --bg-page:#242625; --bg-surface:#141414; --bg-subtle:#373737; --bg-inverse-surface:#ecebe6; --bg-inverse-subtle:#dad8d2;
-  --bg-brand:#c6dbf9; --bg-brand-subtle:#1a2340;
+  --bg-brand:#c6dbf9; --bg-brand-subtle:#1a2340; --bg-sunken:#373737;
   --border-default:#4a4d4b; --border-subtle:#373737; --border-strong:#636965; --border-strongest:#f4f2ea;
   --feedback-success:#38ae7a; --feedback-warning:#e0ac3a; --feedback-error:#e2685d; --feedback-info:#5a82d2;
   --logo-accent:#003dff;
@@ -462,7 +462,7 @@ textarea.field-input{align-items:flex-start;height:84px}
   <aside class="sidebar" id="sidebar">
     <div class="brand">
       <div class="lock"><svg class="logo" viewBox="0 0 234 28" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Fresno"><path d="M223.381 15.7711C217.072 15.7711 213.231 12.7787 213.231 7.86535C213.231 2.95204 217.072 0 223.381 0C229.71 0 233.511 2.95204 233.511 7.86535C233.511 12.7787 229.71 15.7711 223.381 15.7711ZM223.381 13.7492C228.638 13.7492 231.125 11.6059 231.125 7.84513C231.125 4.12476 228.638 1.9815 223.381 1.9815C218.164 1.9815 215.617 4.12476 215.617 7.84513C215.617 11.6059 218.164 13.7492 223.381 13.7492ZM223.442 12.7382C219.721 12.7382 216.992 11.1207 216.992 7.86535C216.992 4.65047 219.721 2.99247 223.442 2.99247C227.02 2.99247 229.427 4.42805 229.77 6.91504H226.899C226.414 5.88385 225.342 5.11551 223.462 5.11551C221.137 5.11551 219.903 6.3489 219.903 7.86535C219.903 9.42225 221.137 10.6354 223.462 10.6354C225.302 10.6354 226.434 9.90751 226.899 8.8561H229.77C229.447 11.2824 227.02 12.7382 223.442 12.7382Z" fill="currentColor"/><path d="M189.041 28C176.979 28 169.836 23.0462 169.836 14V13.9641C169.836 4.88205 176.979 0 189.041 0C201.102 0 208.246 4.88205 208.246 13.9641V14C208.246 23.0462 201.102 28 189.041 28ZM189.041 21.359C194.677 21.359 198.482 18.6308 198.482 14V13.9641C198.482 9.29744 194.677 6.60513 189.041 6.60513C183.405 6.60513 179.6 9.15385 179.6 13.9641V14C179.6 18.7744 183.405 21.359 189.041 21.359Z" fill="currentColor"/><path d="M139.809 27.282H130.906V0.610229H140.922L158.153 17.0154L158.44 17.3384V0.610229H167.342V27.282H157.363L140.024 10.841L139.809 10.6256V27.282Z" fill="currentColor"/><path d="M112.67 28C101.183 28 96.6241 23.4051 96.4087 18.1282H105.598C105.742 20.5333 107.465 21.7897 112.742 21.7897C117.229 21.7897 118.845 20.9282 118.845 19.4564C118.845 18.2359 118.342 17.6615 111.557 16.9436C99.5318 15.7949 97.4497 12.4564 97.4497 8.07692C97.4497 3.94872 100.896 0 111.988 0C122.829 0 127.137 4.2 127.604 9.8H118.773C118.45 7.89744 117.122 6.17436 112.347 6.17436C108.327 6.17436 106.963 6.9641 106.963 8.25641C106.963 9.26154 107.25 10.1949 112.491 10.6974C126.886 12.0615 128.357 15.5795 128.357 19.2051C128.357 25.1641 122.973 28 112.67 28Z" fill="currentColor"/><path d="M95.7788 27.282H66.5224V0.610229H95.4199V7.14356H76.1788V10.7692H93.8763V16.5128H76.1788V20.7487H95.7788V27.282Z" fill="currentColor"/><path d="M40.3936 27.282H30.7372V0.610229H50.05C60.1013 0.610229 63.691 4.09228 63.691 8.75895C63.691 12.4923 61.25 15.0051 57.05 15.8307V15.8666C60.1372 16.6564 61.3936 17.6615 62.291 21.682L62.65 23.1538C63.0808 25.0923 63.4397 26.0256 63.9782 27.282H54.1064C53.7474 26.6 53.532 25.882 53.0295 23.5846L52.6705 22.0051C52.3115 20.3179 50.9115 19.5282 46.9987 19.5282H40.3936V27.282ZM40.3936 7.14356V13.3538H49.4756C52.4551 13.3538 54.0705 12.1333 54.0705 10.0513C54.0705 8.11279 52.4551 7.14356 49.4756 7.14356H40.3936Z" fill="currentColor"/><path d="M9.65641 27.282H0V0.610229H28.6821V7.17946H9.65641V11.4872H26.959V17.8769H9.65641V27.282Z" fill="currentColor"/></svg></div>
-      <div class="ver">DS · v1.0.0</div>
+      <div class="ver">DS · v1.2.0</div>
     </div>
     <nav class="nav" id="nav"></nav>
     <div class="sidebar-foot">
@@ -525,9 +525,9 @@ const R={};
 
 R.overview=()=>`
   <div class="sec-head">
-    <span class="kicker">Fresno© Design System · v1.0.0</span>
+    <span class="kicker">Fresno© Design System · v1.2.0</span>
     <h1 class="sec-title"><span class="br">{</span> Overview <span class="br">}</span></h1>
-    <p class="sec-lede">FDS is the shared design system for every Fresno© product — a single, mode-aware source of truth spanning web, apps and editorial surfaces. Built on a four-layer token architecture (Primitives → Brand → Semantic → Component), five brand contexts, and a three-family type system. v1.0.0 is a breaking release: see <a href="#changelog" style="text-decoration:underline">Changelog</a> for the full migration path.</p>
+    <p class="sec-lede">FDS is the shared design system for every Fresno© product — a single, mode-aware source of truth spanning web, apps and editorial surfaces. Built on a four-layer token architecture (Primitives → Brand → Semantic → Component), five brand contexts, and a three-family type system. One Figma library — <code>01 · FDS — Foundations</code> — holds tokens, styles, components, templates and this documentation's source; code consumes it through <code>fds-tokens.css</code>. See the <a href="#changelog" style="text-decoration:underline">Changelog</a> for every release.</p>
   </div>
   <div class="prose">
     <h3>Principles</h3>
@@ -603,7 +603,7 @@ R.brand=()=>{
   <div class="foot"><span>Fresno© — FDS</span><span>Brand</span></div>`;
 };
 
-/* color data — Primitives + Brand + Semantic + Component, per Figma FDS v1.0.0 (file 7Uco2E5gV4JdqojI7J3kTX) */
+/* color data — Primitives + Brand + Semantic + Component, per Figma FDS v1.2.0 (file 7Uco2E5gV4JdqojI7J3kTX) */
 const PRIMITIVES=[
  {g:'Neutral',items:[['color/neutral/50','#f4f2ea'],['color/neutral/100','#ecebe6'],['color/neutral/200','#dad8d2'],['color/neutral/300','#c9c5bd'],['color/neutral/400','#a9aea9'],['color/neutral/500','#8a918d'],['color/neutral/600','#636965'],['color/neutral/700','#4a4d4b'],['color/neutral/800','#373737'],['color/neutral/900','#242625'],['color/neutral/950','#141414']]},
  {g:'Brand blue',items:[['color/brand/blue/50','#f0f5fe'],['color/brand/blue/100','#dce8fc'],['color/brand/blue/200','#c6dbf9'],['color/brand/blue/300','#a3c3f3'],['color/brand/blue/400','#7ba1e8'],['color/brand/blue/500','#557fdb'],['color/brand/blue/600','#4063c2'],['color/brand/blue/700','#344e9b'],['color/brand/blue/800','#2e4178'],['color/brand/blue/900','#29375e'],['color/brand/blue/950','#1a2340']]},
@@ -615,7 +615,7 @@ const PRIMITIVES=[
 ];
 const SEMANTICS=[
  {g:'Text',items:[['text/primary','#141414','#f4f2ea'],['text/secondary','#373737','#c9c5bd'],['text/tertiary','#4a4d4b','#a9aea9'],['text/inverse-primary','#f4f2ea','#141414'],['text/inverse-secondary','#c9c5bd','#4a4d4b'],['text/inverse-tertiary','#a9aea9','#636965'],['text/brand','#344e9b','#a3c3f3']]},
- {g:'Background',items:[['bg/page','#ecebe6','#242625'],['bg/surface','#f4f2ea','#141414'],['bg/subtle','#c9c5bd','#373737'],['bg/inverse-surface','#242625','#ecebe6'],['bg/inverse-subtle','#373737','#dad8d2'],['bg/brand','#c6dbf9','#c6dbf9'],['bg/brand-subtle','#dce8fc','#1a2340']]},
+ {g:'Background',items:[['bg/page','#e2e2d6','#242625'],['bg/surface','#f4f2ea','#141414'],['bg/subtle','#c9c5bd','#373737'],['bg/inverse-surface','#242625','#ecebe6'],['bg/inverse-subtle','#373737','#dad8d2'],['bg/brand','#c6dbf9','#c6dbf9'],['bg/brand-subtle','#dce8fc','#1a2340'],['bg/sunken','#ecebe6','#373737']]},
  {g:'Border',items:[['border/default','#c9c5bd','#4a4d4b'],['border/subtle','#dad8d2','#373737'],['border/strong','#a9aea9','#636965'],['border/strongest','#141414','#f4f2ea']]},
  {g:'Feedback',items:[['feedback/success','#38ae7a','#38ae7a'],['feedback/warning','#e0ac3a','#e0ac3a'],['feedback/error','#a6423b','#e2685d'],['feedback/info','#5a82d2','#5a82d2']]},
  {g:'Icon',items:[['icon/default','#141414','#f4f2ea'],['icon/muted','#636965','#a9aea9'],['icon/disabled','#a9aea9','#636965'],['icon/inverse','#f4f2ea','#141414']]}
@@ -863,6 +863,20 @@ R.typography=()=>{
 
 /* ---- changelog (newest first) ---- */
 const CHANGELOG=[
+ {v:'1.2.0', date:'2026-10-30', note:'Single library. FDS now lives in one Figma file — 01 · FDS — Foundations — with tokens, styles, components, templates and the Documentation Kit. Nothing breaking: component keys and variable IDs are unchanged.', items:[
+   ['chg','Architecture — single library. The 02 · Core and 03 · Web scaffolds were empty and are retired; the FDS Contract (library map, dependency contract, current state) is updated to Tokens → Components → Templates → Projects.'],
+   ['fix','Components — the 45 canonical components are restored in the Figma file from the 14 Aug 2026 published version (keys unchanged), matching the published library again.'],
+   ['add','Tokens — bg/sunken (Light neutral/100 · Dark neutral/800) for recessed surfaces: tracks, columns, hover rows.'],
+   ['add','Tokens — fds-tokens.css export for code consumers (Panel Fresno, Tracker), named after each variable\'s WEB code syntax.'],
+   ['add','Templates page in Figma — page-level compositions for Panel, apps, social and portfolio (Behance · Dribbble).'],
+   ['chg','Documentation Kit — masters regrouped (page structure · titles · annotation &amp; status · swatches); every documentation frame uses docs/header.'],
+   ['chg','Figma pages reordered: Contract · Changelog / Foundations · Brand / Components · Templates / Doc Kit · Sandbox / Deprecated · Legacy.'],
+   ['fix','bg/page Light documented as neutral/150 (#e2e2d6), matching Figma — this page showed neutral/100 (#ecebe6).'],
+ ]},
+ {v:'1.1.0', date:'2026-08-09', note:'Figma-only release (not previously logged here): multi-library scaffold. Superseded by the single-library model in v1.2.0.', items:[
+   ['add','Core and Web library scaffolds with category pages, Sandbox, Deprecated and Changelog — never populated.'],
+   ['chg','Handoff Kit promoted to Documentation Kit; documentation components namespaced under docs/*.'],
+ ]},
  {v:'1.0.0', date:'2026-08-09', note:'Breaking release — multibrand token architecture, component API cleanup (Theme removed), accessibility contrast fixes, and the full canonical component library replacing placeholder sections. Migration path below; nothing from v0.1.0 removed from this log.', items:[
    ['brk','Components — removed public Theme variant axes from every canonical component; migrate to Semantic Light/Dark context instead.'],
    ['brk','Button — removed neutral-inverse and outline-inverse; use canonical button/neutral and button/outline under Semantic Dark. Both inverse sets remain in Figma only as hidden, untokenized .legacy/* specimens for rollback.'],
