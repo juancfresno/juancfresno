@@ -1,0 +1,121 @@
+/* ==========================================================================
+   Panel Fresno · FDS theme v1 — maps the Panel's alias layer to FDS tokens.
+   Requires fds-tokens.css (v1.2.0) loaded BEFORE app.css / views.css.
+   Load this file LAST:
+     <link rel="stylesheet" href="/fds-tokens.css?v=1">
+     <link rel="stylesheet" href="/app.css?v=1">
+     <link rel="stylesheet" href="/views.css?v=2">
+     <link rel="stylesheet" href="/fds-panel.css?v=1">
+   Rule: no hex here. Every value is an FDS token.
+   Exception (documented): space hues (--sp-*) stay as-is — categorical
+   data colors are not in FDS yet.
+   ========================================================================== */
+
+/* ---------- 1. Alias layer → FDS (all themes; FDS tokens carry Light/Dark) ---------- */
+:root,
+:root[data-theme="light"],
+:root[data-theme="dark"] {
+  --bg: var(--fds-bg-page);
+  --surface: var(--fds-bg-surface);
+  --sunk: var(--fds-bg-sunken);
+  --ink: var(--fds-text-primary);
+  --muted: var(--fds-text-tertiary);
+  --line: var(--fds-border-subtle);
+
+  /* Accent as text/line = text/brand. Accent as fill = primary button tokens (section 3). */
+  --accent: var(--fds-text-brand);
+  --accent-ink: var(--fds-component-button-text-primary);
+  --accent-soft: var(--fds-bg-brand-subtle);
+
+  --danger: var(--fds-feedback-error);
+  --ok: var(--fds-feedback-success);
+  --warn: var(--fds-feedback-warning);
+
+  --f-ui: var(--fds-font-body);
+  --f-mono: var(--fds-font-ui);
+
+  --r: var(--fds-primitives-radius-lg);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: var(--fds-bg-page); --surface: var(--fds-bg-surface); --sunk: var(--fds-bg-sunken);
+    --ink: var(--fds-text-primary); --muted: var(--fds-text-tertiary); --line: var(--fds-border-subtle);
+    --accent: var(--fds-text-brand); --accent-ink: var(--fds-component-button-text-primary); --accent-soft: var(--fds-bg-brand-subtle);
+    --danger: var(--fds-feedback-error); --ok: var(--fds-feedback-success); --warn: var(--fds-feedback-warning);
+  }
+}
+
+/* ---------- 2. Typography: Switzer Regular for reading, Geist Mono uppercase for UI ---------- */
+body { font-size: var(--fds-type-body-sm); line-height: var(--fds-leading-body); font-weight: var(--fds-weight-regular); }
+
+h1, .ftitle, .gate-card h1 {
+  font-family: var(--fds-font-heading);
+  font-weight: var(--fds-weight-regular);
+  letter-spacing: -0.02em;
+  line-height: var(--fds-leading-heading);
+}
+h1 { font-size: var(--fds-type-heading-2); }
+h2, .pc-h b, .scard b, .wcard b, .tc-top b, .now .what b, .rn b { font-weight: var(--fds-weight-regular); }
+.tt, .nav button, .prow .nm, .btn, .addcard { font-weight: var(--fds-weight-regular); }
+
+/* Labels, kickers, table heads → FDS ui/sm (Geist Mono, uppercase, tracked) */
+.eyebrow, .rail h3, .team-h, .slog th, .subs h3, .dlg-b label, .tl-m, .day .lb, .st {
+  font-family: var(--fds-font-ui);
+  font-size: var(--fds-type-ui-sm);
+  font-weight: var(--fds-weight-regular);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.nav button { font-family: var(--fds-font-ui); font-size: var(--fds-type-ui-md); text-transform: uppercase; letter-spacing: 0.07em; }
+
+/* Brand lockup in the rail */
+.brand b { font-family: var(--fds-font-ui); font-weight: var(--fds-weight-regular); font-size: var(--fds-type-ui-md); text-transform: uppercase; letter-spacing: 0.1em; }
+
+/* Big numbers stay mono, regular */
+.stat b, .now .clock, .fclock, .wstats b { font-weight: var(--fds-weight-regular); }
+
+/* ---------- 3. Accent only on the primary action ---------- */
+.btn { border-radius: var(--fds-primitives-radius-md); border-color: var(--fds-border-default); }
+.btn:hover { border-color: var(--fds-border-strong); }
+.btn.pri,
+.play.on {
+  background: var(--fds-component-button-bg-primary);
+  border-color: var(--fds-component-button-bg-primary);
+  color: var(--fds-component-button-text-primary);
+}
+.btn.pri:hover { filter: none; background: var(--fds-component-button-bg-primary-hover); border-color: var(--fds-component-button-bg-primary-hover); }
+.btn.pri:active { background: var(--fds-component-button-bg-primary-active); }
+.btn.pri:disabled { background: var(--fds-component-button-bg-primary-disabled); border-color: transparent; color: var(--fds-component-button-text-primary-disabled); }
+
+.play:hover { border-color: var(--fds-border-strong); color: var(--fds-text-primary); }
+.chk:hover { border-color: var(--fds-border-strongest); }
+
+/* Focus ring = button/border/focus */
+:focus-visible { outline-color: var(--fds-component-button-border-focus); }
+.field:focus, .qadd input:focus, .qadd select:focus {
+  border-color: var(--fds-border-strongest);
+  box-shadow: 0 0 0 3px var(--fds-bg-brand-subtle);
+}
+
+/* Hover borders on cards: neutral, not accent */
+.tcard:hover, .scard:hover { border-color: var(--fds-border-strong); }
+
+/* Done checkbox: inverse surface (FDS checkbox), not green */
+.trow.done .chk { background: var(--fds-component-checkbox-bg-checked); border-color: var(--fds-component-checkbox-bg-checked); color: var(--fds-component-checkbox-mark); }
+
+/* Selected nav / pills = inverse surface (FDS segmented/chip selected) */
+.nav button[aria-current="true"],
+.splist button[aria-current="true"] { background: var(--fds-bg-inverse-surface); color: var(--fds-text-inverse-primary); box-shadow: none; }
+.splist button[aria-current="true"] .c { color: var(--fds-text-inverse-tertiary); }
+.pill { border-radius: var(--fds-primitives-radius-full); }
+.pill[aria-pressed="true"] { background: var(--fds-component-chip-bg-selected); color: var(--fds-component-chip-text-selected); border-color: var(--fds-component-chip-bg-selected); }
+
+/* Status tag "en curso" */
+.st.en-curso { background: var(--fds-bg-brand-subtle); color: var(--fds-text-brand); }
+
+/* Toast + tooltip-like surfaces = inverse */
+.toast { background: var(--fds-bg-inverse-surface); color: var(--fds-text-inverse-primary); border-radius: var(--fds-primitives-radius-md); }
+
+/* Dialogs */
+dialog { border-color: var(--fds-border-subtle); border-radius: var(--fds-primitives-radius-xl); }
+.gate-card { border-radius: var(--fds-primitives-radius-xl); }
