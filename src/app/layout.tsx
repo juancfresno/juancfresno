@@ -9,6 +9,7 @@ import Grain from '@/components/ui/Grain/Grain'
 import Cursor from '@/components/ui/Cursor/Cursor'
 import SmoothScroll from '@/providers/SmoothScroll'
 import PageTransitionProvider from '@/providers/PageTransition'
+import { SITE_URL } from '@/lib/site'
 
 const switzer = localFont({
   variable: '--font-switzer',
@@ -18,8 +19,6 @@ const switzer = localFont({
     { path: '../fonts/switzer/switzer-regular.woff2', weight: '400', style: 'normal' },
   ],
 })
-
-const SITE_URL = 'https://juancfresno.vercel.app'
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -47,7 +46,7 @@ const personJsonLd = {
   sameAs: [
     'https://www.linkedin.com/in/juancfresno',
     'https://www.behance.net/juancfresno',
-    'https://dribbble.com/my-playbook',
+    'https://dribbble.com/JuanCFresno',
     'https://instagram.com/juanc.fresno',
   ],
 }

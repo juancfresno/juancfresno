@@ -8,7 +8,7 @@ import s from './ComingSoon.module.scss'
 const SOCIALS = [
   { id: 'behance', label: 'Behance', href: 'https://www.behance.net/juancfresno', Icon: BehanceLogo },
   { id: 'instagram', label: 'Instagram', href: 'https://instagram.com/juanc.fresno', Icon: InstagramLogo },
-  { id: 'dribbble', label: 'Dribbble', href: 'https://dribbble.com/my-playbook', Icon: DribbbleLogo },
+  { id: 'dribbble', label: 'Dribbble', href: 'https://dribbble.com/JuanCFresno', Icon: DribbbleLogo },
   { id: 'linkedin', label: 'LinkedIn', href: 'https://www.linkedin.com/in/juancfresno', Icon: LinkedInLogo },
 ]
 
@@ -29,9 +29,9 @@ export default function ComingSoon() {
         />
 
         <div className={s.intro}>
-          <p className={s.headline}>
+          <h1 className={s.headline}>
             Juan C. Fresno — Independent Product Designer &amp; Digital Art Director
-          </p>
+          </h1>
         </div>
 
         <p className={s.description}>
