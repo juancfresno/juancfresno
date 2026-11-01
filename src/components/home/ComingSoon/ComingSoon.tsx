@@ -8,7 +8,7 @@ import s from './ComingSoon.module.scss'
 const SOCIALS = [
   { id: 'behance', label: 'Behance', href: 'https://www.behance.net/juancfresno', Icon: BehanceLogo },
   { id: 'instagram', label: 'Instagram', href: 'https://instagram.com/juanc.fresno', Icon: InstagramLogo },
-  { id: 'dribbble', label: 'Dribbble', href: 'https://dribbble.com/my-playbook', Icon: DribbbleLogo },
+  { id: 'dribbble', label: 'Dribbble', href: 'https://dribbble.com/JuanCFresno', Icon: DribbbleLogo },
   { id: 'linkedin', label: 'LinkedIn', href: 'https://www.linkedin.com/in/juancfresno', Icon: LinkedInLogo },
 ]
 
