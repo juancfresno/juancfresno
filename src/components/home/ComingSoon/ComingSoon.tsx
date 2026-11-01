@@ -29,9 +29,9 @@ export default function ComingSoon() {
         />
 
         <div className={s.intro}>
-          <p className={s.headline}>
+          <h1 className={s.headline}>
             Juan C. Fresno — Independent Product Designer &amp; Digital Art Director
-          </p>
+          </h1>
         </div>
 
         <p className={s.description}>

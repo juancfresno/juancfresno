@@ -83,6 +83,7 @@ $_icon-muted:    #636965; // icon/muted
   font-weight: $fw-regular;
   font-size: 1.5rem; // 24px — Desktop/body/xl
   line-height: 1.4;
+  letter-spacing: inherit; // neutralise global h1 tracking — rendered as <h1> for SEO, must look identical to the former <p>
   opacity: 0.9;
   margin: 0;
 }
