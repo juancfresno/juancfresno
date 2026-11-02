@@ -15,6 +15,9 @@
   --text-inverse-primary:#f4f2ea; --text-inverse-secondary:#c9c5bd; --text-inverse-tertiary:#a9aea9; --text-brand:#344e9b;
   --bg-page:#e2e2d6; --bg-surface:#f4f2ea; --bg-subtle:#c9c5bd; --bg-inverse-surface:#242625; --bg-inverse-subtle:#373737;
   --bg-brand:#c6dbf9; --bg-brand-subtle:#dce8fc; --bg-sunken:#ecebe6;
+  --bg-inverse:#141414; --bg-inverse-pressed:#4a4d4b; --bg-canvas:#f8f7f4; --bg-card:#fcfcf7; --bg-pressed:#dad8d2; --bg-disabled:#dad8d2; --bg-brand-hover:#a3c3f3; --bg-brand-active:#7ba1e8;
+  --text-disabled:#a9aea9; --text-on-brand:#141414; --text-success:#236c4c; --text-warning:#7a5a13; --text-info:#305bb2;
+  --border-control:#636965; --border-focus:#4063c2;
   --border-default:#c9c5bd; --border-subtle:#dad8d2; --border-strong:#a9aea9; --border-strongest:#141414;
   --feedback-success:#38ae7a; --feedback-warning:#e0ac3a; --feedback-error:#a6423b; --feedback-info:#5a82d2;
   --logo-accent:#003dff;
@@ -36,6 +39,9 @@
   --text-inverse-primary:#141414; --text-inverse-secondary:#4a4d4b; --text-inverse-tertiary:#636965; --text-brand:#a3c3f3;
   --bg-page:#242625; --bg-surface:#141414; --bg-subtle:#373737; --bg-inverse-surface:#ecebe6; --bg-inverse-subtle:#dad8d2;
   --bg-brand:#c6dbf9; --bg-brand-subtle:#1a2340; --bg-sunken:#373737;
+  --bg-inverse:#f4f2ea; --bg-inverse-pressed:#c9c5bd; --bg-canvas:#242625; --bg-card:#141414; --bg-pressed:#4a4d4b; --bg-disabled:#373737; --bg-brand-hover:#dce8fc; --bg-brand-active:#f0f5fe;
+  --text-disabled:#636965; --text-on-brand:#141414; --text-success:#38ae7a; --text-warning:#e0ac3a; --text-info:#6e91d7;
+  --border-control:#8a918d; --border-focus:#a3c3f3;
   --border-default:#4a4d4b; --border-subtle:#373737; --border-strong:#636965; --border-strongest:#f4f2ea;
   --feedback-success:#38ae7a; --feedback-warning:#e0ac3a; --feedback-error:#e2685d; --feedback-info:#5a82d2;
   --logo-accent:#003dff;
@@ -57,6 +63,8 @@
   --space-0:0;--space-px:1px;--space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:20px;--space-6:24px;--space-7:28px;--space-8:32px;--space-9:36px;--space-10:40px;--space-11:44px;--space-12:48px;--space-14:56px;--space-16:64px;--space-20:80px;--space-24:96px;--space-28:112px;--space-32:128px;--space-36:144px;--space-40:160px;--space-48:192px;--space-50:200px;--space-56:224px;--space-64:256px;
   --radius-sm:4px;--radius-md:6px;--radius-lg:8px;--radius-xl:12px;--radius-full:9999px;
   --target-web:24px;--target-touch:44px;
+  --category-1:#c49a3c;--category-2:#6f9a3e;--category-3:#2f9a95;--category-4:#4f8fd6;--category-5:#5560c4;--category-6:#8a5cc7;--category-7:#c0508f;--category-8:#6e7d8c;
+  --radius-xs:2px;--radius-2xl:16px;--radius-3xl:24px;--radius-4xl:32px;--radius-card:20px;
   --font-body:'Geist',-apple-system,BlinkMacSystemFont,sans-serif;
   --font-ui:'Geist Mono',ui-monospace,monospace;
   --font-editorial:'Instrument Serif',Georgia,serif;
@@ -94,7 +102,7 @@ a{color:inherit;text-decoration:none}
 .nav a{display:flex;align-items:center;gap:10px;padding:9px 24px;font-family:var(--font-ui);font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--text-secondary);
   transition:background .14s ease,color .14s ease;cursor:pointer;position:relative}
 .nav a:hover{background:var(--bg-page);color:var(--text-primary)}
-.nav a.active{background:var(--bg-inverse-surface);color:var(--text-inverse-primary)}
+.nav a.active{background:var(--bg-inverse);color:var(--text-inverse-primary)}
 .nav a.active .dot{background:var(--text-inverse-primary)}
 .sidebar-foot{padding:16px;border-top:1px solid var(--border-subtle)}
 
@@ -102,7 +110,7 @@ a{color:inherit;text-decoration:none}
 .seg{display:flex;background:var(--bg-page);border:1px solid var(--border-subtle);border-radius:var(--radius-full);padding:3px;width:100%}
 .seg button{flex:1;border:0;background:transparent;cursor:pointer;font-family:var(--font-ui);text-transform:uppercase;letter-spacing:.1em;font-size:10px;
   color:var(--text-secondary);padding:7px 0;border-radius:var(--radius-full);display:flex;align-items:center;justify-content:center;gap:6px;transition:all .2s ease}
-.seg button.on{background:var(--bg-inverse-surface);color:var(--text-inverse-primary)}
+.seg button.on{background:var(--bg-inverse);color:var(--text-inverse-primary)}
 .seg svg{width:13px;height:13px}
 
 /* ============ MAIN ============ */
@@ -180,7 +188,7 @@ a{color:inherit;text-decoration:none}
 .sem-row .sh b{color:var(--text-secondary);font-weight:400}
 .copyhint{font-family:var(--font-ui);font-size:10px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.08em;margin-top:10px}
 @media(max-width:720px){.sem-row{grid-template-columns:32px 1fr}.sem-row .sh{display:none}}
-.toast-copy{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--bg-inverse-surface);color:var(--text-inverse-primary);font-family:var(--font-ui);font-size:11px;text-transform:uppercase;letter-spacing:.08em;padding:10px 18px;border-radius:var(--radius-full);opacity:0;transition:all .25s ease;pointer-events:none;z-index:100}
+.toast-copy{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--bg-inverse);color:var(--text-inverse-primary);font-family:var(--font-ui);font-size:11px;text-transform:uppercase;letter-spacing:.08em;padding:10px 18px;border-radius:var(--radius-full);opacity:0;transition:all .25s ease;pointer-events:none;z-index:100}
 .toast-copy.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
 /* typography */
@@ -289,7 +297,7 @@ a{color:inherit;text-decoration:none}
 .ibtn-outline{background:transparent;border-color:var(--border-strong);color:var(--icon-default)}
 .ibtn-outline:hover{background:var(--bg-page)}
 /* fab */
-.fab{display:inline-flex;align-items:center;justify-content:center;gap:10px;background:var(--bg-inverse-surface);color:var(--text-inverse-primary);border:none;border-radius:var(--radius-full);cursor:pointer;box-shadow:var(--shadow-2xl);transition:all .14s ease;font-family:var(--font-ui);font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+.fab{display:inline-flex;align-items:center;justify-content:center;gap:10px;background:var(--bg-inverse);color:var(--text-inverse-primary);border:none;border-radius:var(--radius-full);cursor:pointer;box-shadow:var(--shadow-2xl);transition:all .14s ease;font-family:var(--font-ui);font-size:12px;text-transform:uppercase;letter-spacing:.06em}
 .fab.circle{width:56px;height:56px;padding:0}
 .fab:hover{background:var(--bg-inverse-subtle)}
 .fab svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2}
@@ -299,7 +307,7 @@ a{color:inherit;text-decoration:none}
 /* ============ v1.0.0 — Forms ============ */
 .field{display:flex;flex-direction:column;gap:6px;width:240px}
 .field-label{font-family:var(--font-ui);font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--text-tertiary)}
-.field-input{border:1.5px solid var(--border-strong);border-radius:var(--radius-md);padding:10px 14px;background:var(--bg-surface);color:var(--text-primary);font-family:var(--font-body);font-size:14px;width:100%;display:flex;align-items:center;gap:8px}
+.field-input{border:1.5px solid var(--border-control);border-radius:var(--radius-md);padding:10px 14px;background:var(--bg-surface);color:var(--text-primary);font-family:var(--font-body);font-size:14px;width:100%;display:flex;align-items:center;gap:8px}
 .field-input.focus{border-color:var(--text-primary);box-shadow:0 0 0 3px var(--btn-focus)}
 .field-input.filled{border-color:var(--border-default)}
 .field-input.error{border-color:var(--feedback-error)}
@@ -311,22 +319,22 @@ textarea.field-input{align-items:flex-start;height:84px}
 .field-input svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0;color:var(--icon-muted)}
 .select-input{justify-content:space-between;cursor:pointer}
 .check-row{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text-primary)}
-.checkbox,.radio{width:18px;height:18px;border:1.5px solid var(--border-strong);flex-shrink:0;display:flex;align-items:center;justify-content:center;color:var(--bg-surface)}
+.checkbox,.radio{width:18px;height:18px;border:1.5px solid var(--border-control);flex-shrink:0;display:flex;align-items:center;justify-content:center;color:var(--bg-surface)}
 .checkbox{border-radius:var(--radius-sm)}
 .radio{border-radius:var(--radius-full)}
 .checkbox svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:3}
-.checkbox.checked,.radio.selected{background:var(--bg-inverse-surface);border-color:transparent}
-.radio .dot{width:8px;height:8px;border-radius:var(--radius-full);background:var(--bg-inverse-surface)}
+.checkbox.checked,.radio.selected{background:var(--bg-inverse);border-color:transparent}
+.radio .dot{width:8px;height:8px;border-radius:var(--radius-full);background:var(--bg-inverse)}
 .checkbox.disabled,.radio.disabled{border-color:var(--border-subtle);background:var(--bg-subtle)}
 .toggle{width:44px;height:24px;border-radius:var(--radius-full);background:var(--border-default);padding:3px;cursor:pointer;transition:background .15s ease;display:inline-flex;align-items:center;flex-shrink:0}
-.toggle.on{background:var(--bg-inverse-surface)}
+.toggle.on{background:var(--bg-inverse)}
 .toggle.disabled{background:var(--bg-subtle);cursor:not-allowed}
 .toggle .thumb{width:18px;height:18px;border-radius:var(--radius-full);background:var(--bg-surface);transition:transform .15s ease}
 .toggle.on .thumb{transform:translateX(20px)}
 .slider-wrap{width:240px}
 .slider-track{width:100%;height:4px;border-radius:var(--radius-full);background:var(--bg-subtle);position:relative}
-.slider-fill{height:4px;border-radius:var(--radius-full);background:var(--bg-inverse-surface);position:absolute;left:0;top:0}
-.slider-thumb{width:16px;height:16px;border-radius:var(--radius-full);background:var(--bg-surface);border:2px solid var(--bg-inverse-surface);position:absolute;top:-6px}
+.slider-fill{height:4px;border-radius:var(--radius-full);background:var(--bg-inverse);position:absolute;left:0;top:0}
+.slider-thumb{width:16px;height:16px;border-radius:var(--radius-full);background:var(--bg-surface);border:2px solid var(--bg-inverse);position:absolute;top:-6px}
 .slider-wrap.disabled .slider-fill{background:var(--border-strong)}
 .slider-wrap.disabled .slider-thumb{border-color:var(--border-strong)}
 .stepper{display:inline-flex;align-items:stretch;border:1px solid var(--border-default);border-radius:var(--radius-md);overflow:hidden}
@@ -335,7 +343,7 @@ textarea.field-input{align-items:flex-start;height:84px}
 .stepper .val{width:44px;text-align:center;font-family:var(--font-ui);font-size:13px;border-left:1px solid var(--border-default);border-right:1px solid var(--border-default);display:flex;align-items:center;justify-content:center;color:var(--text-primary)}
 .segctl{display:inline-flex;background:var(--bg-page);border:1px solid var(--border-subtle);border-radius:var(--radius-full);padding:3px;gap:2px}
 .segctl button{border:0;background:transparent;font-family:var(--font-ui);font-size:11px;text-transform:uppercase;letter-spacing:.07em;padding:8px 18px;border-radius:var(--radius-full);cursor:pointer;color:var(--text-secondary)}
-.segctl button.on{background:var(--bg-inverse-surface);color:var(--text-inverse-primary)}
+.segctl button.on{background:var(--bg-inverse);color:var(--text-inverse-primary)}
 .rating-row{display:flex;gap:4px}
 .rating-row svg{width:20px;height:20px;stroke:var(--border-strong);fill:none;stroke-width:1.5}
 .rating-row svg.filled{fill:var(--feedback-warning);stroke:var(--feedback-warning)}
@@ -349,9 +357,9 @@ textarea.field-input{align-items:flex-start;height:84px}
 .banner.success{border-left-color:var(--feedback-success);color:var(--feedback-success)}
 .banner.warning{border-left-color:var(--feedback-warning);color:var(--feedback-warning)}
 .banner.error{border-left-color:var(--feedback-error);color:var(--feedback-error)}
-.toast-demo{display:inline-flex;align-items:center;gap:10px;background:var(--bg-inverse-surface);color:var(--text-inverse-primary);padding:12px 18px;border-radius:var(--radius-md);font-size:13px;box-shadow:var(--shadow-lg)}
+.toast-demo{display:inline-flex;align-items:center;gap:10px;background:var(--bg-inverse);color:var(--text-inverse-primary);padding:12px 18px;border-radius:var(--radius-md);font-size:13px;box-shadow:var(--shadow-lg)}
 .toast-demo svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2}
-.tooltip-demo{display:inline-block;background:var(--bg-inverse-surface);color:var(--text-inverse-primary);padding:7px 12px;border-radius:var(--radius-sm);font-size:12px;font-family:var(--font-ui)}
+.tooltip-demo{display:inline-block;background:var(--bg-inverse);color:var(--text-inverse-primary);padding:7px 12px;border-radius:var(--radius-sm);font-size:12px;font-family:var(--font-ui)}
 .modal-demo{border:1px solid var(--border-subtle);border-radius:var(--radius-lg);background:var(--bg-surface);padding:24px;max-width:340px;box-shadow:var(--shadow-xl)}
 .modal-demo h4{font-size:16px;font-weight:600;margin-bottom:8px}
 .modal-demo p{font-size:14px;color:var(--text-secondary);margin-bottom:20px}
@@ -359,10 +367,10 @@ textarea.field-input{align-items:flex-start;height:84px}
 .badge-dot{width:8px;height:8px;border-radius:var(--radius-full);display:inline-block}
 .badge-count{min-width:19px;height:19px;padding:0 6px;border-radius:var(--radius-full);display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-family:var(--font-ui);color:var(--text-inverse-primary)}
 .badge-error{background:var(--feedback-error)}
-.badge-neutral{background:var(--bg-inverse-surface)}
+.badge-neutral{background:var(--bg-inverse)}
 .progress-track{width:240px;height:8px;border-radius:var(--radius-full);background:var(--bg-subtle);overflow:hidden}
-.progress-fill{height:100%;border-radius:var(--radius-full);background:var(--bg-inverse-surface)}
-.spinner-el{width:24px;height:24px;border-radius:var(--radius-full);border:3px solid var(--bg-subtle);border-top-color:var(--bg-inverse-surface);animation:fds-spin .8s linear infinite}
+.progress-fill{height:100%;border-radius:var(--radius-full);background:var(--bg-inverse)}
+.spinner-el{width:24px;height:24px;border-radius:var(--radius-full);border:3px solid var(--bg-subtle);border-top-color:var(--bg-inverse);animation:fds-spin .8s linear infinite}
 @keyframes fds-spin{to{transform:rotate(360deg)}}
 .skeleton-block{background:var(--bg-subtle);border-radius:var(--radius-sm);animation:fds-pulse 1.6s ease-in-out infinite}
 @keyframes fds-pulse{0%,100%{opacity:1}50%{opacity:.45}}
@@ -379,7 +387,7 @@ textarea.field-input{align-items:flex-start;height:84px}
 .tabs-tab.disabled{color:var(--border-strong);cursor:not-allowed}
 .pagination-demo{display:flex;gap:4px;align-items:center}
 .page-chip{min-width:32px;height:32px;padding:0 6px;display:flex;align-items:center;justify-content:center;border-radius:var(--radius-md);font-family:var(--font-ui);font-size:12px;color:var(--text-secondary);cursor:pointer}
-.page-chip.active{background:var(--bg-inverse-surface);color:var(--text-inverse-primary)}
+.page-chip.active{background:var(--bg-inverse);color:var(--text-inverse-primary)}
 .page-nav{color:var(--text-tertiary)}
 .page-nav svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2}
 .menu-demo{border:1px solid var(--border-subtle);border-radius:var(--radius-md);background:var(--bg-surface);padding:6px;display:flex;flex-direction:column;gap:2px;width:210px;box-shadow:var(--shadow-lg)}
@@ -426,7 +434,7 @@ textarea.field-input{align-items:flex-start;height:84px}
 .avatar-group .avatar:first-child{margin-left:0}
 .tag-pill{display:inline-flex;align-items:center;padding:4px 12px;border-radius:var(--radius-full);border:1px solid;font-family:var(--font-ui);font-size:11px;text-transform:uppercase;letter-spacing:.05em}
 .chip-el{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:var(--radius-full);border:1px solid var(--border-default);font-family:var(--font-ui);font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-secondary);cursor:pointer}
-.chip-el.selected{background:var(--bg-inverse-surface);color:var(--text-inverse-primary);border-color:transparent}
+.chip-el.selected{background:var(--bg-inverse);color:var(--text-inverse-primary);border-color:transparent}
 .chip-el.disabled{color:var(--text-tertiary);border-color:var(--border-subtle);cursor:not-allowed}
 .divider-h{height:1px;background:var(--border-default);width:100%}
 .divider-v{width:1px;height:60px;background:var(--border-default)}
@@ -460,10 +468,11 @@ textarea.field-input{align-items:flex-start;height:84px}
   <aside class="sidebar" id="sidebar">
     <div class="brand">
       <div class="lock"><svg class="logo" viewBox="0 0 234 28" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Fresno"><path d="M223.381 15.7711C217.072 15.7711 213.231 12.7787 213.231 7.86535C213.231 2.95204 217.072 0 223.381 0C229.71 0 233.511 2.95204 233.511 7.86535C233.511 12.7787 229.71 15.7711 223.381 15.7711ZM223.381 13.7492C228.638 13.7492 231.125 11.6059 231.125 7.84513C231.125 4.12476 228.638 1.9815 223.381 1.9815C218.164 1.9815 215.617 4.12476 215.617 7.84513C215.617 11.6059 218.164 13.7492 223.381 13.7492ZM223.442 12.7382C219.721 12.7382 216.992 11.1207 216.992 7.86535C216.992 4.65047 219.721 2.99247 223.442 2.99247C227.02 2.99247 229.427 4.42805 229.77 6.91504H226.899C226.414 5.88385 225.342 5.11551 223.462 5.11551C221.137 5.11551 219.903 6.3489 219.903 7.86535C219.903 9.42225 221.137 10.6354 223.462 10.6354C225.302 10.6354 226.434 9.90751 226.899 8.8561H229.77C229.447 11.2824 227.02 12.7382 223.442 12.7382Z" fill="currentColor"/><path d="M189.041 28C176.979 28 169.836 23.0462 169.836 14V13.9641C169.836 4.88205 176.979 0 189.041 0C201.102 0 208.246 4.88205 208.246 13.9641V14C208.246 23.0462 201.102 28 189.041 28ZM189.041 21.359C194.677 21.359 198.482 18.6308 198.482 14V13.9641C198.482 9.29744 194.677 6.60513 189.041 6.60513C183.405 6.60513 179.6 9.15385 179.6 13.9641V14C179.6 18.7744 183.405 21.359 189.041 21.359Z" fill="currentColor"/><path d="M139.809 27.282H130.906V0.610229H140.922L158.153 17.0154L158.44 17.3384V0.610229H167.342V27.282H157.363L140.024 10.841L139.809 10.6256V27.282Z" fill="currentColor"/><path d="M112.67 28C101.183 28 96.6241 23.4051 96.4087 18.1282H105.598C105.742 20.5333 107.465 21.7897 112.742 21.7897C117.229 21.7897 118.845 20.9282 118.845 19.4564C118.845 18.2359 118.342 17.6615 111.557 16.9436C99.5318 15.7949 97.4497 12.4564 97.4497 8.07692C97.4497 3.94872 100.896 0 111.988 0C122.829 0 127.137 4.2 127.604 9.8H118.773C118.45 7.89744 117.122 6.17436 112.347 6.17436C108.327 6.17436 106.963 6.9641 106.963 8.25641C106.963 9.26154 107.25 10.1949 112.491 10.6974C126.886 12.0615 128.357 15.5795 128.357 19.2051C128.357 25.1641 122.973 28 112.67 28Z" fill="currentColor"/><path d="M95.7788 27.282H66.5224V0.610229H95.4199V7.14356H76.1788V10.7692H93.8763V16.5128H76.1788V20.7487H95.7788V27.282Z" fill="currentColor"/><path d="M40.3936 27.282H30.7372V0.610229H50.05C60.1013 0.610229 63.691 4.09228 63.691 8.75895C63.691 12.4923 61.25 15.0051 57.05 15.8307V15.8666C60.1372 16.6564 61.3936 17.6615 62.291 21.682L62.65 23.1538C63.0808 25.0923 63.4397 26.0256 63.9782 27.282H54.1064C53.7474 26.6 53.532 25.882 53.0295 23.5846L52.6705 22.0051C52.3115 20.3179 50.9115 19.5282 46.9987 19.5282H40.3936V27.282ZM40.3936 7.14356V13.3538H49.4756C52.4551 13.3538 54.0705 12.1333 54.0705 10.0513C54.0705 8.11279 52.4551 7.14356 49.4756 7.14356H40.3936Z" fill="currentColor"/><path d="M9.65641 27.282H0V0.610229H28.6821V7.17946H9.65641V11.4872H26.959V17.8769H9.65641V27.282Z" fill="currentColor"/></svg></div>
-      <div class="ver">DS · v1.3.0</div>
+      <div class="ver">DS · v1.6.1</div>
     </div>
     <nav class="nav" id="nav"></nav>
     <div class="sidebar-foot">
+      <a href="/logout" class="mono" style="display:block;font-size:10px;letter-spacing:.08em;color:var(--text-tertiary);margin-bottom:12px">Lock · log out</a>
       <div class="seg" role="tablist" aria-label="Theme">
         <button id="btn-light" class="on" onclick="setTheme('light')">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19"/></svg>Light
@@ -523,9 +532,9 @@ const R={};
 
 R.overview=()=>`
   <div class="sec-head">
-    <span class="kicker">Fresno© Design System · v1.3.0</span>
+    <span class="kicker">Fresno© Design System · v1.6.1</span>
     <h1 class="sec-title"><span class="br">{</span> Overview <span class="br">}</span></h1>
-    <p class="sec-lede">FDS is the shared design system for every Fresno© product — a single, mode-aware source of truth spanning web, apps and editorial surfaces. Built on a four-layer token architecture (Primitives → Brand → Semantic → Component), five brand contexts, and a three-family type system. One Figma library — <code>01 · FDS — Foundations</code> — holds tokens, styles, components, templates and this documentation's source; code consumes it through <code>fds-tokens.css</code>. See the <a href="#changelog" style="text-decoration:underline">Changelog</a> for every release.</p>
+    <p class="sec-lede">FDS is the shared design system for every Fresno© product — a single, mode-aware source of truth spanning web, apps and editorial surfaces. Built on a four-layer token architecture (Primitives → Brand → Semantic → Component), six brand contexts, and a three-family type system. One Figma library — <code>01 · FDS — Foundations</code> — holds tokens, styles, components, templates and this documentation's source; code consumes it through <a href="/fds-tokens.css" download style="text-decoration:underline"><code>fds-tokens.css</code></a>, generated from Figma. The <a href="#changelog" style="text-decoration:underline">Changelog</a> lives here — this page is the release log, Figma no longer keeps one.</p>
   </div>
   <div class="prose">
     <h3>Principles</h3>
@@ -541,7 +550,7 @@ R.overview=()=>`
   </div>
   <div class="tiers">
     <div class="tier"><div class="t-name">Primitives<span>raw values</span></div><div class="t-desc">The palette and scales. Literal values: <code>blue-200 · #c6dbf9</code>, <code>space-4 · 16px</code>. Never used directly in components.</div></div>
-    <div class="tier"><div class="t-name">Brand<span>identity · 5 modes</span></div><div class="t-desc">Fresno · Biakone · GLYF · Medida · Forma. Changes identity values, never component anatomy. Independent from Theme.</div></div>
+    <div class="tier"><div class="t-name">Brand<span>identity · 6 modes</span></div><div class="t-desc">Fresno · Biakone · GLYF · Medida · Forma · Tracker. Changes identity values, never component anatomy. Independent from Theme.</div></div>
     <div class="tier"><div class="t-name">Semantic<span>intent · mode-aware</span></div><div class="t-desc">Role-based aliases that carry light/dark: <code>text/primary</code>, <code>bg/surface</code>, <code>border/subtle</code>. The only Light/Dark switch, and the layer designers reach for.</div></div>
     <div class="tier"><div class="t-name">Component<span>scoped</span></div><div class="t-desc">Per-component tokens that alias semantics: <code>button/bg-primary</code>, <code>chip/text-selected</code>. Local control without breaking the system.</div></div>
   </div>
@@ -549,18 +558,18 @@ R.overview=()=>`
     <h3>Type system</h3>
     <p><strong>Geist</strong> carries body and headings, each in a Regular and a Light cut. <strong>Geist Mono</strong> (uppercase, tracked) handles display statements, UI, nav and labels. <strong>Instrument Serif</strong> covers editorial and quotes. This page uses all three.</p>
   </div>
-  <div class="foot"><span>Fresno© — FDS</span><span>Private · juancfresno.com</span></div>
+  <div class="foot"><span>Fresno© — FDS</span><span>Private · fds.juancfresno.com</span></div>
 `;
 
 R['token-architecture']=()=>`
   <div class="sec-head">
     <span class="kicker">Foundations</span>
     <h1 class="sec-title"><span class="br">{</span> Token architecture <span class="br">}</span></h1>
-    <p class="sec-lede">One source of truth. Brand and Theme are independent axes — Brand carries identity (Fresno · Biakone · GLYF · Medida · Forma), Semantic is the <strong>only</strong> Light/Dark switch. Components never expose a Theme prop.</p>
+    <p class="sec-lede">One source of truth. Brand and Theme are independent axes — Brand carries identity (Fresno · Biakone · GLYF · Medida · Forma · Tracker), Semantic is the <strong>only</strong> Light/Dark switch. Components never expose a Theme prop.</p>
   </div>
   <div class="tiers">
     <div class="tier"><div class="t-name">01 · Primitives<span>mode: Value</span></div><div class="t-desc">Raw values — color, spacing, radius, breakpoints, interaction targets. Literal, foundation-layer. Never used directly in components.</div></div>
-    <div class="tier"><div class="t-name">02 · Brand<span>modes: Fresno · Biakone · GLYF · Medida · Forma</span></div><div class="t-desc">Identity layer — logo, accent, typography roles per brand. Brand changes <em>values</em>, never component anatomy.</div></div>
+    <div class="tier"><div class="t-name">02 · Brand<span>modes: Fresno · Biakone · GLYF · Medida · Forma · Tracker</span></div><div class="t-desc">Identity layer — logo, accent, typography roles per brand. Brand changes <em>values</em>, never component anatomy.</div></div>
     <div class="tier"><div class="t-name">03 · Semantic<span>modes: Light · Dark</span></div><div class="t-desc">Contextual meaning — <code>text/*</code>, <code>bg/*</code>, <code>border/*</code>, <code>feedback/*</code>, font and logo roles. Semantic is the only Light/Dark switch in the system.</div></div>
     <div class="tier"><div class="t-name">04 · Component<span>mode: Value</span></div><div class="t-desc">Implementation layer — button, controls, optical geometry (padding, gap, overlap). Component-specific public tokens live here; no Theme mode at this layer.</div></div>
   </div>
@@ -568,12 +577,19 @@ R['token-architecture']=()=>`
   <div class="prose"><h3>Mode matrix</h3></div>
   <div class="props"><div class="ph"><span>Layer</span><span>Value</span><span>Note</span></div>
     <div class="pr"><b>Primitives</b><span>Value</span><span>Raw system constants</span></div>
-    <div class="pr"><b>Brand</b><span>Fresno · Biakone · GLYF · Medida · Forma</span><span>Identity context</span></div>
+    <div class="pr"><b>Brand</b><span>Fresno · Biakone · GLYF · Medida · Forma · Tracker</span><span>Identity context</span></div>
     <div class="pr"><b>Semantic</b><span>Light · Dark</span><span>Theme context</span></div>
     <div class="pr"><b>Component</b><span>Value</span><span>Single implementation layer</span></div>
     <div class="pr"><b>Interaction</b><span>24 web · 44 touch</span><span>Target baseline; visual glyph may be smaller</span></div>
   </div>
-  <div class="prose"><h3>Component API migration</h3><p>Prior to v1.0.0, several components carried a component-level <code>Theme</code> variant. That axis is now removed from every canonical component — Light/Dark comes only from placing a component inside a Semantic context. Legacy Theme-based sets remain in Figma only as hidden, untokenized specimens kept for rollback reference — they are not part of the public API.</p></div>
+  <div class="prose"><h3>Component API migration</h3><p>Prior to v1.0.0, several components carried a component-level <code>Theme</code> variant. That axis is now removed from every canonical component — Light/Dark comes only from placing a component inside a Semantic context. Legacy Theme-based sets live on the Figma <em>Deprecated</em> page — not part of the public API. Since v1.6.0 the Component layer is flat: every component token aliases a Semantic token (or, for the few constants with no semantic role, a primitive); the old <code>legacy/*</code> Semantic bridges are gone.</p></div>
+  <div class="prose"><h3>CSS variables</h3><p>Code consumes <a href="/fds-tokens.css" download style="text-decoration:underline"><code>fds-tokens.css</code></a> (2.0.0), generated from the WEB code syntax of every Figma variable — never edited by hand. Theme with <code>data-theme="light|dark"</code>, brand with <code>data-brand="fresno|biakone|glyf|medida|forma|tracker"</code>, on <code>&lt;html&gt;</code> or any container.</p></div>
+  <div class="props"><div class="ph"><span>Layer</span><span>CSS name</span><span>Use</span></div>
+    <div class="pr"><b>Semantic</b><span>--fds-bg-page · --fds-text-primary · --fds-category-3</span><span>What products consume</span></div>
+    <div class="pr"><b>Component</b><span>--fds-button-bg-primary-hover · --fds-chip-bg-selected</span><span>Inside the component only</span></div>
+    <div class="pr"><b>Brand</b><span>--fds-brand-color-accent-surface-on-light · --fds-brand-font-body</span><span>Reference — reach it through Semantic</span></div>
+    <div class="pr"><b>Primitives</b><span>--fds-ref-color-neutral-950 · --fds-ref-space-4 · --fds-ref-radius-card</span><span>Reference — never in product code</span></div></div>
+  <div class="prose"><p>Rules: kebab-case, no <code>DEFAULT</code> (<code>color/brand/blue/default</code> → <code>--fds-ref-color-brand-blue</code>), no <code>legacy/*</code>. <strong>Open:</strong> the 31 Oct decision asked for unprefixed scales (<code>--fds-space-*</code>, <code>--fds-radius-*</code>) and <code>--fds-ref-*</code> for Brand; Figma exports <code>--fds-ref-space-*</code>, <code>--fds-ref-radius-*</code> and <code>--fds-brand-*</code>, and the Panel already consumes those. Figma wins until that is decided.</p></div>
   <div class="foot"><span>Fresno© — FDS</span><span>Token architecture</span></div>`;
 
 const BRAND_LOGOS={fresno:`<svg viewBox="0 0 234 28" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Fresno" style="height:14px;width:auto"><path d="M223.381 15.7711C217.072 15.7711 213.231 12.7787 213.231 7.86535C213.231 2.95204 217.072 0 223.381 0C229.71 0 233.511 2.95204 233.511 7.86535C233.511 12.7787 229.71 15.7711 223.381 15.7711ZM223.381 13.7492C228.638 13.7492 231.125 11.6059 231.125 7.84513C231.125 4.12476 228.638 1.9815 223.381 1.9815C218.164 1.9815 215.617 4.12476 215.617 7.84513C215.617 11.6059 218.164 13.7492 223.381 13.7492ZM223.442 12.7382C219.721 12.7382 216.992 11.1207 216.992 7.86535C216.992 4.65047 219.721 2.99247 223.442 2.99247C227.02 2.99247 229.427 4.42805 229.77 6.91504H226.899C226.414 5.88385 225.342 5.11551 223.462 5.11551C221.137 5.11551 219.903 6.3489 219.903 7.86535C219.903 9.42225 221.137 10.6354 223.462 10.6354C225.302 10.6354 226.434 9.90751 226.899 8.8561H229.77C229.447 11.2824 227.02 12.7382 223.442 12.7382Z" fill="currentColor"/><path d="M189.041 28C176.979 28 169.836 23.0462 169.836 14V13.9641C169.836 4.88205 176.979 0 189.041 0C201.102 0 208.246 4.88205 208.246 13.9641V14C208.246 23.0462 201.102 28 189.041 28ZM189.041 21.359C194.677 21.359 198.482 18.6308 198.482 14V13.9641C198.482 9.29744 194.677 6.60513 189.041 6.60513C183.405 6.60513 179.6 9.15385 179.6 13.9641V14C179.6 18.7744 183.405 21.359 189.041 21.359Z" fill="currentColor"/><path d="M139.809 27.282H130.906V0.610229H140.922L158.153 17.0154L158.44 17.3384V0.610229H167.342V27.282H157.363L140.024 10.841L139.809 10.6256V27.282Z" fill="currentColor"/><path d="M112.67 28C101.183 28 96.6241 23.4051 96.4087 18.1282H105.598C105.742 20.5333 107.465 21.7897 112.742 21.7897C117.229 21.7897 118.845 20.9282 118.845 19.4564C118.845 18.2359 118.342 17.6615 111.557 16.9436C99.5318 15.7949 97.4497 12.4564 97.4497 8.07692C97.4497 3.94872 100.896 0 111.988 0C122.829 0 127.137 4.2 127.604 9.8H118.773C118.45 7.89744 117.122 6.17436 112.347 6.17436C108.327 6.17436 106.963 6.9641 106.963 8.25641C106.963 9.26154 107.25 10.1949 112.491 10.6974C126.886 12.0615 128.357 15.5795 128.357 19.2051C128.357 25.1641 122.973 28 112.67 28Z" fill="currentColor"/><path d="M95.7788 27.282H66.5224V0.610229H95.4199V7.14356H76.1788V10.7692H93.8763V16.5128H76.1788V20.7487H95.7788V27.282Z" fill="currentColor"/><path d="M40.3936 27.282H30.7372V0.610229H50.05C60.1013 0.610229 63.691 4.09228 63.691 8.75895C63.691 12.4923 61.25 15.0051 57.05 15.8307V15.8666C60.1372 16.6564 61.3936 17.6615 62.291 21.682L62.65 23.1538C63.0808 25.0923 63.4397 26.0256 63.9782 27.282H54.1064C53.7474 26.6 53.532 25.882 53.0295 23.5846L52.6705 22.0051C52.3115 20.3179 50.9115 19.5282 46.9987 19.5282H40.3936V27.282ZM40.3936 7.14356V13.3538H49.4756C52.4551 13.3538 54.0705 12.1333 54.0705 10.0513C54.0705 8.11279 52.4551 7.14356 49.4756 7.14356H40.3936Z" fill="currentColor"/><path d="M9.65641 27.282H0V0.610229H28.6821V7.17946H9.65641V11.4872H26.959V17.8769H9.65641V27.282Z" fill="currentColor"/></svg>`,
@@ -594,7 +610,7 @@ R.brand=()=>{
   <div class="sec-head">
     <span class="kicker">Foundations</span>
     <h1 class="sec-title"><span class="br">{</span> Brand <span class="br">}</span></h1>
-    <p class="sec-lede">Five identity contexts on one Brand collection axis, independent from Semantic Light/Dark. <strong>juancfresno.com is Brand = Fresno</strong> — not a separate brand context.</p>
+    <p class="sec-lede">Six identity contexts on one Brand collection axis, independent from Semantic Light/Dark. <strong>juancfresno.com is Brand = Fresno</strong> — not a separate brand context.</p>
   </div>
   <div class="grid cols-3">${cards}</div>
   <div class="prose"><h3>Honest state</h3><p>Fresno is the only brand with a fully distinct accent today. Biakone ships real wordmark assets but resolves its accent/subtle swatches to the same neutral base as GLYF, Medida and Forma. GLYF's "Ink/Cream" identity is the intended direction, documented as a status label — its Brand-mode variables aren't split from the neutral base yet, and it has no logo assets in Figma. Medida and Forma are prepared slots only. None of this implies product code (Forma, Medida, GLYF, Biakone) is automatically consuming FDS — there is still no automated token export from Figma to any product codebase.</p></div>
@@ -603,18 +619,21 @@ R.brand=()=>{
 
 /* color data — Primitives + Brand + Semantic + Component, per Figma FDS v1.2.0 (file 7Uco2E5gV4JdqojI7J3kTX) */
 const PRIMITIVES=[
- {g:'Neutral',items:[['color/neutral/50','#f4f2ea'],['color/neutral/100','#ecebe6'],['color/neutral/200','#dad8d2'],['color/neutral/300','#c9c5bd'],['color/neutral/400','#a9aea9'],['color/neutral/500','#8a918d'],['color/neutral/600','#636965'],['color/neutral/700','#4a4d4b'],['color/neutral/800','#373737'],['color/neutral/900','#242625'],['color/neutral/950','#141414']]},
+ {g:'Neutral',items:[['color/neutral/50','#f4f2ea'],['color/neutral/100','#ecebe6'],['color/neutral/150','#e2e2d6'],['color/neutral/200','#dad8d2'],['color/neutral/300','#c9c5bd'],['color/neutral/400','#a9aea9'],['color/neutral/500','#8a918d'],['color/neutral/600','#636965'],['color/neutral/700','#4a4d4b'],['color/neutral/800','#373737'],['color/neutral/900','#242625'],['color/neutral/950','#141414']]},
  {g:'Brand blue',items:[['color/brand/blue/50','#f0f5fe'],['color/brand/blue/100','#dce8fc'],['color/brand/blue/200','#c6dbf9'],['color/brand/blue/300','#a3c3f3'],['color/brand/blue/400','#7ba1e8'],['color/brand/blue/500','#557fdb'],['color/brand/blue/600','#4063c2'],['color/brand/blue/700','#344e9b'],['color/brand/blue/800','#2e4178'],['color/brand/blue/900','#29375e'],['color/brand/blue/950','#1a2340']]},
  {g:'Feedback — red',items:[['color/red/400','#e2685d'],['color/red/500','#e0655a'],['color/red/700','#a6423b']]},
- {g:'Feedback — other',items:[['color/green/500','#38ae7a'],['color/amber/500','#e0ac3a'],['color/blue/500','#5a82d2']]},
+ {g:'Feedback — other',items:[['color/green/500','#38ae7a'],['color/green/700','#236c4c'],['color/amber/500','#e0ac3a'],['color/amber/700','#7a5a13'],['color/blue/400','#6e91d7'],['color/blue/500','#5a82d2'],['color/blue/700','#305bb2']]},
+ {g:'Category',items:[['color/category/1','#c49a3c'],['color/category/2','#6f9a3e'],['color/category/3','#2f9a95'],['color/category/4','#4f8fd6'],['color/category/5','#5560c4'],['color/category/6','#8a5cc7'],['color/category/7','#c0508f'],['color/category/8','#6e7d8c']]},
  {g:'Brand pop',items:[['color/brand/blue/200','#c6dbf9'],['color/brand/green','#8df8cd'],['color/brand/yellow','#ffffe6']]},
  {g:'Surfaces',items:[['color/surface/marble','#f2f8fc'],['color/surface/ivory','#fffff0'],['color/surface/pearl','#fcfcf7'],['color/surface/lavender','#f4f1f8'],['color/surface/cold-steel','#f8f7f4']]},
  {g:'Accent',items:[['color/accent/electric','#003dff']]}
 ];
 const SEMANTICS=[
- {g:'Text',items:[['text/primary','#141414','#f4f2ea'],['text/secondary','#373737','#c9c5bd'],['text/tertiary','#4a4d4b','#a9aea9'],['text/inverse-primary','#f4f2ea','#141414'],['text/inverse-secondary','#c9c5bd','#4a4d4b'],['text/inverse-tertiary','#a9aea9','#636965'],['text/brand','#344e9b','#a3c3f3']]},
- {g:'Background',items:[['bg/page','#e2e2d6','#242625'],['bg/surface','#f4f2ea','#141414'],['bg/subtle','#c9c5bd','#373737'],['bg/inverse-surface','#242625','#ecebe6'],['bg/inverse-subtle','#373737','#dad8d2'],['bg/brand','#c6dbf9','#c6dbf9'],['bg/brand-subtle','#dce8fc','#1a2340'],['bg/sunken','#ecebe6','#373737']]},
- {g:'Border',items:[['border/default','#c9c5bd','#4a4d4b'],['border/subtle','#dad8d2','#373737'],['border/strong','#a9aea9','#636965'],['border/strongest','#141414','#f4f2ea']]},
+ {g:'Text',items:[['text/primary','#141414','#f4f2ea'],['text/secondary','#373737','#c9c5bd'],['text/tertiary','#4a4d4b','#a9aea9'],['text/inverse-primary','#f4f2ea','#141414'],['text/inverse-secondary','#c9c5bd','#4a4d4b'],['text/inverse-tertiary','#a9aea9','#636965'],['text/brand','#344e9b','#a3c3f3'],['text/on-brand','#141414','#141414'],['text/disabled','#a9aea9','#636965'],['text/success','#236c4c','#38ae7a'],['text/warning','#7a5a13','#e0ac3a'],['text/info','#305bb2','#6e91d7']]},
+ {g:'Background',items:[['bg/page','#e2e2d6','#242625'],['bg/canvas','#f8f7f4','#242625'],['bg/card','#fcfcf7','#141414'],['bg/surface','#f4f2ea','#141414'],['bg/sunken','#ecebe6','#373737'],['bg/subtle','#c9c5bd','#373737'],['bg/pressed','#dad8d2','#4a4d4b'],['bg/disabled','#dad8d2','#373737'],['bg/brand','#c6dbf9','#c6dbf9'],['bg/brand-hover','#a3c3f3','#dce8fc'],['bg/brand-active','#7ba1e8','#f0f5fe'],['bg/brand-subtle','#dce8fc','#1a2340']]},
+ {g:'Inverse — dark block on light UI',items:[['bg/inverse','#141414','#f4f2ea'],['bg/inverse-surface','#242625','#ecebe6'],['bg/inverse-subtle','#373737','#dad8d2'],['bg/inverse-pressed','#4a4d4b','#c9c5bd']]},
+ {g:'Border',items:[['border/default','#c9c5bd','#4a4d4b'],['border/subtle','#dad8d2','#373737'],['border/strong','#a9aea9','#636965'],['border/strongest','#141414','#f4f2ea'],['border/control','#636965','#8a918d'],['border/focus','#4063c2','#a3c3f3']]},
+ {g:'Category — data series (mode-independent)',items:[['category/1','#c49a3c','#c49a3c'],['category/2','#6f9a3e','#6f9a3e'],['category/3','#2f9a95','#2f9a95'],['category/4','#4f8fd6','#4f8fd6'],['category/5','#5560c4','#5560c4'],['category/6','#8a5cc7','#8a5cc7'],['category/7','#c0508f','#c0508f'],['category/8','#6e7d8c','#6e7d8c']]},
  {g:'Feedback',items:[['feedback/success','#38ae7a','#38ae7a'],['feedback/warning','#e0ac3a','#e0ac3a'],['feedback/error','#a6423b','#e2685d'],['feedback/info','#5a82d2','#5a82d2']]},
  {g:'Icon',items:[['icon/default','#141414','#f4f2ea'],['icon/muted','#636965','#a9aea9'],['icon/disabled','#a9aea9','#636965'],['icon/inverse','#f4f2ea','#141414']]}
 ];
@@ -624,7 +643,8 @@ const BRANDS=[
  {id:'biakone',name:'Biakone',status:'Neutral base · ready for overrides',accent:'#141414',subtle:'#dad8d2',logo:true,note:'Wordmark lockups (horizontal + vertical) exist; accent/subtle still resolve to the neutral base until Biakone-specific colors are approved.'},
  {id:'glyf',name:'GLYF',status:'Ink / Cream context',accent:'#141414',subtle:'#dad8d2',logo:false,note:'Intended as a distinct Ink/Cream identity, but the Brand-mode accent/subtle variables aren’t yet split from the neutral base — wordmark + app-icon slots are prepared, not filled.'},
  {id:'medida',name:'Medida',status:'Neutral base · ready for overrides',accent:'#141414',subtle:'#dad8d2',logo:false,note:'Prepared wordmark + app-icon slot only. No Medida-specific assets or overrides yet.'},
- {id:'forma',name:'Forma',status:'Neutral base · ready for overrides',accent:'#141414',subtle:'#dad8d2',logo:false,note:'Prepared wordmark + app-icon slot only. No Forma-specific assets or overrides yet.'}
+ {id:'forma',name:'Forma',status:'Neutral base · ready for overrides',accent:'#141414',subtle:'#dad8d2',logo:false,note:'Prepared wordmark + app-icon slot only. No Forma-specific assets or overrides yet.'},
+ {id:'tracker',name:'Tracker',status:'Own mode · copy of Fresno (v1.5.0)',accent:'#c6dbf9',subtle:'#dce8fc',logo:false,note:'Same 21 values as Fresno today, so nothing changes visually. Its own mode lets Tracker take its own accent later without moving the Panel or the web.'}
 ];
 
 R.color=()=>{
@@ -636,7 +656,7 @@ R.color=()=>{
     <h1 class="sec-title"><span class="br">{</span> Color <span class="br">}</span></h1>
     <p class="sec-lede">Two layers. Primitives are the raw palette — literal values, never used directly. Semantic tokens alias them with intent and carry both modes; flip the toggle and every semantic chip below updates live.</p>
   </div>
-  <div class="prose"><h3>Semantic</h3><p>The mode-aware layer designers build with. Each chip reflects the current theme; <strong>L</strong> / <strong>D</strong> show the resolved light and dark values.</p></div>
+  <div class="prose"><h3>Semantic</h3><p>The mode-aware layer designers build with. Each chip reflects the current theme; <strong>L</strong> / <strong>D</strong> show the resolved light and dark values.</p><p><strong>Inverse roles (v1.5.0)</strong> — <code>bg/inverse</code> is the only fill for a dark element on light UI: Foco blocks, tooltip, toast, FAB, progress fill, selected chip and segment, checked checkbox, toggle on. <code>bg/inverse-surface</code> is only a raised surface <em>inside</em> a <code>bg/inverse</code> block. <strong>Text on feedback (v1.6.0)</strong> — use <code>text/success · warning · info</code> for words; <code>feedback/*</code> stays for fills, lines and icons. <strong>Controls</strong> — inputs, checkbox and radio use <code>border/control</code> (≥3:1); <code>border/default</code> is for dividers and containers.</p></div>
   ${sem}
   <div class="copyhint">Tip — click any token to copy its name</div>
   <div class="prose"><h3>Primitives</h3><p>The raw palette. Reference only — components alias semantics, never these.</p></div>
@@ -697,7 +717,7 @@ R.spacing=()=>`
   </div>
   <div class="foot"><span>Fresno© — FDS</span><span>Spacing</span></div>`;
 
-const RADII=[['sm',4],['md',6],['lg',8],['xl',12],['full',9999]];
+const RADII=[['none',0],['xs',2],['sm',4],['md',6],['lg',8],['xl',12],['2xl',16],['card',20],['3xl',24],['4xl',32],['full',9999]];
 R.radius=()=>`
   <div class="sec-head">
     <span class="kicker">Foundations</span>
@@ -861,6 +881,34 @@ R.typography=()=>{
 
 /* ---- changelog (newest first) ---- */
 const CHANGELOG=[
+ {v:'1.6.1', date:'2026-11-02', note:'Documentation home. The docs move to fds.juancfresno.com behind a password cover, and this page becomes the only changelog — Figma no longer keeps one.', items:[
+   ['chg','Docs — served at fds.juancfresno.com with a password cover (FDS docs/cover, Dark). The old public path juancfresno.com/FDS redirects there.'],
+   ['chg','Changelog — lives only on this page from now on; every release is logged here.'],
+   ['add','fds-tokens.css 2.0.0 downloadable from the Overview and Token architecture pages, generated from the WEB code syntax of every Figma variable.'],
+   ['add','Docs catch up with v1.4.0–v1.6.0: Tracker brand, inverse roles, category palette, canvas/card, new semantic tokens, full radius scale, progress Value.'],
+   ['add','Logged for the first time (already in Figma by 31 Oct, never in a release note): category palette color/category/1–8 + category/1–8 for data series, radius/card (20px), font/display-editorial, radius xs · 2xl · 3xl · 4xl · none.'],
+ ]},
+ {v:'1.6.0', date:'2026-11-01', note:'Audit fixes (approved by Juan, library published 1 Nov): one code export, flat Component layer, accessible text and control borders. Panel and Tracker connected to the FDS library.', items:[
+   ['chg','Code — one export, fds-tokens.css 2.0.0, from the WEB code syntax of all 279 variables: semantic unprefixed (--fds-bg-page), components --fds-&lt;component&gt;-*, primitives --fds-ref-*, Brand --fds-brand-*, no DEFAULT.'],
+   ['chg','Component layer flattened — 75 component tokens re-pointed off Semantic legacy with identical values across 12 mode combinations (2 themes × 6 brands): 59 to semantics, 16 constants to primitives.'],
+   ['add','Semantic — bg/brand-hover, bg/brand-active, bg/disabled, bg/pressed, bg/inverse-pressed, text/on-brand, text/disabled, border/focus (promoted from legacy).'],
+   ['add','Accessibility — text/success, text/warning, text/info pass 4.5:1 on bg/surface and bg/page in both modes; border/control passes 3:1 for inputs, checkbox and radio. New primitives amber/700, green/700, blue/700, blue/400.'],
+   ['chg','Tag success/warning text, checkbox and radio borders, and input/textarea/search-field default borders now use those tokens.'],
+   ['chg','67 legacy/* Semantic variables removed after checking 0 references (13 pages, styles, Tracker). 36 .legacy sets moved to the Deprecated page.'],
+   ['chg','toggle/padding 3 → space/1 (4px). The other optical component numbers stay as documented exceptions.'],
+ ]},
+ {v:'1.5.0', date:'2026-10-31', note:'Decisions t-fds-inverse, t-fds-naming and t-fds-tracker, approved by Juan.', items:[
+   ['chg','Inverse roles — bg/inverse is the only fill for a dark element on light UI: Tooltip, Toast, FAB, Progress, Slider, Spinner, Pagination (43 layers) plus Segmented, Chip, Toggle, Checkbox, Radio and neutral Badge. Light changes #242625 → #141414; Dark still inverts.'],
+   ['chg','bg/inverse-surface is now only a raised surface inside a bg/inverse block.'],
+   ['chg','color/brand/blue/DEFAULT renamed to color/brand/blue/default.'],
+   ['add','Brand mode Tracker — exact copy of Fresno (21 values, no visual change), so Tracker can diverge later without moving the Panel or the web.'],
+   ['chg','CSS naming rule agreed: one name per role, a tier prefix only where direct consumption is forbidden.'],
+ ]},
+ {v:'1.4.0', date:'2026-10-30', note:'Found during the Panel redesign (task pv-fds-redesign).', items:[
+   ['add','Progress — Value property (0–100, step 10). The previous single component is kept as Value=60, so existing instances do not change.'],
+   ['add','Semantic bg/canvas (Light cold-steel · Dark neutral/900) and bg/card (Light pearl · Dark neutral/950).'],
+   ['add','Rule — no borders or lines on cards; cards separate from the canvas only by tone (bg/card on bg/canvas).'],
+ ]},
  {v:'1.3.0', date:'2026-10-30', note:'Typography: Geist replaces Switzer as the body and heading family. Temporary default while the typeface is revisited — switching back is a single token change.', items:[
    ['chg','Typography — body and heading family Switzer → Geist (Vercel, OFL). Geist + Geist Mono is the product type family; sizes, line-heights and weights unchanged.'],
    ['add','Tokens — primitive font-family/geist; Brand font/body aliases it in every brand mode. font-family/switzer kept for editorial/brand pieces.'],
@@ -978,7 +1026,7 @@ R.fab=()=>`
   <span class="cdoc-status stable"><span class="d"></span>Stable</span>
   <div class="prose"><h3>Type</h3><p>Only a circular icon FAB exists in the current Figma file. An "extended" label+icon variant was documented here previously but isn't built in Figma today — removed rather than invented; re-add once Figma ships it.</p></div>
   <div class="demo"><button class="fab circle">${ic('plus')}</button></div>
-  <div class="prose"><p>Always resolves via <code style="font-family:var(--font-ui);font-size:.85em">bg/inverse-surface</code> — it contrasts against the page automatically in both Light and Dark, no Theme prop needed.</p></div>
+  <div class="prose"><p>Always resolves via <code style="font-family:var(--font-ui);font-size:.85em">bg/inverse</code> — it contrasts against the page automatically in both Light and Dark, no Theme prop needed.</p></div>
   <div class="prose"><h3>Props</h3></div>
   <div class="props"><div class="ph"><span>Prop</span><span>Options</span><span>Default</span></div>
     <div class="pr"><b>icon</b><span>instance-swap</span><span>plus</span></div></div>
@@ -986,7 +1034,7 @@ R.fab=()=>`
   <div class="dodont"><div class="dd do"><div class="ddh">Do</div><div class="ddb">Reserve the FAB for the single most important action on a screen (compose, add, create).</div></div>
     <div class="dd dont"><div class="ddh">Don't</div><div class="ddb">Float more than one FAB, or use it for destructive or secondary actions.</div></div></div>
   <div class="prose"><h3>Tokens</h3></div>
-  <div class="tokens-used"><span class="tok">bg/inverse-surface</span><span class="tok">text/inverse-primary</span><span class="tok">shadow/2xl</span><span class="tok">radius/full</span></div>
+  <div class="tokens-used"><span class="tok">bg/inverse</span><span class="tok">text/inverse-primary</span><span class="tok">shadow/2xl</span><span class="tok">radius/full</span></div>
   <div class="foot"><span>Fresno© — FDS</span><span>FAB</span></div>`;
 
 /* ---- Forms ---- */
@@ -1007,7 +1055,7 @@ R.input=()=>`
     <div class="pr"><b>label</b><span>string</span><span>—</span></div>
     <div class="pr"><b>hint</b><span>string (error only)</span><span>—</span></div></div>
   <div class="prose"><h3>Tokens</h3></div>
-  <div class="tokens-used"><span class="tok">text/tertiary</span><span class="tok">text/primary</span><span class="tok">border/strong</span><span class="tok">border/strongest</span><span class="tok">border/subtle</span><span class="tok">feedback/error</span><span class="tok">radius/md</span></div>
+  <div class="tokens-used"><span class="tok">text/tertiary</span><span class="tok">text/primary</span><span class="tok">border/control</span><span class="tok">border/strongest</span><span class="tok">border/subtle</span><span class="tok">feedback/error</span><span class="tok">radius/md</span></div>
   <div class="foot"><span>Fresno© — FDS</span><span>Input</span></div>`;
 
 R.textarea=()=>`
@@ -1071,7 +1119,7 @@ R.checkbox=()=>`
   <div class="props"><div class="ph"><span>Prop</span><span>Options</span><span>Default</span></div>
     <div class="pr"><b>state</b><span>unchecked · checked · indeterminate · disabled</span><span>unchecked</span></div></div>
   <div class="prose"><h3>Tokens</h3></div>
-  <div class="tokens-used"><span class="tok">border/strong</span><span class="tok">bg/inverse-surface</span><span class="tok">border/subtle</span><span class="tok">radius/sm</span></div>
+  <div class="tokens-used"><span class="tok">border/control</span><span class="tok">bg/inverse</span><span class="tok">border/subtle</span><span class="tok">radius/sm</span></div>
   <div class="foot"><span>Fresno© — FDS</span><span>Checkbox</span></div>`;
 
 R.radio=()=>`
@@ -1084,7 +1132,7 @@ R.radio=()=>`
     <label class="check-row" style="color:var(--text-tertiary)"><span class="radio disabled"></span>Disabled</label>
   </div>
   <div class="prose"><h3>Tokens</h3></div>
-  <div class="tokens-used"><span class="tok">border/strong</span><span class="tok">bg/inverse-surface</span><span class="tok">border/subtle</span><span class="tok">radius/full</span></div>
+  <div class="tokens-used"><span class="tok">border/control</span><span class="tok">bg/inverse</span><span class="tok">border/subtle</span><span class="tok">radius/full</span></div>
   <div class="foot"><span>Fresno© — FDS</span><span>Radio</span></div>`;
 
 R.toggle=()=>`
@@ -1097,7 +1145,7 @@ R.toggle=()=>`
     <div class="toggle disabled"><span class="thumb"></span></div>
   </div>
   <div class="prose"><h3>Component tokens</h3></div>
-  <div class="tokens-used"><span class="tok">toggle/padding · 3</span><span class="tok">bg/inverse-surface</span><span class="tok">border/default</span><span class="tok">bg/subtle</span><span class="tok">radius/full</span></div>
+  <div class="tokens-used"><span class="tok">toggle/padding · 3</span><span class="tok">bg/inverse</span><span class="tok">border/default</span><span class="tok">bg/subtle</span><span class="tok">radius/full</span></div>
   <div class="foot"><span>Fresno© — FDS</span><span>Toggle</span></div>`;
 
 R.slider=()=>`
@@ -1109,7 +1157,7 @@ R.slider=()=>`
     <div class="slider-wrap disabled"><div class="slider-track"><div class="slider-fill" style="width:40%"></div><div class="slider-thumb" style="left:calc(40% - 8px)"></div></div></div>
   </div>
   <div class="prose"><h3>Tokens</h3></div>
-  <div class="tokens-used"><span class="tok">bg/subtle</span><span class="tok">bg/inverse-surface</span><span class="tok">border/strong</span><span class="tok">radius/full</span></div>
+  <div class="tokens-used"><span class="tok">bg/subtle</span><span class="tok">bg/inverse</span><span class="tok">border/strong</span><span class="tok">radius/full</span></div>
   <div class="foot"><span>Fresno© — FDS</span><span>Slider</span></div>`;
 
 R.stepper=()=>`
@@ -1164,12 +1212,12 @@ R.banner=()=>{
 };
 
 R.toast=()=>`
-  <div class="sec-head"><span class="kicker">Components · Feedback</span><h1 class="sec-title"><span class="br">{</span> Toast <span class="br">}</span></h1><p class="sec-lede">Transient inverse-surface confirmation, dismissed automatically.</p></div>
+  <div class="sec-head"><span class="kicker">Components · Feedback</span><h1 class="sec-title"><span class="br">{</span> Toast <span class="br">}</span></h1><p class="sec-lede">Transient inverse confirmation, dismissed automatically.</p></div>
   <span class="cdoc-status draft"><span class="d"></span>Draft</span>
-  <div class="prose"><p>Figma still carries Toast only as a hidden, untokenized legacy Theme-based specimen — it hasn't been migrated to a live Theme-free canonical component yet like its siblings (Banner, Modal). The demo below follows the system's standard inverse-surface pattern for consistency, but treat it as provisional until Figma ships the canonical component.</p></div>
+  <div class="prose"><p>Figma still carries Toast only as a hidden, untokenized legacy Theme-based specimen — it hasn't been migrated to a live Theme-free canonical component yet like its siblings (Banner, Modal). The demo below follows the system's standard inverse pattern for consistency, but treat it as provisional until Figma ships the canonical component.</p></div>
   <div class="demo"><div class="toast-demo">${ic('check')}Changes saved</div></div>
   <div class="prose"><h3>Tokens (provisional)</h3></div>
-  <div class="tokens-used"><span class="tok">bg/inverse-surface</span><span class="tok">text/inverse-primary</span><span class="tok">shadow/lg</span><span class="tok">radius/md</span></div>
+  <div class="tokens-used"><span class="tok">bg/inverse</span><span class="tok">text/inverse-primary</span><span class="tok">shadow/lg</span><span class="tok">radius/md</span></div>
   <div class="foot"><span>Fresno© — FDS</span><span>Toast</span></div>`;
 
 R.tooltip=()=>`
@@ -1179,7 +1227,7 @@ R.tooltip=()=>`
   <div class="demo"><div class="tooltip-demo">Placement = top</div><div class="tooltip-demo">Placement = bottom</div></div>
   <div class="prose"><h3>Accessibility</h3><p>Announces via <code style="font-family:var(--font-ui);font-size:.85em">aria-describedby</code> on the trigger; must be reachable on keyboard focus, not hover-only.</p></div>
   <div class="prose"><h3>Tokens</h3></div>
-  <div class="tokens-used"><span class="tok">bg/inverse-surface</span><span class="tok">text/inverse-primary</span><span class="tok">radius/sm</span></div>
+  <div class="tokens-used"><span class="tok">bg/inverse</span><span class="tok">text/inverse-primary</span><span class="tok">radius/sm</span></div>
   <div class="foot"><span>Fresno© — FDS</span><span>Tooltip</span></div>`;
 
 R.modal=()=>`
@@ -1198,15 +1246,16 @@ R.badge=()=>`
   <div class="prose"><h3>Type × Color</h3><p>Figma specimens confirm <code style="font-family:var(--font-ui);font-size:.85em">error</code> and <code style="font-family:var(--font-ui);font-size:.85em">neutral</code> colors on both Type values; other feedback colors aren't specimen'd yet.</p></div>
   <div class="demo"><span class="badge-dot badge-error"></span><span class="badge-dot badge-neutral"></span><span class="badge-count badge-error">3</span><span class="badge-count badge-neutral">12</span></div>
   <div class="prose"><h3>Component tokens</h3></div>
-  <div class="tokens-used"><span class="tok">badge/padding/x · 6</span><span class="tok">badge/padding/y · 2</span><span class="tok">feedback/error</span><span class="tok">bg/inverse-surface</span><span class="tok">radius/full</span></div>
+  <div class="tokens-used"><span class="tok">badge/padding/x · 6</span><span class="tok">badge/padding/y · 2</span><span class="tok">feedback/error</span><span class="tok">bg/inverse</span><span class="tok">radius/full</span></div>
   <div class="foot"><span>Fresno© — FDS</span><span>Badge</span></div>`;
 
 R.progress=()=>`
-  <div class="sec-head"><span class="kicker">Components · Feedback</span><h1 class="sec-title"><span class="br">{</span> Progress <span class="br">}</span></h1><p class="sec-lede">Determinate progress track. No variant axis — fill width is set at the instance level.</p></div>
+  <div class="sec-head"><span class="kicker">Components · Feedback</span><h1 class="sec-title"><span class="br">{</span> Progress <span class="br">}</span></h1><p class="sec-lede">Determinate progress track. <strong>Value</strong> property 0–100 in steps of 10 (v1.4.0): pick the nearest step in Figma; in code set the fill to the exact <code>width:%</code>.</p></div>
   <span class="cdoc-status stable"><span class="d"></span>Stable</span>
-  <div class="demo"><div class="progress-track"><div class="progress-fill" style="width:55%"></div></div></div>
+  <div class="demo" style="flex-direction:column;align-items:flex-start;gap:12px"><div class="progress-track"><div class="progress-fill" style="width:0%"></div></div><div class="progress-track"><div class="progress-fill" style="width:30%"></div></div><div class="progress-track"><div class="progress-fill" style="width:60%"></div></div><div class="progress-track"><div class="progress-fill" style="width:100%"></div></div></div>
+  <div class="props"><div class="ph"><span>Prop</span><span>Options</span><span>Default</span></div><div class="pr"><b>Value</b><span>0 · 10 · 20 · … · 100</span><span>60</span></div></div>
   <div class="prose"><h3>Tokens</h3></div>
-  <div class="tokens-used"><span class="tok">bg/subtle</span><span class="tok">bg/inverse-surface</span><span class="tok">radius/full</span></div>
+  <div class="tokens-used"><span class="tok">bg/subtle</span><span class="tok">bg/inverse</span><span class="tok">radius/full</span></div>
   <div class="foot"><span>Fresno© — FDS</span><span>Progress</span></div>`;
 
 R.spinner=()=>`
@@ -1214,7 +1263,7 @@ R.spinner=()=>`
   <span class="cdoc-status stable"><span class="d"></span>Stable</span>
   <div class="demo"><div class="spinner-el"></div></div>
   <div class="prose"><h3>Tokens</h3></div>
-  <div class="tokens-used"><span class="tok">bg/subtle</span><span class="tok">bg/inverse-surface</span></div>
+  <div class="tokens-used"><span class="tok">bg/subtle</span><span class="tok">bg/inverse</span></div>
   <div class="foot"><span>Fresno© — FDS</span><span>Spinner</span></div>`;
 
 R.skeleton=()=>`
@@ -1276,7 +1325,7 @@ R.pagination=()=>`
   <span class="cdoc-status stable"><span class="d"></span>Stable</span>
   <div class="demo"><div class="pagination-demo"><span class="page-nav">${ic('chevron-left')}</span><span class="page-chip">1</span><span class="page-chip active">2</span><span class="page-chip">3</span><span class="page-chip">4</span><span class="page-chip">5</span><span class="page-nav">${ic('chevron-right')}</span></div></div>
   <div class="prose"><h3>Tokens</h3></div>
-  <div class="tokens-used"><span class="tok">bg/inverse-surface</span><span class="tok">text/inverse-primary</span><span class="tok">text/secondary</span><span class="tok">radius/md</span></div>
+  <div class="tokens-used"><span class="tok">bg/inverse</span><span class="tok">text/inverse-primary</span><span class="tok">text/secondary</span><span class="tok">radius/md</span></div>
   <div class="foot"><span>Fresno© — FDS</span><span>Pagination</span></div>`;
 
 R.menu=()=>`
@@ -1295,6 +1344,7 @@ R.menu=()=>`
 /* ---- Data display ---- */
 R.card=()=>`
   <div class="sec-head"><span class="kicker">Components · Data display</span><h1 class="sec-title"><span class="br">{</span> Card <span class="br">}</span></h1><p class="sec-lede">Media + content composition. No variant axis — the Dark specimen is the exact same component placed on a dark surface.</p></div>
+  <div class="prose"><p><strong>Rule (v1.4.0)</strong> — no borders or lines on cards: not coloured, not neutral, no hairline. A card separates from the canvas only by tone (<code>bg/card</code> on <code>bg/canvas</code>); emphasis comes from type and content. <strong>Open:</strong> the canonical Figma component still ships <code>bg/surface</code> + <code>border/subtle</code>; aligning it is a library change waiting for Juan's OK.</p></div>
   <span class="cdoc-status stable"><span class="d"></span>Stable</span>
   <div class="demo"><div class="card-demo"><div class="card-media"></div><div class="card-body"><div class="card-meta">Article · 5 min</div><div class="card-title">Designing with restraint</div><div class="card-text">A short note on why fewer tokens make a stronger system.</div></div></div></div>
   <div class="prose"><h3>Tokens</h3></div>
@@ -1354,12 +1404,12 @@ R.tag=()=>`
   <div class="demo">
     <span class="tag-pill" style="color:var(--text-secondary);border-color:var(--border-default)">Neutral</span>
     <span class="tag-pill" style="color:var(--text-brand);border-color:var(--bg-brand)">Brand</span>
-    <span class="tag-pill" style="color:var(--feedback-success);border-color:var(--feedback-success)">Success</span>
-    <span class="tag-pill" style="color:var(--feedback-warning);border-color:var(--feedback-warning)">Warning</span>
+    <span class="tag-pill" style="color:var(--text-success);border-color:var(--feedback-success)">Success</span>
+    <span class="tag-pill" style="color:var(--text-warning);border-color:var(--feedback-warning)">Warning</span>
     <span class="tag-pill" style="color:var(--feedback-error);border-color:var(--feedback-error)">Error</span>
   </div>
   <div class="prose"><h3>Tokens</h3></div>
-  <div class="tokens-used"><span class="tok">text/secondary</span><span class="tok">text/brand</span><span class="tok">feedback/success</span><span class="tok">feedback/warning</span><span class="tok">feedback/error</span><span class="tok">radius/full</span></div>
+  <div class="tokens-used"><span class="tok">text/secondary</span><span class="tok">text/brand</span><span class="tok">text/success</span><span class="tok">text/warning</span><span class="tok">feedback/success</span><span class="tok">feedback/warning</span><span class="tok">feedback/error</span><span class="tok">radius/full</span></div>
   <div class="foot"><span>Fresno© — FDS</span><span>Tag</span></div>`;
 
 R.chip=()=>`

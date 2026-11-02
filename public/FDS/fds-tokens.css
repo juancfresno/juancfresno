@@ -1,448 +1,384 @@
 /* ==========================================================================
-   FDS — Fresno Design System · Tokens v1.3.0 (Geist body)
+   FDS — Fresno Design System · Tokens v1.6.0 (fds-tokens.css 2.0.0)
    Generated from Figma "01 · FDS — Foundations" (7Uco2E5gV4JdqojI7J3kTX)
-   on 2026-10-30. Brand = Fresno. Do not edit by hand: Figma is the source.
+   on 2026-11-02. Do not edit by hand: Figma is the source.
    Variable names = Figma WEB code syntax.
-   Theme: set data-theme="light" | "dark" on <html>; defaults to OS preference.
+     --fds-ref-*        Primitives — reference only, never consume in product code
+     --fds-brand-*      Brand collection — switch with data-brand="fresno|biakone|glyf|medida|forma|tracker"
+     --fds-*            Semantic — what products consume
+     --fds-<component>-* Component tokens
+   Theme: set data-theme="light" | "dark" on <html> (default Light).
+   Brand: default Fresno; set data-brand on <html> or any container.
    ========================================================================== */
 
 @import url("https://fonts.googleapis.com/css2?family=Geist:wght@300;400&family=Geist+Mono:wght@400&family=Instrument+Serif:ital@0;1&display=swap");
 
-/* ---------- Primitives (mode: Value) ---------- */
+/* 01 · Primitives (--fds-ref-*) */
 :root {
-  --fds-primitives-color-neutral-50: #f4f2ea;
-  --fds-primitives-color-neutral-100: #ecebe6;
-  --fds-primitives-color-neutral-150: #e2e2d6;
-  --fds-primitives-color-neutral-200: #dad8d2;
-  --fds-primitives-color-neutral-300: #c9c5bd;
-  --fds-primitives-color-neutral-400: #a9aea9;
-  --fds-primitives-color-neutral-500: #8a918d;
-  --fds-primitives-color-neutral-600: #636965;
-  --fds-primitives-color-neutral-700: #4a4d4b;
-  --fds-primitives-color-neutral-800: #373737;
-  --fds-primitives-color-neutral-900: #242625;
-  --fds-primitives-color-neutral-950: #141414;
-  --fds-primitives-color-green-500: #38ae7a;
-  --fds-primitives-color-amber-500: #e0ac3a;
-  --fds-primitives-color-red-400: #e2685d;
-  --fds-primitives-color-red-500: #e0655a;
-  --fds-primitives-color-red-700: #a6423b;
-  --fds-primitives-color-blue-500: #5a82d2;
-  --fds-primitives-color-brand-blue-50: #f0f5fe;
-  --fds-primitives-color-brand-blue-100: #dce8fc;
-  --fds-primitives-color-brand-blue-200: #c6dbf9;
-  --fds-primitives-color-brand-blue-300: #a3c3f3;
-  --fds-primitives-color-brand-blue-400: #7ba1e8;
-  --fds-primitives-color-brand-blue-500: #557fdb;
-  --fds-primitives-color-brand-blue-600: #4063c2;
-  --fds-primitives-color-brand-blue-700: #344e9b;
-  --fds-primitives-color-brand-blue-800: #2e4178;
-  --fds-primitives-color-brand-blue-900: #29375e;
-  --fds-primitives-color-brand-blue-950: #1a2340;
-  --fds-primitives-color-brand-blue-DEFAULT: #c6dbf9;
-  --fds-primitives-color-brand-green: #8df8cd;
-  --fds-primitives-color-brand-yellow: #ffffe6;
-  --fds-primitives-color-accent-electric: #003dff;
-  --fds-primitives-color-surface-marble: #f2f8fc;
-  --fds-primitives-color-surface-ivory: #fffff0;
-  --fds-primitives-color-surface-pearl: #fcfcf7;
-  --fds-primitives-color-surface-lavender: #f4f1f8;
-  --fds-primitives-color-surface-cold-steel: #f8f7f4;
-
-  --fds-primitives-space-0: 0px;
-  --fds-primitives-space-px: 1px;
-  --fds-primitives-space-1: 4px;
-  --fds-primitives-space-2: 8px;
-  --fds-primitives-space-3: 12px;
-  --fds-primitives-space-4: 16px;
-  --fds-primitives-space-5: 20px;
-  --fds-primitives-space-6: 24px;
-  --fds-primitives-space-7: 28px;
-  --fds-primitives-space-8: 32px;
-  --fds-primitives-space-9: 36px;
-  --fds-primitives-space-10: 40px;
-  --fds-primitives-space-11: 44px;
-  --fds-primitives-space-12: 48px;
-  --fds-primitives-space-14: 56px;
-  --fds-primitives-space-16: 64px;
-  --fds-primitives-space-20: 80px;
-  --fds-primitives-space-24: 96px;
-  --fds-primitives-space-28: 112px;
-  --fds-primitives-space-32: 128px;
-  --fds-primitives-space-36: 144px;
-  --fds-primitives-space-40: 160px;
-  --fds-primitives-space-48: 192px;
-  --fds-primitives-space-50: 200px;
-  --fds-primitives-space-56: 224px;
-  --fds-primitives-space-64: 256px;
-
-  --fds-primitives-radius-none: 0px;
-  --fds-primitives-radius-xs: 2px;
-  --fds-primitives-radius-sm: 4px;
-  --fds-primitives-radius-md: 6px;
-  --fds-primitives-radius-lg: 8px;
-  --fds-primitives-radius-xl: 12px;
-  --fds-primitives-radius-2xl: 16px;
-  --fds-primitives-radius-3xl: 24px;
-  --fds-primitives-radius-4xl: 32px;
-  --fds-primitives-radius-full: 9999px;
-
-  /* Breakpoints are reference values: CSS cannot use var() in @media. */
-  --fds-primitives-breakpoint-sm: 640px;
-  --fds-primitives-breakpoint-md: 768px;
-  --fds-primitives-breakpoint-lg: 1024px;
-  --fds-primitives-breakpoint-xl: 1280px;
-  --fds-primitives-breakpoint-2xl: 1536px;
-  --fds-primitives-breakpoint-3xl: 1920px;
-  --fds-primitives-breakpoint-4xl: 2560px;
-
-  --fds-primitives-interaction-target-min-web: 24px;
-  --fds-primitives-interaction-target-min-touch: 44px;
-
-  --fds-primitives-font-family-geist: "Geist";
-  --fds-primitives-font-family-switzer: "Switzer";
-  --fds-primitives-font-family-geist-mono: "Geist Mono";
-  --fds-primitives-font-family-instrument-serif: "Instrument Serif";
+  --fds-ref-color-neutral-50: #f4f2ea;
+  --fds-ref-color-neutral-100: #ecebe6;
+  --fds-ref-color-neutral-150: #e2e2d6;
+  --fds-ref-color-neutral-200: #dad8d2;
+  --fds-ref-color-neutral-300: #c9c5bd;
+  --fds-ref-color-neutral-400: #a9aea9;
+  --fds-ref-color-neutral-500: #8a918d;
+  --fds-ref-color-neutral-600: #636965;
+  --fds-ref-color-neutral-700: #4a4d4b;
+  --fds-ref-color-neutral-800: #373737;
+  --fds-ref-color-neutral-900: #242625;
+  --fds-ref-color-neutral-950: #141414;
+  --fds-ref-color-green-500: #38ae7a;
+  --fds-ref-color-green-700: #236c4c;
+  --fds-ref-color-amber-500: #e0ac3a;
+  --fds-ref-color-amber-700: #7a5a13;
+  --fds-ref-color-red-400: #e2685d;
+  --fds-ref-color-red-500: #e0655a;
+  --fds-ref-color-red-700: #a6423b;
+  --fds-ref-color-blue-400: #6e91d7;
+  --fds-ref-color-blue-500: #5a82d2;
+  --fds-ref-color-blue-700: #305bb2;
+  --fds-ref-color-brand-blue-50: #f0f5fe;
+  --fds-ref-color-brand-blue-100: #dce8fc;
+  --fds-ref-color-brand-blue-200: #c6dbf9;
+  --fds-ref-color-brand-blue-300: #a3c3f3;
+  --fds-ref-color-brand-blue-400: #7ba1e8;
+  --fds-ref-color-brand-blue-500: #557fdb;
+  --fds-ref-color-brand-blue-600: #4063c2;
+  --fds-ref-color-brand-blue-700: #344e9b;
+  --fds-ref-color-brand-blue-800: #2e4178;
+  --fds-ref-color-brand-blue-900: #29375e;
+  --fds-ref-color-brand-blue-950: #1a2340;
+  --fds-ref-color-brand-blue: var(--fds-ref-color-brand-blue-200);
+  --fds-ref-color-brand-green: #8df8cd;
+  --fds-ref-color-brand-yellow: #ffffe6;
+  --fds-ref-color-accent-electric: #003dff;
+  --fds-ref-color-surface-marble: #f2f8fc;
+  --fds-ref-color-surface-ivory: #fffff0;
+  --fds-ref-color-surface-pearl: #fcfcf7;
+  --fds-ref-color-surface-lavender: #f4f1f8;
+  --fds-ref-color-surface-cold-steel: #f8f7f4;
+  --fds-ref-color-category-1: #c49a3c;
+  --fds-ref-color-category-2: #6f9a3e;
+  --fds-ref-color-category-3: #2f9a95;
+  --fds-ref-color-category-4: #4f8fd6;
+  --fds-ref-color-category-5: #5560c4;
+  --fds-ref-color-category-6: #8a5cc7;
+  --fds-ref-color-category-7: #c0508f;
+  --fds-ref-color-category-8: #6e7d8c;
+  --fds-ref-space-0: 0;
+  --fds-ref-space-px: 1px;
+  --fds-ref-space-1: 4px;
+  --fds-ref-space-2: 8px;
+  --fds-ref-space-3: 12px;
+  --fds-ref-space-4: 16px;
+  --fds-ref-space-5: 20px;
+  --fds-ref-space-6: 24px;
+  --fds-ref-space-7: 28px;
+  --fds-ref-space-8: 32px;
+  --fds-ref-space-9: 36px;
+  --fds-ref-space-10: 40px;
+  --fds-ref-space-11: 44px;
+  --fds-ref-space-12: 48px;
+  --fds-ref-space-14: 56px;
+  --fds-ref-space-16: 64px;
+  --fds-ref-space-20: 80px;
+  --fds-ref-space-24: 96px;
+  --fds-ref-space-28: 112px;
+  --fds-ref-space-32: 128px;
+  --fds-ref-space-36: 144px;
+  --fds-ref-space-40: 160px;
+  --fds-ref-space-48: 192px;
+  --fds-ref-space-50: 200px;
+  --fds-ref-space-56: 224px;
+  --fds-ref-space-64: 256px;
+  --fds-ref-radius-none: 0;
+  --fds-ref-radius-xs: 2px;
+  --fds-ref-radius-sm: 4px;
+  --fds-ref-radius-md: 6px;
+  --fds-ref-radius-lg: 8px;
+  --fds-ref-radius-xl: 12px;
+  --fds-ref-radius-2xl: 16px;
+  --fds-ref-radius-3xl: 24px;
+  --fds-ref-radius-4xl: 32px;
+  --fds-ref-radius-full: 9999px;
+  --fds-ref-radius-card: 20px;
+  --fds-ref-breakpoint-sm: 640px;
+  --fds-ref-breakpoint-md: 768px;
+  --fds-ref-breakpoint-lg: 1024px;
+  --fds-ref-breakpoint-xl: 1280px;
+  --fds-ref-breakpoint-2xl: 1536px;
+  --fds-ref-breakpoint-3xl: 1920px;
+  --fds-ref-breakpoint-4xl: 2560px;
+  --fds-ref-interaction-target-min-web: 24px;
+  --fds-ref-interaction-target-min-touch: 44px;
+  --fds-ref-font-family-geist: 'Geist';
+  --fds-ref-font-family-geist-mono: 'Geist Mono';
+  --fds-ref-font-family-instrument-serif: 'Instrument Serif';
+  --fds-ref-font-family-switzer: 'Switzer';
 }
 
-/* ---------- Brand (mode: Fresno) ---------- */
-:root {
-  --fds-brand-color-accent-surface-on-light: var(--fds-primitives-color-brand-blue-200);
-  --fds-brand-color-accent-surface-on-dark: var(--fds-primitives-color-brand-blue-200);
-  --fds-brand-color-accent-text-on-light: var(--fds-primitives-color-brand-blue-700);
-  --fds-brand-color-accent-text-on-dark: var(--fds-primitives-color-brand-blue-300);
-  --fds-brand-color-accent-subtle-on-light: var(--fds-primitives-color-brand-blue-100);
-  --fds-brand-color-accent-subtle-on-dark: var(--fds-primitives-color-brand-blue-950);
-  --fds-brand-color-accent-hover-on-light: var(--fds-primitives-color-brand-blue-300);
-  --fds-brand-color-accent-hover-on-dark: var(--fds-primitives-color-brand-blue-100);
-  --fds-brand-color-accent-active-on-light: var(--fds-primitives-color-brand-blue-400);
-  --fds-brand-color-accent-active-on-dark: var(--fds-primitives-color-brand-blue-50);
-  --fds-brand-color-accent-focus-on-light: var(--fds-primitives-color-brand-blue-600);
-  --fds-brand-color-accent-focus-on-dark: var(--fds-primitives-color-brand-blue-300);
-  --fds-brand-color-accent-on-surface-on-light: var(--fds-primitives-color-neutral-950);
-  --fds-brand-color-accent-on-surface-on-dark: var(--fds-primitives-color-neutral-950);
-  --fds-brand-color-logo-default: var(--fds-primitives-color-neutral-950);
-  --fds-brand-color-logo-inverse: var(--fds-primitives-color-brand-yellow);
-  --fds-brand-color-logo-accent: var(--fds-primitives-color-accent-electric);
-  --fds-brand-font-body: var(--fds-primitives-font-family-geist), -apple-system, BlinkMacSystemFont, sans-serif;
-  --fds-brand-font-display: var(--fds-primitives-font-family-geist-mono), ui-monospace, monospace;
-  --fds-brand-font-ui: var(--fds-primitives-font-family-geist-mono), ui-monospace, monospace;
-  --fds-brand-font-editorial: var(--fds-primitives-font-family-instrument-serif), Georgia, serif;
+/* 02 · Brand (--fds-brand-*) — default Fresno */
+:root, [data-brand="fresno"], [data-brand="tracker"] {
+  --fds-brand-color-accent-surface-on-light: var(--fds-ref-color-brand-blue);
+  --fds-brand-color-accent-surface-on-dark: var(--fds-ref-color-brand-blue);
+  --fds-brand-color-accent-text-on-light: var(--fds-ref-color-brand-blue-700);
+  --fds-brand-color-accent-text-on-dark: var(--fds-ref-color-brand-blue-300);
+  --fds-brand-color-accent-subtle-on-light: var(--fds-ref-color-brand-blue-100);
+  --fds-brand-color-accent-subtle-on-dark: var(--fds-ref-color-brand-blue-950);
+  --fds-brand-color-accent-hover-on-light: var(--fds-ref-color-brand-blue-300);
+  --fds-brand-color-accent-hover-on-dark: var(--fds-ref-color-brand-blue-100);
+  --fds-brand-color-accent-active-on-light: var(--fds-ref-color-brand-blue-400);
+  --fds-brand-color-accent-active-on-dark: var(--fds-ref-color-brand-blue-50);
+  --fds-brand-color-accent-focus-on-light: var(--fds-ref-color-brand-blue-600);
+  --fds-brand-color-accent-focus-on-dark: var(--fds-ref-color-brand-blue-300);
+  --fds-brand-color-accent-on-surface-on-light: var(--fds-ref-color-neutral-950);
+  --fds-brand-color-accent-on-surface-on-dark: var(--fds-ref-color-neutral-950);
+  --fds-brand-color-logo-default: var(--fds-ref-color-neutral-950);
+  --fds-brand-color-logo-inverse: var(--fds-ref-color-brand-yellow);
+  --fds-brand-color-logo-accent: var(--fds-ref-color-accent-electric);
+  --fds-brand-font-body: var(--fds-ref-font-family-geist);
+  --fds-brand-font-display: 'Geist Mono';
+  --fds-brand-font-ui: 'Geist Mono';
+  --fds-brand-font-editorial: 'Instrument Serif';
+}
+/* Biakone · GLYF · Medida · Forma share the neutral base; only logo/accent differs for GLYF */
+[data-brand="biakone"], [data-brand="glyf"], [data-brand="medida"], [data-brand="forma"] {
+  --fds-brand-color-accent-surface-on-light: var(--fds-ref-color-neutral-950);
+  --fds-brand-color-accent-surface-on-dark: var(--fds-ref-color-neutral-50);
+  --fds-brand-color-accent-text-on-light: var(--fds-ref-color-neutral-950);
+  --fds-brand-color-accent-text-on-dark: var(--fds-ref-color-neutral-50);
+  --fds-brand-color-accent-subtle-on-light: var(--fds-ref-color-neutral-200);
+  --fds-brand-color-accent-subtle-on-dark: var(--fds-ref-color-neutral-800);
+  --fds-brand-color-accent-hover-on-light: var(--fds-ref-color-neutral-800);
+  --fds-brand-color-accent-hover-on-dark: var(--fds-ref-color-neutral-100);
+  --fds-brand-color-accent-active-on-light: var(--fds-ref-color-neutral-700);
+  --fds-brand-color-accent-active-on-dark: var(--fds-ref-color-neutral-200);
+  --fds-brand-color-accent-focus-on-light: var(--fds-ref-color-neutral-600);
+  --fds-brand-color-accent-focus-on-dark: var(--fds-ref-color-neutral-300);
+  --fds-brand-color-accent-on-surface-on-light: var(--fds-ref-color-neutral-50);
+  --fds-brand-color-accent-on-surface-on-dark: var(--fds-ref-color-neutral-950);
+  --fds-brand-color-logo-default: var(--fds-ref-color-neutral-950);
+  --fds-brand-color-logo-inverse: var(--fds-ref-color-neutral-50);
+  --fds-brand-color-logo-accent: var(--fds-ref-color-neutral-950);
+  --fds-brand-font-body: var(--fds-ref-font-family-geist);
+  --fds-brand-font-display: 'Geist Mono';
+  --fds-brand-font-ui: 'Geist Mono';
+  --fds-brand-font-editorial: 'Instrument Serif';
+}
+[data-brand="glyf"] {
+  --fds-brand-color-logo-accent: var(--fds-ref-color-neutral-50);
 }
 
-/* ---------- Semantic · mode-independent ---------- */
-:root {
+/* 03 · Semantic (--fds-*) — Light */
+:root, [data-brand], [data-theme="light"] {
+  --fds-text-primary: var(--fds-ref-color-neutral-950);
+  --fds-text-secondary: var(--fds-ref-color-neutral-800);
+  --fds-text-tertiary: var(--fds-ref-color-neutral-700);
+  --fds-text-disabled: var(--fds-ref-color-neutral-400);
+  --fds-text-inverse-primary: var(--fds-ref-color-neutral-50);
+  --fds-text-inverse-secondary: var(--fds-ref-color-neutral-300);
+  --fds-text-inverse-tertiary: var(--fds-ref-color-neutral-400);
+  --fds-text-brand: var(--fds-brand-color-accent-text-on-light);
+  --fds-text-on-brand: var(--fds-brand-color-accent-on-surface-on-light);
+  --fds-text-success: var(--fds-ref-color-green-700);
+  --fds-text-warning: var(--fds-ref-color-amber-700);
+  --fds-text-info: var(--fds-ref-color-blue-700);
+  --fds-text-brand-blue: var(--fds-ref-color-brand-blue-200);
+  --fds-text-brand-yellow: var(--fds-ref-color-brand-yellow);
+  --fds-bg-page: var(--fds-ref-color-neutral-150);
+  --fds-bg-canvas: var(--fds-ref-color-surface-cold-steel);
+  --fds-bg-card: var(--fds-ref-color-surface-pearl);
+  --fds-bg-surface: var(--fds-ref-color-neutral-50);
+  --fds-bg-sunken: var(--fds-ref-color-neutral-100);
+  --fds-bg-subtle: var(--fds-ref-color-neutral-300);
+  --fds-bg-pressed: var(--fds-ref-color-neutral-200);
+  --fds-bg-disabled: var(--fds-ref-color-neutral-200);
+  --fds-bg-inverse: var(--fds-ref-color-neutral-950);
+  --fds-bg-inverse-surface: var(--fds-ref-color-neutral-900);
+  --fds-bg-inverse-subtle: var(--fds-ref-color-neutral-800);
+  --fds-bg-inverse-pressed: var(--fds-ref-color-neutral-700);
+  --fds-bg-brand: var(--fds-brand-color-accent-surface-on-light);
+  --fds-bg-brand-hover: var(--fds-brand-color-accent-hover-on-light);
+  --fds-bg-brand-active: var(--fds-brand-color-accent-active-on-light);
+  --fds-bg-brand-subtle: var(--fds-brand-color-accent-subtle-on-light);
+  --fds-bg-brand-blue: var(--fds-ref-color-brand-blue-200);
+  --fds-bg-brand-green: var(--fds-ref-color-brand-green);
+  --fds-bg-brand-yellow: var(--fds-ref-color-brand-yellow);
+  --fds-bg-page-marble: var(--fds-ref-color-surface-marble);
+  --fds-bg-page-ivory: var(--fds-ref-color-surface-ivory);
+  --fds-bg-page-pearl: var(--fds-ref-color-surface-pearl);
+  --fds-bg-page-lavender: var(--fds-ref-color-surface-lavender);
+  --fds-bg-page-cold-steel: var(--fds-ref-color-surface-cold-steel);
+  --fds-border-default: var(--fds-ref-color-neutral-300);
+  --fds-border-subtle: var(--fds-ref-color-neutral-200);
+  --fds-border-strong: var(--fds-ref-color-neutral-400);
+  --fds-border-strongest: var(--fds-ref-color-neutral-950);
+  --fds-border-control: var(--fds-ref-color-neutral-600);
+  --fds-border-focus: var(--fds-brand-color-accent-focus-on-light);
+  --fds-border-brand: var(--fds-brand-color-accent-surface-on-light);
+  --fds-border-inverse-default: var(--fds-ref-color-neutral-700);
+  --fds-border-inverse-subtle: var(--fds-ref-color-neutral-800);
+  --fds-border-inverse-strong: var(--fds-ref-color-neutral-600);
+  --fds-border-inverse-strongest: var(--fds-ref-color-neutral-50);
+  --fds-feedback-success: var(--fds-ref-color-green-500);
+  --fds-feedback-warning: var(--fds-ref-color-amber-500);
+  --fds-feedback-error: var(--fds-ref-color-red-700);
+  --fds-feedback-info: var(--fds-ref-color-blue-500);
+  --fds-icon-default: var(--fds-ref-color-neutral-950);
+  --fds-icon-muted: var(--fds-ref-color-neutral-600);
+  --fds-icon-disabled: var(--fds-ref-color-neutral-400);
+  --fds-icon-inverse: var(--fds-ref-color-neutral-50);
+  --fds-logo-default: var(--fds-brand-color-logo-default);
+  --fds-logo-inverse: var(--fds-brand-color-logo-inverse);
+  --fds-logo-accent: var(--fds-brand-color-logo-accent);
   --fds-font-heading: var(--fds-brand-font-body);
   --fds-font-body: var(--fds-brand-font-body);
   --fds-font-display: var(--fds-brand-font-display);
   --fds-font-ui: var(--fds-brand-font-ui);
   --fds-font-editorial: var(--fds-brand-font-editorial);
-
-  --fds-border-brand: #c6dbf9;
-  --fds-feedback-success: #38ae7a;
-  --fds-feedback-warning: #e0ac3a;
-  --fds-feedback-info: #5a82d2;
-  --fds-bg-brand: #c6dbf9;
-  --fds-bg-page-marble: #f2f8fc;
-  --fds-bg-page-ivory: #fffff0;
-  --fds-bg-page-pearl: #fcfcf7;
-  --fds-bg-page-lavender: #f4f1f8;
-  --fds-bg-page-cold-steel: #f8f7f4;
-  --fds-bg-brand-blue: #c6dbf9;
-  --fds-bg-brand-green: #8df8cd;
-  --fds-bg-brand-yellow: #ffffe6;
-  --fds-text-brand-blue: #c6dbf9;
-  --fds-text-brand-yellow: #ffffe6;
-  --fds-logo-default: #141414;
-  --fds-logo-inverse: #ffffe6;
-  --fds-logo-accent: #003dff;
-
-  /* Component · mode-independent */
-  --fds-component-button-bg-primary: #c6dbf9;
-  --fds-component-button-text-primary: #141414;
-  --fds-component-button-border-outline-brand: #c6dbf9;
-  --fds-component-tag-text-success: #38ae7a;
-  --fds-component-tag-text-warning: #e0ac3a;
-  --fds-component-tag-border-brand: #c6dbf9;
-  --fds-component-tag-border-success: #38ae7a;
-  --fds-component-tag-border-warning: #e0ac3a;
-  --fds-component-badge-text-error: #f4f2ea;
-  --fds-component-toggle-thumb-off: #f4f2ea;
-  --fds-component-toggle-thumb-disabled: #c9c5bd;
-  --fds-component-checkbox-mark-disabled: #a9aea9;
-
-  /* Component · optical geometry */
-  --fds-component-badge-padding-x: 6px;
-  --fds-component-badge-padding-y: 2px;
-  --fds-component-toggle-padding: 3px;
-  --fds-component-avatar-group-overlap: -8px;
-  --fds-component-banner-padding: 14px;
-  --fds-component-menu-gap: 2px;
-  --fds-component-menu-padding: 6px;
-  --fds-component-table-padding-y: 14px;
-  --fds-component-table-gap: 6px;
+  --fds-font-display-editorial: var(--fds-brand-font-editorial);
+  --fds-category-1: var(--fds-ref-color-category-1);
+  --fds-category-2: var(--fds-ref-color-category-2);
+  --fds-category-3: var(--fds-ref-color-category-3);
+  --fds-category-4: var(--fds-ref-color-category-4);
+  --fds-category-5: var(--fds-ref-color-category-5);
+  --fds-category-6: var(--fds-ref-color-category-6);
+  --fds-category-7: var(--fds-ref-color-category-7);
+  --fds-category-8: var(--fds-ref-color-category-8);
 }
 
-/* ---------- Semantic + Component · Light ---------- */
-:root,
-[data-theme="light"] {
-  color-scheme: light;
-  --fds-text-primary: #141414;
-  --fds-text-secondary: #373737;
-  --fds-text-tertiary: #4a4d4b;
-  --fds-text-inverse-primary: #f4f2ea;
-  --fds-text-inverse-secondary: #c9c5bd;
-  --fds-text-inverse-tertiary: #a9aea9;
-  --fds-text-brand: #344e9b;
-
-  --fds-bg-page: #e2e2d6;
-  --fds-bg-surface: #f4f2ea;
-  --fds-bg-subtle: #c9c5bd;
-  --fds-bg-inverse: #141414;
-  --fds-bg-inverse-surface: #242625;
-  --fds-bg-inverse-subtle: #373737;
-  --fds-bg-brand-subtle: #dce8fc;
-  --fds-bg-sunken: #ecebe6;
-
-  --fds-border-default: #c9c5bd;
-  --fds-border-subtle: #dad8d2;
-  --fds-border-strong: #a9aea9;
-  --fds-border-strongest: #141414;
-  --fds-border-inverse-default: #4a4d4b;
-  --fds-border-inverse-subtle: #373737;
-  --fds-border-inverse-strong: #636965;
-  --fds-border-inverse-strongest: #f4f2ea;
-
-  --fds-feedback-error: #a6423b;
-
-  --fds-icon-default: #141414;
-  --fds-icon-muted: #636965;
-  --fds-icon-disabled: #a9aea9;
-  --fds-icon-inverse: #f4f2ea;
-
-  --fds-component-button-bg-primary-hover: #a3c3f3;
-  --fds-component-button-bg-primary-active: #7ba1e8;
-  --fds-component-button-bg-primary-disabled: #dad8d2;
-  --fds-component-button-text-primary-disabled: #a9aea9;
-  --fds-component-button-bg-neutral: #141414;
-  --fds-component-button-bg-neutral-hover: #373737;
-  --fds-component-button-bg-neutral-active: #4a4d4b;
-  --fds-component-button-bg-neutral-disabled: #dad8d2;
-  --fds-component-button-text-neutral: #f4f2ea;
-  --fds-component-button-text-neutral-disabled: #a9aea9;
-  --fds-component-button-border-outline: #141414;
-  --fds-component-button-text-outline: #141414;
-  --fds-component-button-bg-outline-hover: #ecebe6;
-  --fds-component-button-bg-outline-active: #dad8d2;
-  --fds-component-button-border-outline-disabled: #c9c5bd;
-  --fds-component-button-text-outline-disabled: #a9aea9;
-  --fds-component-button-border-focus: #4063c2;
-
-  --fds-component-tag-text-neutral: #373737;
-  --fds-component-tag-text-brand: #344e9b;
-  --fds-component-tag-text-error: #a6423b;
-  --fds-component-tag-border-neutral: #c9c5bd;
-  --fds-component-tag-border-error: #a6423b;
-
-  --fds-component-segmented-bg-track: #ecebe6;
-  --fds-component-segmented-bg-selected: #242625;
-  --fds-component-segmented-text-selected: #f4f2ea;
-  --fds-component-segmented-text-default: #373737;
-
-  --fds-component-badge-bg-error: #a6423b;
-  --fds-component-badge-bg-neutral: #242625;
-  --fds-component-badge-text-neutral: #f4f2ea;
-
-  --fds-component-chip-border-default: #c9c5bd;
-  --fds-component-chip-text-default: #373737;
-  --fds-component-chip-border-hover: #a9aea9;
-  --fds-component-chip-text-hover: #141414;
-  --fds-component-chip-bg-selected: #242625;
-  --fds-component-chip-text-selected: #f4f2ea;
-  --fds-component-chip-border-disabled: #dad8d2;
-  --fds-component-chip-text-disabled: #4a4d4b;
-
-  --fds-component-toggle-track-off: #c9c5bd;
-  --fds-component-toggle-track-on: #242625;
-  --fds-component-toggle-track-disabled: #dad8d2;
-  --fds-component-toggle-thumb-on: #f4f2ea;
-
-  --fds-component-checkbox-border: #a9aea9;
-  --fds-component-checkbox-bg-checked: #242625;
-  --fds-component-checkbox-mark: #f4f2ea;
-  --fds-component-checkbox-border-disabled: #dad8d2;
-
-  --fds-component-radio-border: #a9aea9;
-  --fds-component-radio-dot: #242625;
-  --fds-component-radio-border-disabled: #dad8d2;
-
-  --fds-component-list-item-bg-hover: #ecebe6;
-  --fds-component-list-item-bg-pressed: #dad8d2;
-  --fds-component-list-item-bg-selected: #dce8fc;
+/* 03 · Semantic (--fds-*) — Dark (only tokens whose value changes) */
+[data-theme="dark"], [data-theme="dark"] [data-brand] {
+  --fds-text-primary: var(--fds-ref-color-neutral-50);
+  --fds-text-secondary: var(--fds-ref-color-neutral-300);
+  --fds-text-tertiary: var(--fds-ref-color-neutral-400);
+  --fds-text-disabled: var(--fds-ref-color-neutral-600);
+  --fds-text-inverse-primary: var(--fds-ref-color-neutral-950);
+  --fds-text-inverse-secondary: var(--fds-ref-color-neutral-700);
+  --fds-text-inverse-tertiary: var(--fds-ref-color-neutral-600);
+  --fds-text-brand: var(--fds-brand-color-accent-text-on-dark);
+  --fds-text-on-brand: var(--fds-brand-color-accent-on-surface-on-dark);
+  --fds-text-success: var(--fds-ref-color-green-500);
+  --fds-text-warning: var(--fds-ref-color-amber-500);
+  --fds-text-info: var(--fds-ref-color-blue-400);
+  --fds-bg-page: var(--fds-ref-color-neutral-900);
+  --fds-bg-canvas: var(--fds-ref-color-neutral-900);
+  --fds-bg-card: var(--fds-ref-color-neutral-950);
+  --fds-bg-surface: var(--fds-ref-color-neutral-950);
+  --fds-bg-sunken: var(--fds-ref-color-neutral-800);
+  --fds-bg-subtle: var(--fds-ref-color-neutral-800);
+  --fds-bg-pressed: var(--fds-ref-color-neutral-700);
+  --fds-bg-disabled: var(--fds-ref-color-neutral-800);
+  --fds-bg-inverse: var(--fds-ref-color-neutral-50);
+  --fds-bg-inverse-surface: var(--fds-ref-color-neutral-100);
+  --fds-bg-inverse-subtle: var(--fds-ref-color-neutral-200);
+  --fds-bg-inverse-pressed: var(--fds-ref-color-neutral-300);
+  --fds-bg-brand: var(--fds-brand-color-accent-surface-on-dark);
+  --fds-bg-brand-hover: var(--fds-brand-color-accent-hover-on-dark);
+  --fds-bg-brand-active: var(--fds-brand-color-accent-active-on-dark);
+  --fds-bg-brand-subtle: var(--fds-brand-color-accent-subtle-on-dark);
+  --fds-border-default: var(--fds-ref-color-neutral-700);
+  --fds-border-subtle: var(--fds-ref-color-neutral-800);
+  --fds-border-strong: var(--fds-ref-color-neutral-600);
+  --fds-border-strongest: var(--fds-ref-color-neutral-50);
+  --fds-border-control: var(--fds-ref-color-neutral-500);
+  --fds-border-focus: var(--fds-brand-color-accent-focus-on-dark);
+  --fds-border-brand: var(--fds-brand-color-accent-surface-on-dark);
+  --fds-border-inverse-default: var(--fds-ref-color-neutral-300);
+  --fds-border-inverse-subtle: var(--fds-ref-color-neutral-200);
+  --fds-border-inverse-strong: var(--fds-ref-color-neutral-400);
+  --fds-border-inverse-strongest: var(--fds-ref-color-neutral-950);
+  --fds-feedback-error: var(--fds-ref-color-red-400);
+  --fds-icon-default: var(--fds-ref-color-neutral-50);
+  --fds-icon-muted: var(--fds-ref-color-neutral-400);
+  --fds-icon-disabled: var(--fds-ref-color-neutral-600);
+  --fds-icon-inverse: var(--fds-ref-color-neutral-950);
 }
 
-/* ---------- Semantic + Component · Dark ---------- */
-[data-theme="dark"] {
-  color-scheme: dark;
-  --fds-text-primary: #f4f2ea;
-  --fds-text-secondary: #c9c5bd;
-  --fds-text-tertiary: #a9aea9;
-  --fds-text-inverse-primary: #141414;
-  --fds-text-inverse-secondary: #4a4d4b;
-  --fds-text-inverse-tertiary: #636965;
-  --fds-text-brand: #a3c3f3;
-
-  --fds-bg-page: #242625;
-  --fds-bg-surface: #141414;
-  --fds-bg-subtle: #373737;
-  --fds-bg-inverse: #f4f2ea;
-  --fds-bg-inverse-surface: #ecebe6;
-  --fds-bg-inverse-subtle: #dad8d2;
-  --fds-bg-brand-subtle: #1a2340;
-  --fds-bg-sunken: #373737;
-
-  --fds-border-default: #4a4d4b;
-  --fds-border-subtle: #373737;
-  --fds-border-strong: #636965;
-  --fds-border-strongest: #f4f2ea;
-  --fds-border-inverse-default: #c9c5bd;
-  --fds-border-inverse-subtle: #dad8d2;
-  --fds-border-inverse-strong: #a9aea9;
-  --fds-border-inverse-strongest: #141414;
-
-  --fds-feedback-error: #e2685d;
-
-  --fds-icon-default: #f4f2ea;
-  --fds-icon-muted: #a9aea9;
-  --fds-icon-disabled: #636965;
-  --fds-icon-inverse: #141414;
-
-  --fds-component-button-bg-primary-hover: #dce8fc;
-  --fds-component-button-bg-primary-active: #f0f5fe;
-  --fds-component-button-bg-primary-disabled: #373737;
-  --fds-component-button-text-primary-disabled: #636965;
-  --fds-component-button-bg-neutral: #f4f2ea;
-  --fds-component-button-bg-neutral-hover: #dad8d2;
-  --fds-component-button-bg-neutral-active: #c9c5bd;
-  --fds-component-button-bg-neutral-disabled: #373737;
-  --fds-component-button-text-neutral: #141414;
-  --fds-component-button-text-neutral-disabled: #636965;
-  --fds-component-button-border-outline: #f4f2ea;
-  --fds-component-button-text-outline: #f4f2ea;
-  --fds-component-button-bg-outline-hover: #373737;
-  --fds-component-button-bg-outline-active: #4a4d4b;
-  --fds-component-button-border-outline-disabled: #4a4d4b;
-  --fds-component-button-text-outline-disabled: #636965;
-  --fds-component-button-border-focus: #a3c3f3;
-
-  --fds-component-tag-text-neutral: #c9c5bd;
-  --fds-component-tag-text-brand: #a3c3f3;
-  --fds-component-tag-text-error: #e2685d;
-  --fds-component-tag-border-neutral: #4a4d4b;
-  --fds-component-tag-border-error: #e2685d;
-
-  --fds-component-segmented-bg-track: #373737;
-  --fds-component-segmented-bg-selected: #ecebe6;
-  --fds-component-segmented-text-selected: #141414;
-  --fds-component-segmented-text-default: #c9c5bd;
-
-  --fds-component-badge-bg-error: #e2685d;
-  --fds-component-badge-bg-neutral: #ecebe6;
-  --fds-component-badge-text-neutral: #141414;
-
-  --fds-component-chip-border-default: #4a4d4b;
-  --fds-component-chip-text-default: #c9c5bd;
-  --fds-component-chip-border-hover: #636965;
-  --fds-component-chip-text-hover: #f4f2ea;
-  --fds-component-chip-bg-selected: #ecebe6;
-  --fds-component-chip-text-selected: #141414;
-  --fds-component-chip-border-disabled: #373737;
-  --fds-component-chip-text-disabled: #a9aea9;
-
-  --fds-component-toggle-track-off: #373737;
-  --fds-component-toggle-track-on: #ecebe6;
-  --fds-component-toggle-track-disabled: #373737;
-  --fds-component-toggle-thumb-on: #141414;
-
-  --fds-component-checkbox-border: #636965;
-  --fds-component-checkbox-bg-checked: #ecebe6;
-  --fds-component-checkbox-mark: #141414;
-  --fds-component-checkbox-border-disabled: #373737;
-
-  --fds-component-radio-border: #636965;
-  --fds-component-radio-dot: #ecebe6;
-  --fds-component-radio-border-disabled: #373737;
-
-  --fds-component-list-item-bg-hover: #373737;
-  --fds-component-list-item-bg-pressed: #4a4d4b;
-  --fds-component-list-item-bg-selected: #1a2340;
-}
-
-/* Follow OS dark mode when no explicit theme is set */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    color-scheme: dark;
-    --fds-text-primary: #f4f2ea; --fds-text-secondary: #c9c5bd; --fds-text-tertiary: #a9aea9;
-    --fds-text-inverse-primary: #141414; --fds-text-inverse-secondary: #4a4d4b; --fds-text-inverse-tertiary: #636965;
-    --fds-text-brand: #a3c3f3;
-    --fds-bg-page: #242625; --fds-bg-surface: #141414; --fds-bg-subtle: #373737;
-    --fds-bg-inverse: #f4f2ea; --fds-bg-inverse-surface: #ecebe6; --fds-bg-inverse-subtle: #dad8d2;
-    --fds-bg-brand-subtle: #1a2340; --fds-bg-sunken: #373737;
-    --fds-border-default: #4a4d4b; --fds-border-subtle: #373737; --fds-border-strong: #636965; --fds-border-strongest: #f4f2ea;
-    --fds-border-inverse-default: #c9c5bd; --fds-border-inverse-subtle: #dad8d2; --fds-border-inverse-strong: #a9aea9; --fds-border-inverse-strongest: #141414;
-    --fds-feedback-error: #e2685d;
-    --fds-icon-default: #f4f2ea; --fds-icon-muted: #a9aea9; --fds-icon-disabled: #636965; --fds-icon-inverse: #141414;
-    --fds-component-button-bg-primary-hover: #dce8fc; --fds-component-button-bg-primary-active: #f0f5fe;
-    --fds-component-button-bg-primary-disabled: #373737; --fds-component-button-text-primary-disabled: #636965;
-    --fds-component-button-bg-neutral: #f4f2ea; --fds-component-button-bg-neutral-hover: #dad8d2; --fds-component-button-bg-neutral-active: #c9c5bd;
-    --fds-component-button-bg-neutral-disabled: #373737; --fds-component-button-text-neutral: #141414; --fds-component-button-text-neutral-disabled: #636965;
-    --fds-component-button-border-outline: #f4f2ea; --fds-component-button-text-outline: #f4f2ea;
-    --fds-component-button-bg-outline-hover: #373737; --fds-component-button-bg-outline-active: #4a4d4b;
-    --fds-component-button-border-outline-disabled: #4a4d4b; --fds-component-button-text-outline-disabled: #636965;
-    --fds-component-button-border-focus: #a3c3f3;
-    --fds-component-tag-text-neutral: #c9c5bd; --fds-component-tag-text-brand: #a3c3f3; --fds-component-tag-text-error: #e2685d;
-    --fds-component-tag-border-neutral: #4a4d4b; --fds-component-tag-border-error: #e2685d;
-    --fds-component-segmented-bg-track: #373737; --fds-component-segmented-bg-selected: #ecebe6;
-    --fds-component-segmented-text-selected: #141414; --fds-component-segmented-text-default: #c9c5bd;
-    --fds-component-badge-bg-error: #e2685d; --fds-component-badge-bg-neutral: #ecebe6; --fds-component-badge-text-neutral: #141414;
-    --fds-component-chip-border-default: #4a4d4b; --fds-component-chip-text-default: #c9c5bd; --fds-component-chip-border-hover: #636965;
-    --fds-component-chip-text-hover: #f4f2ea; --fds-component-chip-bg-selected: #ecebe6; --fds-component-chip-text-selected: #141414;
-    --fds-component-chip-border-disabled: #373737; --fds-component-chip-text-disabled: #a9aea9;
-    --fds-component-toggle-track-off: #373737; --fds-component-toggle-track-on: #ecebe6; --fds-component-toggle-track-disabled: #373737;
-    --fds-component-toggle-thumb-on: #141414;
-    --fds-component-checkbox-border: #636965; --fds-component-checkbox-bg-checked: #ecebe6; --fds-component-checkbox-mark: #141414;
-    --fds-component-checkbox-border-disabled: #373737;
-    --fds-component-radio-border: #636965; --fds-component-radio-dot: #ecebe6; --fds-component-radio-border-disabled: #373737;
-    --fds-component-list-item-bg-hover: #373737; --fds-component-list-item-bg-pressed: #4a4d4b; --fds-component-list-item-bg-selected: #1a2340;
-  }
-}
-
-/* ---------- Typography (52 text styles: Desktop + Mobile ≤767px) ----------
-   Line-height: display 100% · heading 110% · body/ui/editorial 140%.
-   UI style = Geist Mono, uppercase, tracked (per FDS docs). */
-:root {
-  --fds-type-display-xl: 88px;   --fds-type-display-lg: 72px;
-  --fds-type-display-md: 48px;   --fds-type-display-sm: 36px;
-  --fds-type-heading-1: 40px;    --fds-type-heading-2: 32px;
-  --fds-type-heading-3: 24px;    --fds-type-heading-4: 20px;
-  --fds-type-body-xl: 24px;      --fds-type-body-lg: 18px;
-  --fds-type-body-md: 16px;      --fds-type-body-sm: 14px;
-  --fds-type-body-xs: 12px;
-  --fds-type-ui-md: 12px;        --fds-type-ui-sm: 11px;
-  --fds-type-editorial-lg: 24px; --fds-type-editorial-md: 18px;
-  --fds-leading-display: 1;
-  --fds-leading-heading: 1.1;
-  --fds-leading-body: 1.4;
-  --fds-weight-regular: 400;
-  --fds-weight-light: 300;
-}
-@media (max-width: 767px) {
-  :root {
-    --fds-type-display-xl: 48px;   --fds-type-display-lg: 40px;
-    --fds-type-display-md: 32px;   --fds-type-display-sm: 26px;
-    --fds-type-heading-1: 30px;    --fds-type-heading-2: 26px;
-    --fds-type-heading-3: 22px;    --fds-type-heading-4: 18px;
-    --fds-type-body-xl: 20px;      --fds-type-body-lg: 17px;
-    --fds-type-editorial-lg: 20px; --fds-type-editorial-md: 16px;
-  }
+/* 04 · Component (--fds-<component>-*) */
+:root, [data-brand], [data-theme] {
+  --fds-button-bg-primary: var(--fds-bg-brand);
+  --fds-button-bg-primary-hover: var(--fds-bg-brand-hover);
+  --fds-button-bg-primary-active: var(--fds-bg-brand-active);
+  --fds-button-bg-primary-disabled: var(--fds-bg-disabled);
+  --fds-button-text-primary: var(--fds-text-on-brand);
+  --fds-button-text-primary-disabled: var(--fds-text-disabled);
+  --fds-button-bg-neutral: var(--fds-bg-inverse);
+  --fds-button-bg-neutral-hover: var(--fds-bg-inverse-subtle);
+  --fds-button-bg-neutral-active: var(--fds-bg-inverse-pressed);
+  --fds-button-bg-neutral-disabled: var(--fds-bg-disabled);
+  --fds-button-text-neutral: var(--fds-text-inverse-primary);
+  --fds-button-text-neutral-disabled: var(--fds-text-disabled);
+  --fds-button-border-outline: var(--fds-border-strongest);
+  --fds-button-border-outline-brand: var(--fds-border-brand);
+  --fds-button-border-outline-disabled: var(--fds-border-default);
+  --fds-button-text-outline: var(--fds-text-primary);
+  --fds-button-text-outline-disabled: var(--fds-text-disabled);
+  --fds-button-bg-outline-hover: var(--fds-bg-sunken);
+  --fds-button-bg-outline-active: var(--fds-bg-pressed);
+  --fds-button-border-focus: var(--fds-border-focus);
+  --fds-button-bg-neutral-inverse: var(--fds-ref-color-neutral-50);
+  --fds-button-bg-neutral-inverse-hover: var(--fds-ref-color-neutral-200);
+  --fds-button-bg-neutral-inverse-active: var(--fds-ref-color-neutral-300);
+  --fds-button-bg-neutral-inverse-disabled: var(--fds-ref-color-neutral-800);
+  --fds-button-text-neutral-inverse: var(--fds-ref-color-neutral-950);
+  --fds-button-text-neutral-inverse-disabled: var(--fds-ref-color-neutral-600);
+  --fds-button-border-outline-inverse: var(--fds-ref-color-neutral-50);
+  --fds-button-border-outline-inverse-disabled: var(--fds-ref-color-neutral-700);
+  --fds-button-text-outline-inverse: var(--fds-ref-color-neutral-50);
+  --fds-button-text-outline-inverse-disabled: var(--fds-ref-color-neutral-600);
+  --fds-button-bg-outline-inverse-hover: var(--fds-ref-color-neutral-800);
+  --fds-button-bg-outline-inverse-active: var(--fds-ref-color-neutral-700);
+  --fds-tag-text-neutral: var(--fds-text-secondary);
+  --fds-tag-text-brand: var(--fds-text-brand);
+  --fds-tag-text-success: var(--fds-text-success);
+  --fds-tag-text-warning: var(--fds-text-warning);
+  --fds-tag-text-error: var(--fds-feedback-error);
+  --fds-tag-border-neutral: var(--fds-border-default);
+  --fds-tag-border-brand: var(--fds-border-brand);
+  --fds-tag-border-success: var(--fds-feedback-success);
+  --fds-tag-border-warning: var(--fds-feedback-warning);
+  --fds-tag-border-error: var(--fds-feedback-error);
+  --fds-segmented-bg-track: var(--fds-bg-sunken);
+  --fds-segmented-bg-selected: var(--fds-bg-inverse);
+  --fds-segmented-text-selected: var(--fds-text-inverse-primary);
+  --fds-segmented-text-default: var(--fds-text-secondary);
+  --fds-badge-bg-error: var(--fds-feedback-error);
+  --fds-badge-text-error: var(--fds-ref-color-neutral-50);
+  --fds-badge-bg-neutral: var(--fds-bg-inverse);
+  --fds-badge-text-neutral: var(--fds-text-inverse-primary);
+  --fds-badge-padding-x: 6px;
+  --fds-badge-padding-y: 2px;
+  --fds-chip-border-default: var(--fds-border-default);
+  --fds-chip-text-default: var(--fds-text-secondary);
+  --fds-chip-border-hover: var(--fds-border-strong);
+  --fds-chip-text-hover: var(--fds-text-primary);
+  --fds-chip-bg-selected: var(--fds-bg-inverse);
+  --fds-chip-text-selected: var(--fds-text-inverse-primary);
+  --fds-chip-border-disabled: var(--fds-border-subtle);
+  --fds-chip-text-disabled: var(--fds-text-tertiary);
+  --fds-toggle-track-off: var(--fds-bg-subtle);
+  --fds-toggle-track-on: var(--fds-bg-inverse);
+  --fds-toggle-track-disabled: var(--fds-border-subtle);
+  --fds-toggle-thumb-off: var(--fds-ref-color-neutral-50);
+  --fds-toggle-thumb-on: var(--fds-text-inverse-primary);
+  --fds-toggle-thumb-disabled: var(--fds-ref-color-neutral-300);
+  --fds-toggle-padding: var(--fds-ref-space-1);
+  --fds-checkbox-border: var(--fds-border-control);
+  --fds-checkbox-bg-checked: var(--fds-bg-inverse);
+  --fds-checkbox-mark: var(--fds-text-inverse-primary);
+  --fds-checkbox-border-disabled: var(--fds-border-subtle);
+  --fds-checkbox-mark-disabled: var(--fds-ref-color-neutral-400);
+  --fds-radio-border: var(--fds-border-control);
+  --fds-radio-dot: var(--fds-bg-inverse);
+  --fds-radio-border-disabled: var(--fds-border-subtle);
+  --fds-list-item-bg-hover: var(--fds-bg-sunken);
+  --fds-list-item-bg-pressed: var(--fds-bg-pressed);
+  --fds-list-item-bg-selected: var(--fds-bg-brand-subtle);
+  --fds-avatar-group-overlap: -8px;
+  --fds-banner-padding: 14px;
+  --fds-menu-gap: 2px;
+  --fds-menu-padding: 6px;
+  --fds-table-padding-y: 14px;
+  --fds-table-gap: 6px;
 }
