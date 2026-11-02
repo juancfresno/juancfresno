@@ -62,6 +62,6 @@ Since 2 Nov 2026 it is served at **https://fds.juancfresno.com** behind a passwo
 - `src/app/api/fds-login/route.ts` — POST from the cover; sets the `fds_auth` cookie (HttpOnly, 30 days).
 - `src/lib/fds-auth.ts` — cookie = HMAC-SHA256 of a fixed label keyed with the `FDS_PASSWORD` env var (Vercel, production + preview). Changing the password signs everyone out. No password set → nobody gets in.
 - `public/FDS/fds-tokens.css` is generated from Figma (`01 · FDS — Foundations`), never edited by hand. The FDS changelog lives only in `index.html` (`CHANGELOG` array).
-- DNS: `fds` CNAME → `cname.vercel-dns.com` at cdmon (juancfresno.com nameservers).
+- DNS: `fds` CNAME → `987eb5c3be8f14af.vercel-dns-017.com` (same target as `www`) at cdmon (juancfresno.com nameservers).
 
 `vercel.json` disables CDN caching for `/FDS/*` so updates show up immediately.
