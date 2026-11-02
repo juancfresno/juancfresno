@@ -54,4 +54,14 @@ Design tokens pulled from that file (colors, spacing, type scale) are documented
 
 ## Fresno Design System (FDS)
 
-`public/FDS/index.html` is a **static, self-contained styleguide artifact** served at `/FDS`. It is not an npm package and no component in `src/` imports from it — this app does not consume FDS as a dependency, it just hosts a copy of the styleguide page for reference. `vercel.json` disables CDN caching for `/FDS/*` so updates to that static file show up immediately.
+`public/FDS/index.html` is a **static, self-contained styleguide artifact** (owned by Diseño / FDS). It is not an npm package and no component in `src/` imports from it — this app does not consume FDS as a dependency, it just hosts the styleguide.
+
+Since 2 Nov 2026 it is served at **https://fds.juancfresno.com** behind a password cover:
+
+- `src/proxy.ts` — on host `fds.juancfresno.com`: no valid cookie → rewrite to `public/FDS/login.html` (cover); valid cookie → `/` serves `/FDS/index.html`, `/fds-tokens.css` serves `/FDS/fds-tokens.css`, `/logout` clears the cookie. On any other host, `/FDS` and `/FDS/*` redirect (308) to the subdomain, so there is no open copy.
+- `src/app/api/fds-login/route.ts` — POST from the cover; sets the `fds_auth` cookie (HttpOnly, 30 days).
+- `src/lib/fds-auth.ts` — cookie = HMAC-SHA256 of a fixed label keyed with the `FDS_PASSWORD` env var (Vercel, production + preview). Changing the password signs everyone out. No password set → nobody gets in.
+- `public/FDS/fds-tokens.css` is generated from Figma (`01 · FDS — Foundations`), never edited by hand. The FDS changelog lives only in `index.html` (`CHANGELOG` array).
+- DNS: `fds` CNAME → `987eb5c3be8f14af.vercel-dns-017.com` (same target as `www`) at cdmon (juancfresno.com nameservers).
+
+`vercel.json` disables CDN caching for `/FDS/*` so updates show up immediately.

@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#141414">
+<title>FDS — Fresno Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+/* FDS docs/cover · Color=Dark — values are FDS tokens (Semantic Dark-on-inverse) */
+:root{
+  --bg-inverse:#141414;            /* bg/inverse (Light) */
+  --text-inverse-primary:#f4f2ea;  /* text/inverse-primary */
+  --text-inverse-tertiary:#a9aea9; /* text/inverse-tertiary */
+  --border-inverse-default:#4a4d4b;/* border/inverse-default */
+  --border-inverse-strong:#636965; /* border/inverse-strong */
+  --bg-brand:#c6dbf9;              /* bg/brand (Fresno) */
+  --bg-brand-hover:#dce8fc;        /* bg/brand-hover (Dark) */
+  --text-on-brand:#141414;         /* text/on-brand */
+  --border-focus:#a3c3f3;          /* border/focus (Dark) */
+  --feedback-error:#e2685d;        /* feedback/error (Dark) */
+  --logo-inverse:#ffffe6;          /* logo/inverse (Fresno) */
+  --font-ui:'Geist Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --pad:clamp(24px,5vw,96px);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bg-inverse);color:var(--text-inverse-primary);font-family:var(--font-ui);
+  -webkit-font-smoothing:antialiased;text-transform:uppercase}
+.cover{min-height:100%;min-height:100dvh;display:flex;flex-direction:column;justify-content:space-between;
+  padding:var(--pad);padding-top:max(var(--pad),env(safe-area-inset-top));padding-bottom:max(var(--pad),env(safe-area-inset-bottom))}
+h1{font-weight:400;font-size:clamp(34px,4.6vw,88px);line-height:1.1;letter-spacing:0}
+.sub{font-size:clamp(22px,3.75vw,72px);line-height:1.15;margin-top:.25em;word-break:break-word}
+.date{font-size:clamp(14px,1.9vw,36px);margin-top:.9em}
+form{margin-top:clamp(40px,7vh,96px);display:flex;flex-direction:column;gap:12px;width:min(100%,420px)}
+label{font-size:11px;letter-spacing:.1em;color:var(--text-inverse-tertiary)}
+.row{display:flex;gap:8px}
+input{flex:1;min-width:0;height:48px;padding:0 16px;border-radius:6px;background:transparent;
+  border:1px solid var(--border-inverse-default);color:var(--text-inverse-primary);font:inherit;font-size:16px;
+  text-transform:none;letter-spacing:.04em;outline:none;transition:border-color .15s ease}
+input:hover{border-color:var(--border-inverse-strong)}
+input:focus-visible{border-color:var(--border-focus);box-shadow:0 0 0 1px var(--border-focus)}
+button{height:48px;padding:0 20px;border:0;border-radius:6px;background:var(--bg-brand);color:var(--text-on-brand);
+  font:inherit;font-size:12px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:background .15s ease}
+button:hover{background:var(--bg-brand-hover)}
+button:focus-visible{outline:2px solid var(--border-focus);outline-offset:2px}
+.err{font-size:11px;letter-spacing:.08em;color:var(--feedback-error);min-height:14px}
+.foot{display:flex;justify-content:space-between;align-items:flex-end;margin-top:48px}
+.wordmark{height:clamp(14px,1.5vw,28px);width:auto;color:var(--logo-inverse)}
+.face{height:clamp(56px,4.8vw,92px);width:auto}
+@media (max-width:480px){.row{flex-direction:column}button{width:100%}}
+</style>
+</head>
+<body>
+<main class="cover">
+  <div>
+    <h1>[FDS] Fresno Design System</h1>
+    <p class="sub">Tokens—Components—Docs</p>
+    <p class="date">November 2026 · v1.6.1</p>
+    <form method="post" action="/api/fds-login" autocomplete="on">
+      <label for="password">Password</label>
+      <div class="row">
+        <input id="password" name="password" type="password" autocomplete="current-password" required autofocus aria-describedby="err">
+        <button type="submit">Enter</button>
+      </div>
+      <p class="err" id="err" role="alert"></p>
+    </form>
+  </div>
+  <div class="foot">
+    <svg class="wordmark" viewBox="0 0 234 28" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Fresno"><path d="M223.381 15.7711C217.072 15.7711 213.231 12.7787 213.231 7.86535C213.231 2.95204 217.072 0 223.381 0C229.71 0 233.511 2.95204 233.511 7.86535C233.511 12.7787 229.71 15.7711 223.381 15.7711ZM223.381 13.7492C228.638 13.7492 231.125 11.6059 231.125 7.84513C231.125 4.12476 228.638 1.9815 223.381 1.9815C218.164 1.9815 215.617 4.12476 215.617 7.84513C215.617 11.6059 218.164 13.7492 223.381 13.7492ZM223.442 12.7382C219.721 12.7382 216.992 11.1207 216.992 7.86535C216.992 4.65047 219.721 2.99247 223.442 2.99247C227.02 2.99247 229.427 4.42805 229.77 6.91504H226.899C226.414 5.88385 225.342 5.11551 223.462 5.11551C221.137 5.11551 219.903 6.3489 219.903 7.86535C219.903 9.42225 221.137 10.6354 223.462 10.6354C225.302 10.6354 226.434 9.90751 226.899 8.8561H229.77C229.447 11.2824 227.02 12.7382 223.442 12.7382Z" fill="currentColor"/><path d="M189.041 28C176.979 28 169.836 23.0462 169.836 14V13.9641C169.836 4.88205 176.979 0 189.041 0C201.102 0 208.246 4.88205 208.246 13.9641V14C208.246 23.0462 201.102 28 189.041 28ZM189.041 21.359C194.677 21.359 198.482 18.6308 198.482 14V13.9641C198.482 9.29744 194.677 6.60513 189.041 6.60513C183.405 6.60513 179.6 9.15385 179.6 13.9641V14C179.6 18.7744 183.405 21.359 189.041 21.359Z" fill="currentColor"/><path d="M139.809 27.282H130.906V0.610229H140.922L158.153 17.0154L158.44 17.3384V0.610229H167.342V27.282H157.363L140.024 10.841L139.809 10.6256V27.282Z" fill="currentColor"/><path d="M112.67 28C101.183 28 96.6241 23.4051 96.4087 18.1282H105.598C105.742 20.5333 107.465 21.7897 112.742 21.7897C117.229 21.7897 118.845 20.9282 118.845 19.4564C118.845 18.2359 118.342 17.6615 111.557 16.9436C99.5318 15.7949 97.4497 12.4564 97.4497 8.07692C97.4497 3.94872 100.896 0 111.988 0C122.829 0 127.137 4.2 127.604 9.8H118.773C118.45 7.89744 117.122 6.17436 112.347 6.17436C108.327 6.17436 106.963 6.9641 106.963 8.25641C106.963 9.26154 107.25 10.1949 112.491 10.6974C126.886 12.0615 128.357 15.5795 128.357 19.2051C128.357 25.1641 122.973 28 112.67 28Z" fill="currentColor"/><path d="M95.7788 27.282H66.5224V0.610229H95.4199V7.14356H76.1788V10.7692H93.8763V16.5128H76.1788V20.7487H95.7788V27.282Z" fill="currentColor"/><path d="M40.3936 27.282H30.7372V0.610229H50.05C60.1013 0.610229 63.691 4.09228 63.691 8.75895C63.691 12.4923 61.25 15.0051 57.05 15.8307V15.8666C60.1372 16.6564 61.3936 17.6615 62.291 21.682L62.65 23.1538C63.0808 25.0923 63.4397 26.0256 63.9782 27.282H54.1064C53.7474 26.6 53.532 25.882 53.0295 23.5846L52.6705 22.0051C52.3115 20.3179 50.9115 19.5282 46.9987 19.5282H40.3936V27.282ZM40.3936 7.14356V13.3538H49.4756C52.4551 13.3538 54.0705 12.1333 54.0705 10.0513C54.0705 8.11279 52.4551 7.14356 49.4756 7.14356H40.3936Z" fill="currentColor"/><path d="M9.65641 27.282H0V0.610229H28.6821V7.17946H9.65641V11.4872H26.959V17.8769H9.65641V27.282Z" fill="currentColor"/></svg>
+    <svg class="face" viewBox="0 0 77 95" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+<path d="M32.7782 63.2423C32.7782 63.2423 34.5129 62.5295 35.0912 62.8859C35.6694 63.2423 37.4041 64.4304 38.6762 64.4304C40.2953 64.4304 41.9144 63.0047 42.8396 63.0047C43.7648 63.0047 45.1525 63.4799 45.1525 63.4799C45.2682 63.2423 45.2682 62.8859 45.2682 62.5295C45.2682 61.3415 44.8056 60.3911 44.4586 59.2031" stroke="#FFFFE6" stroke-width="2.21894" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M25.6082 48.2733C25.6082 49.3425 26.4177 50.1741 27.4585 50.1741C28.4994 50.1741 29.3089 49.3425 29.3089 48.2733C29.3089 47.2041 28.4994 46.3725 27.4585 46.3725C26.5333 46.3725 25.6082 47.2041 25.6082 48.2733Z" fill="#FFFFE6"/>
+<path d="M48.391 48.2733C48.391 49.3425 49.2005 50.1741 50.2414 50.1741C51.2822 50.1741 52.0917 49.3425 52.0917 48.2733C52.0917 47.2041 51.2822 46.3725 50.2414 46.3725C49.3162 46.3725 48.391 47.2041 48.391 48.2733Z" fill="#FFFFE6"/>
+<path d="M45.7311 42.5709C47.6971 43.0461 51.9761 38.6505 53.7108 38.6505C55.3299 38.7693 57.1802 41.8581 57.1802 41.8581" stroke="#FFFFE6" stroke-width="2.21894" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M13.2339 49.5803C13.2339 49.2239 10.3427 45.7787 8.95496 46.4915C7.68283 47.0855 7.10459 53.0256 7.10459 53.976C6.98894 54.9264 9.76449 58.9656 10.2271 60.7476C10.6897 62.5296 10.574 67.044 14.2748 66.6876" stroke="#FFFFE6" stroke-width="2.21894" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M63.5407 49.5803C63.5407 49.2239 66.4319 45.7787 67.8197 46.4915C69.0918 47.0855 69.6701 53.0256 69.6701 53.976C69.7857 54.9264 67.0102 58.9656 66.5476 60.7476C66.085 62.5296 66.2006 67.044 62.4999 66.6876" stroke="#FFFFE6" stroke-width="2.21894" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M14.9689 66.0932C14.9689 66.0932 23.1799 79.1613 27.2276 79.6365C27.9214 79.7553 25.3772 76.3101 27.3432 73.2213C28.4997 71.4392 31.5065 68.8256 38.3298 68.8256C42.6087 68.8256 49.085 70.6076 50.2415 72.8649C51.5136 75.2409 50.2415 79.2801 50.2415 79.2801C50.2415 79.2801 60.6498 72.2709 62.0376 64.9052" stroke="#FFFFE6" stroke-width="2.21894" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M63.5408 49.3423C63.5408 49.3423 62.6156 68.9444 60.9965 73.6964C60.3026 75.8348 57.9897 82.8441 50.4725 87.4773C50.4725 87.4773 50.3569 87.4773 50.3569 87.5961C47.9283 89.0217 45.6153 93.4173 38.7921 93.4173C38.5608 93.4173 38.3295 93.4173 38.0982 93.4173C37.8669 93.4173 37.6356 93.4173 37.4043 93.4173C30.5811 93.4173 29.7715 89.1405 27.3429 87.7149C27.3429 87.7149 27.2273 87.7149 27.2273 87.5961C19.7102 82.9629 17.8598 75.4784 16.7033 73.5776C14.506 69.8948 13.2339 49.3423 13.2339 49.3423" stroke="#FFFFE6" stroke-width="2.21894" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M32.6628 43.8777L23.7579 41.9769C23.7579 41.9769 20.6354 43.2837 19.4789 45.7785" stroke="#FFFFE6" stroke-width="2.21894" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M35.9009 46.8478C36.3635 47.917 36.9418 48.8674 36.9418 50.1742C36.9418 50.887 35.7853 52.4314 35.7853 53.3818C35.7853 54.5698 35.4383 56.1142 36.3635 57.3022" stroke="#FFFFE6" stroke-width="2.21894" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M32.4314 74.4094C34.1661 74.647 30.6967 75.0034 43.418 74.5282C43.7649 74.5282 44.3431 74.4094 44.5744 74.1718" stroke="#FFFFE6" stroke-width="2.21894" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M11.615 46.7289C11.2681 35.5617 11.4994 36.0369 11.7307 23.444C11.8463 16.4348 18.7852 11.0887 27.4588 8.35633L30.2344 1.8223L36.595 3.96071L44.4591 1.1095C44.4591 1.1095 52.3231 2.4163 51.051 5.38632C50.8197 5.98032 64.9287 12.5144 65.507 18.5732C66.4322 27.3644 66.3165 46.9665 66.3165 46.9665" stroke="#FFFFE6" stroke-width="2.21894" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M13.1183 49.1049C13.1183 49.1049 13.5809 45.0657 17.7442 36.9873C21.4449 29.8592 15.8938 26.1764 21.7919 19.7612C21.7919 19.7612 28.1525 17.6228 31.5063 20.8304C34.9758 23.9192 39.0234 22.9688 43.4181 22.4936" stroke="#FFFFE6" stroke-width="2.21894" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M63.5406 48.6297C63.5406 48.6297 63.8875 42.8085 59.146 35.0865C54.5201 27.3644 64.3501 26.414 50.935 19.4048C50.935 19.4048 49.6628 20.9492 43.4178 22.6124" stroke="#FFFFE6" stroke-width="2.21894" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M34.9758 80.8246C34.9758 80.8246 36.4793 79.5178 38.4453 79.7554C40.4113 80.1118 40.9895 80.8246 40.9895 80.8246" stroke="#FFFFE6" stroke-width="2.21894" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M40.2955 65.1432C40.2955 66.0936 39.486 66.9252 38.5608 66.9252C37.6356 66.9252 36.826 66.0936 36.826 65.1432C36.826 64.1928 38.5608 64.5492 38.5608 64.5492C38.5608 64.5492 40.2955 64.1928 40.2955 65.1432Z" stroke="#FFFFE6" stroke-width="1.10738" stroke-miterlimit="10"/>
+<rect x="0.00012207" y="41.7172" width="76.9234" height="12.8042" fill="#003DFF"/>
+</svg>
+  </div>
+</main>
+<script>
+if (new URLSearchParams(location.search).get('e') === '1') {
+  document.getElementById('err').textContent = 'Wrong password';
+  history.replaceState(null, '', '/');
+}
+</script>
+</body>
+</html>
