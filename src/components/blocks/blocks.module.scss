@@ -1,0 +1,382 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+// ─── Page shell ───────────────────────────────────────────────────────────────
+.page {
+  @include container;
+  padding-top: calc(#{$nav-height} + #{$space-16});
+  padding-bottom: $space-24;
+  display: flex;
+  flex-direction: column;
+  gap: $space-24;
+}
+
+.pageLight {
+  background: $color-text;
+  color: $color-bg;
+}
+
+// ─── Pending marker ───────────────────────────────────────────────────────────
+.pending {
+  display: inline-block;
+  margin-left: $space-2;
+  padding: 0.1em 0.55em;
+  border: 1px dashed currentColor;
+  border-radius: 999px;
+  font-family: $font-mono;
+  font-size: $fs-xs;
+  letter-spacing: $ls-wide;
+  text-transform: uppercase;
+  opacity: 0.55;
+  vertical-align: middle;
+}
+
+// ─── Section ──────────────────────────────────────────────────────────────────
+.section {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 9fr);
+  gap: $space-8;
+  padding-top: $space-8;
+  border-top: 1px solid $color-border;
+
+  @include respond-to(md) {
+    grid-template-columns: 1fr;
+    gap: $space-4;
+  }
+}
+
+.label {
+  font-family: $font-mono;
+  font-size: $fs-xs;
+  letter-spacing: $ls-wide;
+  text-transform: uppercase;
+  color: $color-text-muted;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: $space-8;
+  min-width: 0;
+}
+
+// ─── Hero ─────────────────────────────────────────────────────────────────────
+.hero {
+  display: flex;
+  flex-direction: column;
+  gap: $space-6;
+  padding-top: $space-12;
+}
+
+.heroMeta {
+  font-family: $font-mono;
+  font-size: $fs-xs;
+  letter-spacing: $ls-wide;
+  text-transform: uppercase;
+  color: $color-text-muted;
+}
+
+.heroTitle {
+  font-family: $font-body;
+  font-weight: $fw-light;
+  font-size: clamp(2.75rem, 8vw + 1rem, 9rem);
+  line-height: 1;
+  letter-spacing: $ls-tight;
+  max-width: 14ch;
+  overflow-wrap: normal;
+}
+
+.heroDisciplines {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-2 $space-4;
+  font-family: $font-mono;
+  font-size: $fs-sm;
+  color: $color-text-mid;
+}
+
+.lead {
+  font-family: $font-body;
+  font-weight: $fw-light;
+  font-size: $fs-xl;
+  line-height: $lh-snug;
+  max-width: 32ch;
+}
+
+.text {
+  font-family: $font-body;
+  font-size: $fs-md;
+  line-height: $lh-relaxed;
+  color: $color-text-mid;
+  max-width: 60ch;
+}
+
+// ─── Featured cases ───────────────────────────────────────────────────────────
+.cases {
+  display: flex;
+  flex-direction: column;
+  gap: $space-16;
+}
+
+.case {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+  color: inherit;
+  text-decoration: none;
+}
+
+.caseMedia {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: $color-surface;
+
+  img {
+    object-fit: cover;
+    transition: transform $duration-slow $ease-out-expo;
+  }
+
+  .case:hover & img { transform: scale(1.03); }
+}
+
+.caseInfo {
+  @include flex-between;
+  gap: $space-4;
+  flex-wrap: wrap;
+}
+
+.caseName {
+  font-family: $font-body;
+  font-size: $fs-lg;
+}
+
+.caseTag {
+  font-family: $font-mono;
+  font-size: $fs-xs;
+  letter-spacing: $ls-wide;
+  text-transform: uppercase;
+  color: $color-text-muted;
+}
+
+// ─── Project index ────────────────────────────────────────────────────────────
+.index {
+  list-style: none;
+  border-top: 1px solid $color-border;
+}
+
+.indexRow {
+  display: grid;
+  grid-template-columns: 6rem minmax(0, 1fr) 14rem 12rem;
+  gap: $space-6;
+  align-items: baseline;
+  padding-block: $space-4;
+  border-bottom: 1px solid $color-border;
+
+  @include respond-to(md) {
+    grid-template-columns: 1fr;
+    gap: $space-1;
+  }
+}
+
+.indexYear,
+.indexTag {
+  font-family: $font-mono;
+  font-size: $fs-xs;
+  letter-spacing: $ls-wide;
+  text-transform: uppercase;
+  color: $color-text-muted;
+}
+
+.indexName {
+  font-family: $font-body;
+  font-size: $fs-lg;
+  color: inherit;
+  text-decoration: none;
+
+  &:hover, &:focus-visible { color: $color-text-mid; }
+}
+
+.indexMeta {
+  font-family: $font-body;
+  font-size: $fs-sm;
+  color: $color-text-mid;
+}
+
+// ─── Lists & grids ────────────────────────────────────────────────────────────
+.grid3 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: $space-8;
+
+  @include respond-to(md) { grid-template-columns: 1fr; }
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
+  padding-top: $space-4;
+  border-top: 1px solid $color-border;
+}
+
+.cardTitle {
+  font-family: $font-body;
+  font-size: $fs-lg;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-2;
+  list-style: none;
+
+  li {
+    padding: $space-1 $space-3;
+    border: 1px solid $color-border;
+    border-radius: 999px;
+    font-family: $font-body;
+    font-size: $fs-sm;
+    color: $color-text-mid;
+  }
+}
+
+.rows {
+  list-style: none;
+  border-top: 1px solid $color-border;
+
+  li {
+    display: grid;
+    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+    gap: $space-6;
+    padding-block: $space-6;
+    border-bottom: 1px solid $color-border;
+
+    @include respond-to(md) { grid-template-columns: 1fr; gap: $space-2; }
+  }
+}
+
+.rowTitle {
+  font-family: $font-body;
+  font-size: $fs-lg;
+}
+
+.rowTags {
+  margin-top: $space-2;
+  font-family: $font-mono;
+  font-size: $fs-xs;
+  color: $color-text-muted;
+}
+
+.ficha {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  gap: $space-6;
+
+  dt { @extend .label; }
+  dd { margin-top: $space-1; font-family: $font-body; font-size: $fs-base; }
+}
+
+.placeholderMedia {
+  @include flex-center;
+  aspect-ratio: 16 / 9;
+  background: $color-surface;
+  font-family: $font-mono;
+  font-size: $fs-xs;
+  letter-spacing: $ls-wide;
+  text-transform: uppercase;
+  color: $color-text-muted;
+}
+
+// ─── Buttons & links ──────────────────────────────────────────────────────────
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-2;
+  padding: $space-3 $space-6;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-family: $font-body;
+  font-size: $fs-sm;
+  color: inherit;
+  text-decoration: none;
+  transition: background $duration-fast, color $duration-fast;
+
+  &:is(a):hover, &:is(a):focus-visible {
+    background: $color-text;
+    color: $color-bg;
+  }
+}
+
+.more {
+  align-self: flex-start;
+}
+
+// ─── Contact block ────────────────────────────────────────────────────────────
+.contact {
+  display: flex;
+  flex-direction: column;
+  gap: $space-6;
+  padding-top: $space-12;
+  border-top: 1px solid $color-border;
+}
+
+.contactText {
+  font-family: $font-body;
+  font-weight: $fw-light;
+  font-size: $fs-xl;
+  line-height: $lh-snug;
+  max-width: 30ch;
+}
+
+.contactEmail {
+  font-family: $font-body;
+  font-weight: $fw-light;
+  font-size: clamp(2rem, 6vw + 0.5rem, 6rem);
+  line-height: 1;
+  letter-spacing: $ls-tight;
+  color: inherit;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+
+  &:hover, &:focus-visible { color: $color-text-mid; }
+}
+
+.contactRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $space-6;
+}
+
+.availability {
+  font-family: $font-mono;
+  font-size: $fs-xs;
+  letter-spacing: $ls-wide;
+  text-transform: uppercase;
+  color: $color-text-mid;
+}
+
+.socials {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-4 $space-8;
+  list-style: none;
+
+  a {
+    font-family: $font-mono;
+    font-size: $fs-sm;
+    color: $color-text-mid;
+    text-decoration: none;
+
+    &:hover, &:focus-visible { color: $color-text; }
+  }
+}
+
+// ─── Light page variant (Contact) ─────────────────────────────────────────────
+.pageLight {
+  .label, .heroMeta, .availability, .socials a { color: rgba($color-bg, 0.5); }
+  .text { color: rgba($color-bg, 0.7); }
+  .contact, .section { border-color: rgba($color-bg, 0.12); }
+  .button:is(a):hover { background: $color-bg; color: $color-text; }
+}

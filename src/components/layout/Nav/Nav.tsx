@@ -226,11 +226,7 @@ export default function Nav() {
   }, [])
 
   // ── Light pages get inverted (dark) nav ────────────────────────────────────
-  const isHome  = pathname === '/'
-  const isLight = pathname === '/contact' || isHome
-  // Static light pages force the face icon dark directly; home relies on
-  // mix-blend-mode instead since its background changes under the icon
-  const isLightStatic = pathname === '/contact'
+  const isLight = pathname === '/contact'
 
   const logoLink = (
     <a
@@ -264,45 +260,34 @@ export default function Nav() {
 
   return (
     <>
-      <header className={clsx(s.nav, hidden && s.hidden, scrolled && s.scrolled, isLight && s.light, isLightStatic && s.lightStatic)}>
-        <div className={clsx(s.inner, isHome && s.innerHome)}>
-          {isHome ? (
-            // ── Home: minimal chrome — wordmark left, face right, no menu ──
-            <>
-              {logoLink}
-              {faceLink}
-            </>
-          ) : (
-            <>
-              {/* ── Left cluster: face + nav menu ── */}
-              <div className={s.left}>
-                {faceLink}
+      <header className={clsx(s.nav, hidden && s.hidden, scrolled && s.scrolled, isLight && s.light, isLight && s.lightStatic)}>
+        <div className={s.inner}>
+          {/* ── Left cluster: face + nav menu ── */}
+          <div className={s.left}>
+            {faceLink}
 
-                <nav className={s.navMenu} aria-label="Navegación principal">
-                  {NAV_LINKS.map(({ label, href }) => (
-                    <NavLinkItem
-                      key={href}
-                      label={label}
-                      href={href}
-                      active={pathname === href}
-                    />
-                  ))}
-                </nav>
-              </div>
+            <nav className={s.navMenu} aria-label="Navegación principal">
+              {NAV_LINKS.map(({ label, href }) => (
+                <NavLinkItem
+                  key={href}
+                  label={label}
+                  href={href}
+                  active={pathname === href || pathname.startsWith(href + '/')}
+                />
+              ))}
+            </nav>
+          </div>
 
-              {/* ── Right: wordmark ── */}
-              {logoLink}
-            </>
-          )}
+          {/* ── Right: wordmark ── */}
+          {logoLink}
         </div>
-        <div className={clsx(s.lineWrap, isHome && s.lineWrapHome)}>
+        <div className={s.lineWrap}>
           <ElasticLine className={s.line} />
         </div>
       </header>
 
-      {/* ── Mobile bottom tab bar — hidden on home's minimal chrome ── */}
-      {!isHome && (
-        <nav className={clsx(s.bottomBar, isLight && s.bottomBarLight)} aria-label="Navegación móvil">
+      {/* ── Mobile bottom tab bar ── */}
+      <nav className={clsx(s.bottomBar, isLight && s.bottomBarLight)} aria-label="Navegación móvil">
           {MOBILE_LINKS.map(({ label, href }) => {
             const isActive = pathname === href
             return (
@@ -321,7 +306,7 @@ export default function Nav() {
             )
           })}
         </nav>
-      )}
+
     </>
   )
 }

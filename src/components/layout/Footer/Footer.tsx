@@ -19,16 +19,14 @@ const SOCIALS = [
 // ─── Component ────────────────────────────────────────────────────────────────
 export default function Footer() {
   const pathname = usePathname()
-  const isHome = pathname === '/'
-  const isLight = pathname === '/contact' || isHome
+  const isLight = pathname === '/contact'
 
   return (
-    <footer className={`${s.footer} ${isLight ? s.light : ''} ${isHome ? `${s.homeFooter} ${s.homeReel}` : ''}`}>
-      <div className={clsx(s.inner, isHome && s.innerHome)}>
+    <footer className={clsx(s.footer, isLight && s.light)}>
+      <div className={s.inner}>
 
-        {/* Social wordmarks — omitted on home, already inline in the hero copy */}
-        {!isHome && (
-          <nav className={s.social} aria-label="Redes sociales">
+        {/* Social wordmarks */}
+        <nav className={s.social} aria-label="Redes sociales">
             {SOCIALS.map(({ id, label, href, Icon }) => (
               <GlitchSocialIcon
                 key={id}
@@ -39,7 +37,7 @@ export default function Footer() {
               />
             ))}
           </nav>
-        )}
+
 
         {/* Divider */}
         <ElasticLine className={s.line} />

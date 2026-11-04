@@ -4,13 +4,6 @@ const nextConfig: NextConfig = {
   sassOptions: {
     includePaths: ['./src/styles'],
   },
-  images: {
-    remotePatterns: [
-      { protocol: 'https', hostname: '**.cdninstagram.com' },
-      { protocol: 'https', hostname: '**.fbcdn.net' },
-      { protocol: 'https', hostname: 'cdn.dribbble.com' },
-    ],
-  },
   async redirects() {
     return [
       // juancfresno.vercel.app is the production alias and served a full duplicate

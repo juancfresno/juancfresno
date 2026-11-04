@@ -39,7 +39,7 @@ export default function OpengraphImage() {
             maxWidth: 920,
           }}
         >
-          Independent Product Designer &amp; Digital Art Director
+          Independent Art Director &amp; Interactive Designer
         </div>
         <div
           style={{

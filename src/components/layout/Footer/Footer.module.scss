@@ -9,9 +9,6 @@
 }
 
 // ── Home page: footer sticks to bottom, no extra scroll ─────────────────────
-.homeFooter {
-  flex-shrink: 0;
-}
 
 .inner {
   padding: 0 1.25rem 1.5rem;
@@ -19,13 +16,6 @@
 
 // Home: left edge matches the nav wordmark + content column (2.5rem,
 // switching to the fluid $gutter below `lg` same as ComingSoon's .content)
-.innerHome {
-  padding-left: 2.5rem;
-
-  @include respond-to(lg) {
-    padding-left: $gutter;
-  }
-}
 
 // ─── Social row ───────────────────────────────────────────────────────────────
 .social {
@@ -107,6 +97,8 @@
 // ══════════════════════════════════════════════════════════════════════════════
 
 .light {
+  background: $color-text; // light pages (Contact) keep the footer on the page colour
+
   // Social wordmarks — dark text
   .socialLink {
     color: $color-bg;
@@ -167,23 +159,3 @@
 // page bg on the left) stays dark from the .light variant above.
 // ══════════════════════════════════════════════════════════════════════════════
 
-.homeReel {
-  // The page's light bg ends where <main> ends — paint it again here so the
-  // footer isn't sitting on the site's default dark body background. Right
-  // 38% stays transparent so the fixed reel photo shows through underneath.
-  background: linear-gradient(to right, #c9c5bd 0% 62%, transparent 62% 100%);
-
-  .location,
-  .metaRight time {
-    color: rgba(244, 242, 234, 0.75); // text/inverse-primary — over the dark reel image
-  }
-
-  @include respond-to(lg) {
-    background: #c9c5bd; // reel is hidden below the breakpoint — solid fill
-
-    .location,
-    .metaRight time {
-      color: rgba(16, 16, 14, 0.55); // back to dark — no reel image behind it here
-    }
-  }
-}

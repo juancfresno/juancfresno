@@ -31,22 +31,6 @@
 ::-webkit-scrollbar-track { background: $color-bg; }
 ::-webkit-scrollbar-thumb { background: $color-surface; border-radius: 2px; }
 
-// ─── Lenis smooth scroll class ────────────────────────────────────────────────
-html.lenis, html.lenis body {
-  height: auto;
-}
-
-.lenis.lenis-smooth {
-  scroll-behavior: auto !important;
-}
-
-.lenis.lenis-smooth [data-lenis-prevent] {
-  overscroll-behavior: contain;
-}
-
-.lenis.lenis-stopped {
-  overflow: hidden;
-}
 
 // ─── Mobile bottom bar spacing ─────────────────────────────────────────────
 // Ensure content isn't hidden behind the fixed bottom tab bar on mobile

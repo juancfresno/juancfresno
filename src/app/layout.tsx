@@ -5,9 +5,6 @@ import { Analytics } from '@vercel/analytics/next'
 import '@/styles/globals.scss'
 import Nav from '@/components/layout/Nav/Nav'
 import Footer from '@/components/layout/Footer/Footer'
-import Grain from '@/components/ui/Grain/Grain'
-import Cursor from '@/components/ui/Cursor/Cursor'
-import SmoothScroll from '@/providers/SmoothScroll'
 import PageTransitionProvider from '@/providers/PageTransition'
 import { SITE_URL } from '@/lib/site'
 
@@ -24,9 +21,9 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
     template: '%s — Juan C. Fresno',
-    default: 'Juan C. Fresno — Creative Developer & Designer',
+    default: 'Juan C. Fresno — Independent Art Director & Interactive Designer',
   },
-  description: 'Portfolio of Juan C. Fresno, creative developer and designer based in Valencia, Spain.',
+  description: 'Juan C. Fresno, independent art director and interactive designer for studios and brands. Valencia, Spain.',
   openGraph: {
     siteName: 'Juan C. Fresno',
     locale: 'es_ES',
@@ -41,7 +38,7 @@ const personJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Person',
   name: 'Juan C. Fresno',
-  jobTitle: 'Independent Product Designer & Digital Art Director',
+  jobTitle: 'Independent Art Director & Interactive Designer',
   url: SITE_URL,
   sameAs: [
     'https://www.linkedin.com/in/juancfresno',
@@ -63,15 +60,11 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
         />
-        <SmoothScroll>
-          <PageTransitionProvider>
-            <Grain />
-            <Cursor />
-            <Nav />
-            <main style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>{children}</main>
-            <Footer />
-          </PageTransitionProvider>
-        </SmoothScroll>
+        <PageTransitionProvider>
+          <Nav />
+          <main style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>{children}</main>
+          <Footer />
+        </PageTransitionProvider>
         <Analytics />
       </body>
     </html>

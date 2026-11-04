@@ -9,23 +9,22 @@ Personal portfolio for Juan C. Fresno, deployed at juancfresno.vercel.app.
 - Fonts: Geist Mono (`geist/font/mono`) for UI text, Switzer (self-hosted via `next/font/local`, files in `src/fonts/switzer/`) for body text.
 - `@vercel/analytics` wired into the root layout (`<Analytics />` in `src/app/layout.tsx`).
 
-## Routing (App Router, route group `(site)`)
+## Routing (App Router, route group `(site)`) — v2 (branch `web-v2`)
 
-All real pages live under `src/app/(site)/` — the `(site)` segment doesn't add a URL prefix.
+All real pages live under `src/app/(site)/`. Copy lives in **one file**, `src/content/site.ts`; pages only lay it out. Placeholder copy renders a dashed `<Pending />` tag so gaps are visible on the preview.
 
 | Route | File | Notes |
 |---|---|---|
-| `/` | `src/app/(site)/page.tsx` | Current homepage — static "coming soon" page (`ComingSoon` component), built from Figma node `9:170`. |
-| `/index2` | `src/app/(site)/index2/page.tsx` | The **previous** homepage (hero + Dribbble/Instagram feed, `HomeContent` component). Kept reachable but excluded from indexing/sitemap (`robots: {index:false}`) to avoid duplicate-content with `/`. |
-| `/about` | `src/app/(site)/about/page.tsx` | |
-| `/contact` | `src/app/(site)/contact/page.tsx` | Light-background page; `Nav`/`Footer` render their inverted "light" variant here (and on `/`). |
-| `/playground` | `src/app/(site)/playground/page.tsx` | |
-| `/projects`, `/projects/[slug]` | `src/app/(site)/projects/` | Project list + detail (detail page is a stub, no real data source yet). |
-| `/api/cron/refresh-ig` | `src/app/api/cron/refresh-ig/route.ts` | Vercel cron (see `vercel.json`), refreshes the Instagram feed cache used by `/index2`. |
+| `/` | `(site)/page.tsx` | One line + 3 featured cases + short index + Lab teaser + clients + contact. |
+| `/projects` | `(site)/projects/page.tsx` | Full index (year, name, studio, discipline). |
+| `/projects/[slug]` | `(site)/projects/[slug]/page.tsx` | Case template (ficha, hard question, context, decisions, discarded, result, process, credits, next). Only projects with `caseStudy: true` are generated. |
+| `/about` | `(site)/about/page.tsx` | Bio, modes of work with studios, services, studios, clients, tools. |
+| `/contact` | `(site)/contact/page.tsx` | Light page; Nav/Footer render their light variant. No form. |
+| `/playground` | `(site)/playground/page.tsx` | Lab: own products + experiments. |
 
-`src/app/layout.tsx` is the root layout — it always renders the global `Nav` and `Footer` components around `{children}`, plus `Grain`, `Cursor`, `SmoothScroll`, and `PageTransitionProvider` (the pixel-dissolve page transition + initial `LoadingScreen`).
+`src/app/layout.tsx` renders the global `Nav` (top bar + mobile bottom tab bar) and `Footer` around `{children}`, inside `PageTransitionProvider` (owns the `navigate` seam). Shared page blocks live in `src/components/blocks/` (one `blocks.module.scss`).
 
-**Home-specific chrome:** `Nav` and `Footer` both branch on `pathname === '/'` to render a reduced "home" variant (wordmark + face icon only, no link menu, no footer social row — see the Figma header/footer for `/`) instead of the full site chrome used everywhere else.
+Removed in v2: the old `/index2` home and its Instagram/Dribbble feed + cron, the coming-soon home, custom cursor, grain overlay, Lenis smooth scroll (native scroll for usability), the contact form and the placeholder galleries.
 
 ## Styling system
 
