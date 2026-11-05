@@ -24,7 +24,7 @@ All real pages live under `src/app/(site)/`. Copy lives in **one file**, `src/co
 | `/lab` | `(site)/lab/page.tsx` | Experiments, interactive artefacts, own products. `/playground` redirects here. |
 | `/journal` | `(site)/journal/page.tsx` | Writing: process, decisions, opinion. Placeholder. |
 
-Nav (desktop and mobile bottom bar share `NAV_LINKS`): About · Work · Feed · Lab · Journal · Contact. Desktop wordmark is vertical in the top-right corner and hangs over the header line (the header keeps its 72px height). Press **G** to toggle the layout grid overlay (`src/components/ui/GridOverlay`).
+Nav (desktop and mobile bottom bar share `NAV_LINKS`): About · Work · Feed · Lab · Journal · Contact. The FRESNO wordmark is vertical in the top-right corner on every breakpoint and hangs over the header line (the header keeps its 72px height). Press **G** to toggle the layout grid overlay (`src/components/ui/GridOverlay`).
 
 **Themes.** Dark (default) and light. Colors are CSS custom properties (`--c-*`, defined in `globals.scss` under `:root` and `:root[data-theme="light"]`); the Sass `$color-*` tokens point at them, so never use `rgba($color-*, …)` — add a new `--c-*` var instead. Brand constants that must not change with the theme are `$raw-ink`, `$raw-pearl`, `$raw-chip`. `ThemeToggle` (`src/components/ui/ThemeToggle`) sits after the nav links (next to the face on mobile), saves to `localStorage.theme`, and **D** toggles it; an inline script in `layout.tsx` applies the saved theme before paint. `THEMES` is a list so extra art-direction modes can be added later.
 

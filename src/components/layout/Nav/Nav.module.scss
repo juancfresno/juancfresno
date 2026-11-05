@@ -263,11 +263,11 @@
 
   @include focus-ring;
 
-  // Desktop: wordmark set vertical (reads top → bottom) from the top-right
-  // corner. Its box is only as tall as the row (the face, 32px), so the header
-  // keeps equal space above and below the menu and the wordmark hangs over
-  // the line instead of pushing the content down.
-  @media (min-width: #{$bp-md + 1px}) {
+  // Wordmark set vertical (reads top → bottom) from the top-right corner, on
+  // every breakpoint. Its box is only as tall as the row (the face, 32px), so
+  // the header keeps equal space above and below the menu and the wordmark
+  // hangs over the line instead of pushing the content down.
+  & {
     align-self: flex-start;
     width: 12px;
     height: 32px;
