@@ -15,6 +15,10 @@ const nextConfig: NextConfig = {
         destination: 'https://www.juancfresno.com/:path*',
         permanent: true,
       },
+      // v2 sections: Projects → Work, Playground → Lab.
+      { source: '/projects', destination: '/work', permanent: true },
+      { source: '/projects/:slug', destination: '/work/:slug', permanent: true },
+      { source: '/playground', destination: '/lab', permanent: true },
     ]
   },
   async rewrites() {

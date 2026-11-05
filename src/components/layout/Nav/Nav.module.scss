@@ -33,10 +33,7 @@
   align-items: center;              // centro vertical — face (32px) vs texto (13px)
   justify-content: space-between;
   @include container;
-
-  // Desktop: links sit on the top line next to the face; the vertical
-  // wordmark hangs from the top-right corner.
-  @media (min-width: #{$bp-md + 1px}) { align-items: flex-start; }               // same margins as the page grid (see GridOverlay)
+               // same margins as the page grid (see GridOverlay)
   padding-block: 1.25rem;
 }
 
@@ -260,11 +257,17 @@
 
   @include focus-ring;
 
-  // Desktop: wordmark set vertical (reads top → bottom), top-right corner.
-  // The box takes the rotated size (12 × 101) so the row lays out correctly.
+  // Desktop: wordmark set vertical (reads top → bottom) from the top-right
+  // corner. Its box is only as tall as the row (the face, 32px), so the header
+  // keeps equal space above and below the menu and the wordmark hangs over
+  // the line instead of pushing the content down.
   @media (min-width: #{$bp-md + 1px}) {
+    align-self: flex-start;
     width: 12px;
-    height: 101px;
+    height: 32px;
+    overflow: visible;
+    position: relative;
+    z-index: 2;
 
     .glitchWrap {
       width: 101px;                 // keep natural size inside the 12px box
@@ -358,7 +361,7 @@
   text-decoration: none;
 
   color: $color-text-mid;
-  padding: 0.375rem 0.75rem;
+  padding: 0.375rem 0.625rem;       // 6 tabs fit from 360px wide
   border-radius: 100px; // pill shape
   transition:
     color      $duration-fast $ease-out-quart,

@@ -5,16 +5,16 @@ import ContactBlock from '@/components/blocks/ContactBlock'
 import Pending from '@/components/blocks/Pending'
 import s from '@/components/blocks/blocks.module.scss'
 
-export const metadata: Metadata = { title: 'Playground' }
+export const metadata: Metadata = { title: 'Lab' }
 
 // Lab: own products (with status and how they were built) + experiments.
-export default function PlaygroundPage() {
+export default function LabPage() {
   return (
     <div className={s.page}>
       <header className={s.hero}>
-        <p className={s.heroMeta}>Lab</p>
-        <h1 className={s.heroTitle}>Playground</h1>
-        <p className={s.text}>Productos propios y experimentos.</p>
+        <p className={s.heroMeta}>Experimentos · productos propios</p>
+        <h1 className={s.heroTitle}>Lab</h1>
+        <p className={s.text}>Lo que funciona o se toca: navegaciones, artefactos, prototipos y productos propios.</p>
       </header>
 
       <Section label="Productos propios">

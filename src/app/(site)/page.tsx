@@ -25,7 +25,7 @@ export default function HomePage() {
       <Section label="Selected work">
         <div className={s.cases}>
           {featured.map((p, i) => (
-            <Link key={p.slug} href={`/projects/${p.slug}`} className={s.case}>
+            <Link key={p.slug} href={`/work/${p.slug}`} className={s.case}>
               <div className={s.caseMedia}>
                 <Image src={p.cover} alt="" fill sizes="(max-width: 768px) 100vw, 75vw" priority={i === 0} />
               </div>
@@ -43,7 +43,7 @@ export default function HomePage() {
       {/* 04 · Short index */}
       <Section label="Index">
         <ProjectIndex projects={PROJECTS.slice(0, 8)} />
-        <Link href="/projects" className={`${s.button} ${s.more}`}>Ver todo ↘</Link>
+        <Link href="/work" className={`${s.button} ${s.more}`}>Ver todo ↘</Link>
       </Section>
 
       {/* 05 · Lab teaser */}
@@ -56,7 +56,7 @@ export default function HomePage() {
             </div>
           ))}
         </div>
-        <Link href="/playground" className={`${s.button} ${s.more}`}>Ver Lab ↘</Link>
+        <Link href="/lab" className={`${s.button} ${s.more}`}>Ver Lab ↘</Link>
       </Section>
 
       {/* 06 · Clients */}

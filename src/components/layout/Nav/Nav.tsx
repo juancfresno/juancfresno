@@ -153,20 +153,16 @@ const NavArrow = () => (
 
 // ─── Nav links data ───────────────────────────────────────────────────────────
 const NAV_LINKS = [
-  { label: 'About',     href: '/about'      },
-  { label: 'Projects',   href: '/projects'   },
-  { label: 'Contact',    href: '/contact'    },
-  { label: 'Playground', href: '/playground' },
+  { label: 'About',   href: '/about'   },
+  { label: 'Work',    href: '/work'    },
+  { label: 'Feed',    href: '/feed'    },
+  { label: 'Lab',     href: '/lab'     },
+  { label: 'Journal', href: '/journal' },
+  { label: 'Contact', href: '/contact' },
 ] as const
 
-// ─── Mobile bottom tab bar links (includes Home) ────────────────────────────
-const MOBILE_LINKS = [
-  { label: 'Home',       href: '/'           },
-  { label: 'About',      href: '/about'      },
-  { label: 'Projects',   href: '/projects'   },
-  { label: 'Contact',    href: '/contact'    },
-  { label: 'Playground', href: '/playground' },
-] as const
+// ─── Mobile bottom tab bar — same links as desktop (face/wordmark go home) ──
+const MOBILE_LINKS = NAV_LINKS
 
 // ─── NavLinkItem — scramble + chip + transition ───────────────────────────────
 function NavLinkItem({
@@ -289,7 +285,7 @@ export default function Nav() {
       {/* ── Mobile bottom tab bar ── */}
       <nav className={clsx(s.bottomBar, isLight && s.bottomBarLight)} aria-label="Navegación móvil">
           {MOBILE_LINKS.map(({ label, href }) => {
-            const isActive = pathname === href
+            const isActive = pathname === href || pathname.startsWith(href + '/')
             return (
               <a
                 key={href}

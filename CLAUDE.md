@@ -16,11 +16,15 @@ All real pages live under `src/app/(site)/`. Copy lives in **one file**, `src/co
 | Route | File | Notes |
 |---|---|---|
 | `/` | `(site)/page.tsx` | One line + 3 featured cases + short index + Lab teaser + clients + contact. |
-| `/projects` | `(site)/projects/page.tsx` | Full index (year, name, studio, discipline). |
-| `/projects/[slug]` | `(site)/projects/[slug]/page.tsx` | Case template (ficha, hard question, context, decisions, discarded, result, process, credits, next). Only projects with `caseStudy: true` are generated. |
+| `/work` | `(site)/work/page.tsx` | Full index (year, name, studio, discipline). `/projects` redirects here. |
+| `/work/[slug]` | `(site)/work/[slug]/page.tsx` | Case template (ficha, hard question, context, decisions, discarded, result, process, credits, next). Only projects with `caseStudy: true` are generated. |
 | `/about` | `(site)/about/page.tsx` | Bio, modes of work with studios, services, studios, clients, tools. |
 | `/contact` | `(site)/contact/page.tsx` | Light page; Nav/Footer render their light variant. No form. |
-| `/playground` | `(site)/playground/page.tsx` | Lab: own products + experiments. |
+| `/feed` | `(site)/feed/page.tsx` | Loose pieces that aren't cases; home for everything posted on social. Placeholder. |
+| `/lab` | `(site)/lab/page.tsx` | Experiments, interactive artefacts, own products. `/playground` redirects here. |
+| `/journal` | `(site)/journal/page.tsx` | Writing: process, decisions, opinion. Placeholder. |
+
+Nav (desktop and mobile bottom bar share `NAV_LINKS`): About · Work · Feed · Lab · Journal · Contact. Desktop wordmark is vertical in the top-right corner and hangs over the header line (the header keeps its 72px height). Press **G** to toggle the layout grid overlay (`src/components/ui/GridOverlay`).
 
 `src/app/layout.tsx` renders the global `Nav` (top bar + mobile bottom tab bar) and `Footer` around `{children}`, inside `PageTransitionProvider` (owns the `navigate` seam). Shared page blocks live in `src/components/blocks/` (one `blocks.module.scss`).
 

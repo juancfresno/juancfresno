@@ -11,7 +11,7 @@ export default function ProjectIndex({ projects }: { projects: Project[] }) {
         <li key={p.slug} className={s.indexRow}>
           <span className={s.indexYear}>{p.year ?? <Pending>año</Pending>}</span>
           {p.caseStudy ? (
-            <Link href={`/projects/${p.slug}`} className={s.indexName}>{p.name} <span aria-hidden="true">↘</span></Link>
+            <Link href={`/work/${p.slug}`} className={s.indexName}>{p.name} <span aria-hidden="true">↘</span></Link>
           ) : (
             <span className={s.indexName}>{p.name}</span>
           )}

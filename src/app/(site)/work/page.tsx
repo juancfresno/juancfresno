@@ -4,14 +4,14 @@ import ProjectIndex from '@/components/blocks/ProjectIndex'
 import ContactBlock from '@/components/blocks/ContactBlock'
 import s from '@/components/blocks/blocks.module.scss'
 
-export const metadata: Metadata = { title: 'Projects' }
+export const metadata: Metadata = { title: 'Work' }
 
-export default function ProjectsPage() {
+export default function WorkPage() {
   return (
     <div className={s.page}>
       <header className={s.hero}>
         <p className={s.heroMeta}>{'{ proyectos }'} · {String(PROJECTS.length).padStart(2, '0')} cases</p>
-        <h1 className={s.heroTitle}>Projects</h1>
+        <h1 className={s.heroTitle}>Work</h1>
         <p className={s.text}>Todos los proyectos, el más reciente arriba. Los marcados con ↘ tienen caso.</p>
       </header>
       <ProjectIndex projects={PROJECTS} />

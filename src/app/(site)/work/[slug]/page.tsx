@@ -83,7 +83,7 @@ export default async function ProjectDetailPage({ params }: Props) {
       </Section>
 
       <Section label="Siguiente caso">
-        <Link href={`/projects/${next.slug}`} className={s.case}>
+        <Link href={`/work/${next.slug}`} className={s.case}>
           <div className={s.caseMedia}>
             <Image src={next.cover} alt="" fill sizes="(max-width: 768px) 100vw, 75vw" />
           </div>
