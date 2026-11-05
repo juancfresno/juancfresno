@@ -11,11 +11,9 @@
 // ── Home page: footer sticks to bottom, no extra scroll ─────────────────────
 
 .inner {
-  padding: 0 1.25rem 1.5rem;
+  @include container;               // same margins as the page grid (see GridOverlay)
+  padding-bottom: 1.5rem;
 }
-
-// Home: left edge matches the nav wordmark + content column (2.5rem,
-// switching to the fluid $gutter below `lg` same as ComingSoon's .content)
 
 // ─── Social row ───────────────────────────────────────────────────────────────
 .social {

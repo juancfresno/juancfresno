@@ -32,11 +32,9 @@
   display: flex;
   align-items: center;              // centro vertical — face (32px) vs texto (13px)
   justify-content: space-between;
-  padding: 1.25rem;
+  @include container;               // same margins as the page grid (see GridOverlay)
+  padding-block: 1.25rem;
 }
-
-// Home: left edge matches the content column + footer copyright (2.5rem,
-// switching to the fluid $gutter below `lg` same as ComingSoon's .content)
 
 // ─── Left cluster: face + nav menu ───────────────────────────────────────────
 .left {
@@ -297,10 +295,8 @@
 
 // ─── Separator line ───────────────────────────────────────────────────────────
 .lineWrap {
-  padding: 0 1.25rem;
+  @include container;
 }
-
-// Home: line spans truly edge-to-edge, flush with the full-bleed reel panel
 
 .line {
   color: $color-border;
