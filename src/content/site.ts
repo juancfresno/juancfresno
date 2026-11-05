@@ -59,6 +59,22 @@ export const LAB = [
   { name: 'Panel', what: null, status: null, year: '2026' },
 ]
 
+// Lab experiments: each one is a live demo here plus its source in the public repo.
+// Files live in public/lab/<slug>/ (buttons.css, buttons.js, snippet.html, prompt.md).
+export const EXPERIMENTS = [
+  {
+    slug: 'botones',
+    n: '001',
+    name: 'Botones',
+    kind: 'Interacción',
+    year: '2026',
+    what: 'Cuatro botones con interacción: magnético, columnas, rodillo y scramble. Sin dependencias, listos para copiar o para pedírselos a Claude.',
+    how: 'CSS y unas 80 líneas de JavaScript sin librerías. Funcionan con teclado, respetan «reducir movimiento» y se adaptan al tema con dos variables.',
+    files: ['buttons.css', 'buttons.js', 'snippet.html'],
+    repo: null as string | null, // public GitHub folder, once the repo exists
+  },
+]
+
 export const ABOUT = {
   // Current /about copy, verbatim (missing accents fixed).
   bio: [

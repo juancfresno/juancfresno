@@ -1,9 +1,11 @@
 import type { Metadata } from 'next'
-import { LAB } from '@/content/site'
+import Link from 'next/link'
+import { LAB, EXPERIMENTS } from '@/content/site'
 import Section from '@/components/blocks/Section'
 import ContactBlock from '@/components/blocks/ContactBlock'
 import Pending from '@/components/blocks/Pending'
 import s from '@/components/blocks/blocks.module.scss'
+import l from '@/components/lab/lab.module.scss'
 
 export const metadata: Metadata = { title: 'Lab' }
 
@@ -35,7 +37,13 @@ export default function LabPage() {
 
       <Section label="Experimentos">
         <div className={s.grid3}>
-          {['Motion', 'Shot', 'Interacción'].map((x) => (
+          {EXPERIMENTS.map((e) => (
+            <Link key={e.slug} href={`/lab/${e.slug}`} className={l.piece}>
+              <div className={l.pieceMedia}>{e.name}</div>
+              <p className={l.pieceMeta}>{e.n} · {e.kind} · {e.year}</p>
+            </Link>
+          ))}
+          {['Motion', 'Shot'].map((x) => (
             <div key={x} className={s.placeholderMedia}>{x} <Pending /></div>
           ))}
         </div>
