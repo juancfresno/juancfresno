@@ -13,13 +13,6 @@
   --ease-out-expo:    #{$ease-out-expo};
 }
 
-// ─── Custom cursor — hide OS cursor on fine-pointer devices ───────────────────
-@media (pointer: fine) {
-  *, *::before, *::after {
-    cursor: none !important;
-  }
-}
-
 // ─── Selection ────────────────────────────────────────────────────────────────
 ::selection {
   background: $color-accent;
