@@ -1,0 +1,49 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+// Grid overlay — toggled with "G". Mirrors `@mixin container` + the 12-column
+// grid ($cols-12, $space-4 gap); 4 columns at ≤ md.
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: $z-toast;
+  pointer-events: none;
+}
+
+.inner {
+  @include container;
+  height: 100%;
+  display: grid;
+  grid-template-columns: $cols-12;
+  column-gap: $space-4;
+
+  @include respond-to(md) {
+    grid-template-columns: repeat(4, 1fr);
+    .col:nth-child(n + 5) { display: none; }
+  }
+}
+
+.col {
+  background: rgba(255, 92, 30, 0.07);
+  border-inline: 1px solid rgba(255, 92, 30, 0.35);
+}
+
+.badge {
+  position: fixed;
+  top: calc(#{$nav-height} + #{$space-3});
+  left: max(#{$space-4}, env(safe-area-inset-left, 0px));
+  display: inline-flex;
+  align-items: center;
+  gap: $space-2;
+  padding: 0.25rem 0.5rem;
+  border-radius: 3px;
+  background: $color-bg;
+  color: $color-text;
+  font-family: $font-mono;
+  font-size: 11px;
+  line-height: 13px;
+}
+
+.key {
+  color: #ff5c1e;
+}
