@@ -44,6 +44,12 @@
   gap: 2rem;                        // 32px — de Figma entre biako face y primer link
 }
 
+// ─── Theme toggle — after the links on desktop, next to the face on mobile ───
+.theme {
+  margin-left: 0.5rem;
+  @include respond-to(md) { margin-left: 0; }
+}
+
 // ─── Face icon ────────────────────────────────────────────────────────────────
 .face {
   display: block;
@@ -139,7 +145,7 @@
     position: absolute;
     inset: -3px -6px;
     border-radius: 3px;
-    background: #c6dbf9;
+    background: $raw-chip;
     opacity: 0;
     transform: scale(0.88);
     // Exit: rápido y sin spring
@@ -163,7 +169,7 @@
   // Texto oscuro sobre el chip claro
   &:hover,
   &.active {
-    color: $color-bg;
+    color: $raw-ink;               // dark text on the light chip, both themes
   }
 
   @include focus-ring;
@@ -345,7 +351,7 @@
 
     padding: 0.5rem 0.75rem;
     padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));
-    background: rgba(16, 16, 14, 0.85);
+    background: $color-bar;
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border-top: 1px solid $color-border;
@@ -373,91 +379,12 @@
 }
 
 .bottomTabActive {
-  color: $color-bg;
-  background: #c6dbf9;
+  color: $raw-ink;
+  background: $raw-chip;
 }
 
-// Light variant for bottom bar
-.bottomBarLight {
-  background: rgba(252, 252, 247, 0.85);
-  border-top-color: rgba(16, 16, 14, 0.1);
-
-  .bottomTab {
-    color: rgba(16, 16, 14, 0.5);
-
-    &:hover {
-      color: #10100e;
-    }
-  }
-
-  .bottomTabActive {
-    color: $color-bg;
-    background: #c6dbf9;
-  }
-}
-
-
-// ══════════════════════════════════════════════════════════════════════════════
-// LIGHT PAGE VARIANT — inverted dark nav for light-bg pages (contact, etc.)
-// ══════════════════════════════════════════════════════════════════════════════
-
-.light {
-  // Nav links — dark text
-  .navLink {
-    color: rgba(16, 16, 14, 0.55);
-  }
-
-  // Hover/active stays the same (dark text on blue chip)
-  // Chip color #c6dbf9 works on both
-
-  // Logo wordmark
-  .glMain { color: $color-bg; }
-
-  // Separator
-  .line { color: rgba(16, 16, 14, 0.12); }
-}
-
-// Static light pages (e.g. /contact) only — no dynamic background behind
-// the face icon there, so force it dark directly. Home deliberately does
-// NOT get this: the reel panel cycles through both light and dark images,
-// so the face icon needs mix-blend-mode: difference (set on .face) to
-// stay legible on its own — a hardcoded filter here would lock it to one
-// color and defeat that.
-.lightStatic {
-  .faceGlitchWrap { filter: brightness(0.08); }
-}
-
-
-// ══════════════════════════════════════════════════════════════════════════════
-// HOME THEME VARIANT — when a light color dot is active on the home page
-// Uses html[data-home-theme] set by HomeContent via JS
-// ══════════════════════════════════════════════════════════════════════════════
-
-:global(html[data-home-theme="light"]) {
-  .navLink {
-    color: rgba(16, 16, 14, 0.55);
-  }
-
-  .glMain { color: $color-bg; }
-
-  .faceGlitchWrap { filter: brightness(0.08); }
-
-  .line { color: rgba(16, 16, 14, 0.12); }
-
-  // Mobile bottom bar
-  .bottomBar {
-    background: rgba(252, 252, 247, 0.85);
-    border-top-color: rgba(16, 16, 14, 0.1);
-  }
-
-  .bottomTab {
-    color: rgba(16, 16, 14, 0.5);
-
-    &:hover {
-      color: #10100e;
-    }
-  }
-}
+// Light theme: the face SVG has hardcoded light strokes, so darken it.
+:global(html[data-theme="light"]) .faceGlitchWrap { filter: brightness(0.08); }
 
 
 // ══════════════════════════════════════════════════════════════════════════════

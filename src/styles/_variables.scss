@@ -1,12 +1,21 @@
 // ─── Colors ───────────────────────────────────────────────────────────────────
-$color-bg:          #10100e;   // brand/brand from Figma
-$color-bg-2:        #1a1a18;
-$color-surface:     #242420;
-$color-border:      rgba(252, 252, 247, 0.1);
+// Theme colors are CSS custom properties so the whole site can switch between
+// dark (default) and light at runtime via html[data-theme]. Values live in
+// globals.scss (:root + [data-theme="light"]). Raw brand values stay below
+// for the few places that must not change with the theme.
+$raw-ink:           #10100e;   // brand/brand from Figma
+$raw-pearl:         #fcfcf7;   // background/pearl from Figma
+$raw-chip:          #c6dbf9;   // brand blue — hover/active chip, same in both themes
 
-$color-text:        #fcfcf7;   // background/pearl from Figma
-$color-text-muted:  rgba(252, 252, 247, 0.35);
-$color-text-mid:    rgba(252, 252, 247, 0.6);
+$color-bg:          var(--c-bg);
+$color-bg-2:        var(--c-bg-2);
+$color-surface:     var(--c-surface);
+$color-border:      var(--c-border);
+$color-bar:         var(--c-bar);
+
+$color-text:        var(--c-text);
+$color-text-muted:  var(--c-text-muted);
+$color-text-mid:    var(--c-text-mid);
 
 $color-accent:      #c8ff00;   // ← ajusta tu color de acento
 $color-accent-2:    #ff3d00;

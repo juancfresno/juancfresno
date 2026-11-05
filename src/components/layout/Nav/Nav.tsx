@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import clsx from 'clsx'
 import s from './Nav.module.scss'
 import ElasticLine from '@/components/ui/ElasticLine/ElasticLine'
+import ThemeToggle from '@/components/ui/ThemeToggle/ThemeToggle'
 import { usePageTransition } from '@/providers/PageTransition'
 
 // ─── Scramble character pool ───────────────────────────────────────────────────
@@ -221,9 +222,6 @@ export default function Nav() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  // ── Light pages get inverted (dark) nav ────────────────────────────────────
-  const isLight = pathname === '/contact'
-
   const logoLink = (
     <a
       href="/"
@@ -256,7 +254,7 @@ export default function Nav() {
 
   return (
     <>
-      <header className={clsx(s.nav, hidden && s.hidden, scrolled && s.scrolled, isLight && s.light, isLight && s.lightStatic)}>
+      <header className={clsx(s.nav, hidden && s.hidden, scrolled && s.scrolled)}>
         <div className={s.inner}>
           {/* ── Left cluster: face + nav menu ── */}
           <div className={s.left}>
@@ -272,6 +270,8 @@ export default function Nav() {
                 />
               ))}
             </nav>
+
+            <ThemeToggle className={s.theme} />
           </div>
 
           {/* ── Right: wordmark ── */}
@@ -283,7 +283,7 @@ export default function Nav() {
       </header>
 
       {/* ── Mobile bottom tab bar ── */}
-      <nav className={clsx(s.bottomBar, isLight && s.bottomBarLight)} aria-label="Navegación móvil">
+      <nav className={s.bottomBar} aria-label="Navegación móvil">
           {MOBILE_LINKS.map(({ label, href }) => {
             const isActive = pathname === href || pathname.startsWith(href + '/')
             return (

@@ -1,0 +1,41 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+// Same voice as the nav links: mono 11/13, uppercase. Active mode at full
+// strength, the others at mid.
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  font-family: $font-mono;
+  font-size: 11px;
+  line-height: 13px;
+  text-transform: uppercase;
+}
+
+.item {
+  display: inline-flex;
+  align-items: center;
+}
+
+.sep {
+  margin-inline: 6px;
+  color: $color-text-muted;
+}
+
+.btn {
+  font: inherit;
+  text-transform: inherit;
+  color: $color-text-muted;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  transition: color $duration-fast $ease-out-quart;
+
+  &:hover { color: $color-text; }
+  @include focus-ring;
+}
+
+.on {
+  color: $color-text;
+}

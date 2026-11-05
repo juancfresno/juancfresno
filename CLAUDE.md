@@ -19,12 +19,14 @@ All real pages live under `src/app/(site)/`. Copy lives in **one file**, `src/co
 | `/work` | `(site)/work/page.tsx` | Full index (year, name, studio, discipline). `/projects` redirects here. |
 | `/work/[slug]` | `(site)/work/[slug]/page.tsx` | Case template (ficha, hard question, context, decisions, discarded, result, process, credits, next). Only projects with `caseStudy: true` are generated. |
 | `/about` | `(site)/about/page.tsx` | Bio, modes of work with studios, services, studios, clients, tools. |
-| `/contact` | `(site)/contact/page.tsx` | Light page; Nav/Footer render their light variant. No form. |
+| `/contact` | `(site)/contact/page.tsx` | Follows the site theme like every page. No form. |
 | `/feed` | `(site)/feed/page.tsx` | Loose pieces that aren't cases; home for everything posted on social. Placeholder. |
 | `/lab` | `(site)/lab/page.tsx` | Experiments, interactive artefacts, own products. `/playground` redirects here. |
 | `/journal` | `(site)/journal/page.tsx` | Writing: process, decisions, opinion. Placeholder. |
 
 Nav (desktop and mobile bottom bar share `NAV_LINKS`): About · Work · Feed · Lab · Journal · Contact. Desktop wordmark is vertical in the top-right corner and hangs over the header line (the header keeps its 72px height). Press **G** to toggle the layout grid overlay (`src/components/ui/GridOverlay`).
+
+**Themes.** Dark (default) and light. Colors are CSS custom properties (`--c-*`, defined in `globals.scss` under `:root` and `:root[data-theme="light"]`); the Sass `$color-*` tokens point at them, so never use `rgba($color-*, …)` — add a new `--c-*` var instead. Brand constants that must not change with the theme are `$raw-ink`, `$raw-pearl`, `$raw-chip`. `ThemeToggle` (`src/components/ui/ThemeToggle`) sits after the nav links (next to the face on mobile), saves to `localStorage.theme`, and **D** toggles it; an inline script in `layout.tsx` applies the saved theme before paint. `THEMES` is a list so extra art-direction modes can be added later.
 
 `src/app/layout.tsx` renders the global `Nav` (top bar + mobile bottom tab bar) and `Footer` around `{children}`, inside `PageTransitionProvider` (owns the `navigate` seam). Shared page blocks live in `src/components/blocks/` (one `blocks.module.scss`).
 
@@ -38,7 +40,6 @@ Removed in v2: the old `/index2` home and its Instagram/Dribbble feed + cron, th
 - `src/styles/_mixins.scss` — `respond-to()`/`respond-min()` breakpoint mixins, layout/typography/visual helpers.
 - `src/styles/globals.scss` — resets, custom scrollbar, selection color, Lenis smooth-scroll classes.
 - Import convention: `@use '../../styles/variables' as *;` (relative path depth depends on component location) — no path alias in Sass, only in TS (`@/*` → `src/*` in `tsconfig.json`).
-- Page-local color overrides (e.g. a light-background page on an otherwise dark-themed site) are declared as `$_`-prefixed local Sass variables inside that component's own module file rather than polluting the global tokens (see `ContactForm.module.scss`, `ComingSoon.module.scss`).
 
 ## ElasticLine
 

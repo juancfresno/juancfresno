@@ -4,6 +4,37 @@
 @use 'reset';
 @use 'typography';
 
+// ─── Theme: dark by default, light with html[data-theme="light"] ──────────────
+// Set before paint by the inline script in layout.tsx; toggled by ThemeToggle.
+:root {
+  --c-bg:         #{$raw-ink};
+  --c-bg-2:       #1a1a18;
+  --c-surface:    #242420;
+  --c-border:     rgba(252, 252, 247, 0.1);
+  --c-bar:        rgba(16, 16, 14, 0.85);
+  --c-text:       #{$raw-pearl};
+  --c-text-mid:   rgba(252, 252, 247, 0.6);
+  --c-text-muted: rgba(252, 252, 247, 0.35);
+  color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+  --c-bg:         #{$raw-pearl};
+  --c-bg-2:       #f3f2ec;
+  --c-surface:    #e9e8e1;
+  --c-border:     rgba(16, 16, 14, 0.12);
+  --c-bar:        rgba(252, 252, 247, 0.85);
+  --c-text:       #{$raw-ink};
+  --c-text-mid:   rgba(16, 16, 14, 0.6);
+  --c-text-muted: rgba(16, 16, 14, 0.45);
+  color-scheme: light;
+}
+
+// Smooth swap between themes (colors only).
+html.theme-anim, html.theme-anim * {
+  transition: background-color 0.35s ease, color 0.35s ease, border-color 0.35s ease, fill 0.35s ease !important;
+}
+
 // ─── Custom properties (CSS vars exposed for JS/GSAP access) ──────────────────
 :root {
   --color-bg:         #{$color-bg};

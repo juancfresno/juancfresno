@@ -55,7 +55,15 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="es" className={`${GeistMono.variable} ${switzer.variable}`}>
+    <html lang="es" suppressHydrationWarning className={`${GeistMono.variable} ${switzer.variable}`}>
+      <head>
+        {/* Theme before paint: saved choice, else dark (brand default). */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: "try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}",
+          }}
+        />
+      </head>
       <body>
         <script
           type="application/ld+json"

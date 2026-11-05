@@ -1,7 +1,5 @@
 'use client'
 
-import { usePathname } from 'next/navigation'
-import clsx from 'clsx'
 import s from './Footer.module.scss'
 import ElasticLine from '@/components/ui/ElasticLine/ElasticLine'
 import LiveClock from '@/components/ui/LiveClock/LiveClock'
@@ -18,11 +16,8 @@ const SOCIALS = [
 
 // ─── Component ────────────────────────────────────────────────────────────────
 export default function Footer() {
-  const pathname = usePathname()
-  const isLight = pathname === '/contact'
-
   return (
-    <footer className={clsx(s.footer, isLight && s.light)}>
+    <footer className={s.footer}>
       <div className={s.inner}>
 
         {/* Social wordmarks */}

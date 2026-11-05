@@ -8,7 +8,6 @@
   z-index: 10; // Above pixel canvas (z-index: 5)
 }
 
-// ── Home page: footer sticks to bottom, no extra scroll ─────────────────────
 
 .inner {
   @include container;               // same margins as the page grid (see GridOverlay)
@@ -88,72 +87,3 @@
     display: none;
   }
 }
-
-
-// ══════════════════════════════════════════════════════════════════════════════
-// LIGHT PAGE VARIANT — inverted dark footer for light-bg pages (contact, etc.)
-// ══════════════════════════════════════════════════════════════════════════════
-
-.light {
-  background: $color-text; // light pages (Contact) keep the footer on the page colour
-
-  // Social wordmarks — dark text
-  .socialLink {
-    color: $color-bg;
-  }
-
-  // Separator line
-  .line {
-    color: rgba(16, 16, 14, 0.12);
-  }
-
-  // Meta text
-  .copyright {
-    color: $color-bg;
-  }
-
-  .location {
-    color: rgba(16, 16, 14, 0.55);
-  }
-
-  // LiveClock
-  .metaRight time {
-    color: rgba(16, 16, 14, 0.55);
-  }
-}
-
-
-// ══════════════════════════════════════════════════════════════════════════════
-// HOME THEME VARIANT — when a light color dot is active on the home page
-// Uses html[data-home-theme] set by HomeContent via JS
-// ══════════════════════════════════════════════════════════════════════════════
-
-:global(html[data-home-theme="light"]) {
-  .socialLink {
-    color: $color-bg;
-  }
-
-  .line {
-    color: rgba(16, 16, 14, 0.12);
-  }
-
-  .copyright {
-    color: $color-bg;
-  }
-
-  .location {
-    color: rgba(16, 16, 14, 0.55);
-  }
-
-  .metaRight time {
-    color: rgba(16, 16, 14, 0.55);
-  }
-}
-
-
-// ══════════════════════════════════════════════════════════════════════════════
-// HOME REEL VARIANT — coordinates/clock sit over the full-height reel photo
-// on the right, so they need light text while copyright (over the light
-// page bg on the left) stays dark from the .light variant above.
-// ══════════════════════════════════════════════════════════════════════════════
-

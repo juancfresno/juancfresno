@@ -11,11 +11,6 @@
   gap: $space-24;
 }
 
-.pageLight {
-  background: $color-text;
-  color: $color-bg;
-}
-
 // ─── Pending marker ───────────────────────────────────────────────────────────
 .pending {
   display: inline-block;
@@ -373,10 +368,3 @@
   }
 }
 
-// ─── Light page variant (Contact) ─────────────────────────────────────────────
-.pageLight {
-  .label, .heroMeta, .availability, .socials a { color: rgba($color-bg, 0.5); }
-  .text { color: rgba($color-bg, 0.7); }
-  .contact, .section { border-color: rgba($color-bg, 0.12); }
-  .button:is(a):hover { background: $color-bg; color: $color-text; }
-}
