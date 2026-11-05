@@ -67,7 +67,7 @@ $space-32:  8rem;
 $space-40:  10rem;
 
 // ─── Layout ───────────────────────────────────────────────────────────────────
-$max-width:         1440px;
+$max-width:         1440px;   // reference only; the layout is liquid (no cap)
 $gutter:            clamp(1.5rem, 4vw, 4rem);
 $nav-height:        5rem;
 

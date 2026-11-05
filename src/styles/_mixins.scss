@@ -20,9 +20,9 @@
 }
 
 // ─── Layout ───────────────────────────────────────────────────────────────────
+// Liquid layout: full width at every size, only the fluid gutter as margin.
 @mixin container {
   width: 100%;
-  max-width: $max-width;
   margin-inline: auto;
   padding-inline: $gutter;
 }
