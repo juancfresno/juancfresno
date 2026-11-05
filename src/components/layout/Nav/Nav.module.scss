@@ -32,7 +32,11 @@
   display: flex;
   align-items: center;              // centro vertical — face (32px) vs texto (13px)
   justify-content: space-between;
-  @include container;               // same margins as the page grid (see GridOverlay)
+  @include container;
+
+  // Desktop: links sit on the top line next to the face; the vertical
+  // wordmark hangs from the top-right corner.
+  @media (min-width: #{$bp-md + 1px}) { align-items: flex-start; }               // same margins as the page grid (see GridOverlay)
   padding-block: 1.25rem;
 }
 
@@ -255,6 +259,20 @@
   }
 
   @include focus-ring;
+
+  // Desktop: wordmark set vertical (reads top → bottom), top-right corner.
+  // The box takes the rotated size (12 × 101) so the row lays out correctly.
+  @media (min-width: #{$bp-md + 1px}) {
+    width: 12px;
+    height: 101px;
+
+    .glitchWrap {
+      width: 101px;                 // keep natural size inside the 12px box
+      svg { max-width: none; }
+      transform-origin: top left;
+      transform: rotate(90deg) translateY(-100%);
+    }
+  }
 }
 
 // ─── Glitch wrapper ───────────────────────────────────────────────────────────
