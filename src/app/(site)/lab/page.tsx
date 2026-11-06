@@ -1,55 +1,62 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { LAB, EXPERIMENTS } from '@/content/site'
-import Section from '@/components/blocks/Section'
+import { LAB, EXPERIMENTS, INTROS } from '@/content/site'
+import V0Section from '@/components/blocks/V0Section'
 import ContactBlock from '@/components/blocks/ContactBlock'
 import Pending from '@/components/blocks/Pending'
-import s from '@/components/blocks/blocks.module.scss'
+import v from '@/components/blocks/v0.module.scss'
 import l from '@/components/lab/lab.module.scss'
 
 export const metadata: Metadata = { title: 'Lab' }
 
-// Lab: own products (with status and how they were built) + experiments.
+// Figma: "Lab · Desktop" (6770:10097). Intro, numbered experiments with mono
+// specs, own products with status, and the open-source line.
 export default function LabPage() {
   return (
-    <div className={s.page}>
-      <header className={s.hero}>
-        <p className={s.heroMeta}>Experimentos · productos propios</p>
-        <h1 className={s.heroTitle}>Lab</h1>
-        <p className={s.text}>Lo que funciona o se toca: navegaciones, artefactos, prototipos y productos propios.</p>
-      </header>
+    <div className={v.page}>
+      <p className={v.intro}>{INTROS.lab}</p>
 
-      <Section label="Productos propios">
-        <ul className={s.rows}>
-          {LAB.map((x) => (
+      <V0Section label="Experimentos ↘">
+        <ol className={l.rows}>
+          {EXPERIMENTS.map((e) => (
+            <li key={e.slug}>
+              <Link href={`/lab/${e.slug}`} className={l.row}>
+                <span className={l.n}>{e.n}</span>
+                <span className={l.rowName}>{e.name}</span>
+                <span className={l.spec}>{e.kind}</span>
+                <span className={l.spec}>{e.files.length} archivos · sin dependencias</span>
+                <span className={`${l.spec} ${l.end}`}>{e.year}</span>
+              </Link>
+            </li>
+          ))}
+        </ol>
+      </V0Section>
+
+      <V0Section label="Productos propios ↘">
+        <ol className={l.rows}>
+          {LAB.map((x, i) => (
             <li key={x.name}>
-              <span className={s.rowTitle}>{x.name}</span>
-              <div>
-                <p className={s.text}>{x.what ?? <Pending>qué hace</Pending>}</p>
-                <p className={s.rowTags}>
-                  {x.status ?? 'estado'} · {x.year ?? 'año'} · cómo se ha construido, incluida la parte con IA <Pending />
-                </p>
+              <div className={l.row}>
+                <span className={l.n}>{String(i + 1).padStart(2, '0')}</span>
+                <span className={l.rowName}>{x.name}</span>
+                <span className={l.spec}>{x.what ?? <Pending>qué hace</Pending>}</span>
+                <span className={l.spec}>{x.status ?? <Pending>estado</Pending>}</span>
+                <span className={`${l.spec} ${l.end}`}>{x.year ?? '—'}</span>
               </div>
             </li>
           ))}
-        </ul>
-      </Section>
+        </ol>
+      </V0Section>
 
-      <Section label="Experimentos">
-        <div className={s.grid3}>
-          {EXPERIMENTS.map((e) => (
-            <Link key={e.slug} href={`/lab/${e.slug}`} className={l.piece}>
-              <div className={l.pieceMedia}>{e.name}</div>
-              <p className={l.pieceMeta}>{e.n} · {e.kind} · {e.year}</p>
-            </Link>
-          ))}
-          {['Motion', 'Shot'].map((x) => (
-            <div key={x} className={s.placeholderMedia}>{x} <Pending /></div>
-          ))}
-        </div>
-      </Section>
+      <V0Section label="Código abierto · GitHub ↘">
+        <p className={v.mono}>
+          El código de cada experimento, para copiar o pedírselo a Claude. <Pending>repo público</Pending>
+        </p>
+      </V0Section>
 
-      <ContactBlock />
+      <div className={v.closing}>
+        <ContactBlock />
+      </div>
     </div>
   )
 }

@@ -1,65 +1,95 @@
 import type { Metadata } from 'next'
-import { PERSON, ABOUT } from '@/content/site'
-import Section from '@/components/blocks/Section'
+import Image from 'next/image'
+import { ABOUT, HOME } from '@/content/site'
+import V0Section from '@/components/blocks/V0Section'
 import ContactBlock from '@/components/blocks/ContactBlock'
 import Pending from '@/components/blocks/Pending'
-import s from '@/components/blocks/blocks.module.scss'
+import v from '@/components/blocks/v0.module.scss'
+import a from '@/components/about/about.module.scss'
 
 export const metadata: Metadata = { title: 'About' }
 
+// Figma: "About · Desktop" (6770:10229), dark theme. Bio, services with
+// photos, studios and brands, process, experience; dossier and resources are
+// still placeholders in Figma.
 export default function AboutPage() {
+  const [setup, poster, face] = ABOUT.photos
+
   return (
-    <div className={s.page}>
-      <header className={s.hero}>
-        <p className={s.heroMeta}>{PERSON.role} · {PERSON.years}</p>
-        <h1 className={s.heroTitle}>{PERSON.name}</h1>
+    <div className={v.page}>
+      <header className={a.hero}>
+        <div className={a.heroHead}>
+          <h1 className={a.name}>{HOME.name}</h1>
+          <p className={a.role}>{ABOUT.role}</p>
+        </div>
+        <p className={a.bio}>
+          <span className={a.bioLead}>{ABOUT.bioLead}</span> <span className={a.bioRest}>{ABOUT.bioRest}</span>
+        </p>
       </header>
 
-      <Section label="Bio">
-        {ABOUT.bio.map((p) => <p key={p} className={s.lead}>{p}</p>)}
-        <div className={s.placeholderMedia}>Foto <Pending /></div>
-      </Section>
-
-      <Section label="Cómo trabajo con estudios">
-        <div className={s.grid3}>
-          {ABOUT.modes.map((m) => (
-            <div key={m.name} className={s.card}>
-              <span className={s.cardTitle}>{m.name}</span>
-              <span className={s.text}>{m.text}</span>
-            </div>
-          ))}
+      <V0Section label="{ servicios ↘">
+        <div className={a.services}>
+          <ul className={a.serviceList}>
+            {ABOUT.services.map((x) => (
+              <li key={x.name}>
+                <h2 className={a.serviceName}>{x.name}</h2>
+                <p className={a.serviceText}>{x.text}</p>
+                <p className={a.serviceTags}>{x.tags}</p>
+              </li>
+            ))}
+          </ul>
+          <div className={a.photos}>
+            <Image src={setup.src} width={setup.w} height={setup.h} alt={setup.alt} className={a.photoSetup} sizes="(max-width: 768px) 60vw, 20vw" unoptimized />
+            <Image src={poster.src} width={poster.w} height={poster.h} alt={poster.alt} className={a.photoPoster} sizes="(max-width: 768px) 100vw, 35vw" unoptimized />
+            <Image src={face.src} width={face.w} height={face.h} alt={face.alt} className={a.photoFace} sizes="8rem" unoptimized />
+          </div>
         </div>
-        <Pending>copy por revisar</Pending>
-      </Section>
+      </V0Section>
 
-      <Section label="{ servicios ↘">
-        <ul className={s.rows}>
-          {ABOUT.services.map((x) => (
-            <li key={x.name}>
-              <span className={s.rowTitle}>{x.name}</span>
-              <div>
-                <p className={s.text}>{x.text}</p>
-                <p className={s.rowTags}>{x.tags}</p>
-              </div>
+      <V0Section label="{ Estudios y agencias ↘">
+        <p className={a.paragraph}>{ABOUT.studios}</p>
+        <p className={`${v.label} ${a.subLabel}`}>{'{ Marcas ↘'}</p>
+        <p className={a.paragraph}>{ABOUT.brands}</p>
+      </V0Section>
+
+      <V0Section label="{ proceso ↘">
+        <ol className={a.process}>
+          {ABOUT.process.map((p) => (
+            <li key={p.n}>
+              <span className={a.processN}>{`{${p.n}}`}</span>
+              <span className={a.processName}>{p.name}</span>
+              <span className={a.processText}>{p.text}</span>
             </li>
           ))}
-        </ul>
-      </Section>
+        </ol>
+      </V0Section>
 
-      <Section label="{ Estudios — agencias ↘">
-        <ul className={s.chips}>{ABOUT.studios.map((x) => <li key={x}>{x}</li>)}</ul>
-        <p className={s.text}>Timeline por año con cada cliente y estudio. <Pending>años de las facturas</Pending></p>
-      </Section>
+      <V0Section label="{ Experiencia ↘">
+        <div className={a.table}>
+          <div className={`${a.tr} ${a.th}`} aria-hidden="true">
+            <span>Nº</span><span>Estudio o empresa</span><span>Rol</span><span>Cómo</span><span className={a.right}>Años</span>
+          </div>
+          <ol>
+            {ABOUT.experience.map((x, i) => (
+              <li key={x.name} className={a.tr}>
+                <span className={a.n}>{String(i + 1).padStart(2, '0')}</span>
+                <span className={a.company}>{x.name}</span>
+                <span className={a.cell}>{x.role}</span>
+                <span className={a.cell}>{x.how}</span>
+                <span className={`${a.cell} ${a.right}`}>{x.years}</span>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </V0Section>
 
-      <Section label="{ Clientes ↘">
-        <ul className={s.chips}>{ABOUT.clients.map((x) => <li key={x}>{x}</li>)}</ul>
-      </Section>
+      <V0Section label="Dossier para agencias ↘">
+        <p className={v.mono}>PDF con casos, formas de trabajo y disponibilidad. <Pending>dossier</Pending></p>
+      </V0Section>
 
-      <Section label="Herramientas">
-        <p className={s.text}>{ABOUT.tools} <Pending /></p>
-      </Section>
-
-      <ContactBlock />
+      <div className={v.closing}>
+        <ContactBlock />
+      </div>
     </div>
   )
 }

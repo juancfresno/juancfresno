@@ -108,3 +108,52 @@
   text-transform: uppercase;
   color: $color-text-muted;
 }
+
+// ─── Lab index rows (Lab · Desktop, v0) ───────────────────────────────────────
+.rows { list-style: none; }
+
+.row {
+  display: grid;
+  grid-template-columns: 4.5rem minmax(0, 1fr) minmax(0, 23%) minmax(0, 23%) 6rem;
+  align-items: center;
+  min-height: 3.6rem;
+  padding-block: $space-4;
+  border-top: 1px solid $color-line;
+  color: $color-text;
+  text-decoration: none;
+
+  li:last-child > & { border-bottom: 1px solid $color-line; }
+  &:is(a):hover, &:is(a):focus-visible { border-top-color: $color-line-hi; }
+
+  @include respond-to(md) {
+    grid-template-columns: 2.25rem minmax(0, 1fr) auto;
+    row-gap: $space-1;
+    > :nth-child(3) { grid-column: 2 / -1; grid-row: 2; }
+    > :nth-child(4) { grid-column: 2 / -1; grid-row: 3; }
+    > :nth-child(5) { grid-column: 3; grid-row: 1; }
+  }
+}
+
+.n {
+  font-family: $font-mono;
+  font-size: 0.75rem;
+  color: $color-text-mid;
+}
+
+.rowName {
+  font-family: $font-body;
+  font-size: clamp(1rem, 0.4vw + 0.9rem, 1.125rem);
+}
+
+.spec {
+  font-family: $font-mono;
+  font-size: 0.625rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: $color-text;
+  padding-right: $space-4;
+
+  @include respond-to(md) { color: $color-text-mid; }
+}
+
+.end { text-align: right; padding-right: 0; }
