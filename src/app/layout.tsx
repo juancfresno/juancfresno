@@ -6,6 +6,7 @@ import '@/styles/globals.scss'
 import Nav from '@/components/layout/Nav/Nav'
 import Footer from '@/components/layout/Footer/Footer'
 import GridOverlay from '@/components/ui/GridOverlay/GridOverlay'
+import Shortcuts from '@/components/ui/Shortcuts/Shortcuts'
 import PageTransitionProvider from '@/providers/PageTransition'
 import { SITE_URL } from '@/lib/site'
 
@@ -75,6 +76,7 @@ export default function RootLayout({
           <Footer />
         </PageTransitionProvider>
         <GridOverlay />
+        <Shortcuts />
         <Analytics />
       </body>
     </html>

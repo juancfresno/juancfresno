@@ -15,6 +15,11 @@
   --c-text:       #{$raw-pearl};
   --c-text-mid:   rgba(252, 252, 247, 0.6);
   --c-text-muted: rgba(252, 252, 247, 0.35);
+  --c-text-hi:    #ddedff;   // headings / hero tint (Figma v0)
+  --c-text-dim:   #4d5257;   // second half of the About bio
+  --c-line:       #3c3c3a;   // row and section rules (Figma v0)
+  --c-line-hi:    #{$raw-pearl};
+  --c-overlay:    rgba(16, 16, 14, 0.92); // chips inside images
   color-scheme: dark;
 }
 
@@ -27,6 +32,11 @@
   --c-text:       #{$raw-ink};
   --c-text-mid:   rgba(16, 16, 14, 0.6);
   --c-text-muted: rgba(16, 16, 14, 0.45);
+  --c-text-hi:    #{$raw-ink};
+  --c-text-dim:   rgba(16, 16, 14, 0.4);
+  --c-line:       rgba(16, 16, 14, 0.16);
+  --c-line-hi:    #{$raw-ink};
+  --c-overlay:    rgba(252, 252, 247, 0.92);
   color-scheme: light;
 }
 

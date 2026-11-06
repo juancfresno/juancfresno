@@ -243,6 +243,43 @@
   }
 }
 
+// ─── Right cluster: local time + "?" + wordmark ──────────────────────────────
+.right {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  align-self: stretch;
+}
+
+.clock {
+  font-family: $font-mono;
+  font-size: 0.6875rem;
+  line-height: 13px;
+  color: $color-text-mid;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.help {
+  display: inline-grid;
+  place-items: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 1px solid $color-line;
+  border-radius: 999px;
+  font-family: $font-mono;
+  font-size: 0.6875rem;
+  color: $color-text-mid;
+  cursor: pointer;
+  transition: color $duration-fast, border-color $duration-fast;
+
+  &:hover, &:focus-visible { color: $color-text; border-color: $color-text; }
+  @include focus-ring;
+
+  // Keyboard legend is a desktop affordance.
+  @include respond-to(md) { display: none; }
+}
+
 // ─── Wordmark — VHS glitch container ──────────────────────────────────────────
 .logo {
   display: block;

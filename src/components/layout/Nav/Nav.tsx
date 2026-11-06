@@ -6,6 +6,7 @@ import clsx from 'clsx'
 import s from './Nav.module.scss'
 import ElasticLine from '@/components/ui/ElasticLine/ElasticLine'
 import ThemeToggle from '@/components/ui/ThemeToggle/ThemeToggle'
+import NavClock from '@/components/ui/NavClock/NavClock'
 import { usePageTransition } from '@/providers/PageTransition'
 
 // ─── Scramble character pool ───────────────────────────────────────────────────
@@ -274,8 +275,20 @@ export default function Nav() {
             <ThemeToggle className={s.theme} />
           </div>
 
-          {/* ── Right: wordmark ── */}
-          {logoLink}
+          {/* ── Right: local time + shortcuts, then the wordmark ── */}
+          <div className={s.right}>
+            <NavClock className={s.clock} />
+            <button
+              type="button"
+              className={s.help}
+              aria-label="Atajos de teclado"
+              aria-keyshortcuts="?"
+              onClick={() => window.dispatchEvent(new Event('fresno:shortcuts'))}
+            >
+              ?
+            </button>
+            {logoLink}
+          </div>
         </div>
         <div className={s.lineWrap}>
           <ElasticLine className={s.line} />
