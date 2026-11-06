@@ -1,0 +1,323 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+// Case template — Figma "Caso · Shoeciety · Rediseño" (6771:23052) for the
+// text modules and "Caso · Shoeciety · v0" (6728:6380) for the image block.
+// Grid: label column 1/3, content 2/3, gutter 16 (web/case-header: 12 col,
+// margin 64, gutter 16 at 1680).
+
+// ─── Header (web/case-header) ─────────────────────────────────────────────────
+.header {
+  @include container;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.5rem, 2.9vw, 3rem);
+  padding-top: clamp(3rem, 5.7vw, 6rem);
+  padding-bottom: clamp(2.5rem, 3.8vw, 4rem);
+}
+
+.metaRow {
+  display: flex;
+  justify-content: space-between;
+  gap: $space-4;
+  flex-wrap: wrap;
+  font-family: $font-mono;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: $color-text-mid;
+
+  a { color: inherit; text-decoration: none; &:hover, &:focus-visible { color: $color-text; } }
+}
+
+.title {
+  font-family: $font-body;
+  font-weight: $fw-regular;
+  font-size: clamp(2rem, 1.6vw + 1.4rem, 2.5rem);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: $color-text-hi;
+}
+
+.lead {
+  font-family: $font-body;
+  font-weight: $fw-light;
+  font-size: clamp(1.375rem, 1.4vw + 0.9rem, 2.125rem);
+  line-height: 1.25;
+  max-width: 900px;
+  color: $color-text;
+}
+
+.ficha {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: $space-4;
+
+  @include respond-to(md) { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: $space-6; }
+
+  div {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-top: $space-4;
+    border-top: 1px solid $color-line;
+    min-width: 0;
+  }
+
+  dt {
+    font-family: $font-mono;
+    font-size: 0.6875rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: $color-text-mid;
+  }
+
+  dd {
+    font-family: $font-body;
+    font-size: clamp(1rem, 0.4vw + 0.9rem, 1.125rem);
+    color: $color-text;
+  }
+}
+
+// ─── Text modules ─────────────────────────────────────────────────────────────
+.mod {
+  @include container;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.5rem, 2.9vw, 3rem);
+  padding-bottom: clamp(4rem, 7vw, 7.5rem);
+}
+
+.modQuestion { padding-block: clamp(4rem, 11.9vw, 12.5rem); }
+
+.rule { display: block; color: $color-line; }
+
+.fila {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  gap: $space-4;
+
+  @include respond-to(md) { grid-template-columns: 1fr; gap: $space-6; }
+}
+
+.colLabel {
+  display: flex;
+  flex-direction: column;
+  gap: $space-6;
+}
+
+.label {
+  font-family: $font-mono;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: $color-text-mid;
+}
+
+.colContent {
+  display: flex;
+  flex-direction: column;
+  gap: $space-6;
+  min-width: 0;
+}
+
+.question,
+.decisionTitle {
+  font-family: $font-body;
+  font-weight: $fw-light;
+  font-size: clamp(2rem, 4.3vw, 4.5rem);
+  line-height: 1.04;
+  letter-spacing: -0.025em;
+  color: $color-text;
+}
+
+.contextLead {
+  font-family: $font-body;
+  font-weight: $fw-light;
+  font-size: clamp(1.375rem, 2vw, 2.125rem);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  max-width: 760px;
+}
+
+.text {
+  font-family: $font-body;
+  font-weight: $fw-light;
+  font-size: clamp(1.0625rem, 1.3vw, 1.375rem);
+  line-height: 1.45;
+  color: $color-text-mid;
+  max-width: 640px;
+}
+
+.bigNumber {
+  font-family: $font-body;
+  font-weight: $fw-light;
+  font-size: clamp(4rem, 9.5vw, 10rem);
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  color: $color-text-mid;
+}
+
+// ─── Behance block ────────────────────────────────────────────────────────────
+.blockWrap {
+  @include container;
+  position: relative;
+}
+
+.notesBar {
+  position: sticky;
+  // Below the vertical FRESNO wordmark, which hangs ~120 px from the top.
+  top: calc(#{$nav-height} + 3.5rem);
+  z-index: 3;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+  height: 0;            // floats over the block without pushing it
+  overflow: visible;
+
+  > div {
+    margin-top: $space-3;
+    margin-right: $space-3;
+    padding: 4px 4px 4px 14px;
+    border-radius: 999px;
+    background: $color-overlay;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  }
+
+  @media (max-width: 900px) { display: none; }
+}
+
+.block {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  line-height: 0;
+}
+
+.blockImg {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 0;
+}
+
+.notes {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  line-height: normal;
+
+  @media (max-width: 900px) { display: none; }
+}
+
+.lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+
+  line { stroke: $raw-chip; stroke-width: 1.25; }
+}
+
+.dot {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  border-radius: 50%;
+  background: $raw-chip;
+  box-shadow: 0 0 0 3px rgba(198, 219, 249, 0.25);
+}
+
+.note {
+  position: absolute;
+  width: clamp(14rem, 21.1%, 20.5rem);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px;
+  border-radius: 4px;
+  background: $raw-chip;
+  color: $raw-ink;
+  font-family: $font-mono;
+  font-size: 0.75rem;
+  line-height: 1.35;
+  pointer-events: auto;
+
+  @media (prefers-reduced-motion: no-preference) {
+    animation: noteIn 0.25s $ease-out-quart both;
+  }
+}
+
+@keyframes noteIn { from { opacity: 0; transform: translateY(4px); } }
+
+.noteTitle { font-weight: $fw-medium; }
+
+// ─── Result ───────────────────────────────────────────────────────────────────
+.modResult { padding-top: clamp(5rem, 14.3vw, 15rem); padding-bottom: clamp(4rem, 11.9vw, 12.5rem); }
+
+.stats { display: flex; flex-direction: column; }
+
+.stat {
+  display: grid;
+  grid-template-columns: minmax(0, 62%) auto;
+  align-items: baseline;
+  gap: $space-4;
+  padding-block: $space-6;
+  border-bottom: 1px solid $color-line;
+
+  @include respond-to(sm) { grid-template-columns: 1fr; gap: $space-2; }
+}
+
+.statValue {
+  font-family: $font-body;
+  font-weight: $fw-light;
+  font-size: clamp(3.5rem, 9.5vw, 10rem);
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  color: $color-text;
+  white-space: nowrap;
+}
+
+.published {
+  font-family: $font-body;
+  font-weight: $fw-light;
+  font-size: clamp(1rem, 0.4vw + 0.9rem, 1.125rem);
+  line-height: 1.5;
+  color: $color-text-mid;
+  max-width: 640px;
+
+  a { color: $color-text; }
+}
+
+.credits {
+  font-family: $font-body;
+  font-size: clamp(1rem, 0.4vw + 0.9rem, 1.125rem);
+  line-height: 1.3;
+}
+
+.modCredits { padding-bottom: clamp(4rem, 11.9vw, 12.5rem); }
+
+// ─── Next case ────────────────────────────────────────────────────────────────
+.next {
+  display: flex;
+  flex-direction: column;
+  gap: $space-6;
+  padding: clamp(4rem, 7vw, 7.5rem) $gutter;
+  background: $color-bg-2;
+  color: $color-text;
+  text-decoration: none;
+}
+
+.nextTitle {
+  font-family: $font-body;
+  font-weight: $fw-light;
+  font-size: clamp(3rem, 8.3vw, 8.75rem);
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+  transition: color $duration-fast;
+
+  .next:hover &, .next:focus-visible & { color: $color-text-hi; }
+}

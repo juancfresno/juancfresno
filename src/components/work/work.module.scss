@@ -1,0 +1,259 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+// ─── Index (Work · v0 → 02 · Índice) ──────────────────────────────────────────
+.index { position: relative; }
+
+.list { list-style: none; }
+
+.row {
+  display: grid;
+  // 72 · fluid · 360 · 360 · 96 at 1552 px (Figma)
+  grid-template-columns: 4.5rem minmax(0, 1fr) minmax(0, 23%) minmax(0, 23%) 6rem;
+  align-items: center;
+  min-height: 3.6rem;
+  padding-block: $space-4;
+  border-top: 1px solid $color-line;
+  color: $color-text;
+  text-decoration: none;
+  transition: border-color $duration-fast;
+
+  @include respond-to(lg) {
+    grid-template-columns: 3rem minmax(0, 1fr) minmax(0, 30%) 4rem;
+    .colClient { display: none; }
+  }
+
+  @include respond-to(md) {
+    grid-template-columns: 2.25rem minmax(0, 1fr) auto;
+    grid-template-areas: 'n name year' 'n disc disc';
+    row-gap: $space-1;
+    .n { grid-area: n; align-self: start; padding-top: 0.35rem; }
+    .name { grid-area: name; }
+    .colDisc { grid-area: disc; }
+    .colYear { grid-area: year; }
+  }
+}
+
+.head {
+  min-height: 0;
+  padding-block: 0 $space-4;
+  border-top: 0;
+  font-family: $font-mono;
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: $color-text-mid;
+
+  @include respond-to(md) { display: none; }
+}
+
+.item:last-child .row { border-bottom: 1px solid $color-line; }
+
+.item.on .row,
+.item:hover > a.row,
+.item > a.row:focus-visible {
+  border-top-color: $color-line-hi;
+}
+
+.row:focus-visible { outline: 1px solid $color-text; outline-offset: 2px; }
+
+.n {
+  font-family: $font-mono;
+  font-size: 0.75rem;
+  color: $color-text-mid;
+}
+
+.name {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-3;
+  min-width: 0;
+  font-family: $font-body;
+  font-size: clamp(1rem, 0.4vw + 0.9rem, 1.125rem);
+  line-height: 1.4;
+
+  > span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+}
+
+.arrow {
+  opacity: 0;
+  transform: translate(-4px, 4px);
+  transition: opacity $duration-fast, transform $duration-fast $ease-out-quart;
+
+  .item:hover &, a:focus-visible & { opacity: 1; transform: none; }
+  @media (hover: none) { display: none; }
+}
+
+.cell {
+  font-family: $font-mono;
+  font-size: 0.625rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: $color-text;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  @include respond-to(md) { color: $color-text-mid; white-space: normal; }
+}
+
+.colYear { text-align: right; }
+
+.blur {
+  filter: blur(4px);
+  color: $color-text-mid;
+  user-select: none;
+}
+
+.pill {
+  display: inline-flex;
+  padding: 0.3rem 0.65rem;
+  border: 1px solid $color-line;
+  border-radius: 999px;
+  font-family: $font-mono;
+  font-size: 0.6875rem;
+  line-height: 1.2;
+  color: $color-text;
+  background: $color-bg;
+}
+
+// Touch: a small fixed thumbnail at the end of each row instead of the cursor preview.
+.touchThumb {
+  display: none;
+
+  @media (hover: none), (pointer: coarse), (max-width: #{$bp-md}) {
+    display: block;
+    grid-column: 1 / -1;
+    width: 100%;
+    max-width: 10rem;
+    height: auto;
+    aspect-ratio: 400 / 272;
+    object-fit: cover;
+    margin-top: $space-3;
+    border-radius: 2px;
+    background: $color-surface;
+
+    @include respond-to(md) { grid-area: auto; grid-column: 2 / -1; }
+  }
+}
+
+// ─── Floating preview ─────────────────────────────────────────────────────────
+.float {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: $z-overlay;
+  width: 400px;
+  height: 272px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity $duration-fast;
+  will-change: transform;
+
+  @media (hover: none) { display: none; }
+}
+
+.floatOn { opacity: 1; }
+
+.floatImg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 2px;
+  background: $color-surface;
+  opacity: 0;
+
+  &.floatImgOn { opacity: 1; }
+}
+
+.floatLabel {
+  position: absolute;
+  left: 0;
+  top: calc(100% + 8px);
+  padding: 4px 8px;
+  border-radius: 2px;
+  background: $color-overlay;
+  color: $color-text;
+  font-family: $font-mono;
+  font-size: 0.6875rem;
+  white-space: nowrap;
+}
+
+// ─── Views toggle + Portadas ──────────────────────────────────────────────────
+.views { display: flex; flex-direction: column; gap: $space-8; }
+
+.covers {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(2rem, 3vw, 3rem) $space-4;
+  list-style: none;
+
+  @include respond-to(md) { grid-template-columns: 1fr; }
+}
+
+.cover {
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
+  color: $color-text;
+  text-decoration: none;
+}
+
+.coverMedia {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border-radius: 2px;
+  background: $color-surface;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform $duration-slow $ease-out-expo;
+  }
+
+  a:hover & img, a:focus-visible & img { transform: scale(1.02); }
+  @media (prefers-reduced-motion: reduce) { img { transition: none; } }
+}
+
+.coverNda {
+  display: grid;
+  place-items: center;
+  background:
+    repeating-linear-gradient(135deg, transparent 0 10px, $color-line 10px 11px),
+    $color-bg-2;
+}
+
+.coverMeta {
+  display: flex;
+  justify-content: space-between;
+  gap: $space-4;
+  align-items: baseline;
+}
+
+.coverName {
+  font-family: $font-body;
+  font-size: clamp(1rem, 0.4vw + 0.9rem, 1.125rem);
+}
+
+// ─── Archive (compact) ────────────────────────────────────────────────────────
+.archive {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  column-gap: $space-4;
+
+  li {
+    display: flex;
+    justify-content: space-between;
+    gap: $space-4;
+    padding-block: $space-3;
+    border-top: 1px solid $color-line;
+    font-family: $font-body;
+    font-size: 0.9375rem;
+  }
+}

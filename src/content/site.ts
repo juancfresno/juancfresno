@@ -24,32 +24,28 @@ export const SOCIALS = [
   { label: 'X', href: 'https://x.com/JuanCFresno' },
 ]
 
-export type Project = {
-  slug: string
-  name: string
-  discipline: string
-  year: string | null
-  client: string | null
-  studio: string | null // "para @estudio"
-  url: string | null
-  featured?: boolean
-  caseStudy?: boolean
-  cover: string // image under /public/images
+// Projects, cases and archive live in ./cases.ts (data model for /work).
+
+// ─── Home hero · "Home · v0" (6770:9448) ─────────────────────────────────────
+export const HOME = {
+  name: 'Juan C. Fresno',
+  title: 'Independent Art Director & Interactive Designer',
+  disciplines: 'Digital products — Art direction — Interaction design — Brand identity — Things.',
+  intro: 'Inquieto y autodidacta. Diseño desde 2012 y sigo aprendiendo cada semana, porque este oficio no se está quieto.',
+  figures: [
+    { label: 'Agencias/Estudios', value: '+30' },
+    { label: 'Marcas', value: '+50' },
+    { label: 'Proyectos', value: '+100' },
+  ],
 }
 
-// Names and disciplines as listed today on /projects ("09 cases").
-// Years, clients, studios and links are still to be confirmed by Juan.
-export const PROJECTS: Project[] = [
-  { slug: 'bbva', name: 'BBVA', discipline: 'Digital Product', year: null, client: 'BBVA', studio: null, url: null, featured: true, caseStudy: true, cover: '/images/01.webp' },
-  { slug: 'google', name: 'Google', discipline: 'Art Direction', year: null, client: 'Google', studio: null, url: null, featured: true, caseStudy: true, cover: '/images/02.webp' },
-  { slug: 'la-liga', name: 'La Liga', discipline: 'Interaction Design', year: null, client: 'La Liga', studio: null, url: null, featured: true, caseStudy: true, cover: '/images/03.webp' },
-  { slug: 'repsol', name: 'Repsol', discipline: 'Product Design', year: null, client: 'Repsol', studio: null, url: null, cover: '/images/04.webp' },
-  { slug: 'acciona', name: 'Acciona', discipline: 'Brand Identity', year: null, client: 'Acciona', studio: null, url: null, cover: '/images/05.webp' },
-  { slug: 'coca-cola', name: 'Coca-Cola', discipline: 'Web Experience', year: null, client: 'Coca-Cola', studio: null, url: null, cover: '/images/06.webp' },
-  { slug: 'iberdrola', name: 'Iberdrola', discipline: 'Visual System', year: null, client: 'Iberdrola', studio: null, url: null, cover: '/images/07.webp' },
-  { slug: 'telefonica', name: 'Telefónica', discipline: 'Campaign', year: null, client: 'Telefónica', studio: null, url: null, cover: '/images/08.webp' },
-  { slug: 'vodafone', name: 'Vodafone', discipline: 'Creative Direction', year: null, client: 'Vodafone', studio: null, url: null, cover: '/images/09.webp' },
-]
+// ─── Page intros (one line under the nav, from the v0 frames) ────────────────
+export const INTROS = {
+  work: 'Proyectos de los últimos años: marcas, webs y producto digital. Unos con estudios y agencias, otros mano a mano con la marca.',
+  feed: 'Lo último que he ido publicando: piezas sueltas, procesos y cosas que no llegan a caso. Por fecha.',
+  lab: 'Lo que hago cuando nadie me lo pide: experimentos, apps propias y recursos. Aquí es donde aprendo, y a veces sale algo que acaba en un proyecto.',
+  contact: '¿Hacemos algo juntos?',
+}
 
 export const LAB = [
   { name: 'Tracker', what: 'Time tracking for iPhone and Mac.', status: 'En desarrollo', year: '2026' },
@@ -92,29 +88,46 @@ export const EXPERIMENTS = [
   },
 ]
 
+// ─── About · "About · Desktop" (6770:10229) ───────────────────────────────────
 export const ABOUT = {
-  // Current /about copy, verbatim (missing accents fixed).
-  bio: [
-    'Desde 2012 trabajo de forma independiente como Art Director & Digital Designer, colaborando con marcas, agencias y equipos en proyectos digitales de distinta escala.',
-    'Trabajo desde Valencia, España, adaptándome a diferentes contextos, ritmos y formas de trabajo, tanto con clientes pequeños como con grandes organizaciones.',
-    'Mi foco está en definir líneas visuales claras, cuidar la interacción y construir productos digitales que no solo se vean bien, sino que funcionen con sentido.',
-  ],
-  // Proposed in the architecture doc; pending Juan's copy.
-  modes: [
-    { name: 'Marca blanca', text: 'Diseño dentro del proyecto del estudio, que firma el trabajo.' },
-    { name: 'Refuerzo de equipo', text: 'Me integro en el equipo durante unas semanas.' },
-    { name: 'Proyecto entero', text: 'Llevo la dirección de arte de principio a fin.' },
-  ],
+  role: 'Independent Art Director & Interactive Designer',
+  // First sentence is highlighted; the rest reads in the muted tone (as in Figma).
+  bioLead: 'Diseño para pantallas desde 2012, y desde 2016 trabajo como independiente en Valencia.',
+  bioRest: 'Soy inquieto y bastante autodidacta. He pasado por agencias, consultoras y estudios pequeños; he diseñado para banca, moda, hoteles y energía, y he dado clase de diseño de interfaces. Cuando no tengo proyecto, me invento uno: en el Lab están mis apps y experimentos. Me engancha que este oficio cambie cada año; siempre hay algo nuevo que aprender. Lo justo, bien hecho.',
   services: [
-    { name: 'Dirección Creativa & Arte', text: 'Defino la dirección visual de marcas y productos digitales, estableciendo un criterio claro y coherente desde el concepto hasta la ejecución.', tags: 'Art direction · Visual direction · Concept development · Visual systems · Creative guidance' },
-    { name: 'Producto Digital', text: 'Diseño productos y experiencias digitales claras, funcionales y bien pensadas, cuidando tanto la estructura como la interacción y el detalle visual.', tags: 'UI design · Interaction design · Product thinking · Prototyping · User flows · Design systems' },
-    { name: 'Branding', text: 'Creo y desarrollo identidades visuales sólidas que funcionan en contextos digitales y se adaptan a distintos formatos y necesidades.', tags: 'Brand identity · Rebranding · Logo design · Visual identity · Brand systems · Guidelines' },
-    { name: 'Desarrollo web', text: 'Desarrollo webs funcionales y bien ejecutadas, colaborando con perfiles técnicos para llevar el diseño a producción con fidelidad y calidad.', tags: 'Frontend collaboration · Web implementation · Framer · CMS · Developer handoff · QA visual' },
+    { name: 'Dirección de arte', text: 'Le doy a una marca o a un producto una línea visual clara, y me aseguro de que llega intacta hasta la última pantalla.', tags: 'Concepto · Dirección visual · Sistemas visuales · Supervisión creativa' },
+    { name: 'Diseño web e interacción', text: 'Webs con movimiento, pensadas para entenderse y disfrutarse. Las llevo a producción con desarrolladores de confianza.', tags: 'Diseño web · Interacción · Motion · Prototipos · Framer · QA visual' },
+    { name: 'Producto digital', text: 'Apps y plataformas que se entienden a la primera: estructura, flujos, interfaz y sistema de diseño.', tags: 'Interfaz · Flujos · Prototipos · Design systems' },
+    { name: 'Identidad de marca', text: 'Identidades pensadas para la pantalla, que aguantan en cualquier formato.', tags: 'Identidad · Rebranding · Logotipo · Sistemas de marca · Guías' },
   ],
-  // Verbatim from /about. "VML KingeClient" and "Cinces Capitol" look like typos: Juan to confirm.
-  studios: ['Invisible Geeks', 'Accenture Song', 'Fjord', 'Hanzo', 'VML KingeClient', 'Wildbytes'],
-  clients: ['Acciona', 'Bankia', 'BBVA', 'Cepsa', 'Cinces Capitol', 'Coca-Cola', 'Correos', 'Google', 'Iberdrola', 'La Liga', 'Moto GP', 'Movistar', 'Orange', 'Pull & Bear', 'Real Madrid C.F.', 'Room Mate Hotels', 'Standard Chartered', 'Uno de 50', 'Sephora', 'Burger King', 'Melia'],
-  tools: 'Figma · Notion · Claude · Swift · Framer',
+  studios: 'Fjord (Accenture Song), Hanzo, VML, Saffron, Goodrebels, Wildbytes, Audax Studio y otros.',
+  brands: 'BBVA, Deutsche Bank, Iberdrola, Meliá, Google, Coca-Cola, Movistar, Orange, Seat, Dior, H&M, Sephora, Pull & Bear, Real Madrid C.F., LaLiga, MotoGP, Correos, Acciona, Cepsa, Room Mate Hotels, Standard Chartered, Burger King, Uno de 50 y otras.',
+  process: [
+    { n: '01', name: 'Entender', text: 'Antes de abrir Figma busco la pregunta difícil: qué tiene que resolver esto y para quién.' },
+    { n: '02', name: 'Dirección', text: 'Propongo una dirección clara, no diez. La defiendo y la ajustamos juntos.' },
+    { n: '03', name: 'Diseño', text: 'Diseño, prototipo y pruebo pronto. Uso IA para explorar más rápido; decidir sigue siendo cosa mía.' },
+    { n: '04', name: 'Producción', text: 'Me quedo hasta que está publicado y se ve como se diseñó.' },
+  ],
+  experience: [
+    { name: 'Fresno©', role: 'Estudio independiente', how: 'Propio', years: '2016 — hoy' },
+    { name: 'Forebound', role: 'Dirección creativa y de producto', how: 'Freelance', years: '2025 — hoy' },
+    { name: 'Saffron', role: 'Diseño', how: 'Freelance', years: '2026' },
+    { name: 'VML', role: 'Diseño de producto', how: 'Freelance', years: '2021 — 2022' },
+    { name: 'Fjord · Accenture Song', role: 'Diseño', how: 'Freelance', years: '2019 — 2023' },
+    { name: 'Wildbytes', role: 'Diseño web e interacción', how: 'Freelance', years: '2019 — 2021' },
+    { name: 'Trazos', role: 'Profesor de UI/UX', how: 'Docencia', years: '2018 — 2020' },
+    { name: 'Hanzo', role: 'Visual Designer', how: 'En plantilla', years: '2016 — 2018' },
+    { name: 'Redbility', role: 'Visual Designer', how: 'En plantilla', years: '2016' },
+    { name: 'Hermanos Clever', role: 'UI & UX Designer', how: 'En plantilla', years: '2014 — 2016' },
+    { name: 'The Cocktail (hoy VML)', role: 'UI & UX Designer', how: 'En plantilla', years: '2014' },
+    { name: 'Onestic', role: 'UI & UX Designer', how: 'En plantilla', years: '2012 — 2014' },
+  ],
+  // Photos from the About frame, downloaded from Figma into public/images/about/.
+  photos: [
+    { src: '/images/about/setup.webp', w: 1000, h: 563, alt: 'Puesto de trabajo' },
+    { src: '/images/about/poster.webp', w: 1200, h: 789, alt: 'Póster enmarcado apoyado en la pared' },
+    { src: '/images/about/juan.webp', w: 400, h: 400, alt: 'Juan C. Fresno' },
+  ],
 }
 
 export const CONTACT = {
