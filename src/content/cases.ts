@@ -69,17 +69,30 @@ export const PROJECTS: Project[] = [
   { slug: 'super-nintendo', name: 'Super Nintendo', discipline: 'Web · UI · UX', client: 'Concepto propio', year: '2016', caseStudy: true },
 ]
 
-// ─── Archive: the rest, compact (names as listed on today's /projects) ───────
-// Years and studios still to be confirmed by Juan.
+// ─── Archive: brands Juan has worked with (from ABOUT.brands in site.ts) ──────
+// Only names he lists himself. Discipline and year stay '—' until he confirms them.
 export const ARCHIVE: { name: string; discipline: string; year: string | null }[] = [
-  { name: 'BBVA', discipline: 'Digital Product', year: null },
-  { name: 'La Liga', discipline: 'Interaction Design', year: null },
-  { name: 'Repsol', discipline: 'Product Design', year: null },
-  { name: 'Acciona', discipline: 'Brand Identity', year: null },
-  { name: 'Coca-Cola', discipline: 'Web Experience', year: null },
-  { name: 'Iberdrola', discipline: 'Visual System', year: null },
-  { name: 'Telefónica', discipline: 'Campaign', year: null },
-  { name: 'Vodafone', discipline: 'Creative Direction', year: null },
+  { name: 'BBVA', discipline: '—', year: null },
+  { name: 'Deutsche Bank', discipline: '—', year: null },
+  { name: 'Iberdrola', discipline: '—', year: null },
+  { name: 'Meliá', discipline: '—', year: null },
+  { name: 'Coca-Cola', discipline: '—', year: null },
+  { name: 'Movistar', discipline: '—', year: null },
+  { name: 'Orange', discipline: '—', year: null },
+  { name: 'Seat', discipline: '—', year: null },
+  { name: 'Dior', discipline: '—', year: null },
+  { name: 'H&M', discipline: '—', year: null },
+  { name: 'Sephora', discipline: '—', year: null },
+  { name: 'Pull & Bear', discipline: '—', year: null },
+  { name: 'Real Madrid C.F.', discipline: '—', year: null },
+  { name: 'LaLiga', discipline: '—', year: null },
+  { name: 'MotoGP', discipline: '—', year: null },
+  { name: 'Acciona', discipline: '—', year: null },
+  { name: 'Cepsa', discipline: '—', year: null },
+  { name: 'Room Mate Hotels', discipline: '—', year: null },
+  { name: 'Standard Chartered', discipline: '—', year: null },
+  { name: 'Burger King', discipline: '—', year: null },
+  { name: 'Uno de 50', discipline: '—', year: null },
 ]
 
 // ─── Cases ────────────────────────────────────────────────────────────────────
