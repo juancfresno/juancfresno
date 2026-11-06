@@ -70,8 +70,25 @@ export const EXPERIMENTS = [
     year: '2026',
     what: 'Cuatro botones con interacción: magnético, columnas, rodillo y scramble. Sin dependencias, listos para copiar o para pedírselos a Claude.',
     how: 'CSS y unas 80 líneas de JavaScript sin librerías. Funcionan con teclado, respetan «reducir movimiento» y se adaptan al tema con dos variables.',
+    css: 'buttons.css',
+    js: 'buttons.js',
+    init: 'fresnoButtons', // global init fn: window[init](root) → cleanup
     files: ['buttons.css', 'buttons.js', 'snippet.html'],
     repo: null as string | null, // public GitHub folder, once the repo exists
+  },
+  {
+    slug: 'transiciones',
+    n: '002',
+    name: 'Transiciones',
+    kind: 'Navegación',
+    year: '2026',
+    what: 'Diez transiciones entre páginas sobre una web de prueba, para verlas una al lado de otra antes de elegir. Las cuatro con ★ son las que recomiendo; el resto está para comparar.',
+    how: 'JavaScript sin librerías con la Web Animations API: un overlay por encima de la página y el cambio de página cuando está tapada. El morph es FLIP dentro del escenario. Con «reducir movimiento» todo es instantáneo y el glitch no se reproduce nunca. Para la web real, el prompt pide View Transitions si el stack las tiene.',
+    css: 'transitions.css',
+    js: 'transitions.js',
+    init: 'fresnoTransitions',
+    files: ['transitions.css', 'transitions.js', 'snippet.html'],
+    repo: null as string | null,
   },
 ]
 

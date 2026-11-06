@@ -17,6 +17,24 @@
     --fb-fg: var(--c-text);
     --fb-inv: var(--c-bg);
   }
+
+  // 002 · Transiciones: full-width piece (picker + mock site), site tokens.
+  &:has(> :global(.ft)) {
+    display: block;
+    padding: $space-8;
+
+    @include respond-to(sm) { padding: $space-6 $space-4; }
+  }
+
+  :global(.ft) {
+    --ft-bg: var(--c-bg);
+    --ft-bg-2: var(--c-bg-2);
+    --ft-fg: var(--c-text);
+    --ft-mid: var(--c-text-mid);
+    --ft-muted: var(--c-text-muted);
+    --ft-line: var(--c-border);
+    --ft-mono: #{$font-mono};
+  }
 }
 
 .actions {
@@ -57,6 +75,7 @@
   font-size: $fs-xs;
   line-height: 1.7;
   color: $color-text-mid;
+  max-height: 28rem;
 }
 
 // Lab index card for an experiment.

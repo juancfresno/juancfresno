@@ -32,7 +32,7 @@ export default async function ExperimentPage({ params }: { params: Promise<Param
   if (!e) notFound()
 
   const html = read(slug, 'snippet.html')
-  const code = `<!-- HTML -->\n${html}\n<link rel="stylesheet" href="buttons.css">\n<script src="buttons.js"></script>\n\n/* buttons.css */\n${read(slug, 'buttons.css')}\n\n// buttons.js\n${read(slug, 'buttons.js')}`
+  const code = `<!-- HTML -->\n${html}\n<link rel="stylesheet" href="${e.css}">\n<script src="${e.js}"></script>\n\n/* ${e.css} */\n${read(slug, e.css)}\n\n// ${e.js}\n${read(slug, e.js)}`
   const prompt = read(slug, 'prompt.md')
 
   return (
@@ -43,7 +43,7 @@ export default async function ExperimentPage({ params }: { params: Promise<Param
         <p className={s.text}>{e.what}</p>
       </header>
 
-      <LabDemo slug={slug} html={html} />
+      <LabDemo slug={slug} html={html} css={e.css} js={e.js} init={e.init} />
 
       <Section label="Úsalo">
         <div className={l.actions}>
