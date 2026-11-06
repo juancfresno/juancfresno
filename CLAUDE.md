@@ -11,26 +11,41 @@ Personal portfolio for Juan C. Fresno, deployed at juancfresno.vercel.app.
 
 ## Routing (App Router, route group `(site)`) — v2 (branch `web-v2`)
 
-All real pages live under `src/app/(site)/`. Copy lives in **one file**, `src/content/site.ts`; pages only lay it out. Placeholder copy renders a dashed `<Pending />` tag so gaps are visible on the preview.
+All real pages live under `src/app/(site)/`. Pages only lay content out; copy lives in `src/content/`:
+
+- `site.ts` — person, socials, home hero (`HOME`), page intros (`INTROS`), Lab (`LAB`, `EXPERIMENTS`), About (`ABOUT`), contact.
+- `cases.ts` — the Work data model: `PROJECTS` (index rows, newest first; `nda`, `caseStudy`, `featured`), `CASES` (copy and Behance stats per case, from each "Caso · …" frame in Figma ↪ Casos; `notes` = annotations over the image block), `ARCHIVE` (compact list), helpers `toRow`, `caseMedia`, `projectNumber`, `CASE_PROJECTS`.
+- `feed.ts` — feed items + `groupFeed()` (sessions of the same project within 60 days; the rest in "Sueltos").
+- `generated/cases-media.json`, `generated/feed.json` — image paths and sizes, written by `scripts/build-media.mjs`. Do not edit by hand.
+
+Placeholder copy renders a dashed `<Pending />` tag so gaps are visible on the preview.
 
 | Route | File | Notes |
 |---|---|---|
-| `/` | `(site)/page.tsx` | One line + 3 featured cases + short index + Lab teaser + clients + contact. |
-| `/work` | `(site)/work/page.tsx` | Full index (year, name, studio, discipline). `/projects` redirects here. |
-| `/work/[slug]` | `(site)/work/[slug]/page.tsx` | Case template (ficha, hard question, context, decisions, discarded, result, process, credits, next). Only projects with `caseStudy: true` are generated. |
-| `/about` | `(site)/about/page.tsx` | Bio, modes of work with studios, services, studios, clients, tools. |
-| `/contact` | `(site)/contact/page.tsx` | Follows the site theme like every page. No form. |
-| `/feed` | `(site)/feed/page.tsx` | Loose pieces that aren't cases; home for everything posted on social. Placeholder. |
-| `/lab` | `(site)/lab/page.tsx` | Experiments, interactive artefacts, own products. `/playground` redirects here. |
-| `/journal` | `(site)/journal/page.tsx` | Writing: process, decisions, opinion. Placeholder. |
+| `/` | `(site)/page.tsx` | Figma "Home · v0". Hero, featured cases as an index with floating cursor preview, links to `/work` and `/work#archivo`, latest 7 feed pieces, Lab rows, contact. |
+| `/work` | `(site)/work/page.tsx` | Figma "Work · v0". Index (Nº · proyecto · disciplina · cliente/estudio · año) with floating preview; NDA rows blurred with a pill, no link. Lista / Portadas toggle (`?view=portadas`, remembered in `localStorage['work:view']`). `#archivo` section at the end. `/projects` redirects here. |
+| `/work/[slug]` | `(site)/work/[slug]/page.tsx` | Case template ("Caso · Shoeciety · Rediseño" + "· v0"): case header, question, context, decisions, ONE continuous image block (`components/case/CaseBlock`: Behance order, content width, gap 0, intrinsic ratio, no captions), result (Behance stats), credits, next case. `Notas: ON/OFF` when the case has `notes` (Shoeciety; hidden under 900px). Only `caseStudy: true` with an entry in `CASES` is generated (`dynamicParams = false`). |
+| `/about` | `(site)/about/page.tsx` | Figma "About · Desktop": bio, services + photos (`public/images/about/`), studios and brands, process, experience, dossier (pending). |
+| `/contact` | `(site)/contact/page.tsx` | Figma "Contact · Desktop": title line + shared `ContactBlock`. No form. |
+| `/feed` | `(site)/feed/page.tsx` | Figma "Feed · Desktop". Dribbble + Instagram pieces minus duplicates and Biako; sessions; CSS-columns masonry 3/2/1; title + MM/AAAA inside each image; monochrome + 4×4 dither overlay at rest, colour on hover/focus. Each item opens the original post. |
+| `/lab` | `(site)/lab/page.tsx` | Figma "Lab · Desktop". Experiments (001, 002 → `/lab/[slug]`), own products with status, "Código abierto · GitHub" (pending until the repo is public). `/playground` redirects here. |
+| `/journal` | `(site)/journal/page.tsx` | Writing. Placeholder (no Figma frame yet). |
 
-Nav (desktop and mobile bottom bar share `NAV_LINKS`): About · Work · Feed · Lab · Journal · Contact. The FRESNO wordmark is vertical in the top-right corner on every breakpoint and hangs over the header line (the header keeps its 72px height). Press **G** to toggle the layout grid overlay (`src/components/ui/GridOverlay`).
+Shared v0 blocks: `components/blocks/V0Section` (ElasticLine + mono `{ label ↘`) and `v0.module.scss` (page shell, intro line, segmented toggles, closing block); `components/work/HoverIndex` (index + floating preview; on touch/small screens each row shows a small fixed thumbnail instead).
 
-**Themes.** Dark (default) and light. Colors are CSS custom properties (`--c-*`, defined in `globals.scss` under `:root` and `:root[data-theme="light"]`); the Sass `$color-*` tokens point at them, so never use `rgba($color-*, …)` — add a new `--c-*` var instead. Brand constants that must not change with the theme are `$raw-ink`, `$raw-pearl`, `$raw-chip`. `ThemeToggle` (`src/components/ui/ThemeToggle`) sits after the nav links (next to the face on mobile), saves to `localStorage.theme`, and **D** toggles it; an inline script in `layout.tsx` applies the saved theme before paint. `THEMES` is a list so extra art-direction modes can be added later.
+**Media.** `node scripts/build-media.mjs` (needs the source folders, outside the repo: `CASES_DIR`, `FEED_DIR`, and `SHOE_DIR` for the Shoeciety originals exported from Figma) converts to WebP with sharp: cases max 1600px q80 into `public/work/<slug>/NN.webp` (+ `cover.webp`, 800px), feed max 900px q78 into `public/feed/<id>.webp`, plus `public/feed/_dither.png`. Image count and order per case match its "Behance · bloque" in Figma (Dinamo without its 12th image, Google without its 17th; GIFs as first frame). Pages use `next/image` with explicit sizes and `unoptimized`.
 
-`src/app/layout.tsx` renders the global `Nav` (top bar + mobile bottom tab bar) and `Footer` around `{children}`, inside `PageTransitionProvider` (owns the `navigate` seam). Shared page blocks live in `src/components/blocks/` (one `blocks.module.scss`).
+Nav (desktop and mobile bottom bar share `NAV_LINKS`): About · Work · Feed · Lab · Journal · Contact. The FRESNO wordmark is vertical in the top-right corner on every breakpoint and hangs over the header line (the header keeps its 72px height). Next to it: local time `VLC HH:MM CET/CEST` (`components/ui/NavClock`, Europe/Madrid, aria-hidden) and a `?` button.
 
-Removed in v2: the old `/index2` home and its Instagram/Dribbble feed + cron, the coming-soon home, custom cursor, grain overlay, Lenis smooth scroll (native scroll for usability), the contact form and the placeholder galleries.
+**Keyboard.** **G** toggles the layout grid overlay (`src/components/ui/GridOverlay`), **D** toggles the theme, **?** opens the shortcuts legend (`src/components/ui/Shortcuts`; Esc closes; the `?` button dispatches `fresno:shortcuts`), **M** (modes) shows "próximamente". All ignore keys typed in form fields.
+
+**Themes.** Dark (default) and light. Colors are CSS custom properties (`--c-*`, defined in `globals.scss` under `:root` and `:root[data-theme="light"]`); the Sass `$color-*` tokens point at them, so never use `rgba($color-*, …)` — add a new `--c-*` var instead. v0 added `--c-text-hi` (heading tint), `--c-text-dim`, `--c-line`, `--c-line-hi`, `--c-overlay` (chips over images). Brand constants that must not change with the theme are `$raw-ink`, `$raw-pearl`, `$raw-chip` (the note cards and dots in case blocks use `$raw-chip`). `ThemeToggle` (`src/components/ui/ThemeToggle`) sits after the nav links (next to the face on mobile), saves to `localStorage.theme`; an inline script in `layout.tsx` applies the saved theme before paint. `THEMES` is a list so extra art-direction modes can be added later.
+
+**Fonts in Figma vs code.** The Figma frames use Geist because the plugin can't load Switzer: Figma Geist (non-mono) → `$font-body` (Switzer), Geist Mono → `$font-mono`.
+
+`src/app/layout.tsx` renders the global `Nav` (top bar + mobile bottom tab bar) and `Footer` around `{children}`, inside `PageTransitionProvider` (owns the `navigate` seam), plus `GridOverlay` and `Shortcuts`. Older shared page blocks live in `src/components/blocks/` (`blocks.module.scss`, `ContactBlock`, `Pending`, `Section`).
+
+Removed in v2: the old `/index2` home and its Instagram/Dribbble feed + cron, the coming-soon home, custom cursor, grain overlay, Lenis smooth scroll (native scroll for usability), the contact form, the placeholder galleries and the placeholder cases (bbva, google, la-liga as fake case pages).
 
 ## Styling system
 
@@ -45,11 +60,13 @@ Removed in v2: the old `/index2` home and its Instagram/Dribbble feed + cron, th
 
 `src/components/ui/ElasticLine/ElasticLine.tsx` — an interactive divider: an SVG line that deforms toward the cursor with spring physics on hover/proximity and eases back on release (rAF-driven, no dependencies). Renders `stroke="currentColor"`, so its color is set by the parent's `color` CSS property.
 
-This is the **only** divider implementation in the app — every horizontal rule in the UI (nav bottom border, footer top border, home hero dividers) is an `<ElasticLine />`, never a static `<hr>`. Reuse it for any new divider rather than adding a plain line.
+This is the **only** divider implementation in the app — every horizontal rule in the UI (nav bottom border, footer top border, section rules in `V0Section` and the case modules) is an `<ElasticLine />`, never a static `<hr>`. Reuse it for any new divider rather than adding a plain line. Exception: the row separators inside tables/indexes (Work index, Lab and experience rows, feed session headers) are CSS borders, since dozens of animated lines per page would be heavy.
 
 ## Figma
 
-The `/` homepage (and its home-specific Nav/Footer chrome) was rebuilt 1:1 from Figma:
+v2 source: file `AXxkCCuckrXGKDUCk8lNyQ`, pages ↪ Visual (Home · v0, Work · v0, Feed · Desktop, Lab · Desktop, About · Desktop, Contact · Desktop, Caso · Shoeciety · Rediseño) and ↪ Casos (one "Caso · …" frame per case; "Caso · Shoeciety · v0" has the notes).
+
+v1 (historic): the `/` homepage (and its home-specific Nav/Footer chrome) was rebuilt 1:1 from Figma:
 
 - File key: `0ycaVZcPchp6EejZFSBRt1` ("Portfolio")
 - Source node: `9:170` ("Home" frame)
