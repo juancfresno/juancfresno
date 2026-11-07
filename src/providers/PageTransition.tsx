@@ -45,7 +45,8 @@ function linkTarget(e: MouseEvent): URL | null {
 // ─── Provider ─────────────────────────────────────────────────────────────────
 // Owns the `navigate` seam and the site transition (SITE_TRANSITION in
 // components/transition/effects.ts): cover → router.push → wait for the new
-// pathname + a frame → reveal → focus. Internal <a>/<Link> clicks are caught
+// pathname + 2 frames → reveal (the effect measures the new page here) → focus.
+// Back/forward covers at once and runs the effect mirrored. Internal <a>/<Link> clicks are caught
 // here, so pages and links don't need to know about it.
 export default function PageTransitionProvider({ children }: { children: ReactNode }) {
   const router = useRouter()
@@ -55,6 +56,9 @@ export default function PageTransitionProvider({ children }: { children: ReactNo
   const busy = useRef(false)
   const current = useRef(pathname)
   const waiters = useRef<(() => void)[]>([])
+  // In-memory history (pathnames + index) so back/forward knows its direction.
+  const stack = useRef<string[]>([pathname])
+  const at = useRef(0)
 
   useEffect(() => {
     if (canvasRef.current) effect.current = EFFECTS[SITE_TRANSITION](canvasRef.current)
@@ -64,6 +68,10 @@ export default function PageTransitionProvider({ children }: { children: ReactNo
   // Resolve anyone waiting for the route to change once the new page has committed.
   useEffect(() => {
     current.current = pathname
+    if (stack.current[at.current] !== pathname) {
+      stack.current = stack.current.slice(0, at.current + 1).concat(pathname)
+      at.current = stack.current.length - 1
+    }
     const w = waiters.current
     waiters.current = []
     w.forEach((f) => f())
@@ -93,7 +101,9 @@ export default function PageTransitionProvider({ children }: { children: ReactNo
     if (url.pathname === from) { router.push(to); return }
     busy.current = true
     const animate = !reduced() && !!effect.current
-    if (animate) await effect.current!.cover()
+    stack.current = stack.current.slice(0, at.current + 1).concat(url.pathname)
+    at.current = stack.current.length - 1
+    if (animate) await effect.current!.cover({ back: false })
     router.push(to)
     await finish(from, animate)
   }, [router, finish])
@@ -116,8 +126,12 @@ export default function PageTransitionProvider({ children }: { children: ReactNo
       const from = current.current
       if (busy.current || location.pathname === from) return
       busy.current = true
+      // Forward only when the next entry we know of is this one; anything else reads as back.
+      const forward = stack.current[at.current + 1] === location.pathname
+      if (forward) at.current += 1
+      else if (stack.current[at.current - 1] === location.pathname) at.current -= 1
       const animate = !reduced() && !!effect.current
-      if (animate) effect.current!.coverNow()
+      if (animate) effect.current!.coverNow({ back: !forward })
       finish(from, animate)
     }
     window.addEventListener('popstate', onPop)
