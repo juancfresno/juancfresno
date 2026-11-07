@@ -33,6 +33,8 @@ export const SOCIAL_PREVIEWS: Partial<Record<SocialId, { webm?: string; mp4?: st
   behance:   { webm: '/social/behance.webm',   mp4: '/social/behance.mp4',   poster: '/social/behance.jpg' },
   dribbble:  { webm: '/social/dribbble.webm',  mp4: '/social/dribbble.mp4',  poster: '/social/dribbble.jpg' },
   instagram: { webm: '/social/instagram.webm', mp4: '/social/instagram.mp4', poster: '/social/instagram.jpg' },
+  linkedin:  { webm: '/social/linkedin.webm',  mp4: '/social/linkedin.mp4',  poster: '/social/linkedin.jpg' },
+  x:         { webm: '/social/x.webm',         mp4: '/social/x.mp4',         poster: '/social/x.jpg' },
 }
 
 // Projects, cases and archive live in ./cases.ts (data model for /work).
