@@ -5,7 +5,8 @@
 .footer {
   width: 100%;
   position: relative;
-  z-index: 10; // Above pixel canvas (z-index: 5)
+  z-index: 20; // above the site transition canvas (15): the footer is persistent chrome
+  background: $color-bg;
 }
 
 

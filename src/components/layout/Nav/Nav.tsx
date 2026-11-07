@@ -255,7 +255,7 @@ export default function Nav() {
 
   return (
     <>
-      <header className={clsx(s.nav, hidden && s.hidden, scrolled && s.scrolled)}>
+      <header data-site-header className={clsx(s.nav, hidden && s.hidden, scrolled && s.scrolled)}>
         <div className={s.inner}>
           {/* ── Left cluster: face + nav menu ── */}
           <div className={s.left}>

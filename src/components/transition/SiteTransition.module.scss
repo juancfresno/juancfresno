@@ -1,0 +1,12 @@
+// Site transition canvas: fixed over the content area. Above <main> (z 10),
+// under the footer (z 20) and the nav / mobile tab bar ($z-nav), so the
+// persistent chrome never gets covered. Top/size are set by the effect.
+.canvas {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 15;
+  display: block;
+  visibility: hidden;
+  pointer-events: none;
+}

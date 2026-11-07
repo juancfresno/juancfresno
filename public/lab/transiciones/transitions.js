@@ -18,25 +18,40 @@
     curtain: { up: 300, hold: 40, off: 260 },
     zoom: { out: 220, inn: 320, scale: 0.82 },
     words: { out: 150, word: 300, stagger: 80 },
-    slide: { dist: 60, out: 160, inn: 240 }
+    slide: { dist: 60, out: 160, inn: 240 },
+    // Grid explorations (11–16): the 12-column grid of the page is visible while
+    // the old page is taken apart and the new one is put together on it.
+    wireframe: { inn: 160, move: 380, out: 220 },
+    modular: { snap: 120, colStagger: 20, leave: 200, setStart: 320, setStagger: 45, set: 160, out: 100, parts: 8 },
+    fold: { out: 300, hold: 40, inn: 340, stagger: 8 },
+    cells: { wave: 14, half: 130, maxStep: 23 },
+    blueprint: { draw: 220, cover: 160, coverStagger: 8, coverDur: 140, buildStagger: 10, build: 180, out: 160, rows: 14 },
+    step: { fade: 80, cols: 12, per: 45, out: 100 }
   };
+  var W = T.wireframe, Md = T.modular, F = T.fold, Ce = T.cells, Bp = T.blueprint, St = T.step;
   var c = T.columns;
 
   var LIST = [
-    { id: 'instant', n: '01', name: 'Sin transición', star: true, ms: 0, tag: 'chrome quieto' },
-    { id: 'columns', n: '02', name: 'Barrido 12 columnas', star: true, ms: (c.n - 1) * c.stagger + c.drop + (c.n - 1) * c.backStagger + c.back },
-    { id: 'scramble', n: '03', name: 'Scramble del título', star: true, ms: T.scramble.out + T.scramble.decode },
-    { id: 'morph', n: '04', name: 'Morph miniatura → hero', star: true, ms: T.morph.move, tag: 'al entrar en un caso' },
-    { id: 'pixels', n: '05', name: 'Disolución en píxeles', ms: 2 * (T.pixels.spread + T.pixels.step) },
-    { id: 'glitch', n: '06', name: 'Corte con glitch RGB', ms: T.glitch.dur, tag: '⚠ fotosensibilidad' },
+    { id: 'instant', n: '01', name: 'Sin transición', ms: 0, tag: 'chrome quieto' },
+    { id: 'columns', n: '02', name: 'Barrido 12 columnas', ms: (c.n - 1) * c.stagger + c.drop + (c.n - 1) * c.backStagger + c.back },
+    { id: 'scramble', n: '03', name: 'Scramble del título', ms: T.scramble.out + T.scramble.decode },
+    { id: 'morph', n: '04', name: 'Morph miniatura → hero', ms: T.morph.move, tag: 'al entrar en un caso' },
+    { id: 'pixels', n: '05', name: 'Disolución en píxeles', ms: 2 * (T.pixels.spread + T.pixels.step), tag: 'en prueba en la web' },
+    { id: 'glitch', n: '06', name: 'Corte con glitch RGB', ms: T.glitch.dur, tag: 'descartada · ya en Biakone', out: true },
     { id: 'curtain', n: '07', name: 'Cortina con clip-path', ms: T.curtain.up + T.curtain.hold + T.curtain.off, tag: 'cliché' },
     { id: 'zoom', n: '08', name: 'Zoom de portada', ms: T.zoom.out + T.zoom.inn },
     { id: 'words', n: '09', name: 'Titular palabra a palabra', ms: '≈ 600' },
-    { id: 'slide', n: '10', name: 'Slide direccional', ms: T.slide.out + T.slide.inn, tag: 'inverso al volver' }
+    { id: 'slide', n: '10', name: 'Slide direccional', ms: T.slide.out + T.slide.inn, tag: 'inverso al volver' },
+    { id: 'wireframe', n: '11', name: 'Wireframe intermedio', star: true, ms: W.inn + W.move + W.out, tag: 'retícula' },
+    { id: 'modular', n: '12', name: 'Desmontaje modular', ms: Md.setStart + (Md.parts - 1) * Md.setStagger + Md.set + Md.out, tag: 'retícula' },
+    { id: 'fold', n: '13', name: 'Retícula que se pliega', ms: F.out + F.hold + F.inn + 11 * F.stagger, tag: 'retícula' },
+    { id: 'cells', n: '14', name: 'Celdas', star: true, ms: Ce.maxStep * Ce.wave + 2 * Ce.half, tag: 'retícula' },
+    { id: 'blueprint', n: '15', name: 'Plano', ms: Bp.cover + (Bp.rows - 1) * Bp.coverStagger + Bp.coverDur + (Bp.rows - 1) * Bp.buildStagger + Bp.build + Bp.out, tag: 'retícula' },
+    { id: 'step', n: '16', name: 'Paso de columna', star: true, ms: St.fade + St.cols * St.per + St.out, tag: 'retícula' }
   ];
 
   var NOTE_REDUCE = 'Tienes activado «reducir movimiento»: todas las transiciones caen a instantáneo.';
-  var NOTE_GLITCH = 'Aviso: unos 200 ms de franjas desplazadas. Si eres sensible a los destellos, sáltatela. Con «reducir movimiento» no se reproduce nunca.';
+  var NOTE_GLITCH = 'Descartada: Biakone ya usa glitch y el portfolio tiene que diferenciarse. Se queda solo para comparar. Aviso: unos 200 ms de franjas desplazadas; con «reducir movimiento» no se reproduce nunca.';
   var NOTE_MORPH_FALLBACK = 'Sin miniatura de origen no hay morph: fundido corto. Entra en un caso desde Work para verlo.';
 
   // ── Engine ─────────────────────────────────────────────────────────────
@@ -74,6 +89,71 @@
       ctx.raf = requestAnimationFrame(tick);
       ctx.stops.push(function () { cancelAnimationFrame(ctx.raf); node.textContent = text; done(); });
     });
+  }
+
+  // ── Grid helpers (11–16) ───────────────────────────────────────────────
+  // The mock page sits on a 12-column grid: margin = page padding, gutter = .ft__grid gap.
+  function metrics(ctx) {
+    var v = ctx.view.getBoundingClientRect();
+    var pad = parseFloat(getComputedStyle(ctx.from).paddingLeft) || v.width * 0.03;
+    var gap = pad * 1.4 / 3, colW = (v.width - 2 * pad - 11 * gap) / 12;
+    var m = { w: v.width, h: v.height, pad: pad, gap: gap, colW: colW, pitch: colW + gap };
+    m.x = function (i) { return pad + i * (colW + gap); };
+    // Column bands edge to edge: split at the middle of each gutter, margins go to the outer bands.
+    m.edges = [0];
+    for (var i = 1; i < 12; i++) m.edges.push(m.x(i) - gap / 2);
+    m.edges.push(v.width);
+    m.col = function (x) { return Math.max(0, Math.min(11, Math.floor((x - pad + gap / 2) / (colW + gap)))); };
+    return m;
+  }
+  function box(cls, parent, r) {
+    var d = el(cls, parent);
+    d.style.left = r.x + 'px'; d.style.top = r.y + 'px'; d.style.width = r.w + 'px'; d.style.height = r.h + 'px';
+    return d;
+  }
+  function gridFx(ctx, m, numbers) {
+    var g = el('ft__gfx', ctx.fx);
+    for (var i = 0; i < 12; i++) {
+      var c = box('ft__gcol', g, { x: m.x(i), y: 0, w: m.colW, h: m.h });
+      if (numbers) c.textContent = (i < 9 ? '0' : '') + (i + 1);
+    }
+    return g;
+  }
+  function veil(ctx, node) { node.style.visibility = 'hidden'; ctx.stops.push(function () { node.style.visibility = ''; }); }
+  // Lays out a hidden page without showing it, so it can be measured and cloned.
+  function ghostShow(ctx, page) {
+    page.hidden = false; page.style.visibility = 'hidden';
+    ctx.stops.push(function () { page.style.visibility = ''; });
+  }
+  // A clone of `page` seen through a window at (x, y, w, h) of the view.
+  function cut(page, m, r, parent, cls) {
+    var s = box(cls || 'ft__slice', parent, r), c = page.cloneNode(true);
+    c.removeAttribute('data-ft-page'); c.hidden = false;
+    c.style.cssText = 'inset:auto;left:' + (-r.x) + 'px;top:' + (-r.y) + 'px;width:' + m.w + 'px;height:' + m.h + 'px;visibility:visible';
+    s.appendChild(c);
+    return s;
+  }
+  function parts(ctx, page) {
+    return Array.prototype.slice.call(page.querySelectorAll('.ft__kicker, .ft__title, .ft__thumb, [data-ft-hero]'))
+      .map(function (n) { return { n: n, r: rel(n, ctx.view) }; })
+      .filter(function (p) { return p.r.w > 0 && p.r.h > 0; });
+  }
+  var RATIOS = [[1, 1], [5, 4], [4, 3], [3, 2], [16, 9], [21, 9], [4, 5], [3, 4], [2, 3], [9, 16]];
+  function ratio(w, h) {
+    var best = RATIOS[0];
+    RATIOS.forEach(function (q) { if (Math.abs(w / h - q[0] / q[1]) < Math.abs(w / h - best[0] / best[1])) best = q; });
+    return best[0] + ':' + best[1];
+  }
+  // The label each element wears as a wireframe box: "H1 · 72/68", "P · 12", "IMG 16:9".
+  function tagOf(p) {
+    var n = p.n, cs = getComputedStyle(n);
+    if (n.classList.contains('ft__title')) return 'H1 · ' + Math.round(parseFloat(cs.fontSize)) + '/' + Math.round(parseFloat(cs.lineHeight) || parseFloat(cs.fontSize));
+    if (n.classList.contains('ft__kicker')) return 'P · ' + Math.round(parseFloat(cs.fontSize)) + ' MONO';
+    var media = n.classList.contains('ft__media') ? n : n.querySelector('.ft__media'), r = media ? media.getBoundingClientRect() : p.r;
+    return 'IMG ' + ratio(r.width || p.r.w, r.height || p.r.h);
+  }
+  function wait(ctx, ms) {
+    return new Promise(function (done) { var id = setTimeout(done, ms); ctx.stops.push(function () { clearTimeout(id); done(); }); });
   }
 
   var FX = {
@@ -224,6 +304,175 @@
         ctx.swap();
         return anim(ctx, ctx.to, [{ transform: 'translateX(' + (t.dist * d) + 'px)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: t.inn, easing: EASE, fill: 'backwards' });
       });
+    },
+
+    // 11 · The page reduces to its own wireframe on the grid; the boxes travel (FLIP-style)
+    // to where the new page's elements sit, then fill with the real content.
+    wireframe: function (ctx) {
+      var t = T.wireframe, m = metrics(ctx), g = gridFx(ctx, m);
+      var A = parts(ctx, ctx.from);
+      ghostShow(ctx, ctx.to);
+      var B = parts(ctx, ctx.to);
+      A.forEach(function (p) { p.l = tagOf(p); });
+      B.forEach(function (p) { p.l = tagOf(p); });
+      var n = Math.max(A.length, B.length), boxes = [];
+      for (var i = 0; i < n; i++) {
+        var a = A[i] || A[A.length - 1], b = B[i] || B[B.length - 1];
+        var d = box('ft__wf', ctx.fx, a.r), lab = el('ft__wfl', d);
+        lab.textContent = a.l;
+        boxes.push({ d: d, lab: lab, a: a, b: b, born: !A[i], dies: !B[i] });
+      }
+      var fr = function (r) { return { left: r.x + 'px', top: r.y + 'px', width: r.w + 'px', height: r.h + 'px' }; };
+      return Promise.all([
+        fadeIn(ctx, g, t.inn),
+        fadeOut(ctx, ctx.from, t.inn),
+        Promise.all(boxes.map(function (x) { return x.born ? null : fadeIn(ctx, x.d, t.inn); }))
+      ]).then(function () {
+        return Promise.all(boxes.map(function (x, i) {
+          x.lab.textContent = x.b.l;
+          var k0 = fr(x.a.r), k1 = fr(x.b.r);
+          k0.opacity = x.born ? 0 : 1; k1.opacity = x.dies ? 0 : 1;
+          return anim(ctx, x.d, [k0, k1], { duration: t.move, delay: i * 12, easing: EASE, fill: 'forwards' });
+        }));
+      }).then(function () {
+        ctx.swap();
+        return Promise.all([fadeIn(ctx, ctx.to, t.out), fadeOut(ctx, ctx.fx, t.out)]);
+      });
+    },
+
+    // 12 · Elements snap to their grid columns with outlines, leave column by column;
+    // the new modules drop into their cells in reading order, like setting type.
+    modular: function (ctx) {
+      var t = T.modular, m = metrics(ctx), g = gridFx(ctx, m);
+      var mk = function (p) {
+        var b = box('ft__mod', ctx.fx, p.r), c = p.n.cloneNode(true);
+        c.style.cssText = 'width:100%;height:100%;margin:0;visibility:visible';
+        b.appendChild(c);
+        var c0 = m.col(p.r.x), c1 = m.col(p.r.x + p.r.w - 1);
+        p.c = c0; p.b = b; p.snap = { left: m.x(c0) + 'px', width: (m.x(c1) + m.colW - m.x(c0)) + 'px' };
+        return p;
+      };
+      var A = parts(ctx, ctx.from).map(mk);
+      veil(ctx, ctx.from);
+      ghostShow(ctx, ctx.to);
+      var B = parts(ctx, ctx.to).map(mk).sort(function (a, b) { return (a.r.y - b.r.y) || (a.r.x - b.r.x); });
+      return Promise.all([
+        fadeIn(ctx, g, t.snap),
+        Promise.all(A.map(function (p) {
+          return anim(ctx, p.b, [{ left: p.r.x + 'px', width: p.r.w + 'px' }, p.snap], { duration: t.snap, easing: EASE_IO, fill: 'forwards' }).then(function () {
+            return anim(ctx, p.b, [{ transform: 'none', opacity: 1 }, { transform: 'translateY(-2.5cqi)', opacity: 0 }], { duration: t.leave, delay: p.c * t.colStagger, easing: EASE_IO, fill: 'forwards' });
+          });
+        })),
+        Promise.all(B.map(function (p, i) {
+          return anim(ctx, p.b, [{ transform: 'translateY(-1.5cqi)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: t.set, delay: t.setStart + i * t.setStagger, easing: EASE, fill: 'both' });
+        }))
+      ]).then(function () { ctx.swap(); return fadeOut(ctx, ctx.fx, t.out); });
+    },
+
+    // 13 · The 12 columns fold to zero width against one edge, carrying the content;
+    // the gutters stay as lines; then they unfold into the new page.
+    fold: function (ctx) {
+      var t = T.fold, m = metrics(ctx), d = ctx.back ? -1 : 1, edge = d > 0 ? m.pad : m.w - m.pad;
+      el('ft__fill', ctx.fx);
+      var band = function (i) { return { x: m.edges[i], y: 0, w: m.edges[i + 1] - m.edges[i], h: m.h }; };
+      var folded = function (i) { var r = band(i); return 'translateX(' + ((d > 0 ? edge : edge - r.w) - r.x) + 'px) scaleX(0)'; };
+      var strips = function (page) {
+        var out = [];
+        for (var i = 0; i < 12; i++) { var s = cut(page, m, band(i), ctx.fx); s.style.transformOrigin = d > 0 ? 'left' : 'right'; out.push(s); }
+        return out;
+      };
+      var lines = [];
+      for (var i = 1; i < 12; i++) { var l = box('ft__gline', ctx.fx, { x: m.edges[i], y: 0, w: 1, h: m.h }); lines.push({ l: l, x: m.edges[i] }); }
+      var A = strips(ctx.from);
+      veil(ctx, ctx.from);
+      return Promise.all(A.map(function (s, i) {
+        return anim(ctx, s, [{ transform: 'none' }, { transform: folded(i) }], { duration: t.out, easing: EASE_IO, fill: 'forwards' });
+      }).concat(lines.map(function (x) {
+        return anim(ctx, x.l, [{ transform: 'none' }, { transform: 'translateX(' + (edge - x.x) + 'px)' }], { duration: t.out, easing: EASE_IO, fill: 'forwards' });
+      }))).then(function () { return wait(ctx, t.hold); }).then(function () {
+        A.forEach(function (s) { s.remove(); });
+        ghostShow(ctx, ctx.to);
+        var B = strips(ctx.to);
+        lines.forEach(function (x) { ctx.fx.appendChild(x.l); });
+        var order = function (i) { return (d > 0 ? i : 11 - i) * t.stagger; };
+        return Promise.all(B.map(function (s, i) {
+          return anim(ctx, s, [{ transform: folded(i) }, { transform: 'none' }], { duration: t.inn, delay: order(i), easing: EASE, fill: 'both' });
+        }).concat(lines.map(function (x, i) {
+          return anim(ctx, x.l, [{ transform: 'translateX(' + (edge - x.x) + 'px)', opacity: 1 }, { transform: 'none', opacity: 1, offset: 0.8 }, { transform: 'none', opacity: 0 }], { duration: t.inn, delay: order(i + 1), easing: EASE, fill: 'both' });
+        })));
+      }).then(function () { ctx.swap(); });
+    },
+
+    // 14 · The page is cut into its real grid cells (column × square row); each cell turns
+    // over in a reading-order wave and shows the new page on its back.
+    cells: function (ctx) {
+      var t = T.cells, m = metrics(ctx), rows = Math.ceil(m.h / m.pitch), all = [];
+      ghostShow(ctx, ctx.to);
+      for (var y = 0; y < rows; y++) for (var x = 0; x < 12; x++) {
+        var r = { x: m.edges[x], y: y * m.pitch, w: m.edges[x + 1] - m.edges[x], h: Math.min(m.pitch, m.h - y * m.pitch) };
+        var cell = box('ft__cell', ctx.fx, r), local = { x: 0, y: 0, w: r.w, h: r.h };
+        var a = cut(ctx.from, m, r, cell, 'ft__face'), b = cut(ctx.to, m, r, cell, 'ft__face');
+        a.style.cssText = b.style.cssText = 'left:0;top:0;width:' + local.w + 'px;height:' + local.h + 'px';
+        all.push({ a: a, b: b, d: Math.min(t.maxStep, x + y * 2) * t.wave });
+      }
+      veil(ctx, ctx.from);
+      return Promise.all(all.map(function (c) {
+        return Promise.all([
+          anim(ctx, c.a, [{ transform: 'perspective(40em) rotateY(0deg)' }, { transform: 'perspective(40em) rotateY(90deg)' }], { duration: t.half, delay: c.d, easing: 'ease-in', fill: 'forwards' }),
+          anim(ctx, c.b, [{ transform: 'perspective(40em) rotateY(-90deg)' }, { transform: 'perspective(40em) rotateY(0deg)' }], { duration: t.half, delay: c.d + t.half, easing: 'ease-out', fill: 'both' })
+        ]);
+      })).then(function () { ctx.swap(); });
+    },
+
+    // 15 · Blueprint: columns, baselines and a measured dimension line draw in; the old
+    // content sinks into the baselines, the new one rises back up from them.
+    blueprint: function (ctx) {
+      var t = T.blueprint, m = metrics(ctx), base = m.h / t.rows, bands = [], bases = [];
+      for (var i = 0; i < t.rows; i++) {
+        var b = box('ft__band', ctx.fx, { x: 0, y: i * base, w: m.w, h: base + 1 });
+        bands.push(b);
+      }
+      var g = gridFx(ctx, m);
+      for (i = 0; i < t.rows; i++) bases.push(box('ft__base', ctx.fx, { x: 0, y: (i + 1) * base - 1, w: m.w, h: 1 }));
+      var dim = box('ft__dim', ctx.fx, { x: m.pad, y: m.pad * 0.45, w: m.w - 2 * m.pad, h: 1 });
+      el('ft__diml', dim).textContent = 'W ' + Math.round(m.w) + ' · 12 COL · G ' + Math.round(m.gap) + ' · M ' + Math.round(m.pad) + ' · B ' + Math.round(base);
+      var cols = Array.prototype.slice.call(g.children);
+      var lines = cols.map(function (c, i) {
+        return anim(ctx, c, [{ transform: 'scaleY(0)' }, { transform: 'scaleY(1)' }], { duration: t.draw, delay: i * 10, easing: EASE, fill: 'both' });
+      }).concat(bases.map(function (b, i) {
+        return anim(ctx, b, [{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }], { duration: t.draw, delay: i * 8, easing: EASE, fill: 'both' });
+      }), [fadeIn(ctx, dim, t.draw)]);
+      var cover = bands.map(function (b, i) {
+        b.style.transformOrigin = 'bottom';
+        return anim(ctx, b, [{ transform: 'scaleY(0)' }, { transform: 'scaleY(1)' }], { duration: t.coverDur, delay: t.cover + i * t.coverStagger, easing: EASE_IO, fill: 'both' });
+      });
+      return Promise.all(lines.concat(cover)).then(function () {
+        ctx.swap();
+        return Promise.all(bands.map(function (b, i) {
+          b.style.transformOrigin = 'top';
+          return anim(ctx, b, [{ transform: 'scaleY(1)' }, { transform: 'scaleY(0)' }], { duration: t.build, delay: i * t.buildStagger, easing: EASE, fill: 'forwards' });
+        }));
+      }).then(function () { return fadeOut(ctx, ctx.fx, t.out); });
+    },
+
+    // 16 · The page ratchets sideways one grid column at a time (12 eased steps of exactly
+    // one column + gutter); the new page follows on the same grid, numbered 01–12.
+    step: function (ctx) {
+      var t = T.step, m = metrics(ctx), d = ctx.back ? -1 : 1, dist = 12 * m.pitch;
+      el('ft__fill', ctx.fx);
+      var track = el('ft__track', ctx.fx);
+      ghostShow(ctx, ctx.to);
+      var a = cut(ctx.from, m, { x: 0, y: 0, w: m.w, h: m.h }, track), b = cut(ctx.to, m, { x: 0, y: 0, w: m.w, h: m.h }, track);
+      b.style.left = (d * dist) + 'px';
+      b.firstChild.style.background = 'transparent';
+      a.style.overflow = b.style.overflow = 'visible';
+      var g = gridFx(ctx, m, true);
+      veil(ctx, ctx.from);
+      var frames = [];
+      for (var i = 0; i <= t.cols; i++) frames.push({ transform: 'translateX(' + (-d * i * m.pitch) + 'px)', easing: EASE_IO });
+      return fadeIn(ctx, g, t.fade).then(function () {
+        return anim(ctx, track, frames, { duration: t.cols * t.per, fill: 'forwards' });
+      }).then(function () { ctx.swap(); return fadeOut(ctx, ctx.fx, t.out); });
     }
   };
 
@@ -233,7 +482,7 @@
     ctx.stops = ctx.stops || [];
     if (!ctx.swap) ctx.swap = function () { ctx.from.hidden = true; ctx.to.hidden = false; };
     var once = false, swap = ctx.swap;
-    ctx.swap = function () { if (!once) { once = true; swap(); } };
+    ctx.swap = function () { if (!once) { once = true; swap(); if (ctx.to && ctx.to.style) ctx.to.style.visibility = ''; } };
     var fn = FX[id] || FX.instant;
     var end = function () {
       ctx.swap();
@@ -272,7 +521,7 @@
       var name = 'ft-' + (++uid);
       LIST.forEach(function (x) {
         var l = document.createElement('label');
-        l.className = 'ft__opt';
+        l.className = 'ft__opt' + (x.out ? ' ft__opt--out' : '');
         l.innerHTML = '<input type="radio" name="' + name + '" value="' + x.id + '"' + (x.id === selected ? ' checked' : '') + '>' +
           '<span class="ft__n">' + x.n + '</span>' +
           '<span class="ft__name">' + x.name + (x.star ? ' <span aria-hidden="true">★</span><span class="ft__sr"> (recomendada)</span>' : '') + '</span>' +

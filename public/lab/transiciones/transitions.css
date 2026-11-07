@@ -7,6 +7,7 @@
   --ft-mid: rgba(252, 252, 247, 0.6);
   --ft-muted: rgba(252, 252, 247, 0.35);
   --ft-line: rgba(252, 252, 247, 0.12);
+  --ft-accent: #ff5c1e; /* grid overlay colour (same as the site's G grid) */
   --ft-mono: 'Geist Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
   --ft-ease: cubic-bezier(0.19, 1, 0.22, 1);
   container: ft / inline-size;
@@ -70,6 +71,8 @@
 .ft__opt input { position: absolute; opacity: 0; pointer-events: none; }
 .ft__opt:hover { color: var(--ft-fg); }
 .ft__opt:has(input:checked) { color: var(--ft-bg); background: var(--ft-fg); }
+.ft__opt--out .ft__name { text-decoration: line-through; text-decoration-thickness: 1px; }
+.ft__opt--out:not(:has(input:checked)) { opacity: 0.55; }
 .ft__opt:has(input:focus-visible) { outline: 2px solid var(--ft-fg); outline-offset: 2px; }
 .ft__n { color: inherit; opacity: 0.6; }
 .ft__ms { white-space: nowrap; opacity: 0.7; }
@@ -178,3 +181,52 @@
   font-family: var(--ft-mono); font-size: clamp(10px, 1.6cqi, 14px); letter-spacing: 0.08em; text-transform: uppercase;
 }
 .ft__word { display: inline-block; white-space: pre; }
+
+/* Grid explorations (11–16) */
+.ft__gfx { position: absolute; inset: 0; }
+.ft__gcol {
+  position: absolute;
+  border-inline: 1px solid color-mix(in srgb, var(--ft-accent) 70%, transparent);
+  background: color-mix(in srgb, var(--ft-accent) 7%, transparent);
+  transform-origin: top;
+  padding-top: 0.6cqi;
+  font-family: var(--ft-mono); font-size: clamp(7px, 0.9cqi, 10px); letter-spacing: 0.06em;
+  color: var(--ft-accent); text-align: center;
+}
+.ft__wf, .ft__mod {
+  position: absolute;
+  outline: 1px solid var(--ft-accent);
+  outline-offset: -1px;
+}
+.ft__wf { background: color-mix(in srgb, var(--ft-bg) 80%, transparent); }
+.ft__wfl {
+  position: absolute; left: 0; top: 0;
+  padding: 0.2em 0.45em;
+  background: var(--ft-accent); color: var(--ft-bg);
+  font-family: var(--ft-mono); font-size: clamp(7px, 0.9cqi, 10px); letter-spacing: 0.06em; line-height: 1.3;
+  white-space: nowrap;
+}
+.ft__mod { overflow: hidden; }
+.ft__mod > * { display: flex; }
+.ft__mod > .ft__thumb { flex-direction: column; }
+.ft__mod > .ft__kicker, .ft__mod > .ft__title { display: block; }
+.ft__slice, .ft__cell, .ft__face { position: absolute; overflow: hidden; }
+.ft__slice > .ft__page, .ft__face > .ft__page { position: absolute; }
+.ft__face { backface-visibility: hidden; }
+.ft__fill { position: absolute; inset: 0; background: var(--ft-bg); }
+.ft__gline { position: absolute; background: var(--ft-accent); }
+.ft__band { position: absolute; background: var(--ft-bg); }
+.ft__base { position: absolute; background: color-mix(in srgb, var(--ft-accent) 55%, transparent); transform-origin: left; }
+.ft__dim {
+  position: absolute;
+  background: var(--ft-accent);
+}
+.ft__dim::before, .ft__dim::after { content: ''; position: absolute; top: -0.5cqi; width: 1px; height: 1cqi; background: var(--ft-accent); }
+.ft__dim::before { left: 0; }
+.ft__dim::after { right: 0; }
+.ft__diml {
+  position: absolute; left: 50%; top: 0; transform: translate(-50%, -50%);
+  padding: 0 0.6em; background: var(--ft-bg); color: var(--ft-accent);
+  font-family: var(--ft-mono); font-size: clamp(7px, 0.9cqi, 10px); letter-spacing: 0.06em; white-space: nowrap;
+}
+.ft__track { position: absolute; inset: 0; }
