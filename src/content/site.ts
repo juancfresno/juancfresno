@@ -99,6 +99,20 @@ export const EXPERIMENTS = [
     files: ['transitions.css', 'transitions.js', 'snippet.html'],
     repo: null as string | null,
   },
+  {
+    slug: 'galerias',
+    n: '003',
+    name: 'Galerías',
+    kind: 'Layout',
+    year: '2026',
+    what: 'Ocho galerías interactivas con las piezas reales del feed, para elegir el layout de la página Feed y una galería para la Home. Arco, canvas infinito, láminas, tira horizontal, mazo, rejilla con zoom, barras y pasarela; todas en monocromo con trama en reposo y color al pasar por encima. Las dos con ★ son las que recomiendo.',
+    how: 'JavaScript sin librerías: un bucle de requestAnimationFrame por galería que se duerme cuando no hay movimiento, solo transform y opacity, y virtualización (solo existen en el DOM las piezas que se ven, así que aguanta 200). El arco y la pasarela son CSS 3D: cada pieza está cortada en franjas para que se curve o se doble. Las imágenes cargan al aparecer, con miniaturas de 600 px y la imagen grande solo al ampliar. El zoom es un FLIP desde la miniatura. Con «reducir movimiento» todas se quedan en una rejilla quieta. La versión pública usa imágenes generadas.',
+    css: 'galleries.css',
+    js: 'galleries.js',
+    init: 'fresnoGalleries',
+    files: ['galleries.css', 'galleries.js', 'snippet.html'],
+    repo: null as string | null,
+  },
 ]
 
 // ─── About · "About · Desktop" (6770:10229) ───────────────────────────────────
