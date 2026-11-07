@@ -1,8 +1,8 @@
 Add page transitions to this project, based on "Fresno Lab · 002 · Transitions".
 
 Source (no dependencies, MIT): https://juancfresno.com/lab/transiciones
-- transitions.js — fresnoTransitions.run(id, ctx) runs one transition between two page elements (ctx: view, fx overlay, from, to, swap, back, source, target). The sixteen ids: instant, columns, scramble, morph, pixels, glitch, curtain, zoom, words, slide, and the grid explorations wireframe, modular, fold, cells, blueprint, step (they read the page's 12-column grid: margin = page padding, gutter = grid gap).
-- transitions.css — the overlay pieces (.ft__fx, .ft__col, .ft__px, .ft__ghost, .ft__curtain, and the grid layers .ft__gfx, .ft__wf, .ft__mod, .ft__slice, .ft__cell, .ft__band) and the --ft-* color variables (--ft-accent colors the visible grid).
+- transitions.js — fresnoTransitions.run(id, ctx) runs one transition between two page elements (ctx: view, fx overlay, from, to, swap, back, source, target). The twenty-two ids: instant, columns, scramble, morph, pixels, glitch, curtain, zoom, words, slide; the grid explorations wireframe, modular, fold, cells, blueprint, step; and the wireframe variants wf-drop (grid lines fall in, gutters open, columns fill, then the boxes morph), wf-rise, wf-boxes, wf-labels, wf-hold, wf-base. The grid ones read the page's 12-column grid: margin = page padding, gutter = grid gap.
+- transitions.css — the overlay pieces (.ft__fx, .ft__col, .ft__px, .ft__ghost, .ft__curtain, and the grid layers .ft__gfx, .ft__gl, .ft__gfill, .ft__wf, .ft__mod, .ft__slice, .ft__cell, .ft__band) and the --ft-* color variables (--ft-accent colors the visible grid).
 
 What I want:
 1. Base: no transition. Content swaps instantly; nav, header and footer live in the persistent layout and never move or re-render.

@@ -85,6 +85,12 @@
   font-size: 0.6875rem;
   opacity: 0.8;
 }
+/* Option groups (11a–11f): an indented block with an accent rule, a name and a compare hint. */
+.ft__group { display: flex; flex-direction: column; margin-left: 0.6rem; padding-left: 0.6rem; border-left: 1px solid var(--ft-accent); border-bottom: 1px solid var(--ft-line); }
+.ft__group > .ft__opt:last-child { border-bottom: 0; }
+.ft__ghead { display: flex; flex-direction: column; gap: 0.2rem; margin: 0; padding: 0.65rem 0.25rem 0.55rem; border-bottom: 1px solid var(--ft-line); }
+.ft__gname { color: var(--ft-accent); text-transform: uppercase; letter-spacing: 0.08em; }
+.ft__ghint { color: var(--ft-muted); }
 .ft__sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 /* ── Stage: a mini mock site, 16:10 ─────────────────────────────────────── */
@@ -99,11 +105,14 @@
   background: var(--ft-bg);
   color: var(--ft-fg);
   font-size: clamp(10px, 1.6cqi, 14px);
+  /* The site's grid, scaled to the stage: margin 64 and gutter 16 at 1680, liquid. */
+  --ft-m: max(12px, calc(100cqi * 64 / 1680));
+  --ft-g: max(4px, calc(100cqi * 16 / 1680));
 }
 .ft__nav, .ft__foot {
   position: relative; z-index: 6;
   display: flex; align-items: center; justify-content: space-between;
-  padding: 0 3cqi;
+  padding: 0 var(--ft-m);
   background: var(--ft-bg);
   font-family: var(--ft-mono);
   font-size: clamp(9px, 1.25cqi, 12px);
@@ -123,7 +132,7 @@
 .ft__page {
   position: absolute; inset: 0;
   display: flex; flex-direction: column; gap: 2cqi;
-  padding: 3cqi;
+  padding: var(--ft-m);
   background: var(--ft-bg);
 }
 .ft__kicker { margin: 0; font-family: var(--ft-mono); font-size: clamp(9px, 1.2cqi, 12px); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ft-muted); }
@@ -135,7 +144,7 @@
   letter-spacing: -0.03em;
 }
 .ft__title:focus { outline: none; }
-.ft__grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 1.4cqi; flex: 1; min-height: 0; }
+.ft__grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 1.4cqi var(--ft-g); flex: 1; min-height: 0; }
 .ft__grid--home { margin-top: auto; flex: 0 0 34%; }
 .ft__grid--work { grid-template-rows: 1fr 1fr; }
 .ft__thumb { grid-column: span 4; display: flex; flex-direction: column; gap: 0.6cqi; min-height: 0; }
@@ -151,6 +160,9 @@
   .ft__opts { display: grid; grid-template-columns: 1fr 1fr; column-gap: 0.75rem; }
   .ft__opt { grid-template-columns: 2em 1fr; }
   .ft__ms { grid-column: 2; }
+  .ft__group { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; column-gap: 0.75rem; margin-left: 0; }
+  .ft__ghead { grid-column: 1 / -1; }
+  .ft__group > .ft__opt:last-child { border-bottom: 1px solid var(--ft-line); }
 }
 @container ft (max-width: 480px) {
   .ft__stage { aspect-ratio: 1 / 1; }
@@ -159,6 +171,7 @@
   .ft__opts { grid-template-columns: 1fr; }
   .ft__opt { grid-template-columns: 2em 1fr auto; padding: 0.5rem 0.25rem; }
   .ft__ms { grid-column: auto; }
+  .ft__group { grid-template-columns: 1fr; }
 }
 @container ftstage (max-width: 480px) {
   .ft__thumb { grid-column: span 6; }
@@ -199,6 +212,10 @@
   outline-offset: -1px;
 }
 .ft__wf { background: color-mix(in srgb, var(--ft-bg) 80%, transparent); }
+.ft__wf--line { background: none; }
+.ft__wf--solid { background: var(--ft-bg); overflow: hidden; }
+.ft__gl { position: absolute; background: color-mix(in srgb, var(--ft-accent) 70%, transparent); transform-origin: top; }
+.ft__gfill { position: absolute; background: color-mix(in srgb, var(--ft-accent) 7%, transparent); transform-origin: top; }
 .ft__wfl {
   position: absolute; left: 0; top: 0;
   padding: 0.2em 0.45em;

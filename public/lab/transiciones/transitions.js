@@ -26,8 +26,18 @@
     fold: { out: 300, hold: 40, inn: 340, stagger: 8 },
     cells: { wave: 14, half: 130, maxStep: 23 },
     blueprint: { draw: 220, cover: 160, coverStagger: 8, coverDur: 140, buildStagger: 10, build: 180, out: 160, rows: 14 },
-    step: { fade: 80, cols: 12, per: 45, out: 100 }
+    step: { fade: 80, cols: 12, per: 45, out: 100 },
+    // Wireframe variants (11a–11f). Absolute start times (…At) from the click, in ms.
+    wfDrop: { drop: 120, dropStagger: 6, splitAt: 120, split: 100, fillAt: 190, fill: 110, fillStagger: 5, boxesAt: 300, boxes: 90, moveAt: 380, move: 230, moveStagger: 4, out: 110 },
+    wfRise: { rise: 200, riseStagger: 10, boxesAt: 240, boxStagger: 30, box: 120, out: 120 },
+    wfBoxes: { inn: 100, move: 300, out: 100 },
+    wfLabels: { inn: 120, boxesAt: 60, boxes: 100, typeAt: 80, type: 240, typeStagger: 20, fillAt: 340, fillStagger: 40, fill: 140 },
+    wfHold: { inn: 120, move: 300, moveStagger: 6, fill: 140, hold: 120, fade: 160 },
+    wfBase: { lines: 140, lineStagger: 8, inn: 100, sinkAt: 100, sink: 140, growAt: 220, growStagger: 30, grow: 160, out: 120 }
   };
+  var PARTS_MAX = 8; // elements on the busiest mock page (Work: kicker, title, 6 thumbs)
+  var ROWS_MAX = 4;  // rows of elements on it (kicker, title, two rows of thumbs)
+  var Wd = T.wfDrop, Wr = T.wfRise, Wb = T.wfBoxes, Wl = T.wfLabels, Wh = T.wfHold, Wa = T.wfBase;
   var W = T.wireframe, Md = T.modular, F = T.fold, Ce = T.cells, Bp = T.blueprint, St = T.step;
   var c = T.columns;
 
@@ -42,13 +52,22 @@
     { id: 'zoom', n: '08', name: 'Zoom de portada', ms: T.zoom.out + T.zoom.inn },
     { id: 'words', n: '09', name: 'Titular palabra a palabra', ms: '≈ 600' },
     { id: 'slide', n: '10', name: 'Slide direccional', ms: T.slide.out + T.slide.inn, tag: 'inverso al volver' },
-    { id: 'wireframe', n: '11', name: 'Wireframe intermedio', star: true, ms: W.inn + W.move + W.out, tag: 'retícula' },
+    { id: 'wireframe', n: '11', name: 'Wireframe intermedio', ms: W.inn + W.move + W.out, tag: 'retícula · la base' },
+    // Wireframe · variantes: same idea as 11 (page → its wireframe → next page), different order and rhythm.
+    { id: 'wf-drop', n: '11a', group: 'wf', name: 'Cae la retícula', star: true, ms: Wd.moveAt + Wd.move + (PARTS_MAX - 1) * Wd.moveStagger + Wd.out, tag: 'idea de Juan' },
+    { id: 'wf-rise', n: '11b', group: 'wf', name: 'Columnas primero', ms: Wr.boxesAt + (PARTS_MAX - 1) * Wr.boxStagger + Wr.box + Wr.out },
+    { id: 'wf-boxes', n: '11c', group: 'wf', name: 'Solo cajas', ms: Wb.inn + Wb.move + Wb.out, tag: 'la más rápida' },
+    { id: 'wf-labels', n: '11d', group: 'wf', name: 'Etiquetas primero', star: true, ms: Wl.fillAt + (PARTS_MAX - 1) * Wl.fillStagger + Wl.fill },
+    { id: 'wf-hold', n: '11e', group: 'wf', name: 'La retícula se queda', ms: Wh.inn + Wh.move + (PARTS_MAX - 1) * Wh.moveStagger + Wh.fill + Wh.hold + Wh.fade },
+    { id: 'wf-base', n: '11f', group: 'wf', name: 'Desde la línea base', ms: Wa.growAt + (ROWS_MAX - 1) * Wa.growStagger + Wa.grow + Wa.out },
     { id: 'modular', n: '12', name: 'Desmontaje modular', ms: Md.setStart + (Md.parts - 1) * Md.setStagger + Md.set + Md.out, tag: 'retícula' },
     { id: 'fold', n: '13', name: 'Retícula que se pliega', ms: F.out + F.hold + F.inn + 11 * F.stagger, tag: 'retícula' },
-    { id: 'cells', n: '14', name: 'Celdas', star: true, ms: Ce.maxStep * Ce.wave + 2 * Ce.half, tag: 'retícula' },
+    { id: 'cells', n: '14', name: 'Celdas', ms: Ce.maxStep * Ce.wave + 2 * Ce.half, tag: 'retícula' },
     { id: 'blueprint', n: '15', name: 'Plano', ms: Bp.cover + (Bp.rows - 1) * Bp.coverStagger + Bp.coverDur + (Bp.rows - 1) * Bp.buildStagger + Bp.build + Bp.out, tag: 'retícula' },
-    { id: 'step', n: '16', name: 'Paso de columna', star: true, ms: St.fade + St.cols * St.per + St.out, tag: 'retícula' }
+    { id: 'step', n: '16', name: 'Paso de columna', ms: St.fade + St.cols * St.per + St.out, tag: 'retícula' }
   ];
+
+  var GROUPS = { wf: { name: 'Wireframe · variantes', hint: 'La idea de la 11 con otro orden y otro ritmo. Elige una y pulsa ↻ Repetir; con ↑ ↓ saltas a la siguiente y se reproduce sola.' } };
 
   var NOTE_REDUCE = 'Tienes activado «reducir movimiento»: todas las transiciones caen a instantáneo.';
   var NOTE_GLITCH = 'Descartada: Biakone ya usa glitch y el portfolio tiene que diferenciarse. Se queda solo para comparar. Aviso: unos 200 ms de franjas desplazadas; con «reducir movimiento» no se reproduce nunca.';
@@ -92,11 +111,13 @@
   }
 
   // ── Grid helpers (11–16) ───────────────────────────────────────────────
-  // The mock page sits on a 12-column grid: margin = page padding, gutter = .ft__grid gap.
+  // The mock page sits on the site's 12-column grid: margin = page padding (64 at 1680),
+  // gutter = .ft__grid gap (16 at 1680), both liquid with the stage width.
   function metrics(ctx) {
     var v = ctx.view.getBoundingClientRect();
-    var pad = parseFloat(getComputedStyle(ctx.from).paddingLeft) || v.width * 0.03;
-    var gap = pad * 1.4 / 3, colW = (v.width - 2 * pad - 11 * gap) / 12;
+    var pad = parseFloat(getComputedStyle(ctx.from).paddingLeft) || v.width * 64 / 1680;
+    var grid = ctx.from.querySelector('.ft__grid');
+    var gap = (grid && parseFloat(getComputedStyle(grid).columnGap)) || pad * 16 / 64, colW = (v.width - 2 * pad - 11 * gap) / 12;
     var m = { w: v.width, h: v.height, pad: pad, gap: gap, colW: colW, pitch: colW + gap };
     m.x = function (i) { return pad + i * (colW + gap); };
     // Column bands edge to edge: split at the middle of each gutter, margins go to the outer bands.
@@ -155,6 +176,62 @@
   function wait(ctx, ms) {
     return new Promise(function (done) { var id = setTimeout(done, ms); ctx.stops.push(function () { clearTimeout(id); done(); }); });
   }
+
+  // ── Wireframe helpers (11, 11a–11f) ───────────────────────────────────
+  function fr(r) { return { left: r.x + 'px', top: r.y + 'px', width: r.w + 'px', height: r.h + 'px' }; }
+  // Measures both pages: A = old page's elements, B = new page's, each with its label.
+  function wfSetup(ctx) {
+    var m = metrics(ctx), A = parts(ctx, ctx.from);
+    ghostShow(ctx, ctx.to);
+    var B = parts(ctx, ctx.to);
+    A.forEach(function (p) { p.l = tagOf(p); });
+    B.forEach(function (p) { p.l = tagOf(p); });
+    return { m: m, A: A, B: B };
+  }
+  // One box per element pair, created at the old element's rect; extra ones are born/die at the last.
+  function wfPairs(ctx, A, B, cls, labels) {
+    var n = Math.max(A.length, B.length), out = [];
+    for (var i = 0; i < n; i++) {
+      var a = A[i] || A[A.length - 1], b = B[i] || B[B.length - 1];
+      var d = box('ft__wf' + (cls ? ' ' + cls : ''), ctx.fx, a.r), lab = labels === false ? null : el('ft__wfl', d);
+      if (!A[i]) d.style.opacity = '0';
+      if (lab) lab.textContent = a.l;
+      out.push({ d: d, lab: lab, a: a, b: b, born: !A[i], dies: !B[i] });
+    }
+    return out;
+  }
+  // FLIP-style travel from rect a to rect b. Born boxes fade in on the way, dying ones fade out.
+  function wfMove(ctx, x, dur, delay) {
+    var k0 = fr(x.a.r), k1 = fr(x.b.r);
+    if (x.born || x.dies) { k0.opacity = x.born ? 0 : 1; k1.opacity = x.dies ? 0 : 1; }
+    return anim(ctx, x.d, [k0, k1], { duration: dur, delay: delay, easing: EASE, fill: x.born ? 'both' : 'forwards' });
+  }
+  function relabel(ctx, boxes, at) {
+    return wait(ctx, at).then(function () { boxes.forEach(function (x) { if (x.lab) x.lab.textContent = x.b.l; }); });
+  }
+  // Labels type in with the scramble, staggered; one rAF loop for all of them.
+  function typeLabels(ctx, items, dur, stagger) {
+    return new Promise(function (done) {
+      var start = performance.now(), raf, over = false;
+      var finish = function () { if (over) return; over = true; cancelAnimationFrame(raf); items.forEach(function (it) { it.node.textContent = it.text; }); done(); };
+      var tick = function (now) {
+        var all = true;
+        items.forEach(function (it, i) {
+          var p = Math.max(0, Math.min(1, (now - start - i * stagger) / dur)), n = Math.floor(p * it.text.length);
+          if (p < 1) all = false;
+          it.node.textContent = now - start < i * stagger ? '' : it.text.split('').map(function (ch, j) {
+            return j < n || ch === ' ' || ch === '·' ? ch : GLYPHS[(Math.random() * GLYPHS.length) | 0];
+          }).join('');
+        });
+        if (all) finish(); else raf = requestAnimationFrame(tick);
+      };
+      raf = requestAnimationFrame(tick);
+      ctx.stops.push(finish);
+    });
+  }
+  // Reading order: top to bottom, then left to right.
+  function reading(list) { return list.slice().sort(function (p, q) { return (Math.round(p.r.y) - Math.round(q.r.y)) || (p.r.x - q.r.x); }); }
+  function swapIn(ctx, d) { ctx.swap(); return Promise.all([fadeIn(ctx, ctx.to, d), fadeOut(ctx, ctx.fx, d)]); }
 
   var FX = {
     instant: function (ctx) { ctx.swap(); return Promise.resolve(); },
@@ -340,6 +417,138 @@
       });
     },
 
+    // 11a · Juan's idea. The grid falls in first: one thin line per gutter drops, splits open
+    // into the gutter, the columns fill. Then the old page turns into its wireframe, the boxes
+    // travel to the new layout and fill with the content. Reversed (right to left) going back.
+    'wf-drop': function (ctx) {
+      var t = T.wfDrop, s = wfSetup(ctx), m = s.m, d = ctx.back ? -1 : 1, run = [];
+      var ord = function (i) { return d > 0 ? i : 11 - i; };
+      var g = el('ft__gfx', ctx.fx);
+      for (var i = 0; i < 12; i++) {
+        var f = box('ft__gfill', g, { x: m.x(i), y: 0, w: m.colW, h: m.h });
+        run.push(anim(ctx, f, [{ transform: 'scaleY(0)' }, { transform: 'scaleY(1)' }], { duration: t.fill, delay: t.fillAt + ord(i) * t.fillStagger, easing: EASE, fill: 'both' }));
+        // Left and right edge of column i. Inner edges start together in the middle of their gutter.
+        [[m.x(i), i > 0 ? -m.gap / 2 : 0], [m.x(i) + m.colW - 1, i < 11 ? m.gap / 2 : 0]].forEach(function (q) {
+          var l = box('ft__gl', g, { x: q[0], y: 0, w: 1, h: m.h }), o = 'translateX(' + q[1] + 'px)';
+          l.style.transform = o;
+          run.push(anim(ctx, l, [{ transform: o + ' scaleY(0)' }, { transform: o + ' scaleY(1)' }], { duration: t.drop, delay: ord(i) * t.dropStagger, easing: EASE, fill: 'backwards' }));
+          if (q[1]) run.push(anim(ctx, l, [{ transform: o }, { transform: 'none' }], { duration: t.split, delay: t.splitAt + ord(i) * t.dropStagger, easing: EASE_IO, fill: 'forwards' }));
+        });
+      }
+      var boxes = wfPairs(ctx, s.A, s.B);
+      run.push(anim(ctx, ctx.from, [{ opacity: 1 }, { opacity: 0 }], { duration: t.boxes, delay: t.boxesAt, easing: 'ease-out', fill: 'forwards' }));
+      boxes.forEach(function (x, i) {
+        if (!x.born) run.push(fadeIn(ctx, x.d, t.boxes, t.boxesAt));
+        run.push(wfMove(ctx, x, t.move, t.moveAt + i * t.moveStagger));
+      });
+      run.push(relabel(ctx, boxes, t.moveAt));
+      var outAt = t.moveAt + t.move + (boxes.length - 1) * t.moveStagger;
+      return Promise.all(run.concat(wait(ctx, outAt).then(function () { return swapIn(ctx, t.out); })));
+    },
+
+    // 11b · Column-first. The 12 columns rise from the bottom while the old page fades; the new
+    // page's boxes and labels draw in, in reading order; then the content fills. No travel.
+    'wf-rise': function (ctx) {
+      var t = T.wfRise, s = wfSetup(ctx), m = s.m, d = ctx.back ? -1 : 1, run = [];
+      var g = gridFx(ctx, m);
+      Array.prototype.forEach.call(g.children, function (c, i) {
+        c.style.transformOrigin = 'bottom';
+        run.push(anim(ctx, c, [{ transform: 'scaleY(0)' }, { transform: 'scaleY(1)' }], { duration: t.rise, delay: (d > 0 ? i : 11 - i) * t.riseStagger, easing: EASE, fill: 'backwards' }));
+      });
+      run.push(fadeOut(ctx, ctx.from, t.rise));
+      var B = reading(s.B);
+      B.forEach(function (p, i) {
+        var b = box('ft__wf', ctx.fx, p.r);
+        el('ft__wfl', b).textContent = p.l;
+        run.push(anim(ctx, b, [{ clipPath: 'inset(0 100% 0 0)', opacity: 0 }, { clipPath: 'inset(0 0 0 0)', opacity: 1 }], { duration: t.box, delay: t.boxesAt + i * t.boxStagger, easing: EASE, fill: 'backwards' }));
+      });
+      var outAt = t.boxesAt + (B.length - 1) * t.boxStagger + t.box;
+      return Promise.all(run.concat(wait(ctx, outAt).then(function () { return swapIn(ctx, t.out); })));
+    },
+
+    // 11c · Boxes only. No grid, no labels: outlines take over the old page, morph, fill. ~500 ms.
+    'wf-boxes': function (ctx) {
+      var t = T.wfBoxes, s = wfSetup(ctx), boxes = wfPairs(ctx, s.A, s.B, 'ft__wf--line', false);
+      return Promise.all([fadeOut(ctx, ctx.from, t.inn)].concat(boxes.map(function (x) {
+        return x.born ? null : fadeIn(ctx, x.d, t.inn);
+      }), boxes.map(function (x) { return wfMove(ctx, x, t.move, t.inn); }))).then(function () { return swapIn(ctx, t.out); });
+    },
+
+    // 11d · Labels forward. The new page's boxes appear over a faint grid and their mono labels
+    // ("H1 · 72/68", "IMG 16:9") type in with the scramble; then each box fills, in reading order.
+    'wf-labels': function (ctx) {
+      var t = T.wfLabels, s = wfSetup(ctx), m = s.m, run = [];
+      var g = gridFx(ctx, m);
+      run.push(anim(ctx, g, [{ opacity: 0 }, { opacity: 0.6 }], { duration: t.inn, easing: 'ease-out', fill: 'forwards' }));
+      run.push(fadeOut(ctx, ctx.from, t.inn));
+      var B = reading(s.B), items = [];
+      var covers = B.map(function (p, i) {
+        var b = box('ft__wf ft__wf--solid', ctx.fx, { x: p.r.x - 2, y: p.r.y - 2, w: p.r.w + 4, h: p.r.h + 4 });
+        var lab = el('ft__wfl', b);
+        items.push({ node: lab, text: p.l });
+        run.push(fadeIn(ctx, b, t.boxes, t.boxesAt));
+        return b;
+      });
+      run.push(wait(ctx, t.typeAt).then(function () { return typeLabels(ctx, items, t.type, t.typeStagger); }));
+      // The covers are opaque, so the new page can go in underneath before they open.
+      run.push(wait(ctx, t.boxesAt + t.boxes).then(function () { ctx.swap(); }));
+      covers.forEach(function (b, i) {
+        run.push(anim(ctx, b, [{ opacity: 1 }, { opacity: 0 }], { duration: t.fill, delay: t.fillAt + i * t.fillStagger, easing: 'ease-out', fill: 'forwards' }));
+      });
+      var end = t.fillAt + (covers.length - 1) * t.fillStagger;
+      run.push(anim(ctx, g, [{ opacity: 0.6 }, { opacity: 0 }], { duration: t.fill, delay: end, easing: 'ease-out', fill: 'forwards' }));
+      return Promise.all(run);
+    },
+
+    // 11e · Grid stays. Like 11, but once the new page has filled in, the grid stays on top of it
+    // for a beat (as if you had pressed G) and then fades.
+    'wf-hold': function (ctx) {
+      var t = T.wfHold, s = wfSetup(ctx), m = s.m;
+      var g = gridFx(ctx, m), boxes = wfPairs(ctx, s.A, s.B);
+      return Promise.all([fadeIn(ctx, g, t.inn), fadeOut(ctx, ctx.from, t.inn)].concat(boxes.map(function (x) {
+        return x.born ? null : fadeIn(ctx, x.d, t.inn);
+      }))).then(function () {
+        boxes.forEach(function (x) { if (x.lab) x.lab.textContent = x.b.l; });
+        return Promise.all(boxes.map(function (x, i) { return wfMove(ctx, x, t.move, i * t.moveStagger); }));
+      }).then(function () {
+        ctx.swap();
+        return Promise.all([fadeIn(ctx, ctx.to, t.fill)].concat(boxes.map(function (x) { return fadeOut(ctx, x.d, t.fill); })));
+      }).then(function () {
+        return anim(ctx, g, [{ opacity: 1 }, { opacity: 0 }], { duration: t.fade, delay: t.hold, easing: 'ease-in-out', fill: 'forwards' });
+      });
+    },
+
+    // 11f · From the baseline. Baselines draw in from the bottom up; the old boxes sink into
+    // their own baseline; the new ones grow upward from theirs, bottom row first, then fill.
+    'wf-base': function (ctx) {
+      var t = T.wfBase, s = wfSetup(ctx), m = s.m, run = [];
+      var g = gridFx(ctx, m);
+      run.push(anim(ctx, g, [{ opacity: 0 }, { opacity: 0.6 }], { duration: t.inn, easing: 'ease-out', fill: 'forwards' }));
+      var step = m.pitch / 2, rows = Math.ceil(m.h / step);
+      for (var i = 0; i < rows; i++) {
+        var b = box('ft__base', ctx.fx, { x: 0, y: m.h - (i + 1) * step, w: m.w, h: 1 });
+        run.push(anim(ctx, b, [{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }], { duration: t.lines, delay: i * t.lineStagger, easing: EASE, fill: 'backwards' }));
+      }
+      run.push(fadeOut(ctx, ctx.from, t.inn));
+      s.A.forEach(function (p) {
+        var a = box('ft__wf', ctx.fx, p.r);
+        el('ft__wfl', a).textContent = p.l;
+        run.push(fadeIn(ctx, a, t.inn));
+        run.push(anim(ctx, a, [{ clipPath: 'inset(0 0 0 0)' }, { clipPath: 'inset(100% 0 0 0)' }], { duration: t.sink, delay: t.sinkAt, easing: EASE_IO, fill: 'forwards' }));
+      });
+      // Rows of the new page by their bottom edge, lowest first.
+      var bottoms = [];
+      s.B.forEach(function (p) { var y = Math.round(p.r.y + p.r.h); if (bottoms.indexOf(y) < 0) bottoms.push(y); });
+      bottoms.sort(function (p, q) { return q - p; });
+      s.B.forEach(function (p) {
+        var nb = box('ft__wf', ctx.fx, p.r);
+        el('ft__wfl', nb).textContent = p.l;
+        run.push(anim(ctx, nb, [{ clipPath: 'inset(100% 0 0 0)' }, { clipPath: 'inset(0 0 0 0)' }], { duration: t.grow, delay: t.growAt + bottoms.indexOf(Math.round(p.r.y + p.r.h)) * t.growStagger, easing: EASE, fill: 'backwards' }));
+      });
+      var outAt = t.growAt + (bottoms.length - 1) * t.growStagger + t.grow;
+      return Promise.all(run.concat(wait(ctx, outAt).then(function () { return swapIn(ctx, t.out); })));
+    },
+
     // 12 · Elements snap to their grid columns with outlines, leave column by column;
     // the new modules drop into their cells in reading order, like setting type.
     modular: function (ctx) {
@@ -518,8 +727,22 @@
       picker.querySelectorAll('.ft__opts').forEach(function (n) { n.remove(); });
       var opts = document.createElement('div');
       opts.className = 'ft__opts';
-      var name = 'ft-' + (++uid);
+      var name = 'ft-' + (++uid), groupEl = null, groupId = null;
       LIST.forEach(function (x) {
+        var parent = opts;
+        if (x.group) {
+          if (x.group !== groupId) {
+            var gi = GROUPS[x.group], hid = name + '-' + x.group;
+            groupEl = document.createElement('div');
+            groupEl.className = 'ft__group';
+            groupEl.setAttribute('role', 'group');
+            groupEl.setAttribute('aria-labelledby', hid);
+            groupEl.innerHTML = '<p class="ft__ghead"><span class="ft__gname" id="' + hid + '">' + gi.name + '</span><span class="ft__ghint">' + gi.hint + '</span></p>';
+            opts.appendChild(groupEl);
+          }
+          parent = groupEl;
+        }
+        groupId = x.group || null;
         var l = document.createElement('label');
         l.className = 'ft__opt' + (x.out ? ' ft__opt--out' : '');
         l.innerHTML = '<input type="radio" name="' + name + '" value="' + x.id + '"' + (x.id === selected ? ' checked' : '') + '>' +
@@ -527,7 +750,7 @@
           '<span class="ft__name">' + x.name + (x.star ? ' <span aria-hidden="true">★</span><span class="ft__sr"> (recomendada)</span>' : '') + '</span>' +
           '<span class="ft__ms">' + x.ms + ' ms</span>' +
           (x.tag ? '<span class="ft__tag">' + x.tag + '</span>' : '');
-        opts.appendChild(l);
+        parent.appendChild(l);
       });
       picker.appendChild(opts);
       on(opts, 'change', function (e) { selected = e.target.value; render(); preview(); });
@@ -656,6 +879,7 @@
 
   fresnoTransitions.run = run;
   fresnoTransitions.list = LIST;
+  fresnoTransitions.timings = T;
   global.fresnoTransitions = fresnoTransitions;
   var me = document.currentScript;
   if (!(me && me.hasAttribute('data-manual'))) {
