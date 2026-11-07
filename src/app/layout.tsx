@@ -7,6 +7,7 @@ import Nav from '@/components/layout/Nav/Nav'
 import Footer from '@/components/layout/Footer/Footer'
 import GridOverlay from '@/components/ui/GridOverlay/GridOverlay'
 import Shortcuts from '@/components/ui/Shortcuts/Shortcuts'
+import SocialPreview from '@/components/ui/SocialPreview/SocialPreview'
 import PageTransitionProvider from '@/providers/PageTransition'
 import { SITE_URL } from '@/lib/site'
 
@@ -77,6 +78,7 @@ export default function RootLayout({
         </PageTransitionProvider>
         <GridOverlay />
         <Shortcuts />
+        <SocialPreview />
         <Analytics />
       </body>
     </html>

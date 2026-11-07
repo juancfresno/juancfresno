@@ -29,6 +29,7 @@ export default function Footer() {
                 label={label}
                 icon={<Icon />}
                 className={s.socialLink}
+                social={id}
               />
             ))}
           </nav>

@@ -19,7 +19,7 @@ export default function ContactBlock() {
       </div>
       <ul className={s.socials}>
         {SOCIALS.map((x) => (
-          <li key={x.label}><a href={x.href} target="_blank" rel="noreferrer">{x.label} ↗</a></li>
+          <li key={x.label}><a href={x.href} target="_blank" rel="noreferrer" data-social={x.id}>{x.label} ↗</a></li>
         ))}
       </ul>
     </section>
