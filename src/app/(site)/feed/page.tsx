@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import { INTROS } from '@/content/site'
-import { FEED, groupFeed, groupRange, monthYear } from '@/content/feed'
+import { FEED_SELECTED, groupFeed, groupRange, monthYear } from '@/content/feed'
 import ContactBlock from '@/components/blocks/ContactBlock'
 import v from '@/components/blocks/v0.module.scss'
 import f from '@/components/feed/feed.module.scss'
@@ -17,13 +17,14 @@ export const metadata: Metadata = { title: 'Feed' }
 // each image; monochrome dither at rest, colour on hover or focus. The grid is
 // always server-rendered; the inline script picks the view before paint.
 export default function FeedPage() {
-  const groups = groupFeed()
+  // Only the curated selection (content/feed-selection.ts); the grid by date.
+  const groups = groupFeed([...FEED_SELECTED].sort((a, b) => b.date.localeCompare(a.date)))
   let n = 0
 
   return (
     <div className={v.page}>
       <script dangerouslySetInnerHTML={{ __html: FEED_VIEW_SCRIPT }} />
-      <FeedViews items={FEED} intro={INTROS.feed}>
+      <FeedViews items={FEED_SELECTED} intro={INTROS.feed}>
       <div className={f.feed}>
         {groups.map((g) => (
           <section key={g.key} className={f.group} aria-label={g.label}>
@@ -62,7 +63,7 @@ export default function FeedPage() {
             </ul>
           </section>
         ))}
-        <p className={v.mono}>{FEED.length} piezas · Dribbble e Instagram</p>
+        <p className={v.mono}>{FEED_SELECTED.length} piezas · Dribbble e Instagram</p>
       </div>
 
       <div className={v.closing}>

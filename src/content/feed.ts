@@ -5,6 +5,7 @@
 // Newest first. Pieces of the same project posted close together are grouped
 // as a "session" (Figma "Feed · Desktop", 6770:9789); the rest go into "Sueltos".
 import items from './generated/feed.json'
+import { FEED_SELECTION } from './feed-selection'
 
 export type FeedItem = {
   id: string
@@ -18,6 +19,10 @@ export type FeedItem = {
 }
 
 export const FEED = items as FeedItem[]
+
+// The curated pieces /feed shows (feed-selection.ts), in selection order.
+const BY_ID = new Map(FEED.map((it) => [it.id, it]))
+export const FEED_SELECTED: FeedItem[] = FEED_SELECTION.map((id) => BY_ID.get(id)).filter((it): it is FeedItem => !!it)
 
 // Project names recognised in titles → session label.
 const PROJECTS: [RegExp, string][] = [

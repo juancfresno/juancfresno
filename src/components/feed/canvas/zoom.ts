@@ -8,7 +8,7 @@
 // close; focus is trapped in the dialog and returns to the canvas. The full
 // 900 px file loads only here (the 600 px thumbnail shows first).
 import type { FeedItem } from '@/content/feed'
-import { monthYear, groupFeed } from '@/content/feed'
+import { FEED, monthYear, groupFeed } from '@/content/feed'
 import s from './zoom.module.scss'
 
 const EASE = 'cubic-bezier(0.19, 1, 0.22, 1)'
@@ -31,9 +31,9 @@ function el<K extends keyof HTMLElementTagNameMap>(tag: K, cls?: string, text?: 
 }
 
 export function createZoom(items: FeedItem[], hooks: ZoomHooks) {
-  // Session of each piece, for the meta line.
+  // Session of each piece (computed on the full feed), for the meta line.
   const session = new Map<string, string>()
-  for (const g of groupFeed(items)) for (const it of g.items) session.set(it.id, g.session ? g.label.replace('Sesión · ', 'Sesión ') : 'Sesión sueltos')
+  for (const g of groupFeed(FEED)) for (const it of g.items) session.set(it.id, g.session ? g.label.replace('Sesión · ', 'Sesión ') : 'Sesión sueltos')
 
   let z: null | {
     i: number; wrap: HTMLDivElement; back: HTMLDivElement; img: HTMLDivElement; pic: HTMLImageElement
@@ -85,7 +85,7 @@ export function createZoom(items: FeedItem[], hooks: ZoomHooks) {
     z!.meta.textContent = `${monthYear(it.date)} · ${SOURCE[it.source]} · ${session.get(it.id) ?? ''}`
     z!.link.href = it.url
     z!.link.setAttribute('aria-label', `Ver post original en ${SOURCE[it.source]} (se abre en otra pestaña)`)
-    z!.count.textContent = `${pad3(i + 1)} / ${pad3(items.length)}`
+    z!.count.textContent = `${pad3(i + 1)} / ${items.length}`
     return place(it)
   }
 

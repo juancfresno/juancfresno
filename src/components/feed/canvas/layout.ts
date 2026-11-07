@@ -38,8 +38,28 @@ export type Layout = {
   variantOf: (i: number, j: number) => number
 }
 
+// Off: one piece per slot and every tile repeat is identical (the curated
+// selection, like Juan Mora's lab). On: each tile copy shows another slice of
+// the list ("variants"), for walking a long feed without repeats.
+export const ROTATE_VARIANTS = false
+
 export function makeLayout(items: FeedItem[], W: number, tile: Tile = TILE): Layout {
   const { unit, gutter } = gridMetrics(W)
+  const base = { unit, gutter, TW: tile.cols * unit, TH: tile.rows * unit }
+  if (!ROTATE_VARIANTS) {
+    // Slot by slot: the next unused piece with the slot's ratio, else the next
+    // unused piece; once all are used, start again from the top of the list.
+    const used = new Set<number>()
+    const fixed = tile.slots.map((sl) => {
+      const o = orientationOf(sl.w, sl.h)
+      let k = items.findIndex((it, i) => !used.has(i) && orientationOf(it.w, it.h) === o)
+      if (k < 0) k = items.findIndex((_, i) => !used.has(i))
+      if (k < 0) { used.clear(); k = items.findIndex((it) => orientationOf(it.w, it.h) === o); if (k < 0) k = 0 }
+      used.add(k)
+      return k
+    })
+    return { ...base, variants: 1, piece: (_v, s) => fixed[s], variantOf: () => 0 }
+  }
   // Buckets by orientation; slot k of orientation o takes the next piece of o.
   const buckets: Record<Orientation, number[]> = { land: [], port: [], tall: [] }
   items.forEach((it, i) => buckets[orientationOf(it.w, it.h)].push(i))
@@ -61,7 +81,7 @@ export function makeLayout(items: FeedItem[], W: number, tile: Tile = TILE): Lay
   }
   // Right neighbour +1, lower neighbour +3: all 8 neighbours differ when variants ≥ 5.
   const variantOf = (i: number, j: number) => mod(i + 3 * j, variants)
-  return { unit, gutter, TW: tile.cols * unit, TH: tile.rows * unit, variants, piece, variantOf }
+  return { ...base, variants, piece, variantOf }
 }
 
 export const mod = (n: number, m: number) => ((n % m) + m) % m
