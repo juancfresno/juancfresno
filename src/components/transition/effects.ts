@@ -200,6 +200,8 @@ const CONTAINERS = 'li,tr,figure,a,button,[data-wf]'
 const MEDIA = 'img,video,canvas,picture'
 
 function labelOf(el: Element, r: DOMRect, row: () => number) {
+  const own = el.getAttribute('data-wf-label') // e.g. the feed canvas: "CANVAS · 201"
+  if (own) return own
   const tag = el.tagName.toUpperCase()
   const cs = getComputedStyle(el)
   const fs = Math.round(parseFloat(cs.fontSize) || 16)

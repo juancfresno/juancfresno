@@ -5,20 +5,25 @@ import { FEED, groupFeed, groupRange, monthYear } from '@/content/feed'
 import ContactBlock from '@/components/blocks/ContactBlock'
 import v from '@/components/blocks/v0.module.scss'
 import f from '@/components/feed/feed.module.scss'
+import FeedViews from '@/components/feed/FeedViews'
+import { FEED_VIEW_SCRIPT } from '@/components/feed/feedView'
 
 export const metadata: Metadata = { title: 'Feed' }
 
-// Figma: "Feed · Desktop" (6770:9789). Sessions of consecutive pieces of the
-// same project, newest first; masonry in 3 / 2 / 1 columns; title and month
-// inside each image; monochrome dither at rest, colour on hover or focus.
+// Two views (components/feed/FeedViews): Canvas, an infinite WebGL plane
+// (default on desktop), and Rejilla, the static accessible grid below — Figma
+// "Feed · Desktop" (6770:9789): sessions of consecutive pieces of the same
+// project, newest first; masonry in 3 / 2 / 1 columns; title and month inside
+// each image; monochrome dither at rest, colour on hover or focus. The grid is
+// always server-rendered; the inline script picks the view before paint.
 export default function FeedPage() {
   const groups = groupFeed()
   let n = 0
 
   return (
     <div className={v.page}>
-      <p className={v.intro}>{INTROS.feed}</p>
-
+      <script dangerouslySetInnerHTML={{ __html: FEED_VIEW_SCRIPT }} />
+      <FeedViews items={FEED} intro={INTROS.feed}>
       <div className={f.feed}>
         {groups.map((g) => (
           <section key={g.key} className={f.group} aria-label={g.label}>
@@ -63,6 +68,7 @@ export default function FeedPage() {
       <div className={v.closing}>
         <ContactBlock />
       </div>
+      </FeedViews>
     </div>
   )
 }

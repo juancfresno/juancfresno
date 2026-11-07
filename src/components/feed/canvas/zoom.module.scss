@@ -1,0 +1,176 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+// Open piece on the feed canvas — Figma "Feed · Canvas" 6867:1566.
+// The dialog starts under the header (top set inline), so nav stays visible.
+
+.lock { overflow: hidden; }
+
+.zoom {
+  position: fixed;
+  inset: 0;
+  z-index: $z-modal;
+  color: $color-text;
+  font-family: $font-mono;
+  overflow: hidden;
+}
+
+.back {
+  position: absolute;
+  inset: 0;
+  background: $color-bg;
+  opacity: 0;
+  transition: opacity 0.45s ease;
+}
+
+.open .back { opacity: 0.9; }
+
+// The piece's original slot, outlined while it is open.
+.slot {
+  position: absolute;
+  border: 1px dashed $color-text-muted;
+  border-radius: 2px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease 0.2s;
+
+  &[hidden] { display: none; }
+}
+
+.open .slot { opacity: 1; }
+
+.img {
+  position: absolute;
+  transform-origin: 0 0;
+  touch-action: none;
+  cursor: grab;
+  will-change: transform;
+  background: $color-bg-2;
+
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+}
+
+.info {
+  position: absolute;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: $space-2 $space-6;
+  opacity: 0;
+  transition: opacity 0.3s ease 0.18s;
+
+  @media (max-width: 720px) { flex-wrap: wrap; }
+}
+
+.open .info, .open .hint { opacity: 1; }
+
+.col { display: flex; flex-direction: column; gap: 0.6rem; min-width: 0; }
+.right { align-items: flex-end; flex-shrink: 0; }
+
+.title {
+  font-family: $font-body;
+  font-size: clamp(1.125rem, 0.5vw + 0.95rem, 1.375rem);
+  line-height: 1.2;
+  color: $color-text;
+}
+
+.meta, .count {
+  font-size: 0.6875rem;
+  line-height: 1.2;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: $color-text-mid;
+}
+
+.link {
+  font-size: 0.75rem;
+  line-height: 1.2;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: $color-text;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  white-space: nowrap;
+
+  &:hover { color: #ff5c1e; }
+  @include focus-ring;
+}
+
+.hint {
+  position: absolute;
+  left: $gutter;
+  bottom: $space-4;
+  padding: 6px 9px;
+  border-radius: 2px;
+  background: $color-overlay;
+  color: $color-text-mid;
+  font-size: 0.6875rem;
+  line-height: 1.2;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0;
+  transition: opacity 0.3s ease 0.18s;
+
+  @media (hover: none), (max-width: 720px) { display: none; }
+}
+
+// Prev / next / close: hidden until focused (keyboard), close always visible on touch.
+.ctl {
+  position: absolute;
+  right: $gutter;
+  bottom: $space-4;
+  display: flex;
+  gap: 0.4rem;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.25rem;
+  padding: 0 0.9rem;
+  border: 1px solid $color-line;
+  border-radius: 999px;
+  background: $color-overlay;
+  color: $color-text;
+  font: inherit;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+
+  &:not(:focus-visible) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    border: 0;
+  }
+
+  &:hover, &:focus-visible { background: $color-text; color: $color-bg; }
+  &:focus-visible { outline: 2px solid $color-text; outline-offset: 2px; }
+}
+
+@media (hover: none), (max-width: 720px) {
+  .x:not(:focus-visible) {
+    position: static;
+    width: auto;
+    height: auto;
+    min-height: 2.25rem;
+    padding: 0 0.9rem;
+    clip: auto;
+    border: 1px solid $color-line;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .back, .info, .hint, .slot { transition: none; }
+}
