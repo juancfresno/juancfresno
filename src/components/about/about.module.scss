@@ -1,194 +1,248 @@
 @use '../../styles/variables' as *;
 @use '../../styles/mixins' as *;
 
-// About v1.0 — professional / personal views, services, studios & brands,
-// experience. Site grid: 12 columns, gutter 16, liquid.
+// About v1.0 — Figma "About · v1.0 · 1680" (6888:1117).
 
 .hero {
   @include container;
-  display: flex;
-  flex-direction: column;
-  gap: clamp(2.5rem, 5vw, 5rem);
-  padding-top: clamp(3rem, 6vw, 6.5rem);
-  padding-bottom: clamp(4rem, 8vw, 8rem);
+  padding-top: clamp(4rem, 7vw, 7.5rem);
+  padding-bottom: clamp(4.5rem, 8vw, 8.5rem);
 }
 
-.heroHead { display: flex; flex-direction: column; gap: $space-3; }
+.heroRow {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: $space-6;
+  margin-bottom: clamp(3rem, 4.3vw, 4.5rem);
+}
 
 .name {
   font-family: $font-body;
-  font-weight: $fw-light;
-  font-size: clamp(2.75rem, 6vw, 7rem);
-  line-height: 0.98;
-  letter-spacing: -0.04em;
+  font-weight: 200;
+  font-size: clamp(5rem, 13.1vw, 13.75rem);
+  line-height: 0.84;
+  letter-spacing: -0.06em;
   color: $color-text-hi;
+  margin-left: -0.04em;
 }
 
-.role {
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 24px;
+
+  @include respond-to(md) { padding-bottom: 0; }
+
+  button {
+    padding: 4px 8px;
+    border: 1px solid $color-text-mid;
+    border-radius: 3px;
+    font-family: $font-mono;
+    font-size: 0.625rem;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: $color-text;
+    cursor: pointer;
+    transition: background $duration-fast, color $duration-fast, border-color $duration-fast;
+
+    &[aria-pressed='true'] { background: $color-text; border-color: $color-text; color: $color-bg; }
+    &:hover:not([aria-pressed='true']) { border-color: $color-text; }
+    @include focus-ring($color-text);
+  }
+}
+
+.toggleLabel {
+  margin-right: 6px;
   font-family: $font-mono;
-  font-size: 0.6875rem;
+  font-size: 0.625rem;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   color: $color-text-mid;
 }
 
-// ─── Views ──────────────────────────────────────────────────────────────────
-.views { display: flex; flex-direction: column; gap: $space-6; }
-
-.viewsBar { display: flex; justify-content: flex-start; }
-
-.viewsGrid {
+.split {
   display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: $space-4;
-  align-items: start;
+  grid-template-columns: minmax(0, 1fr) 1px minmax(0, 1fr);
 
-  @include respond-to(md) { grid-template-columns: 1fr; gap: $space-8; }
+  &[data-view='professional'], &[data-view='personal'] { grid-template-columns: minmax(0, 1fr); }
+
+  @include respond-to(md) { grid-template-columns: 1fr; row-gap: $space-16; }
 }
 
-.viewsPhoto {
-  grid-column: 1 / span 4;
-  display: grid;
-  position: relative;
-
-  img { display: block; width: 100%; height: auto; }
-
-  @include respond-to(md) { grid-column: 1 / -1; grid-row: 2; }
+.splitDivider {
+  background: $color-line;
+  &[hidden] { display: none; }
+  @include respond-to(md) { display: none; }
 }
 
-.photoLayer {
-  grid-area: 1 / 1;
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(8px);
-  transition: opacity 0.45s $ease-out-expo, transform 0.6s $ease-out-expo, visibility 0s linear 0.45s;
-
-  @media (prefers-reduced-motion: reduce) { transition: none; transform: none; }
-}
-
-.photoOn {
-  opacity: 1;
-  visibility: visible;
-  transform: none;
-  transition: opacity 0.45s $ease-out-expo, transform 0.6s $ease-out-expo, visibility 0s;
-}
-
-.personalPhotos {
-  position: relative;
-  padding-bottom: 3rem;
-}
-
-.face {
-  position: absolute;
-  right: 8%;
-  bottom: 0;
-  width: 32% !important;
-  box-shadow: 0 0 0 6px $color-bg;
-}
-
-.viewsText {
-  grid-column: 6 / -1;
-  min-width: 0;
-
-  @include respond-to(lg) { grid-column: 5 / -1; }
-  @include respond-to(md) { grid-column: 1 / -1; grid-row: 1; }
-}
-
-.viewPane {
+.pane {
   display: flex;
   flex-direction: column;
-  gap: $space-6;
+  padding-right: 48px;
+  min-width: 0;
+
+  &[hidden] { display: none; }
 
   @media (prefers-reduced-motion: no-preference) {
-    &:not([hidden]) { animation: paneIn 0.5s $ease-out-expo both; }
+    animation: paneIn 0.5s $ease-out-expo both;
   }
+  @include respond-to(md) { padding-right: 0; }
 }
+
+.panePersonal {
+  padding-right: 0;
+  padding-left: 48px;
+  @include respond-to(md) { padding-left: 0; }
+}
+
+.split[data-view='personal'] .panePersonal { padding-left: 0; }
 
 @keyframes paneIn { from { opacity: 0; transform: translateY(6px); } }
 
-.bioLead, .bioRest {
-  font-family: $font-body;
-  font-weight: $fw-light;
-  font-size: clamp(1.25rem, 1vw + 0.95rem, 1.875rem);
-  line-height: 1.25;
-  letter-spacing: -0.015em;
-  max-width: 34ch;
+.paneLabel {
+  display: flex;
+  justify-content: space-between;
+  gap: $space-4;
+  font-family: $font-mono;
+  text-transform: uppercase;
+
+  span:first-child { font-size: 0.6875rem; letter-spacing: 0.03em; color: $color-text-hi; }
+  span:last-child { font-size: 0.625rem; letter-spacing: 0.03em; color: $color-text-mid; }
 }
 
-.bioLead { color: $color-text-hi; }
-.bioRest { color: $color-text-mid; }
+.photo {
+  margin-top: 28px;
+  width: min(100%, 23.5rem);
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: var(--c-stage);
 
-.ref { font-size: 0.5em; margin-left: 0.15em; color: $color-text-mid; }
+  img { width: 100%; height: 100%; object-fit: cover; display: block; }
+}
+
+.bioLead {
+  margin-top: 40px;
+  font-family: $font-body;
+  font-weight: $fw-light;
+  font-size: clamp(1.375rem, 1.7vw, 1.75rem);
+  line-height: 1.36;
+  letter-spacing: -0.012em;
+  color: $color-text;
+  max-width: 45rem;
+}
+
+.bioRest {
+  font-family: $font-body;
+  font-size: 1.125rem;
+  line-height: 1.52;
+  letter-spacing: -0.01em;
+  color: $color-text-mid;
+  max-width: 45rem;
+}
+
+.bioLead + .bioRest { margin-top: 24px; }
+
+.hobbies {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+
+  :global([class*='pending']) { margin-left: 0; }
+}
 
 .footnote {
-  padding-top: $space-4;
+  margin-top: 40px;
+  padding-top: 14px;
   border-top: 1px solid $color-line;
-  font-family: $font-mono;
-  font-size: 0.6875rem;
-  line-height: 1.5;
+  font-family: $font-body;
+  font-size: 0.8125rem;
   color: $color-text-mid;
-  max-width: 60ch;
 
-  sup { font-size: 0.85em; }
   a { color: $color-text; text-underline-offset: 3px; }
 }
 
-// ─── Services ───────────────────────────────────────────────────────────────
-.serviceList {
+// ─── Alt band (Services, Experience) ────────────────────────────────────────
+.alt { background: $color-bg-2; }
+
+// ─── Services: rows 1 · 4 · 4 · 3 ──────────────────────────────────────────
+.services {
   list-style: none;
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: $space-4;
 
-  @include respond-to(lg) { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: $space-8; }
-  @include respond-to(sm) { grid-template-columns: 1fr; }
+  > li {
+    display: grid;
+    grid-template-columns: 1fr 4fr 4fr 3fr;
+    gap: $space-4;
+    align-items: start;
+    padding-block: 28px;
+    border-bottom: 1px solid $color-line;
 
-  li {
-    display: flex;
-    flex-direction: column;
-    gap: $space-3;
-    padding-top: $space-4;
-    border-top: 1px solid $color-line;
+    @include respond-to(lg) { grid-template-columns: 2rem minmax(0, 1fr) minmax(0, 1fr); > :last-child { grid-column: 2 / -1; } }
+    @include respond-to(md) { grid-template-columns: 2rem minmax(0, 1fr); > :nth-child(n + 3) { grid-column: 2; } }
   }
+}
+
+.n {
+  font-family: $font-mono;
+  font-size: 0.625rem;
+  letter-spacing: 0.02em;
+  color: $color-text-mid;
+  padding-top: 0.6em;
 }
 
 .serviceName {
   font-family: $font-body;
-  font-weight: $fw-regular;
-  font-size: clamp(1.125rem, 0.4vw + 1rem, 1.375rem);
-  letter-spacing: -0.01em;
+  font-weight: $fw-light;
+  font-size: clamp(1.75rem, 2.15vw, 2.25rem);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
   color: $color-text;
 }
 
 .serviceText {
   font-family: $font-body;
-  font-size: 0.9375rem;
-  line-height: 1.45;
-  color: $color-text-mid;
-  max-width: 36ch;
-}
-
-.serviceTags {
-  margin-top: auto;
-  padding-top: $space-2;
-  font-family: $font-mono;
-  font-size: 0.625rem;
+  font-size: 1.0625rem;
   line-height: 1.5;
-  text-transform: uppercase;
-  color: $color-text;
+  letter-spacing: -0.01em;
+  color: $color-text-mid;
+  max-width: 32rem;
 }
 
-.after { margin-top: $space-6; align-self: flex-start; }
+.tags {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+
+  li {
+    padding: 4px 8px;
+    border: 1px solid $color-text-mid;
+    border-radius: 999px;
+    font-family: $font-mono;
+    font-size: 0.5625rem;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: $color-text;
+  }
+}
+
+.after { margin-top: 40px; align-self: flex-start; }
 
 // ─── Studios & brands ───────────────────────────────────────────────────────
 .sentence {
   font-family: $font-body;
   font-weight: $fw-light;
-  font-size: clamp(1.25rem, 1vw + 0.95rem, 1.875rem);
-  line-height: 1.25;
-  letter-spacing: -0.015em;
+  font-size: clamp(1.75rem, 2.9vw, 3rem);
+  line-height: 1.06;
+  letter-spacing: -0.03em;
   color: $color-text-hi;
   max-width: 30ch;
-  margin-bottom: $space-8;
+  margin-top: 16px;
+  margin-bottom: clamp(2.5rem, 3.8vw, 4rem);
 }
 
 .lists {
@@ -198,20 +252,16 @@
 
   @include respond-to(md) { grid-template-columns: 1fr; }
 
-  > div { display: flex; flex-direction: column; gap: $space-4; }
+  > div { display: flex; flex-direction: column; gap: 20px; }
 }
 
 .names {
-  list-style: none;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.15rem 0;
   font-family: $font-body;
-  font-size: clamp(1.0625rem, 0.5vw + 0.95rem, 1.375rem);
-  line-height: 1.4;
+  font-weight: $fw-light;
+  font-size: clamp(1.125rem, 1.3vw, 1.375rem);
+  line-height: 1.6;
   color: $color-text;
-
-  li:not(:last-child)::after { content: ','; margin-right: 0.35em; color: $color-text-dim; }
+  max-width: 46rem;
 }
 
 .namesTail { color: $color-text-mid; }
@@ -222,104 +272,105 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: $space-4;
-  margin-bottom: clamp(2rem, 4vw, 4rem);
+  margin-top: 16px;
+  margin-bottom: clamp(3rem, 4.8vw, 5rem);
 
-  @include respond-to(sm) { grid-template-columns: 1fr; }
+  @include respond-to(sm) { grid-template-columns: 1fr; row-gap: $space-8; }
 
   li {
     display: flex;
     flex-direction: column;
-    gap: $space-2;
-    padding-top: $space-4;
-    border-top: 1px solid $color-line;
+    gap: 8px;
+    padding-top: 16px;
+    border-top: 1px solid $color-text-mid;
   }
-}
-
-.figValue {
-  font-family: $font-body;
-  font-weight: $fw-light;
-  font-size: clamp(2.75rem, 5.5vw, 6.5rem);
-  line-height: 0.95;
-  letter-spacing: -0.04em;
-  color: $color-text-hi;
 }
 
 .figLabel {
   font-family: $font-mono;
-  font-size: 0.6875rem;
+  font-size: 0.625rem;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   color: $color-text-mid;
 }
 
-.before {
-  margin-top: clamp(3rem, 6vw, 5rem);
-  margin-bottom: $space-6;
+.figValue {
   font-family: $font-body;
-  font-weight: $fw-light;
-  font-size: clamp(1.125rem, 0.6vw + 0.95rem, 1.5rem);
-  line-height: 1.3;
+  font-weight: 200;
+  font-size: clamp(4rem, 9.5vw, 10rem);
+  line-height: 0.9;
+  letter-spacing: -0.06em;
   color: $color-text-hi;
-  max-width: 40ch;
 }
 
-// Experience table — same grid as the Work index
-.table ol { list-style: none; }
+.exp { list-style: none; }
 
+// Rows on the index grid: 1 · 5 · 3 · 2 · 1 (v1/index-row)
 .tr {
   display: grid;
-  grid-template-columns: 4.5rem minmax(0, 1fr) minmax(0, 23%) minmax(0, 14%) 7rem;
+  grid-template-columns: 1fr 5fr 3fr 2fr 1fr;
+  gap: $space-4;
   align-items: center;
-  min-height: 3.6rem;
-  padding-block: $space-4;
-  border-top: 1px solid $color-line;
-
-  &:last-child { border-bottom: 1px solid $color-line; }
-
-  &.noN { grid-template-columns: minmax(0, 1fr) minmax(0, 23%) minmax(0, 14%) 7rem; }
+  min-height: 4rem;
+  border-bottom: 1px solid $color-line;
 
   @include respond-to(md) {
     grid-template-columns: 2.25rem minmax(0, 1fr) auto;
+    padding-block: 12px;
     > :nth-child(3) { grid-column: 2 / -1; grid-row: 2; }
     > :nth-child(4) { display: none; }
     > :nth-child(5) { grid-column: 3; grid-row: 1; }
-
-    &.noN {
-      grid-template-columns: minmax(0, 1fr) auto;
-      > :nth-child(2) { grid-column: 1 / -1; grid-row: 2; }
-      > :nth-child(3) { display: none; }
-      > :nth-child(4) { grid-column: 2; grid-row: 1; display: block; }
-    }
   }
 }
 
 .th {
   min-height: 0;
-  padding-block: 0 $space-4;
-  border-top: 0;
+  padding-bottom: 12px;
+  border-bottom: 1px solid $color-line;
   font-family: $font-mono;
   font-size: 0.625rem;
+  letter-spacing: 0.02em;
   text-transform: uppercase;
   color: $color-text-mid;
 
   @include respond-to(md) { display: none !important; }
 }
 
-.n { font-family: $font-mono; font-size: 0.75rem; color: $color-text-mid; }
-
 .company {
   font-family: $font-body;
-  font-size: clamp(1rem, 0.4vw + 0.9rem, 1.125rem);
+  font-size: clamp(1.125rem, 1.3vw, 1.375rem);
+  letter-spacing: -0.015em;
+  color: $color-text;
 }
 
 .cell {
   font-family: $font-mono;
   font-size: 0.625rem;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.02em;
   text-transform: uppercase;
+  color: $color-text;
   padding-right: $space-4;
-  color: $color-text-mid;
 }
 
 .right { text-align: right; padding-right: 0; }
 
-.viewPane[hidden] { display: none; }
+.before {
+  display: grid;
+  grid-template-columns: 1fr 11fr;
+  gap: $space-4;
+  margin-top: clamp(3rem, 4.3vw, 4rem);
+  margin-bottom: 32px;
+
+  span:last-child {
+    font-family: $font-body;
+    font-weight: $fw-light;
+    font-size: clamp(1.375rem, 1.8vw, 1.875rem);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    color: $color-text-hi;
+    max-width: 30ch;
+  }
+
+  @include respond-to(md) { grid-template-columns: 1fr; span:first-child { display: none; } }
+}
+.before + .exp { border-top: 1px solid $color-line; }
