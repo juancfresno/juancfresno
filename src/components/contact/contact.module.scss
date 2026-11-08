@@ -1,0 +1,137 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+// Contact v1.0 — own layout on the site grid (12 col, gutter 16, liquid).
+
+.hero {
+  @include container;
+  display: flex;
+  flex-direction: column;
+  gap: $space-6;
+  padding-top: clamp(3rem, 6vw, 6.5rem);
+  padding-bottom: clamp(3rem, 7vw, 7rem);
+}
+
+.title {
+  font-family: $font-body;
+  font-weight: $fw-light;
+  font-size: clamp(2.75rem, 6.4vw, 7.5rem);
+  line-height: 0.98;
+  letter-spacing: -0.04em;
+  color: $color-text-hi;
+  max-width: 13ch;
+  text-wrap: balance;
+}
+
+.mono {
+  font-family: $font-mono;
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  color: $color-text-mid;
+  font-variant-numeric: tabular-nums;
+}
+
+// ─── Two doors ──────────────────────────────────────────────────────────────
+.doors {
+  @include container;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: $space-4;
+  padding-bottom: clamp(4rem, 8vw, 8rem);
+
+  @include respond-to(md) { grid-template-columns: 1fr; gap: $space-12; }
+}
+
+.door {
+  grid-column: span 6;
+  display: flex;
+  flex-direction: column;
+  gap: $space-6;
+  padding-top: $space-4;
+  border-top: 1px solid $color-line-hi;
+
+  &:first-child { grid-column: 1 / span 7; }
+  &:last-child { grid-column: 8 / -1; }
+
+  @include respond-to(lg) {
+    &:first-child, &:last-child { grid-column: span 6; }
+  }
+  @include respond-to(md) {
+    &:first-child, &:last-child { grid-column: 1 / -1; }
+  }
+}
+
+.doorLabel {
+  font-family: $font-mono;
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  color: $color-text-hi;
+
+  span { color: $color-text-dim; margin-right: 0.5rem; }
+}
+
+.doorText {
+  font-family: $font-body;
+  font-weight: $fw-light;
+  font-size: clamp(1.0625rem, 0.5vw + 0.95rem, 1.3125rem);
+  line-height: 1.4;
+  color: $color-text-mid;
+  max-width: 38ch;
+}
+
+.callBig > * {
+  font-size: clamp(1.5rem, 3vw, 3rem) !important;
+  font-weight: $fw-light;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+// ─── Modes ──────────────────────────────────────────────────────────────────
+.modes {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: $space-4;
+
+  @include respond-to(md) { grid-template-columns: 1fr; gap: $space-8; }
+
+  li {
+    display: flex;
+    flex-direction: column;
+    gap: $space-3;
+    padding-top: $space-4;
+    border-top: 1px solid $color-line;
+  }
+}
+
+.modeN { font-family: $font-mono; font-size: 0.6875rem; color: $color-text-dim; }
+
+.modeName {
+  font-family: $font-body;
+  font-weight: $fw-light;
+  font-size: clamp(1.75rem, 2.4vw, 2.75rem);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  color: $color-text;
+}
+
+.modeText {
+  font-family: $font-body;
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  color: $color-text-mid;
+  max-width: 34ch;
+}
+
+.foot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: $space-4 $space-8;
+  margin-top: clamp(3rem, 6vw, 5rem);
+  padding-top: $space-4;
+  border-top: 1px solid $color-line;
+}
+
+.small { font-family: $font-body; font-size: 0.875rem; color: $color-text-mid; }
