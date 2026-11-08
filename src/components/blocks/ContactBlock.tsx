@@ -1,27 +1,38 @@
-import { PERSON, SOCIALS, CONTACT } from '@/content/site'
+import { CLOSE, PERSON } from '@/content/site'
+import ElasticLine from '@/components/ui/ElasticLine/ElasticLine'
+import NavClock from '@/components/ui/NavClock/NavClock'
+import CopyEmail from '@/components/close/CopyEmail'
+import CallLink from '@/components/close/CallLink'
+import Socials from '@/components/close/Socials'
 import Pending from './Pending'
-import s from './blocks.module.scss'
+import s from '@/components/close/close.module.scss'
 
-// Closing contact block, shared by every page: email, call, availability, socials.
+// Global close / pre-footer (copy doc "Mood · Cierre"): label, headline with
+// voice, big email + Copy, the call as second action, a mono line with local
+// time and the reply promise, rates on request, socials with hover clips.
+// Every page except Contact and the end of a case (those use their own).
 export default function ContactBlock() {
   return (
-    <section className={s.contact} aria-label="Contacto">
-      <p className={s.label}>{CONTACT.kicker}</p>
-      <p className={s.contactText}>{CONTACT.text}</p>
-      <a className={s.contactEmail} href={`mailto:${PERSON.email}`}>{PERSON.email}</a>
-      <div className={s.contactRow}>
-        {PERSON.callUrl ? (
-          <a className={s.button} href={PERSON.callUrl}>Reservar llamada · 15 min</a>
-        ) : (
-          <span className={s.button}>Reservar llamada · 15 min <Pending>enlace</Pending></span>
-        )}
-        <span className={s.availability}>● {PERSON.availability.text}{PERSON.availability.pending && <Pending />}</span>
+    <section className={s.close} aria-labelledby="close-title">
+      <ElasticLine className={s.rule} />
+      <p className={s.label}>{CLOSE.label}</p>
+      <div className={s.grid}>
+        <div className={s.head}>
+          <h2 id="close-title" className={s.headline}>{CLOSE.headline}</h2>
+          <p className={s.sub}>{CLOSE.sub}</p>
+        </div>
+        <div className={s.actions}>
+          <CopyEmail />
+          <CallLink label={CLOSE.call} />
+        </div>
       </div>
-      <ul className={s.socials}>
-        {SOCIALS.map((x) => (
-          <li key={x.label}><a href={x.href} target="_blank" rel="noreferrer" data-social={x.id}>{x.label} ↗</a></li>
-        ))}
-      </ul>
+      <div className={s.foot}>
+        <p className={s.mono}>
+          <NavClock /> · {PERSON.replies.text}{PERSON.replies.pending && <Pending>confirm</Pending>}
+        </p>
+        <p className={s.small}>{CLOSE.small}</p>
+        <Socials />
+      </div>
     </section>
   )
 }

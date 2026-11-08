@@ -1,11 +1,9 @@
 // ─── Work: index, cases and archive ───────────────────────────────────────────
-// Source: Figma file AXxkCCuckrXGKDUCk8lNyQ.
-//   · Index rows: "Work · v0" (page ↪ Visual, node 6770:9563), frame "02 · Índice".
-//   · Case copy and stats: one frame per case in page ↪ Casos ("Caso · <name>").
-//     Copy is taken as it is in Figma; layers marked "· borrador" there are
-//     flagged `draft: true` here (rendered the same, kept for the copy review).
-//   · Images and their order: the "Behance · bloque" of each case frame; files
-//     are built by scripts/build-media.mjs into public/work/<slug>/.
+// Copy: copy-web-v1.md (8 Nov 2026), English. Leads and questions are verbatim
+// from the doc; context and decisions are the Figma copy ("Caso · …" frames in
+// ↪ Casos) translated. Behance stats are gone from the site (decision 11).
+// Images and their order: the "Behance · bloque" of each case frame; files are
+// built by scripts/build-media.mjs into public/work/<slug>/.
 import media from './generated/cases-media.json'
 
 export type Img = { src: string; w: number; h: number }
@@ -20,17 +18,20 @@ export type Note = {
 }
 
 export type Case = {
-  meta: string // "2018 · Concepto propio"
+  meta: string // "2018 · Personal project"
   title: string // big title on the case page (may differ from the index name)
-  lead: string
-  ficha: { cliente: string; año: string; rol: string; disciplina: string }
+  chips: string[] // disciplines, under the title
+  lead: string // one-sentence description (also the meta description)
+  // Ficha: Client · Via · Year · Role (+ Team). `via` only when it came through
+  // a studio; `role: null` renders <Pending />.
+  ficha: { client: string; via?: string; year: string; role: string | null; team?: string }
   question?: string
   context?: { lead: string; text: string }
   decisions?: { title: string; text: string }[]
-  draft?: boolean
-  stats: { value: string; label: string }[]
-  published: string
+  hindsight: string | null // Juan writes it; null renders <Pending />
   credits: string
+  live?: string // "Live site ↗" only when there is something live to see
+  draft?: boolean
   behance?: string
   notes?: { blockHeight: number; items: Note[] }
 }
@@ -49,289 +50,355 @@ export type Project = {
 const M = media as Record<string, { cover: Img; images: Img[] }>
 export const caseMedia = (slug: string) => M[slug]
 
+// NDA rows don't match the invoices yet (copy doc, question 3): kept in the
+// data, hidden until Juan confirms them.
+export const SHOW_NDA = false
+
 // ─── Index (Work · v0, newest first) ──────────────────────────────────────────
-export const PROJECTS: Project[] = [
+// `featured` = the Home Arco gallery and its short index, in this order.
+const ALL_PROJECTS: Project[] = [
   { slug: 'signflow', name: 'Signflow', discipline: 'SaaS · Fintech · Legal tech', client: 'Signflow', year: '2026', caseStudy: true, featured: true },
-  { slug: 'access', name: 'Access', discipline: 'Identidad visual', client: 'Audax Studio', year: '2025', caseStudy: true },
-  { slug: 'educa-projects', name: 'Educa Projects', discipline: 'Identidad visual', client: 'Audax Studio', year: '2025', caseStudy: true },
-  { slug: 'likitech', name: 'Likitech', discipline: 'Brand Identity · B2B', client: 'vía Aspid', year: '2025', caseStudy: true, featured: true },
-  { slug: 'nda-banca', name: 'Banca · producto digital', discipline: 'Product Design', client: 'vía agencia', year: '2024', nda: true },
-  { slug: 'dinamo', name: 'Dinamo', discipline: 'Branding', client: 'Empresa eléctrica', year: '2024', caseStudy: true },
-  { slug: 'bonamar', name: 'Bonamar', discipline: 'Branding', client: 'Bonamar · restaurante', year: '2024', caseStudy: true },
-  { slug: 'awen', name: 'Awen', discipline: 'Web', client: 'Awen · agencia de marketing', year: '2024', caseStudy: true },
-  { slug: 'correos', name: 'Correos', discipline: 'UI · Diseño web', client: 'vía Goodrebels', year: '2024', caseStudy: true },
-  { slug: 'selected-logos', name: 'Selected Logos', discipline: 'Logo · Marca', client: 'Varios', year: '2024', caseStudy: true },
-  { slug: 'casa-carbon', name: 'Casa Carbon', discipline: 'Branding', client: 'Casacarbón', year: '2022', caseStudy: true },
-  { slug: 'nda-moda', name: 'Moda · campaña digital', discipline: 'Art Direction', client: 'vía agencia', year: '2022', nda: true },
-  { slug: 'nda-energia', name: 'Energía · sistema visual', discipline: 'Visual System', client: 'vía agencia', year: '2021', nda: true },
-  { slug: 'shoeciety', name: 'Shoeciety', discipline: 'App · Interacción', client: 'Concepto propio', year: '2018', caseStudy: true, featured: true },
-  { slug: 'google', name: 'Google', discipline: 'UI · UX · Web', client: 'Concepto propio', year: '2016', caseStudy: true },
-  { slug: 'super-nintendo', name: 'Super Nintendo', discipline: 'Web · UI · UX', client: 'Concepto propio', year: '2016', caseStudy: true },
+  { slug: 'access', name: 'Access', discipline: 'Visual Identity', client: 'Audax Studio', year: '2025', caseStudy: true },
+  { slug: 'educa-projects', name: 'Educa Projects', discipline: 'Visual Identity', client: 'Audax Studio', year: '2025', caseStudy: true },
+  { slug: 'likitech', name: 'Likitech', discipline: 'Brand Identity · B2B', client: 'via Aspid', year: '2025', caseStudy: true, featured: true },
+  { slug: 'nda-banca', name: 'Banking · digital product', discipline: 'Product Design', client: 'via agency', year: '2024', nda: true },
+  { slug: 'dinamo', name: 'Dinamo', discipline: 'Naming · Branding', client: 'Electrical company', year: '2024', caseStudy: true, featured: true },
+  { slug: 'bonamar', name: 'Bonamar', discipline: 'Logo · Branding', client: 'Bonamar · restaurant', year: '2024', caseStudy: true },
+  { slug: 'awen', name: 'Awen', discipline: 'Web', client: 'Awen · marketing agency', year: '2024', caseStudy: true },
+  { slug: 'correos', name: 'Correos', discipline: 'UI · Web Design', client: 'via Goodrebels', year: '2024', caseStudy: true },
+  { slug: 'selected-logos', name: 'Selected Logos', discipline: 'Logo · Brand', client: 'Various', year: '2024', caseStudy: true },
+  { slug: 'casa-carbon', name: 'Casacarbón', discipline: 'Branding · Packaging', client: 'Casacarbón', year: '2022', caseStudy: true, featured: true },
+  { slug: 'nda-moda', name: 'Fashion · digital campaign', discipline: 'Art Direction', client: 'via agency', year: '2022', nda: true },
+  { slug: 'nda-energia', name: 'Energy · visual system', discipline: 'Visual System', client: 'via agency', year: '2021', nda: true },
+  { slug: 'shoeciety', name: 'Shoeciety', discipline: 'App · Interaction', client: 'Personal project', year: '2018', caseStudy: true, featured: true },
+  { slug: 'google', name: 'Google Search', discipline: 'UI · UX · Web', client: 'Personal project', year: '2016', caseStudy: true, featured: true },
+  { slug: 'super-nintendo', name: 'Nintendo Classics', discipline: 'Web · UI · UX', client: 'Personal project', year: '2016', caseStudy: true },
 ]
 
-// ─── Archive: brands Juan has worked with (from ABOUT.brands in site.ts) ──────
-// Only names he lists himself. Discipline and year stay '—' until he confirms them.
-export const ARCHIVE: { name: string; discipline: string; year: string | null }[] = [
-  { name: 'BBVA', discipline: '—', year: null },
-  { name: 'Deutsche Bank', discipline: '—', year: null },
-  { name: 'Iberdrola', discipline: '—', year: null },
-  { name: 'Meliá', discipline: '—', year: null },
-  { name: 'Coca-Cola', discipline: '—', year: null },
-  { name: 'Movistar', discipline: '—', year: null },
-  { name: 'Orange', discipline: '—', year: null },
-  { name: 'Seat', discipline: '—', year: null },
-  { name: 'Dior', discipline: '—', year: null },
-  { name: 'H&M', discipline: '—', year: null },
-  { name: 'Sephora', discipline: '—', year: null },
-  { name: 'Pull & Bear', discipline: '—', year: null },
-  { name: 'Real Madrid C.F.', discipline: '—', year: null },
-  { name: 'LaLiga', discipline: '—', year: null },
-  { name: 'MotoGP', discipline: '—', year: null },
-  { name: 'Acciona', discipline: '—', year: null },
-  { name: 'Cepsa', discipline: '—', year: null },
-  { name: 'Room Mate Hotels', discipline: '—', year: null },
-  { name: 'Standard Chartered', discipline: '—', year: null },
-  { name: 'Burger King', discipline: '—', year: null },
-  { name: 'Uno de 50', discipline: '—', year: null },
+export const PROJECTS = ALL_PROJECTS.filter((p) => SHOW_NDA || !p.nda)
+
+// ─── Archive 2016—2026 (copy doc, from the invoices) ──────────────────────────
+// Via = who invoiced (Direct = the brand itself). Role only when the invoice
+// says it, else "—". Category is inferred for the whole table: draft, not
+// shown as such. `viaUnconfirmed`: the client isn't named on the invoice.
+export type ArchiveRow = { project: string; via: string; category: string; role: string; year: string; nda?: boolean; viaUnconfirmed?: boolean }
+export const ARCHIVE_CATEGORY_DRAFT = true
+export const ARCHIVE: ArchiveRow[] = [
+  { project: "El Zorro Gris · design retainer", via: "Forebound", category: "Brand · Design System", role: "Design", year: "2025—2026" },
+  { project: "Deone · website", via: "Saffron", category: "Web", role: "—", year: "2026" },
+  { project: "Bal Ventures · website", via: "Saffron", category: "Web", role: "—", year: "2026" },
+  { project: "Meliá", via: "Hanzo", category: "Digital", role: "—", year: "2025" },
+  { project: "Fudigital · emails & checkout", via: "Direct", category: "UI · E-commerce", role: "Design", year: "2025" },
+  { project: "Access · rebrand", via: "Audax Studio", category: "Brand Identity", role: "Branding", year: "2024—2025" },
+  { project: "Educa Projects · rebrand", via: "Audax Studio", category: "Brand Identity", role: "Branding", year: "2024—2025" },
+  { project: "Alecook", via: "Audax Studio", category: "Brand Identity", role: "Branding", year: "2024—2025" },
+  { project: "H&N · visual universe", via: "Audax Studio", category: "Brand Identity", role: "Branding", year: "2025" },
+  { project: "Room Mate Hotels", via: "Emascaro Crossmedia", category: "Art Direction · Hospitality", role: "Look & feel · visual development", year: "2024—2025" },
+  { project: "Sant Pere del Bosc", via: "Emascaro Crossmedia", category: "Art Direction · Hospitality", role: "Look & feel · visual development", year: "2024—2025" },
+  { project: "Gran Hotel Taoro", via: "Emascaro Crossmedia", category: "Art Direction · Hospitality", role: "Look & feel · visual development", year: "2024—2025" },
+  { project: "Capitol", via: "Emascaro Crossmedia", category: "Art Direction · Hospitality", role: "Look & feel · visual development", year: "2024—2025" },
+  { project: "Casita Blanca", via: "Emascaro Crossmedia", category: "Art Direction · Hospitality", role: "Look & feel · visual development", year: "2024—2025" },
+  { project: "Dream Place Hotels", via: "Emascaro Crossmedia", category: "Art Direction · Hospitality", role: "Look & feel · visual development", year: "2024—2025" },
+  { project: "HIP", via: "Emascaro Crossmedia", category: "Art Direction · Hospitality", role: "Look & feel · visual development", year: "2024—2025" },
+  { project: "ATuAire by Iberdrola", via: "Accenture · via Malt", category: "Web · Art Direction", role: "Web visual line", year: "2024" },
+  { project: "Fudeat", via: "Fudigital", category: "Digital Product", role: "—", year: "2024" },
+  { project: "La Remediadora · ECo", via: "Truman Digital", category: "Web", role: "—", year: "2024" },
+  { project: "Klapper · case sheets", via: "Truman Digital", category: "Editorial · Web", role: "—", year: "2024" },
+  { project: "Likitech · rebrand", via: "Aspid", category: "Brand Identity", role: "Art Direction · Visual Design", year: "2023—2024" },
+  { project: "Anglada", via: "Aspid", category: "Brand Identity", role: "—", year: "2023—2024" },
+  { project: "Tisvod", via: "Aspid", category: "Brand Identity", role: "—", year: "2023—2024" },
+  { project: "Dyrelux", via: "Aspid", category: "Brand Identity", role: "—", year: "2023—2024" },
+  { project: "Dyresel", via: "Aspid", category: "Brand Identity", role: "—", year: "2023—2024" },
+  { project: "Garplast", via: "Aspid", category: "Brand Identity", role: "—", year: "2023—2024" },
+  { project: "Gestión de Residencias", via: "Aspid", category: "Brand Identity", role: "—", year: "2023—2024" },
+  { project: "Sureact", via: "Aspid", category: "Brand Identity", role: "—", year: "2023—2024" },
+  { project: "Entradium · redesign + covers", via: "Crocantickets", category: "Digital Product", role: "—", year: "2023—2024" },
+  { project: "IVF Life · brandbook, posters, templates", via: "Hype Entertainment", category: "Brand Identity", role: "Visual proposals · brandbook", year: "2023—2024" },
+  { project: "Kuzidesign · website + branding", via: "Direct", category: "Brand Identity · Web", role: "Branding · web", year: "2023" },
+  { project: "Undisclosed", via: "Nixae Digital Minds", category: "—", role: "Design", year: "2023" },
+  { project: "Undisclosed", via: "Fjord · Accenture Song (via Arelance)", category: "—", role: "Design", year: "2021—2023", nda: true },
+  { project: "AECC · 1pixel1minuto", via: "VML", category: "Campaign · Digital", role: "Digital designer (support)", year: "2022" },
+  { project: "send2sign", via: "Wow Showroom Business", category: "Digital Product", role: "Visual design", year: "2022" },
+  { project: "Deutsche Bank · AEM migration", via: "VML (King-eClient)", category: "Digital Product · Web", role: "Design / UX", year: "2021—2022" },
+  { project: "DCN · website", via: "VML (King-eClient)", category: "Web", role: "Design / UX", year: "2021—2022" },
+  { project: "Creand · websites", via: "VML (King-eClient)", category: "Web", role: "Design / UX", year: "2021—2022" },
+  { project: "OnTheRoad · tourism", via: "Brands&Roses", category: "Web", role: "Visual design", year: "2021" },
+  { project: "Orange · Conde de Godó", via: "Wildbytes", category: "Interactive", role: "—", year: "2021" },
+  { project: "Codorníu", via: "Muskae Design", category: "Digital Product · UX", role: "Digital product & UX", year: "2020—2021" },
+  { project: "Correos", via: "Muskae Design", category: "Digital Product · UX", role: "Digital product & UX", year: "2020—2021" },
+  { project: "Proeduca", via: "Muskae Design", category: "Digital Product · UX", role: "Digital product & UX", year: "2020—2021" },
+  { project: "HUB Experience", via: "Muskae Design", category: "Digital Product · UX", role: "Digital product & UX", year: "2020—2021" },
+  { project: "UX mobile / desktop + design system", via: "Xabier Blanco", category: "Digital Product · Design System", role: "UX · design system", year: "2020" },
+  { project: "Guess · Mirror", via: "Wildbytes", category: "Interactive", role: "—", year: "2020" },
+  { project: "Securitas Direct · Zoom Vision", via: "Wildbytes", category: "Interactive", role: "—", year: "2020" },
+  { project: "Arima · app", via: "Wildbytes", category: "Digital Product", role: "—", year: "2020" },
+  { project: "H&M · microsite", via: "Wildbytes", category: "Web", role: "—", year: "2020" },
+  { project: "Dior · Backstage", via: "Wildbytes", category: "Interactive", role: "—", year: "2020" },
+  { project: "Universidad Europea · search & newsletters", via: "Brands&Roses", category: "Web · Email", role: "—", year: "2020" },
+  { project: "Roadis · website", via: "Brands&Roses", category: "Web", role: "—", year: "2019—2020" },
+  { project: "App animations", via: "Fjord · Accenture Song (via Arelance)", category: "Interaction", role: "UI / interaction design", year: "2019—2020" },
+  { project: "UI/UX classes", via: "Trazos", category: "Teaching", role: "UI/UX teacher", year: "2018—2020" },
+  { project: "Sephora", via: "Wildbytes", category: "Interactive", role: "—", year: "2019" },
+  { project: "Seat", via: "Wildbytes", category: "Interactive", role: "—", year: "2019" },
+  { project: "Douglas", via: "Wildbytes", category: "Interactive", role: "—", year: "2019" },
+  { project: "Jorge Blass", via: "Wildbytes", category: "Interactive", role: "—", year: "2019" },
+  { project: "Platea", via: "Wildbytes", category: "Interactive", role: "—", year: "2019" },
+  { project: "New Balance", via: "Wildbytes", category: "Interactive", role: "—", year: "2019" },
+  { project: "Femm · website", via: "Real Results", category: "Web", role: "UX/UI", year: "2019" },
+  { project: "Beer & Food · website", via: "Drygital Rocks You", category: "Web", role: "UX/UI", year: "2019" },
+  { project: "Safeboda · app", via: "Elio Investments", category: "Digital Product", role: "Visual design", year: "2019" },
+  { project: "Blink Shell · iOS / macOS app", via: "Direct", category: "Digital Product", role: "Visual design", year: "2018" },
+  { project: "Bulgari", via: "—", category: "Web", role: "Visual design", year: "2018", viaUnconfirmed: true },
+  { project: "Room Mate · website", via: "—", category: "Web", role: "Visual design", year: "2018", viaUnconfirmed: true },
+  { project: "Cerveza Malasaña", via: "Xabier Blanco", category: "Brand Identity", role: "Graphic line", year: "2018" },
+  { project: "SmartOS", via: "Direct", category: "Digital Product", role: "Visual design", year: "2017" },
+  { project: "Undisclosed", via: "Hanzo", category: "—", role: "Visual design", year: "2016—2018, 2021" },
+  { project: "Live@BBVA Net Cash CIB · CX · board presentation", via: "Contents Area", category: "UX · Presentation", role: "—", year: "2016" },
+  { project: "Applus iTeuve · iOS / Android app", via: "Web Partners Madrid", category: "Digital Product", role: "—", year: "2016" },
 ]
 
 // ─── Cases ────────────────────────────────────────────────────────────────────
 export const CASES: Record<string, Case> = {
   shoeciety: {
-    meta: '2018 · Concepto propio',
+    meta: '2018 · Personal project',
     title: 'Shoeciety',
-    lead: 'Una app para quienes viven las zapatillas. Diseño mínimo para que el producto sea lo único que importe.',
-    ficha: { cliente: 'Concepto propio', año: '2018', rol: 'Product Design · UI', disciplina: 'App · Interacción' },
-    question: '¿Cómo se diseña una tienda de zapatillas en la que la zapatilla sea lo único que importa?',
+    chips: ['App', 'Interaction', 'Product Design'],
+    lead: 'A sneaker app for people who live sneakers. Minimal design, so the product is the only thing that matters.',
+    ficha: { client: 'Personal project', year: '2018', role: 'Product Design · UI' },
+    question: 'How do you design a sneaker store where the sneaker is the only thing that matters?',
     context: {
-      lead: 'Concepto propio de 2018, pensado para quienes viven las zapatillas.',
-      text: 'Una app de producto con una idea fija: la interfaz da un paso atrás para que la zapatilla mande. Diseño simple y mínimo, centrado en el producto.',
+      lead: 'A personal concept from 2018, made for people who live sneakers.',
+      text: 'A product app with one fixed idea: the interface steps back so the sneaker leads. Simple, minimal, product first.',
     },
     decisions: [
-      { title: 'El producto manda', text: 'Fondos neutros y mucho aire. La zapatilla es la única nota de color en pantalla.' },
-      { title: 'La marca, como acento', text: 'Cada marca aporta su color solo en momentos concretos, nunca en toda la interfaz.' },
-      { title: 'Navegación mínima', text: 'Pocas pantallas y gestos claros para llegar al producto sin pasos de más.' },
+      { title: 'The product leads', text: 'Neutral backgrounds and plenty of air. The sneaker is the only colour on screen.' },
+      { title: 'The brand as an accent', text: 'Each brand brings its colour only at specific moments, never across the whole interface.' },
+      { title: 'Minimal navigation', text: 'Few screens and clear gestures, so you reach the product without extra steps.' },
     ],
-    stats: [{ value: '61,3 mil', label: 'visitas' }, { value: '7,1 mil', label: 'valoraciones' }, { value: '320', label: 'comentarios' }],
-    published: 'Publicado en Behance el 12 de junio de 2018. Etiquetas: app · UX · UI · sneakers · interface · product design · interaction.',
-    credits: 'Diseño y dirección de arte: Juan C. Fresno · 2018 · Proyecto personal',
+    hindsight: null,
+    credits: 'Design & art direction: Juan C. Fresno · Personal project · 2018 · Featured on Behance.',
+    behance: 'https://www.behance.net/juancfresno',
     // Annotations from "Caso · Shoeciety · v0" (6728:6380), block 6728:6425.
     notes: {
       blockHeight: 18410,
       items: [
-        { title: '03 · Navegación mínima', text: 'Pocas pantallas y gestos claros para llegar al producto sin pasos de más.', dot: [778, 1245], end: [1056, 1099], card: [1056, 1060] },
-        { title: '01 · El producto manda', text: 'Fondos neutros y mucho aire. La zapatilla es la única nota de color en pantalla.', dot: [988, 1964], end: [1196, 1699], card: [1196, 1660] },
-        { title: '02 · La marca, como acento', text: 'Cada marca aporta su color solo en momentos concretos, nunca en toda la interfaz.', dot: [900, 4103], end: [360, 4377], card: [32, 4330] },
-        { title: 'Contexto', text: 'La interfaz da un paso atrás para que la zapatilla mande.', dot: [1234, 6172], end: [384, 6509], card: [56, 6470] },
+        { title: '03 · Minimal navigation', text: 'Few screens and clear gestures, so you reach the product without extra steps.', dot: [778, 1245], end: [1056, 1099], card: [1056, 1060] },
+        { title: '01 · The product leads', text: 'Neutral backgrounds and plenty of air. The sneaker is the only colour on screen.', dot: [988, 1964], end: [1196, 1699], card: [1196, 1660] },
+        { title: '02 · The brand as an accent', text: 'Each brand brings its colour only at specific moments, never across the whole interface.', dot: [900, 4103], end: [360, 4377], card: [32, 4330] },
+        { title: 'Context', text: 'The interface steps back so the sneaker leads.', dot: [1234, 6172], end: [384, 6509], card: [56, 6470] },
       ],
     },
   },
   signflow: {
-    meta: '2026 · Producto SaaS',
+    meta: '2026 · SaaS product',
     title: 'Signflow',
-    lead: 'Plataforma SaaS de firma digital: un proceso complejo y rígido convertido en un flujo claro, guiado y escalable.',
-    ficha: { cliente: 'Signflow', año: '2026', rol: 'UX · Product · UI Design', disciplina: 'SaaS · Fintech · Legal tech' },
-    question: '¿Cómo se convierte firmar un contrato, un proceso rígido y legal, en un flujo que cualquiera completa sin dudar?',
+    chips: ['SaaS', 'Fintech', 'Legal tech'],
+    lead: 'Digital signature SaaS: a rigid, complex process turned into a clear, guided flow that scales.',
+    ficha: { client: 'Signflow', year: '2026', role: 'UX · Product · UI Design' },
+    question: 'How do you turn signing a contract, a rigid legal process, into a flow anyone completes without hesitating?',
     context: {
-      lead: 'Plataforma SaaS de firma digital para empresas.',
-      text: 'El producto reduce la fricción al firmar documentos con una experiencia clara, guiada y escalable, tanto para equipos internos como para usuarios externos. La UX prioriza claridad, confianza y eficiencia en entornos profesionales y legales.',
+      lead: 'A digital signature SaaS platform for companies.',
+      text: 'The product takes the friction out of signing documents with a clear, guided experience that scales, for internal teams and external users alike. The UX puts clarity, trust and efficiency first, in professional and legal settings.',
     },
     decisions: [
-      { title: 'Un paso cada vez', text: 'El envío de un documento se guía por partes: documento, destinatarios y campos, sin pantallas cargadas.' },
-      { title: 'Plantillas para escalar', text: 'Los contratos que se repiten se guardan como plantillas reutilizables.' },
-      { title: 'Confianza al firmar', text: 'La firma, el momento crítico, en una pantalla clara: escribir o dibujar y confirmar.' },
+      { title: 'One step at a time', text: 'Sending a document is guided in parts: document, recipients and fields, with no crowded screens.' },
+      { title: 'Templates to scale', text: 'Contracts that repeat are saved as reusable templates.' },
+      { title: 'Trust at the signature', text: 'The signature, the critical moment, on one clear screen: type or draw, then confirm.' },
     ],
-    stats: [{ value: '416', label: 'visitas' }, { value: '18', label: 'valoraciones' }, { value: '4', label: 'comentarios' }],
-    published: 'Publicado en Behance el 21 de enero de 2026. Herramienta: Figma. Etiquetas: SaaS · product design · UX design · UI design · B2B · digital signatures · fintech · legal tech · web app · design system.',
-    credits: 'UX, product y UI design: Juan C. Fresno · Cliente: Signflow · 2026',
+    hindsight: null,
+    credits: 'UX, product & UI design: Juan C. Fresno · Client: Signflow · 2026',
     behance: 'https://www.behance.net/gallery/241843645/Signflow-Secure-Digital-Signature-SaaS',
   },
   likitech: {
     meta: '2025 · Rebrand',
     title: 'Likitech',
-    lead: 'Rebrand de una empresa industrial B2B: claridad, estructura y un sistema visual para digital y físico.',
-    ficha: { cliente: 'Likitech · vía Aspid', año: '2025', rol: 'Art Direction · Visual Design', disciplina: 'Brand Identity · B2B' },
-    question: '¿Cómo se ordena la marca de una empresa industrial para que aguante igual en un catálogo que en una pantalla?',
+    chips: ['Brand Identity', 'B2B'],
+    lead: 'Rebrand for a B2B industrial company: clarity, structure and one visual system for digital and print.',
+    ficha: { client: 'Likitech', via: 'Aspid', year: '2025', role: 'Art Direction · Visual Design' },
+    question: 'How do you order an industrial brand so it holds up in a catalogue as well as on a screen?',
     context: {
-      lead: 'Rebrand para Likitech, empresa industrial B2B, con la agencia Aspid en 2025.',
-      text: 'Un sistema visual pensado para soportes digitales y físicos: logotipo, color, tarjetas, catálogos de producto, web y redes.',
+      lead: 'A rebrand for Likitech, a B2B industrial company, with the agency Aspid in 2025.',
+      text: 'A visual system built for digital and print: logo, colour, business cards, product catalogues, website and social.',
     },
-    stats: [{ value: '252', label: 'visitas' }, { value: '19', label: 'valoraciones' }, { value: '3', label: 'comentarios' }],
-    published: 'Publicado en Behance el 4 de febrero de 2026. Etiquetas: brand identity · art direction · visual design · rebrand · industrial design · corporate branding · logo design · minimal.',
-    credits: 'Art Direction & Visual Design: Juan C. Fresno · Agencia: Aspid · Cliente: Likitech · 2025',
+    hindsight: null,
+    credits: 'Art direction & visual design: Juan C. Fresno · Agency: Aspid · Client: Likitech · 2025',
   },
   access: {
     meta: '2025 · Branding',
     title: 'Access',
-    lead: 'Rebranding de Access, marca de recursos humanos, para Audax Studio.',
-    ficha: { cliente: 'Audax Studio', año: '2025', rol: 'Branding', disciplina: 'Identidad visual' },
+    chips: ['Visual Identity'],
+    lead: 'Rebrand for Access, a human-resources brand, with Audax Studio.',
+    ficha: { client: 'Access', via: 'Audax Studio', year: '2025', role: 'Branding' },
     context: {
-      lead: 'Rebranding para Audax Studio, publicado en Behance en noviembre de 2025.',
-      text: 'Access es una marca de recursos humanos centrada en crear conexiones y oportunidades a través de las personas. Un sistema visual flexible para soportes digitales y físicos.',
+      lead: 'A rebrand made with Audax Studio in 2025.',
+      text: 'Access is a human-resources brand built on creating connections and opportunities through people. A flexible visual system for digital and print.',
     },
     decisions: [
-      { title: 'Geometría y confianza', text: 'Formas geométricas y una paleta de azul y negro para transmitir equilibrio, confianza y estructura, valores clave en recursos humanos.' },
-      { title: 'Un lenguaje que se adapta', text: 'Un sistema flexible que funciona igual en digital y en físico, con claridad y coherencia en toda la experiencia de marca.' },
+      { title: 'Geometry and trust', text: 'Geometric shapes and a blue-and-black palette for balance, trust and structure, the values that matter in human resources.' },
+      { title: 'A language that adapts', text: 'A flexible system that works the same in digital and print, with clarity and consistency across the whole brand experience.' },
     ],
-    stats: [{ value: '572', label: 'visitas' }, { value: '44', label: 'valoraciones' }, { value: '10', label: 'comentarios' }],
-    published: 'Publicado en Behance el 6 de noviembre de 2025. Herramientas: Photoshop e Illustrator. Etiquetas: branding · rebranding · visual identity · corporate design · human resources.',
-    credits: 'Branding: Juan C. Fresno · Cliente: Audax Studio · 2025',
+    hindsight: null,
+    credits: 'Branding: Juan C. Fresno · Agency: Audax Studio · Client: Access · 2025',
     behance: 'https://www.behance.net/gallery/238012619/Access-Rebranding',
   },
   'educa-projects': {
     meta: '2025 · Branding',
     title: 'Educa Projects',
-    lead: 'Rebranding de Educa Projects, marca educativa, para Audax Studio.',
-    ficha: { cliente: 'Audax Studio', año: '2025', rol: 'Branding', disciplina: 'Identidad visual' },
+    chips: ['Visual Identity'],
+    lead: 'Rebrand for Educa Projects, an education brand, with Audax Studio.',
+    ficha: { client: 'Educa Projects', via: 'Audax Studio', year: '2025', role: 'Branding' },
     context: {
-      lead: 'Rebranding para Audax Studio, publicado en Behance en noviembre de 2025.',
-      text: 'Educa Projects es una marca educativa que impulsa el crecimiento profesional con formación especializada. Un sistema visual flexible para soportes digitales y físicos.',
+      lead: 'A rebrand made with Audax Studio in 2025.',
+      text: 'Educa Projects is an education brand that drives professional growth through specialised training. A flexible visual system for digital and print.',
     },
     decisions: [
-      { title: 'Formas que avanzan', text: 'Formas dinámicas y un azul intenso que simbolizan progreso y conocimiento. Tipografía limpia y actual para reforzar su carácter digital y profesional.' },
+      { title: 'Shapes that move forward', text: 'Dynamic shapes and an intense blue that stand for progress and knowledge. Clean, current type to reinforce its digital, professional character.' },
     ],
-    stats: [{ value: '177', label: 'visitas' }, { value: '26', label: 'valoraciones' }, { value: '8', label: 'comentarios' }],
-    published: 'Publicado en Behance el 5 de noviembre de 2025. Herramientas: Photoshop e Illustrator. Etiquetas: branding · visual identity · corporate identity · education · logo design.',
-    credits: 'Branding: Juan C. Fresno · Cliente: Audax Studio · 2025',
+    hindsight: null,
+    credits: 'Branding: Juan C. Fresno · Agency: Audax Studio · Client: Educa Projects · 2025',
   },
   dinamo: {
-    meta: '2024 · Naming y branding',
+    meta: '2024 · Naming & branding',
     title: 'Dinamo',
-    lead: 'Nombre e identidad visual para una empresa eléctrica: logotipo, manual de marca y sistema de aplicaciones.',
-    ficha: { cliente: 'Empresa eléctrica', año: '2024', rol: 'Naming · Identidad visual', disciplina: 'Branding' },
-    question: '¿Cómo se nombra a una empresa eléctrica para que no suene como todas las del sector?',
+    chips: ['Naming', 'Branding'],
+    lead: 'Name and visual identity for an electrical company: logo, brand book and applications.',
+    ficha: { client: 'Electrical company', year: '2024', role: 'Naming · Visual Identity' },
+    question: 'How do you name an electrical company so it doesn’t sound like every other one?',
     context: {
-      lead: 'Naming y branding para una empresa de instalaciones eléctricas.',
-      text: 'Antes de dibujar nada, análisis del sector, del mercado y del público para fijar un posicionamiento. Después, el nombre, el logotipo, el manual de marca y un sistema de identidad para digital e impresión.',
+      lead: 'Naming and branding for an electrical installations company.',
+      text: 'Before drawing anything, an analysis of the sector, the market and the audience to set a position. Then the name, the logo, the brand book and an identity system for digital and print.',
     },
     decisions: [
-      { title: 'Primero, el nombre', text: 'El nombre sale del análisis del sector y del posicionamiento, antes que cualquier forma.' },
-      { title: 'Mono y verde eléctrico', text: 'Space Mono como voz tipográfica. Negros y grises de base, verde como acento, amarillo y azul de apoyo.' },
-      { title: 'Una marca que se aplica', text: 'Un sistema coherente para digital e impresión: tarjetas, cinta de marca, textil y packaging.' },
+      { title: 'The name first', text: 'The name comes out of the sector analysis and the positioning, before any shape.' },
+      { title: 'Mono and electric green', text: 'Space Mono as the typographic voice. Blacks and greys as the base, green as the accent, yellow and blue in support.' },
+      { title: 'A brand that applies', text: 'One consistent system for digital and print: business cards, brand tape, apparel and packaging.' },
     ],
+    hindsight: null,
     draft: true,
-    stats: [{ value: '1,2 mil', label: 'visitas' }, { value: '146', label: 'valoraciones' }, { value: '25', label: 'comentarios' }],
-    published: 'Publicado en Behance el 11 de septiembre de 2024. Etiquetas: logo design · logotype · mark · brand · identity · visual identity · branding.',
-    credits: 'Naming, identidad y manual de marca: Juan C. Fresno · Illustrator, Photoshop, InDesign',
+    credits: 'Naming, identity & brand book: Juan C. Fresno · 2024',
     behance: 'https://www.behance.net/gallery/207594623/Dinamo-Naming-Branding',
   },
   bonamar: {
-    meta: '2024 · Logotipo',
+    meta: '2024 · Logo',
     title: 'Bonamar',
-    lead: 'Logotipo para un restaurante con historia desde 1988. La M está escrita a mano por la madre del propietario.',
-    ficha: { cliente: 'Bonamar · restaurante', año: '2024', rol: 'Logotipo', disciplina: 'Branding' },
-    question: '¿Cómo se mete la historia de una familia en un logotipo sin tener que contarla?',
+    chips: ['Logo', 'Branding'],
+    lead: 'Logo for a family restaurant open since 1988. The M is written by the owner’s mother.',
+    ficha: { client: 'Bonamar · restaurant', year: '2024', role: 'Logo' },
+    question: 'How do you put a family’s history into a logo without having to tell it?',
     context: {
-      lead: 'Logotipo para Bonamar, restaurante abierto desde 1988.',
-      text: 'Todo gira alrededor de una letra: la M del nombre, tomada directamente de la escritura de la madre del propietario.',
+      lead: 'A logo for Bonamar, a restaurant open since 1988.',
+      text: 'Everything turns on one letter: the M of the name, taken straight from the handwriting of the owner’s mother.',
     },
     decisions: [
-      { title: 'La M, de su puño y letra', text: 'La M sale de la escritura de la madre del propietario. Es el vínculo emocional del logotipo y lo que lo hace único.' },
+      { title: 'The M, in her own hand', text: 'The M comes from the handwriting of the owner’s mother. It is the logo’s emotional link and what makes it unique.' },
     ],
+    hindsight: null,
     draft: true,
-    stats: [{ value: '428', label: 'visitas' }, { value: '39', label: 'valoraciones' }, { value: '6', label: 'comentarios' }],
-    published: 'Publicado en Behance el 18 de septiembre de 2024. Etiquetas: logo design · logotype · mark · brand · restaurant · identity · visual identity.',
-    credits: 'Logotipo: Juan C. Fresno',
+    credits: 'Logo: Juan C. Fresno · Client: Bonamar · 2024',
   },
   awen: {
-    meta: '2024 · Web corporativa',
+    meta: '2024 · Corporate website',
     title: 'Awen',
-    lead: 'Interfaz de usuario para la web corporativa de una agencia de marketing.',
-    ficha: { cliente: 'Awen · agencia de marketing', año: '2024', rol: 'UI · UX', disciplina: 'Web' },
+    chips: ['Web'],
+    lead: 'Interface for a marketing agency’s corporate website.',
+    ficha: { client: 'Awen · marketing agency', year: '2024', role: 'UI · UX' },
     context: {
-      lead: 'Interfaz de usuario para la web corporativa de Awen, una agencia de marketing.',
-      text: 'Home, servicios, trabajos, sobre nosotros, contacto y 404, en escritorio y móvil.',
+      lead: 'The user interface for the corporate website of Awen, a marketing agency.',
+      text: 'Home, services, work, about, contact and 404, on desktop and mobile.',
     },
+    hindsight: null,
     draft: true,
-    stats: [{ value: '323', label: 'visitas' }, { value: '16', label: 'valoraciones' }, { value: '2', label: 'comentarios' }],
-    published: 'Publicado en Behance el 17 de septiembre de 2024. Etiquetas: ui ux · webdesign · ui design · user interface · landing page · agency · corporate.',
-    credits: 'UI/UX: Juan C. Fresno · Figma',
+    credits: 'UI/UX: Juan C. Fresno · Client: Awen · 2024',
   },
   correos: {
-    meta: '2024 · Propuesta',
+    meta: '2024 · Proposal',
     title: 'Correos',
-    lead: 'Propuestas de línea gráfica para la interfaz de Correos Prepago: web, app e iconografía.',
-    ficha: { cliente: 'Correos · vía Goodrebels', año: '2024', rol: '—', disciplina: 'UI · Diseño web' },
+    chips: ['UI', 'Web Design'],
+    lead: 'Visual direction proposals for Correos Prepago: web, app and iconography.',
+    ficha: { client: 'Correos', via: 'Goodrebels', year: '2024', role: null },
     context: {
-      lead: 'Propuestas de interfaz para Correos Prepago, presentadas para Goodrebels.',
-      text: 'Una tarjeta prepago con web y app propias. Las láminas recogen la línea gráfica propuesta: amarillo de marca, azul de apoyo, fotografía e iconos de línea.',
+      lead: 'Interface proposals for Correos Prepago, presented for Goodrebels.',
+      text: 'A prepaid card with its own website and app. The plates gather the proposed visual line: brand yellow, supporting blue, photography and line icons.',
     },
-    stats: [{ value: '9,2 mil', label: 'visitas' }, { value: '443', label: 'valoraciones' }, { value: '83', label: 'comentarios' }],
-    published: 'Publicado en Behance el 1 de febrero de 2024. Etiquetas: UI/UX · user interface · correos · clean · modern · proposal · presentation · business · marketing · advertising.',
-    credits: 'Juan C. Fresno · Cliente: Goodrebels (Correos Prepago) · Illustrator · Figma',
+    hindsight: null,
+    credits: 'Design: Juan C. Fresno · Agency: Goodrebels · Client: Correos Prepago · 2024',
   },
   'selected-logos': {
-    meta: '2024 · Selección',
+    meta: '2024 · Selection',
     title: 'Selected Logos',
-    lead: 'Selección de logotipos y marcas, vol. 1. Quince marcas, una por lámina.',
-    ficha: { cliente: 'Varios', año: '2024', rol: '—', disciplina: 'Logo · Marca' },
-    stats: [{ value: '586', label: 'visitas' }, { value: '34', label: 'valoraciones' }, { value: '5', label: 'comentarios' }],
-    published: 'Publicado en Behance el 23 de enero de 2024. Etiquetas: logos · logo collection · logofolio · brand identity · mark · monogram · logo design · branding · identity.',
-    credits: 'Juan C. Fresno · Illustrator',
+    chips: ['Logo', 'Brand'],
+    lead: 'Selected logos and marks, vol. 1. Fifteen brands, one per plate.',
+    ficha: { client: 'Various', year: '2024', role: 'Logo design' },
+    hindsight: null,
+    credits: 'Logos: Juan C. Fresno · 2024',
   },
   'casa-carbon': {
     meta: '2022 · Branding',
     title: 'Casacarbón',
-    lead: 'Marca para una cocina fantasma con el pollo como protagonista. Humo, hierro, carbón y brasas.',
-    ficha: { cliente: 'Casacarbón', año: '2022', rol: 'Identidad · Packaging', disciplina: 'Branding' },
-    question: '¿Cómo se hace cercana una marca que no tiene sala, solo cocina?',
+    chips: ['Branding', 'Packaging'],
+    lead: 'A brand for a ghost kitchen built around chicken. Smoke, iron, charcoal and embers.',
+    ficha: { client: 'Casacarbón', year: '2022', role: 'Identity · Packaging' },
+    question: 'How do you make a brand feel close when it has no dining room, only a kitchen?',
     context: {
-      lead: 'Casacarbón es una marca bajo el concepto de cocina fantasma: lo familiar y lo cercano, como la comida de tu abuela. El pollo manda; también huevos y tortillas.',
-      text: 'Logotipo, adaptaciones a packaging (bolsas y cajas), un pequeño ejercicio de adaptación a web y publicidad para redes sociales.',
+      lead: 'Casacarbón is a ghost-kitchen brand about the familiar and the close, like your grandmother’s cooking. Chicken leads; eggs and omelettes too.',
+      text: 'Logo, packaging (bags and boxes), a small web adaptation and social media ads.',
     },
     decisions: [
-      { title: 'Humo, hierro, carbón y brasas', text: 'La marca se apoya en cuatro materias del horno. Son también su paleta: blanco, gris hierro, negro y rojo brasa.' },
-      { title: 'El horno, en el centro', text: 'El horno, tan característico de esta cocina, pasa a ser el símbolo que acompaña al logotipo.' },
-      { title: 'Packaging con voz', text: 'El logotipo se adapta a bolsas y cajas, con sellos circulares y mensajes en el tono de la marca.' },
+      { title: 'Smoke, iron, charcoal and embers', text: 'The brand rests on four materials from the oven. They are also its palette: white, iron grey, black and ember red.' },
+      { title: 'The oven at the centre', text: 'The oven, so characteristic of this kitchen, becomes the symbol that goes with the logo.' },
+      { title: 'Packaging with a voice', text: 'The logo adapts to bags and boxes, with round seals and messages in the brand’s tone.' },
     ],
+    hindsight: null,
     draft: true,
-    stats: [{ value: '820', label: 'visitas' }, { value: '86', label: 'valoraciones' }, { value: '8', label: 'comentarios' }],
-    published: 'Publicado en Behance el 16 de marzo de 2022. Sin etiquetas.',
-    credits: 'Identidad, packaging y redes: Juan C. Fresno · Photoshop, Illustrator, Affinity Designer, Figma',
+    credits: 'Identity, packaging & social: Juan C. Fresno · Client: Casacarbón · 2022',
   },
   google: {
-    meta: '2016 · Concepto propio',
+    meta: '2016 · Personal project',
     title: 'Google Search',
-    lead: 'Rediseño conceptual de la búsqueda de Google: una experiencia más limpia y una interfaz actual sin perder el estilo de Google.',
-    ficha: { cliente: 'Concepto propio', año: '2016', rol: '—', disciplina: 'UI · UX · Web' },
-    question: '¿Cuánto se puede modernizar la búsqueda de Google sin que deje de parecer Google?',
+    chips: ['UI', 'UX', 'Web'],
+    lead: 'A concept redesign of Google Search: cleaner, more current, still unmistakably Google.',
+    ficha: { client: 'Personal project', year: '2016', role: 'Design' },
+    question: 'How far can you modernise Google Search before it stops feeling like Google?',
     context: {
-      lead: 'Concepto propio de 2016. No es un encargo.',
-      text: 'Una experiencia más limpia y una interfaz actual, sin perder el estilo de Google. El concepto recorre la portada y los resultados de web, imágenes, noticias, mapas y libros, además del traductor.',
+      lead: 'A personal concept from 2016. Not a commission.',
+      text: 'A cleaner experience and a current interface, without losing Google’s style. The concept covers the home page and the web, image, news, maps and books results, plus Translate.',
     },
     decisions: [
-      { title: 'La búsqueda, sola en portada', text: 'Un campo, una pregunta —«What are you looking for?»— y el azul de Google a pantalla completa.' },
-      { title: 'Un color por vertical', text: 'Web en azul, imágenes en amarillo, noticias en rojo y mapas en verde: los cuatro colores de la marca ordenan los resultados.' },
+      { title: 'Search, alone on the home page', text: 'One field, one question — “What are you looking for?” — and Google blue full screen.' },
+      { title: 'One colour per vertical', text: 'Web in blue, images in yellow, news in red and maps in green: the brand’s four colours order the results.' },
     ],
-    stats: [{ value: '113,6 mil', label: 'visitas' }, { value: '8,5 mil', label: 'valoraciones' }, { value: '607', label: 'comentarios' }],
-    published: 'Publicado en Behance el 12 de julio de 2016. Destacado en la galería Interfaz y exp. de usuario. Etiquetas: ux · google · concept · search · google maps · google translate · google image · brand · website · ui.',
-    credits: 'Diseño: Juan C. Fresno · 2016 · Concepto propio. Todas las imágenes del diseño pertenecen a sus propietarios.',
+    hindsight: null,
+    credits: 'Design: Juan C. Fresno · Personal project · 2016 · Featured in Behance’s UI/UX gallery. All images in the design belong to their owners.',
     behance: 'https://www.behance.net/gallery/40166825/Google-Search-Design-Concept',
   },
   'super-nintendo': {
-    meta: '2016 · Concepto propio',
+    meta: '2016 · Personal project',
     title: 'Nintendo Classics',
-    lead: 'Una nueva experiencia digital para Nintendo: un viaje por la historia de NES, Game Boy y Super Nintendo.',
-    ficha: { cliente: 'Concepto propio', año: '2016', rol: '—', disciplina: 'Web · UI · UX' },
-    question: '¿Cómo se cuenta la historia de Nintendo con la tecnología de hoy?',
+    chips: ['Web', 'UI', 'UX'],
+    lead: 'A digital experience for Nintendo: a journey through NES, Game Boy and Super Nintendo.',
+    ficha: { client: 'Personal project', year: '2016', role: 'Design' },
+    question: 'How do you tell Nintendo’s history with today’s technology?',
     context: {
-      lead: 'Concepto propio de 2016. No es un encargo.',
-      text: 'Nintendo Classics es una vuelta al pasado: la historia de NES, Game Boy y Super Nintendo y sus personajes clásicos, con la opción de convertir la Smart TV en una consola clásica. Una experiencia pensada para todos los dispositivos.',
+      lead: 'A personal concept from 2016. Not a commission.',
+      text: 'Nintendo Classics is a trip back: the history of NES, Game Boy and Super Nintendo and their classic characters, with the option to turn a Smart TV into a classic console. An experience made for every device.',
     },
     decisions: [
-      { title: 'La historia como recorrido', text: 'NES, Game Boy y Super Nintendo, consola a consola, con sus juegos y sus personajes.' },
-      { title: 'El móvil, como mando', text: '«Your phone, your controller»: el teléfono se convierte en el mando de cada consola.' },
-      { title: 'La Smart TV, como consola', text: 'La tele pasa a ser una consola clásica: eliges plataforma y juegas a los clásicos.' },
+      { title: 'History as a journey', text: 'NES, Game Boy and Super Nintendo, console by console, with their games and characters.' },
+      { title: 'The phone as the controller', text: '“Your phone, your controller”: the phone becomes the controller for each console.' },
+      { title: 'The Smart TV as the console', text: 'The TV becomes a classic console: pick a platform and play the classics.' },
     ],
-    stats: [{ value: '42,6 mil', label: 'visitas' }, { value: '4,5 mil', label: 'valoraciones' }, { value: '251', label: 'comentarios' }],
-    published: 'Publicado en Behance el 7 de noviembre de 2016. Destacado en la galería Interfaz y exp. de usuario. Herramientas: Photoshop, Illustrator, Sketch. Etiquetas: Nintendo · Super Mario · games · UI · interface · webdesign · concept · ux · game boy · Super Nintendo.',
-    credits: 'Diseño: Juan C. Fresno · 2016 · Concepto propio. Todas las imágenes incluidas en el diseño pertenecen a sus propietarios.',
+    hindsight: null,
+    credits: 'Design: Juan C. Fresno · Personal project · 2016 · Featured in Behance’s UI/UX gallery. All images in the design belong to their owners.',
     behance: 'https://www.behance.net/gallery/44821191/Nintendo-Classics',
   },
 }
 
 export const CASE_PROJECTS = PROJECTS.filter((p) => p.caseStudy && CASES[p.slug])
-export const projectNumber = (slug: string) => String(PROJECTS.findIndex((p) => p.slug === slug) + 1).padStart(2, '0')
+export const FEATURED = PROJECTS.filter((p) => p.featured && CASES[p.slug])
+const pad = (n: number) => String(n).padStart(2, '0')
+// Numbers follow the visible index (hidden NDA rows leave no gaps).
+export const projectNumber = (slug: string) => pad(PROJECTS.findIndex((p) => p.slug === slug) + 1)
+export const projectTotal = () => pad(PROJECTS.length)
 
 // Rows for the index/hover components.
 export const toRow = (p: Project) => ({

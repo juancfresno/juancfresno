@@ -3,7 +3,7 @@
 // (Dribbble shots also posted on Instagram) and Biako pieces are left out —
 // Biako is a separate personal project and stays out of the professional feed.
 // Newest first. Pieces of the same project posted close together are grouped
-// as a "session" (Figma "Feed · Desktop", 6770:9789); the rest go into "Sueltos".
+// as a "session" (Figma "Feed · Desktop", 6770:9789); the rest go into "Singles".
 import items from './generated/feed.json'
 import { FEED_SELECTION } from './feed-selection'
 
@@ -73,13 +73,13 @@ export function groupFeed(list: FeedItem[] = FEED): FeedGroup[] {
     same.forEach((x) => taken.add(x.id))
     units.push({ session: p && same.length >= 2 ? p : null, items: same })
   }
-  // Consecutive loose pieces are shown together as "Sueltos".
+  // Consecutive loose pieces are shown together as "Singles".
   const groups: FeedGroup[] = []
   for (const u of units) {
     const last = groups[groups.length - 1]
     if (!u.session && last && !last.session) last.items.push(...u.items)
-    else if (!u.session) groups.push({ key: `sueltos-${u.items[0].id}`, label: 'Sueltos', session: false, items: [...u.items] })
-    else groups.push({ key: `${u.session}-${u.items[0].id}`, label: `Sesión · ${u.session}`, session: true, items: u.items })
+    else if (!u.session) groups.push({ key: `sueltos-${u.items[0].id}`, label: 'Singles', session: false, items: [...u.items] })
+    else groups.push({ key: `${u.session}-${u.items[0].id}`, label: `Session · ${u.session}`, session: true, items: u.items })
   }
   return groups
 }
