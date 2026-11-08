@@ -16,7 +16,7 @@ export default function CopyButton({ label, text }: Props) {
   }
   return (
     <button type="button" className={s.action} onClick={copy} aria-live="polite">
-      {done ? 'Copiado' : label}
+      {done ? 'Copied' : label}
     </button>
   )
 }

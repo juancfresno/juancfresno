@@ -42,36 +42,36 @@
   var c = T.columns;
 
   var LIST = [
-    { id: 'instant', n: '01', name: 'Sin transición', ms: 0, tag: 'chrome quieto' },
-    { id: 'columns', n: '02', name: 'Barrido 12 columnas', ms: (c.n - 1) * c.stagger + c.drop + (c.n - 1) * c.backStagger + c.back },
-    { id: 'scramble', n: '03', name: 'Scramble del título', ms: T.scramble.out + T.scramble.decode },
-    { id: 'morph', n: '04', name: 'Morph miniatura → hero', ms: T.morph.move, tag: 'al entrar en un caso' },
-    { id: 'pixels', n: '05', name: 'Disolución en píxeles', ms: 2 * (T.pixels.spread + T.pixels.step), tag: 'en prueba en la web' },
-    { id: 'glitch', n: '06', name: 'Corte con glitch RGB', ms: T.glitch.dur, tag: 'descartada · ya en Biakone', out: true },
-    { id: 'curtain', n: '07', name: 'Cortina con clip-path', ms: T.curtain.up + T.curtain.hold + T.curtain.off, tag: 'cliché' },
-    { id: 'zoom', n: '08', name: 'Zoom de portada', ms: T.zoom.out + T.zoom.inn },
-    { id: 'words', n: '09', name: 'Titular palabra a palabra', ms: '≈ 600' },
-    { id: 'slide', n: '10', name: 'Slide direccional', ms: T.slide.out + T.slide.inn, tag: 'inverso al volver' },
-    { id: 'wireframe', n: '11', name: 'Wireframe intermedio', ms: W.inn + W.move + W.out, tag: 'retícula · la base' },
+    { id: 'instant', n: '01', name: 'No transition', ms: 0, tag: 'still chrome' },
+    { id: 'columns', n: '02', name: '12-column sweep', ms: (c.n - 1) * c.stagger + c.drop + (c.n - 1) * c.backStagger + c.back },
+    { id: 'scramble', n: '03', name: 'Title scramble', ms: T.scramble.out + T.scramble.decode },
+    { id: 'morph', n: '04', name: 'Thumbnail → hero morph', ms: T.morph.move, tag: 'into a case' },
+    { id: 'pixels', n: '05', name: 'Pixel dissolve', ms: 2 * (T.pixels.spread + T.pixels.step), tag: 'tried on the site' },
+    { id: 'glitch', n: '06', name: 'RGB glitch cut', ms: T.glitch.dur, tag: 'ruled out · Biakone uses it', out: true },
+    { id: 'curtain', n: '07', name: 'Clip-path curtain', ms: T.curtain.up + T.curtain.hold + T.curtain.off, tag: 'cliché' },
+    { id: 'zoom', n: '08', name: 'Cover zoom', ms: T.zoom.out + T.zoom.inn },
+    { id: 'words', n: '09', name: 'Headline word by word', ms: '≈ 600' },
+    { id: 'slide', n: '10', name: 'Directional slide', ms: T.slide.out + T.slide.inn, tag: 'reversed on back' },
+    { id: 'wireframe', n: '11', name: 'Wireframe in between', ms: W.inn + W.move + W.out, tag: 'grid · the base' },
     // Wireframe · variantes: same idea as 11 (page → its wireframe → next page), different order and rhythm.
-    { id: 'wf-drop', n: '11a', group: 'wf', name: 'Cae la retícula', star: true, ms: Wd.moveAt + Wd.move + (PARTS_MAX - 1) * Wd.moveStagger + Wd.out, tag: 'idea de Juan' },
-    { id: 'wf-rise', n: '11b', group: 'wf', name: 'Columnas primero', ms: Wr.boxesAt + (PARTS_MAX - 1) * Wr.boxStagger + Wr.box + Wr.out },
-    { id: 'wf-boxes', n: '11c', group: 'wf', name: 'Solo cajas', ms: Wb.inn + Wb.move + Wb.out, tag: 'la más rápida' },
-    { id: 'wf-labels', n: '11d', group: 'wf', name: 'Etiquetas primero', star: true, ms: Wl.fillAt + (PARTS_MAX - 1) * Wl.fillStagger + Wl.fill },
-    { id: 'wf-hold', n: '11e', group: 'wf', name: 'La retícula se queda', ms: Wh.inn + Wh.move + (PARTS_MAX - 1) * Wh.moveStagger + Wh.fill + Wh.hold + Wh.fade },
-    { id: 'wf-base', n: '11f', group: 'wf', name: 'Desde la línea base', ms: Wa.growAt + (ROWS_MAX - 1) * Wa.growStagger + Wa.grow + Wa.out },
-    { id: 'modular', n: '12', name: 'Desmontaje modular', ms: Md.setStart + (Md.parts - 1) * Md.setStagger + Md.set + Md.out, tag: 'retícula' },
-    { id: 'fold', n: '13', name: 'Retícula que se pliega', ms: F.out + F.hold + F.inn + 11 * F.stagger, tag: 'retícula' },
-    { id: 'cells', n: '14', name: 'Celdas', ms: Ce.maxStep * Ce.wave + 2 * Ce.half, tag: 'retícula' },
-    { id: 'blueprint', n: '15', name: 'Plano', ms: Bp.cover + (Bp.rows - 1) * Bp.coverStagger + Bp.coverDur + (Bp.rows - 1) * Bp.buildStagger + Bp.build + Bp.out, tag: 'retícula' },
-    { id: 'step', n: '16', name: 'Paso de columna', ms: St.fade + St.cols * St.per + St.out, tag: 'retícula' }
+    { id: 'wf-drop', n: '11a', group: 'wf', name: 'The grid falls', star: true, ms: Wd.moveAt + Wd.move + (PARTS_MAX - 1) * Wd.moveStagger + Wd.out, tag: 'Juan’s idea · runs this site' },
+    { id: 'wf-rise', n: '11b', group: 'wf', name: 'Columns first', ms: Wr.boxesAt + (PARTS_MAX - 1) * Wr.boxStagger + Wr.box + Wr.out },
+    { id: 'wf-boxes', n: '11c', group: 'wf', name: 'Boxes only', ms: Wb.inn + Wb.move + Wb.out, tag: 'the fastest' },
+    { id: 'wf-labels', n: '11d', group: 'wf', name: 'Labels first', star: true, ms: Wl.fillAt + (PARTS_MAX - 1) * Wl.fillStagger + Wl.fill },
+    { id: 'wf-hold', n: '11e', group: 'wf', name: 'The grid stays', ms: Wh.inn + Wh.move + (PARTS_MAX - 1) * Wh.moveStagger + Wh.fill + Wh.hold + Wh.fade },
+    { id: 'wf-base', n: '11f', group: 'wf', name: 'From the baseline', ms: Wa.growAt + (ROWS_MAX - 1) * Wa.growStagger + Wa.grow + Wa.out },
+    { id: 'modular', n: '12', name: 'Modular take-apart', ms: Md.setStart + (Md.parts - 1) * Md.setStagger + Md.set + Md.out, tag: 'grid' },
+    { id: 'fold', n: '13', name: 'Folding grid', ms: F.out + F.hold + F.inn + 11 * F.stagger, tag: 'grid' },
+    { id: 'cells', n: '14', name: 'Cells', ms: Ce.maxStep * Ce.wave + 2 * Ce.half, tag: 'grid' },
+    { id: 'blueprint', n: '15', name: 'Blueprint', ms: Bp.cover + (Bp.rows - 1) * Bp.coverStagger + Bp.coverDur + (Bp.rows - 1) * Bp.buildStagger + Bp.build + Bp.out, tag: 'grid' },
+    { id: 'step', n: '16', name: 'Column step', ms: St.fade + St.cols * St.per + St.out, tag: 'grid' }
   ];
 
-  var GROUPS = { wf: { name: 'Wireframe · variantes', hint: 'La idea de la 11 con otro orden y otro ritmo. Elige una y pulsa ↻ Repetir; con ↑ ↓ saltas a la siguiente y se reproduce sola.' } };
+  var GROUPS = { wf: { name: 'Wireframe · variants', hint: 'The idea of 11 in another order and rhythm. Pick one and press ↻ Replay; ↑ ↓ jumps to the next one and plays it.' } };
 
-  var NOTE_REDUCE = 'Tienes activado «reducir movimiento»: todas las transiciones caen a instantáneo.';
-  var NOTE_GLITCH = 'Descartada: Biakone ya usa glitch y el portfolio tiene que diferenciarse. Se queda solo para comparar. Aviso: unos 200 ms de franjas desplazadas; con «reducir movimiento» no se reproduce nunca.';
-  var NOTE_MORPH_FALLBACK = 'Sin miniatura de origen no hay morph: fundido corto. Entra en un caso desde Work para verlo.';
+  var NOTE_REDUCE = 'Reduced motion is on: every transition falls back to instant.';
+  var NOTE_GLITCH = 'Ruled out: Biakone already uses glitch and the portfolio has to stand apart. Kept only to compare. Warning: about 200 ms of shifted bands; with reduced motion it never plays.';
+  var NOTE_MORPH_FALLBACK = 'No source thumbnail, no morph: a short fade. Open a case from Work to see it.';
 
   // ── Engine ─────────────────────────────────────────────────────────────
   // ctx: { view, fx, from, to, swap(), back, source, target, live[] }
@@ -720,7 +720,7 @@
     var selected = box.getAttribute('data-transition') || 'columns';
     var slug = '01', busy = false, last = null, active = null;
     var info = function (id) { return LIST.filter(function (x) { return x.id === id; })[0] || LIST[0]; };
-    var label = function (id) { var p = page(id), h = p && titleOf(p); return id === 'case' ? 'Caso ' + slug : (h ? (id === 'home' ? 'Home' : h.textContent) : id); };
+    var label = function (id) { var p = page(id), h = p && titleOf(p); return id === 'case' ? 'Case ' + slug : (h ? (id === 'home' ? 'Home' : h.textContent) : id); };
 
     // Picker, built from LIST so names and durations live in one place.
     if (picker) {
@@ -758,7 +758,7 @@
 
     function render(msg) {
       var x = info(selected), reduce = mq.matches;
-      if (status) status.textContent = (msg ? msg + ' · ' : '') + x.n + ' ' + x.name + ' · ' + (reduce ? '0 ms (reducir movimiento)' : x.ms + ' ms');
+      if (status) status.textContent = (msg ? msg + ' · ' : '') + x.n + ' ' + x.name + ' · ' + (reduce ? '0 ms (reduced motion)' : x.ms + ' ms');
       if (note) {
         var t = reduce ? NOTE_REDUCE : selected === 'glitch' ? NOTE_GLITCH : '';
         note.textContent = t; note.hidden = !t;
@@ -778,8 +778,8 @@
       var n = src.querySelector('[data-ft-name]') || src.querySelector('.ft__label span:last-child');
       var media = src.querySelector('.ft__media');
       var t = q('[data-ft-case-title]'), m = q('[data-ft-case-meta]'), hero = q('[data-ft-hero]');
-      if (t) { t.textContent = n ? n.textContent : 'Caso ' + s; t.setAttribute('data-ft-text', t.textContent); }
-      if (m) m.textContent = 'Caso ' + s + ' · 2026';
+      if (t) { t.textContent = n ? n.textContent : 'Case ' + s; t.setAttribute('data-ft-text', t.textContent); }
+      if (m) m.textContent = 'Case ' + s + ' · 2026';
       if (hero && media) hero.style.setProperty('--g', media.style.getPropertyValue('--g'));
     }
 
@@ -817,7 +817,7 @@
         active = null; busy = false;
         stage.removeAttribute('aria-busy');
         current = id; setNav();
-        render(useId === 'morph' && ctx.fallback ? 'Página: ' + label(id) + ' · fundido' : 'Página: ' + label(id));
+        render(useId === 'morph' && ctx.fallback ? 'Page: ' + label(id) + ' · fade' : 'Page: ' + label(id));
         if (note && useId === 'morph' && ctx.fallback) { note.textContent = NOTE_MORPH_FALLBACK; note.hidden = false; }
         if (o.focus) { var h = titleOf(to); if (h) h.focus({ preventScroll: true }); }
       });

@@ -1,0 +1,32 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.wrap {
+  @include container;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: $space-6;
+  min-height: calc(100svh - #{$nav-height} - 14rem);
+  padding-block: clamp(4rem, 10vw, 10rem);
+}
+
+.title {
+  font-family: $font-body;
+  font-weight: $fw-light;
+  font-size: clamp(6rem, 22vw, 22rem);
+  line-height: 0.8;
+  letter-spacing: -0.06em;
+  color: $color-text-hi;
+}
+
+.line {
+  font-family: $font-body;
+  font-weight: $fw-light;
+  font-size: clamp(1.25rem, 1vw + 0.95rem, 1.875rem);
+  line-height: 1.25;
+  color: $color-text-mid;
+  max-width: 30ch;
+}
+
+.links { display: flex; flex-wrap: wrap; gap: $space-3 $space-8; padding-top: $space-4; }

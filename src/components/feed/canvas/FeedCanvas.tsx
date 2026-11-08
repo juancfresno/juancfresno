@@ -142,7 +142,7 @@ export default function FeedCanvas({ items, active }: Props) {
       MH = Math.round(MW * TILE.rows / TILE.cols)
       for (const cnv of [mini, mapBase]) { cnv.width = MW * 2; cnv.height = MH * 2 }
       mini.style.width = `${MW}px`; mini.style.height = `${MH}px`
-      tileCap.textContent = `Tile ${Math.round(L.TW)} × ${Math.round(L.TH)} · se repite`
+      tileCap.textContent = `Tile ${Math.round(L.TW)} × ${Math.round(L.TH)} · repeats`
       const x = mapBase.getContext('2d')!, s = (MW * 2) / TILE.cols
       const cs = getComputedStyle(stage)
       x.clearRect(0, 0, mapBase.width, mapBase.height)
@@ -436,7 +436,7 @@ export default function FeedCanvas({ items, active }: Props) {
       tabIndex={0}
       role="region"
       aria-roledescription="canvas"
-      aria-label={`Canvas infinito con ${items.length} piezas. Arrastra, usa la rueda o las flechas para moverte; Enter amplía la pieza del centro; 0 vuelve al inicio. La vista Rejilla lista todas las piezas.`}
+      aria-label={`Infinite canvas with ${items.length} pieces. Drag, use the wheel or the arrow keys to move; Enter opens the piece in the centre; 0 goes back home. The Grid view lists every piece.`}
     >
       <canvas ref={glRef} className={c.gl} aria-hidden="true" data-wf-label={`CANVAS · ${items.length}`} />
       <div ref={domRef} className={c.dom} aria-hidden="true" hidden />
@@ -444,7 +444,7 @@ export default function FeedCanvas({ items, active }: Props) {
       <div ref={capsRef} className={c.caps} aria-hidden="true" />
       <span className={c.cross} aria-hidden="true" />
       <div className={c.hud} data-hud aria-hidden="true">
-        <span className={c.chip}>Feed · {items.length} piezas<span className={c.hint}> · Arrastra ↔ ↕</span></span>
+        <span className={c.chip}>Feed · {items.length} pieces<span className={c.hint}> · Drag ↔ ↕</span></span>
         <span ref={xyRef} className={c.chip}>X 0 · Y 0</span>
         <span ref={velRef} className={`${c.chip} ${c.vel}`}>VEL → 0 ↓ 0 PX/F</span>
       </div>

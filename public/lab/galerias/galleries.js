@@ -10,17 +10,17 @@
   var EASE = 'cubic-bezier(0.19, 1, 0.22, 1)';
 
   var VIEWS = [
-    { id: 'arco', n: '01', name: 'Arco', star: 'Home', note: 'Las piezas sobre un tambor que gira con el scroll y al arrastrar, con inercia, y siempre se para en una. Quieta, la del centro se ve en color; en marcha, todo pasa a trama. Idea de mathiasadolfsson.dev.' },
-    { id: 'canvas', n: '02', name: 'Canvas infinito', star: 'Feed', note: 'Un plano sin bordes que se repite en las dos direcciones: arrastra, usa la rueda o las flechas. Inercia con tope, minimapa (también se arrastra) y «Rejilla» para volver a una retícula quieta. Idea de Juan.' },
-    { id: 'laminas', n: '03', name: 'Láminas', note: 'Retícula abierta, con huecos y numeración [001]. Cada imagen está cortada en 8 láminas: entran escalonadas al hacer scroll y se desplazan con el cursor. Idea del playground de Eva Sánchez.' },
-    { id: 'tira', n: '04', name: 'Tira horizontal', note: 'Una fila que avanza en horizontal con el scroll vertical. La velocidad inclina y encoge las piezas; al parar vuelven a su sitio.' },
-    { id: 'mazo', n: '05', name: 'Mazo', note: 'Un mazo de cartas: arrastra la de arriba hacia un lado, o usa ← →. Asoman las tres siguientes y al acabar vuelve a empezar.' },
-    { id: 'rejilla', n: '06', name: 'Rejilla con zoom', note: 'Retícula densa, una pieza por columna. Al hacer clic la pieza crece desde su sitio hasta verse entera (FLIP); Esc, clic fuera o arrastrarla hacia abajo la devuelven.' },
-    { id: 'barras', n: '07', name: 'Barras', note: 'Todo el archivo a la vez, en franjas ordenadas por fecha. El cursor (o el dedo) abre una lupa y debajo corren los años. Propuesta mía.' },
-    { id: 'pasarela', n: '08', name: 'Pasarela', note: 'Las piezas de pie sobre un suelo en perspectiva con la retícula de 12 columnas. El scroll y el arrastre te llevan por la fila; si vas rápido, las piezas se doblan como papel. Idea de jesperlandberg.com.' }
+    { id: 'arco', n: '01', name: 'Arc', star: 'Home', note: 'The pieces on a drum that turns with scroll and drag, with inertia, and always stops on one. At rest the centre one is in colour; in motion everything turns to dither. Idea from mathiasadolfsson.dev.' },
+    { id: 'canvas', n: '02', name: 'Infinite canvas', star: 'Feed', note: 'A borderless plane that repeats both ways: drag, use the wheel or the arrow keys. Capped inertia, a minimap (also draggable) and “Grid” to go back to a still grid. Juan’s idea.' },
+    { id: 'laminas', n: '03', name: 'Plates', note: 'An open grid with gaps and [001] numbering. Each image is cut into 8 slats: they come in staggered on scroll and shift with the cursor. Idea from Eva Sánchez’s playground.' },
+    { id: 'tira', n: '04', name: 'Strip', note: 'A row that moves sideways with vertical scroll. Speed tilts and shrinks the pieces; when it stops they settle back.' },
+    { id: 'mazo', n: '05', name: 'Deck', note: 'A deck of cards: drag the top one aside, or use ← →. The next three peek out and it loops at the end.' },
+    { id: 'rejilla', n: '06', name: 'Zoom grid', note: 'A dense grid, one piece per column. Click and the piece grows from its place until it is whole (FLIP); Esc, a click outside or dragging it down sends it back.' },
+    { id: 'barras', n: '07', name: 'Bars', note: 'The whole archive at once, in bands ordered by date. The cursor (or a finger) opens a loupe and the years run underneath. My own proposal.' },
+    { id: 'pasarela', n: '08', name: 'Runway', note: 'The pieces stand on a floor in perspective with the 12-column grid. Scroll and drag take you along the row; go fast and the pieces fold like paper. Idea from jesperlandberg.com.' }
   ];
   var COUNTS = [60, 120, 200];
-  var NOTE_REDUCE = 'Tienes activado «reducir movimiento»: todas las galerías se muestran como una rejilla quieta.';
+  var NOTE_REDUCE = 'Reduced motion is on: every gallery shows as a still grid.';
 
   /* ─── Utilities ──────────────────────────────────────────────────────── */
   function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
@@ -149,7 +149,7 @@
         '<rect width="100%" height="100%" fill="url(#g)"/>' +
         '<text x="50%" y="' + (hh / 2 + 80) + '" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="240" fill="rgba(255,255,255,0.85)">' + num + '</text></svg>';
       var src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
-      out.push({ id: 'p' + num, t: 'Pieza ' + num, d: String(m).padStart(2, '0') + '/' + y, src: src, th: src, w: w, h: hh, url: '' });
+      out.push({ id: 'p' + num, t: 'Piece ' + num, d: String(m).padStart(2, '0') + '/' + y, src: src, th: src, w: w, h: hh, url: '' });
       if (i % 2) { m--; if (m < 1) { m = 12; y--; } }
     }
     return out;
@@ -248,7 +248,7 @@
     function open(list, i, getEl, reduce) {
       if (z) return;
       var opener = doc.activeElement, offs = [];
-      var wrap = h('div', 'fg-zoom', { role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Pieza ampliada', style: vars() });
+      var wrap = h('div', 'fg-zoom', { role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Enlarged piece', style: vars() });
       var back = h('div', 'fg-zoom__back');
       var img = h('div', 'fg-zoom__img'), p = h('img', '', { alt: '', draggable: 'false' });
       p.onload = function () { p.classList.add('is-in'); };
@@ -257,10 +257,10 @@
       var n = h('span', 'fg-zoom__n'), t = h('span', 'fg-zoom__t'), d = h('span', 'fg-zoom__d');
       info.appendChild(n); info.appendChild(t); info.appendChild(d);
       var btns = h('div', 'fg-zoom__btns');
-      var prev = h('button', 'fg-zoom__btn', { type: 'button', 'aria-label': 'Anterior', text: '←' });
-      var next = h('button', 'fg-zoom__btn', { type: 'button', 'aria-label': 'Siguiente', text: '→' });
+      var prev = h('button', 'fg-zoom__btn', { type: 'button', 'aria-label': 'Previous', text: '←' });
+      var next = h('button', 'fg-zoom__btn', { type: 'button', 'aria-label': 'Next', text: '→' });
       var link = h('a', 'fg-zoom__btn fg-zoom__link', { target: '_blank', rel: 'noreferrer', 'data-no-transition': '', text: 'Original ↗' });
-      var x = h('button', 'fg-zoom__btn', { type: 'button', 'aria-label': 'Cerrar (Esc)', text: 'Cerrar ✕' });
+      var x = h('button', 'fg-zoom__btn', { type: 'button', 'aria-label': 'Close (Esc)', text: 'Close ✕' });
       [prev, next, link, x].forEach(function (b) { btns.appendChild(b); });
       bar.appendChild(info); bar.appendChild(btns);
       wrap.appendChild(back); wrap.appendChild(img); wrap.appendChild(bar);
@@ -325,7 +325,7 @@
   function viewArco(ctx) {
     var list = ctx.list, N = list.length, offs = [], S = 8, RANGE = Math.min(N, 30) - 1, PX = 150;
     var pin = makePin(ctx.stage, function () { return RANGE * PX; });
-    var view = h('div', 'fg-arc', { tabindex: '0', 'aria-label': 'Arco: arrastra, haz scroll o usa ← → · Enter amplía' });
+    var view = h('div', 'fg-arc', { tabindex: '0', 'aria-label': 'Arc: drag, scroll or use ← → · Enter enlarges' });
     var ring = h('div', 'fg-arc__ring'), hud = h('div', 'fg-arc__hud');
     var arc = doc.createElementNS('http://www.w3.org/2000/svg', 'svg');
     arc.setAttribute('viewBox', '0 0 120 34'); arc.setAttribute('class', 'fg-arc__dial'); arc.setAttribute('aria-hidden', 'true');
@@ -415,14 +415,14 @@
   /* ─── 02 · Canvas infinito ───────────────────────────────────────────── */
   function viewCanvas(ctx) {
     var list = ctx.list, N = list.length, offs = [], m = ctx.m, grid = false;
-    var box = h('div', 'fg-cv', { tabindex: '0', 'aria-label': 'Canvas infinito: arrastra, rueda o flechas · Enter amplía la pieza central' });
+    var box = h('div', 'fg-cv', { tabindex: '0', 'aria-label': 'Infinite canvas: drag, wheel or arrow keys · Enter enlarges the centre piece' });
     var plane = h('div', 'fg-cv__plane'), hud = h('div', 'fg-cv__hud');
     var mini = h('canvas', 'fg-cv__mini', { 'aria-hidden': 'true' }), coords = h('span', 'fg-cv__xy');
     var cross = h('span', 'fg-cv__cross', { 'aria-hidden': 'true' });
     box.appendChild(plane); box.appendChild(cross); hud.appendChild(coords); hud.appendChild(mini); box.appendChild(hud);
     ctx.stage.appendChild(box);
     var gridBox = h('div', 'fg-cv__grid'); gridBox.hidden = true; ctx.stage.appendChild(gridBox);
-    var toggle = h('button', 'fg__chip', { type: 'button', 'aria-pressed': 'false', text: 'Rejilla' });
+    var toggle = h('button', 'fg__chip', { type: 'button', 'aria-pressed': 'false', text: 'Grid' });
     ctx.vtools.appendChild(toggle);
 
     // World: C columns of tw px; each column a loop of its pieces, all with the same period H,
@@ -633,7 +633,7 @@
     var list = ctx.list, N = list.length, offs = [], m = ctx.m;
     var travel = 0, H, xs = [], ws = [], items = [], cur = 0, prev = 0, skew = 0, sc = 1, ci = -1;
     var pin = makePin(ctx.stage, function () { return Math.min(travel, innerHeight * 6); });
-    var box = h('div', 'fg-tr', { tabindex: '0', 'aria-label': 'Tira horizontal: haz scroll o usa ← →' });
+    var box = h('div', 'fg-tr', { tabindex: '0', 'aria-label': 'Strip: scroll or use ← →' });
     var track = h('div', 'fg-tr__track'), hud = h('div', 'fg-tr__hud'), bar = h('span', 'fg-tr__bar'), fill = h('span', 'fg-tr__fill');
     bar.appendChild(fill); hud.appendChild(bar);
     box.appendChild(track); pin.inner.appendChild(box); pin.inner.appendChild(hud);
@@ -688,7 +688,7 @@
   /* ─── 05 · Mazo ──────────────────────────────────────────────────────── */
   function viewMazo(ctx) {
     var list = ctx.list, N = list.length, offs = [], m = ctx.m, i = 0, cards = new Map(), wheelAcc = 0, wheelLock = 0;
-    var box = h('div', 'fg-mz', { tabindex: '0', 'aria-label': 'Mazo: arrastra la carta o usa ← → · Enter amplía' });
+    var box = h('div', 'fg-mz', { tabindex: '0', 'aria-label': 'Deck: drag the card or use ← → · Enter enlarges' });
     var deck = h('div', 'fg-mz__deck'), hud = h('div', 'fg-mz__hud');
     box.appendChild(deck); box.appendChild(hud); ctx.stage.appendChild(box);
     var read = readout(hud);
@@ -767,7 +767,7 @@
   /* ─── 06 · Rejilla con zoom ──────────────────────────────────────────── */
   function viewRejilla(ctx) {
     var list = ctx.list, N = list.length, offs = [], focus = 0;
-    var wrap = h('div', 'fg-rj'), head = h('div', 'fg-rj__head'), grid = h('div', 'fg-rj__grid', { role: 'grid', 'aria-label': 'Rejilla: flechas para moverte · Enter amplía' });
+    var wrap = h('div', 'fg-rj'), head = h('div', 'fg-rj__head'), grid = h('div', 'fg-rj__grid', { role: 'grid', 'aria-label': 'Grid: arrow keys to move · Enter enlarges' });
     wrap.appendChild(head); wrap.appendChild(grid); ctx.stage.appendChild(wrap);
     var read = readout(head);
     list.forEach(function (it, i) {
@@ -801,7 +801,7 @@
   /* ─── 07 · Barras (fisheye over the whole archive, by date) ─────────── */
   function viewBarras(ctx) {
     var list = ctx.list, N = list.length, offs = [], m = ctx.m;
-    var box = h('div', 'fg-br', { tabindex: '0', 'aria-label': 'Barras: mueve el cursor o usa ← → · Enter amplía' });
+    var box = h('div', 'fg-br', { tabindex: '0', 'aria-label': 'Bars: move the cursor or use ← → · Enter enlarges' });
     var row = h('div', 'fg-br__row'), years = h('div', 'fg-br__years', { 'aria-hidden': 'true' }), hud = h('div', 'fg-br__hud');
     box.appendChild(hud); box.appendChild(row); box.appendChild(years); ctx.stage.appendChild(box);
     var read = readout(hud);
@@ -866,7 +866,7 @@
   function viewPasarela(ctx) {
     var list = ctx.list, N = list.length, offs = [], m = ctx.m, S2 = 4, RANGE = Math.min(N, 30) - 1, PX = 130;
     var pin = makePin(ctx.stage, function () { return RANGE * PX; });
-    var world = h('div', 'fg-pw', { tabindex: '0', 'aria-label': 'Pasarela: haz scroll, arrastra o usa ← → · Enter amplía' });
+    var world = h('div', 'fg-pw', { tabindex: '0', 'aria-label': 'Runway: scroll, drag or use ← → · Enter enlarges' });
     var floor = h('div', 'fg-pw__floor', { 'aria-hidden': 'true' }), cardsBox = h('div', 'fg-pw__cards'), hud = h('div', 'fg-pw__hud');
     world.appendChild(floor); world.appendChild(cardsBox); pin.inner.appendChild(world); pin.inner.appendChild(hud);
     var read = readout(hud);
@@ -985,7 +985,7 @@
     }, false, offs);
 
     if (counts) {
-      counts.appendChild(h('span', 'fg__label', { text: 'Piezas' }));
+      counts.appendChild(h('span', 'fg__label', { text: 'Pieces' }));
       COUNTS.forEach(function (n) {
         var b = h('button', 'fg__chip', { type: 'button', 'aria-pressed': String(n === count), text: String(n) });
         on(b, 'click', function () {

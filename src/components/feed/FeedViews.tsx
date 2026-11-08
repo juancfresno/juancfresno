@@ -54,11 +54,11 @@ export default function FeedViews({ items, intro, children }: { items: FeedItem[
   }
 
   const toggle = (
-    <div className={v.segmented} role="group" aria-label="Vista">
-      <span>Vista:</span>
+    <div className={v.segmented} role="group" aria-label="View">
+      <span>View:</span>
       <span className={v.segment}>
         <button type="button" aria-pressed={view === 'canvas'} onClick={() => choose('canvas')}>Canvas</button>
-        <button type="button" aria-pressed={view !== 'canvas'} onClick={() => choose('rejilla')}>Rejilla</button>
+        <button type="button" aria-pressed={view !== 'canvas'} onClick={() => choose('rejilla')}>Grid</button>
       </span>
     </div>
   )

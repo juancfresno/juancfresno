@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
-import { INTROS } from '@/content/site'
+import { INTROS, META } from '@/content/site'
 import { FEED_SELECTED, groupFeed, groupRange, monthYear } from '@/content/feed'
 import ContactBlock from '@/components/blocks/ContactBlock'
 import v from '@/components/blocks/v0.module.scss'
@@ -8,7 +8,7 @@ import f from '@/components/feed/feed.module.scss'
 import FeedViews from '@/components/feed/FeedViews'
 import { FEED_VIEW_SCRIPT } from '@/components/feed/feedView'
 
-export const metadata: Metadata = { title: 'Feed' }
+export const metadata: Metadata = { title: META.feed.title, description: META.feed.description, alternates: { canonical: '/feed' } }
 
 // Two views (components/feed/FeedViews): Canvas, an infinite WebGL plane
 // (default on desktop), and Rejilla, the static accessible grid below — Figma
@@ -24,6 +24,7 @@ export default function FeedPage() {
   return (
     <div className={v.page}>
       <script dangerouslySetInnerHTML={{ __html: FEED_VIEW_SCRIPT }} />
+      <h1 className={v.srOnly}>Feed</h1>
       <FeedViews items={FEED_SELECTED} intro={INTROS.feed}>
       <div className={f.feed}>
         {groups.map((g) => (
@@ -31,7 +32,7 @@ export default function FeedPage() {
             <header className={f.head}>
               <p className={f.headLabel}>{g.label}</p>
               <p className={f.headMeta}>
-                {g.items.length} {g.items.length === 1 ? 'pieza' : 'piezas'} · {groupRange(g)}
+                {g.items.length} {g.items.length === 1 ? 'piece' : 'pieces'} · {groupRange(g)}
               </p>
             </header>
             <ul className={f.masonry}>
@@ -39,7 +40,7 @@ export default function FeedPage() {
                 const eager = n++ < 6
                 return (
                   <li key={it.id} className={f.item}>
-                    <a href={it.url} target="_blank" rel="noopener noreferrer" className={f.link} aria-label={`${it.title} · ${monthYear(it.date)} · abre ${it.source === 'instagram' ? 'Instagram' : 'Dribbble'}`}>
+                    <a href={it.url} target="_blank" rel="noopener noreferrer" className={f.link} aria-label={`${it.title} · ${monthYear(it.date)} · opens ${it.source === 'instagram' ? 'Instagram' : 'Dribbble'}`}>
                       <span className={f.media}>
                         <Image
                           src={it.src}
@@ -63,12 +64,10 @@ export default function FeedPage() {
             </ul>
           </section>
         ))}
-        <p className={v.mono}>{FEED_SELECTED.length} piezas · Dribbble e Instagram</p>
+        <p className={v.mono}>{FEED_SELECTED.length} pieces · Dribbble and Instagram</p>
       </div>
 
-      <div className={v.closing}>
-        <ContactBlock />
-      </div>
+      <ContactBlock />
       </FeedViews>
     </div>
   )

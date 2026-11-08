@@ -20,7 +20,7 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { slug } = await params
   const e = EXPERIMENTS.find((x) => x.slug === slug)
-  return e ? { title: `${e.name} · Lab`, description: e.what } : {}
+  return e ? { title: `${e.n} ${e.name} · Lab`, description: e.what, alternates: { canonical: `/lab/${e.slug}` } } : {}
 }
 
 const read = (slug: string, file: string) =>
@@ -36,6 +36,7 @@ export default async function ExperimentPage({ params }: { params: Promise<Param
   const prompt = read(slug, 'prompt.md')
 
   return (
+    <>
     <div className={s.page}>
       <header className={s.hero}>
         <p className={s.heroMeta}>Lab / {e.n} · {e.kind} · {e.year}</p>
@@ -45,24 +46,26 @@ export default async function ExperimentPage({ params }: { params: Promise<Param
 
       <LabDemo slug={slug} html={html} css={e.css} js={e.js} init={e.init} />
 
-      <Section label="Úsalo">
+      <Section label="Use it">
         <div className={l.actions}>
-          <CopyButton label="Copiar código" text={code} />
-          <CopyButton label="Copiar prompt para Claude" text={prompt} />
+          <CopyButton label="Copy code" text={code} />
+          <CopyButton label="Copy the prompt for an AI agent" text={prompt} />
           {e.repo ? (
-            <a className={l.action} href={e.repo} target="_blank" rel="noreferrer">Ver en GitHub ↗</a>
+            <a className={l.action} href={e.repo} target="_blank" rel="noreferrer">View on GitHub ↗</a>
           ) : (
-            <span className={s.text}>GitHub <Pending>repo público</Pending></span>
+            <span className={s.text}>GitHub <Pending>public repo</Pending></span>
           )}
         </div>
         <pre className={l.code}><code>{html}</code></pre>
       </Section>
 
-      <Section label="Cómo está hecho">
+      <Section label="How it’s built">
         <p className={s.text}>{e.how}</p>
+        <p className={s.rowTags}>{e.built}</p>
       </Section>
 
-      <ContactBlock />
     </div>
+    <ContactBlock />
+    </>
   )
 }
