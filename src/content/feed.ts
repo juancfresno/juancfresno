@@ -55,7 +55,7 @@ const PROJECTS: [RegExp, string][] = [
 
 const projectOf = (title: string) => PROJECTS.find(([re]) => re.test(title))?.[1] ?? null
 
-export type FeedGroup = { key: string; label: string; session: boolean; items: FeedItem[] }
+export type FeedGroup = { key: string; label: string; session: boolean; items: FeedItem[]; project?: string }
 
 // Pieces of the same project posted within this window (newest piece as
 // reference) form one session; Dribbble and Instagram posts interleave by
@@ -63,7 +63,8 @@ export type FeedGroup = { key: string; label: string; session: boolean; items: F
 const WINDOW_DAYS = 60
 const days = (a: string, b: string) => Math.abs(Date.parse(a) - Date.parse(b)) / 864e5
 
-export function groupFeed(list: FeedItem[] = FEED): FeedGroup[] {
+// `labels` = the UI words for loose pieces and sessions (getUi(l).feed).
+export function groupFeed(list: FeedItem[] = FEED, labels: { singles: string; session: string } = { singles: 'Singles', session: 'Session' }): FeedGroup[] {
   const taken = new Set<string>()
   const units: { session: string | null; items: FeedItem[] }[] = []
   for (const it of list) {
@@ -78,8 +79,8 @@ export function groupFeed(list: FeedItem[] = FEED): FeedGroup[] {
   for (const u of units) {
     const last = groups[groups.length - 1]
     if (!u.session && last && !last.session) last.items.push(...u.items)
-    else if (!u.session) groups.push({ key: `sueltos-${u.items[0].id}`, label: 'Singles', session: false, items: [...u.items] })
-    else groups.push({ key: `${u.session}-${u.items[0].id}`, label: `Session · ${u.session}`, session: true, items: u.items })
+    else if (!u.session) groups.push({ key: `sueltos-${u.items[0].id}`, label: labels.singles, session: false, items: [...u.items] })
+    else groups.push({ key: `${u.session}-${u.items[0].id}`, label: `${labels.session} · ${u.session}`, session: true, items: u.items, project: u.session })
   }
   return groups
 }
