@@ -30,6 +30,7 @@
   border: 0;
   padding: 0;
   cursor: pointer;
+  @include touch-target(16px, 4px);
   transition: color $duration-fast $ease-out-quart;
 
   &:hover { color: $color-text; }

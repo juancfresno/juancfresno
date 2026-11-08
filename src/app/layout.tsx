@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Fragment_Mono } from 'next/font/google'
 import localFont from 'next/font/local'
 import { Analytics } from '@vercel/analytics/next'
@@ -31,6 +31,12 @@ const switzer = localFont({
   ],
 })
 
+// viewport-fit=cover so env(safe-area-inset-*) reaches the CSS (tab bar, feed HUD).
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+}
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

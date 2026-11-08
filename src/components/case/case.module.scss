@@ -101,7 +101,7 @@
   text-transform: uppercase;
   color: $color-text-mid;
 
-  a { color: inherit; text-decoration: none; &:hover, &:focus-visible { color: $color-text; } }
+  a { color: inherit; text-decoration: none; @include touch-target(15px, 8px); &:hover, &:focus-visible { color: $color-text; } }
 }
 
 .title {
@@ -289,7 +289,7 @@
   letter-spacing: 0.03em;
   text-transform: uppercase;
   > :first-child { color: $color-text-hi; }
-  a { color: $color-text; text-decoration: none; &:hover, &:focus-visible { text-decoration: underline; text-underline-offset: 3px; } }
+  a { color: $color-text; text-decoration: none; @include touch-target(15px, 8px); &:hover, &:focus-visible { text-decoration: underline; text-underline-offset: 3px; } }
 }
 
 .next {

@@ -67,7 +67,7 @@
 .emailLink {
   font-family: $font-body;
   font-weight: $fw-light;
-  font-size: clamp(1.75rem, 3.8vw, 4rem);
+  font-size: min(clamp(1.75rem, 3.8vw, 4rem), 7.6vw); // never wider than a 320 px screen
   line-height: 1.1;
   letter-spacing: -0.03em;
   color: $color-text;
@@ -84,6 +84,7 @@
 
 .copy {
   flex-shrink: 0;
+  @include touch-target(12px, 6px);
   align-self: center;
   padding: 4px 8px;
   border: 1px solid $color-text-mid;
@@ -153,7 +154,10 @@
   gap: $space-2 $space-6;
   list-style: none;
 
+  @media (pointer: coarse) { row-gap: 1.25rem; }
+
   a {
+    @include touch-target(15px, 8px);
     font-family: $font-mono;
     font-size: 0.6875rem;
     letter-spacing: 0.02em;

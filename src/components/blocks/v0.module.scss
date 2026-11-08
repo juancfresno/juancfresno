@@ -60,6 +60,7 @@
   text-decoration: none;
 
   &:is(a):hover, &:is(a):focus-visible { color: $color-text; text-decoration: underline; text-underline-offset: 3px; }
+  &:is(a) { @include touch-target(15px, 6px); }
 }
 
 .mono {
@@ -115,6 +116,7 @@
     color: $color-text-mid;
     cursor: pointer;
     transition: background $duration-fast, color $duration-fast;
+    @include touch-target(8px, 1px);
 
     &[aria-pressed='true'] { background: $color-text; color: $color-bg; }
     &:hover:not([aria-pressed='true']), &:focus-visible:not([aria-pressed='true']) { color: $color-text; }
@@ -182,6 +184,7 @@
     color: $color-text;
     cursor: pointer;
     transition: background $duration-fast, color $duration-fast, border-color $duration-fast;
+    @include touch-target(10px, 3px);
 
     &[aria-pressed='true'] { background: $color-text; border-color: $color-text; color: $color-bg; }
     &:hover:not([aria-pressed='true']) { border-color: $color-text; }

@@ -419,6 +419,7 @@
 }
 
 .more {
+  @include touch-target(15px, 8px);
   font-family: $font-mono;
   font-size: 0.625rem;
   letter-spacing: 0.04em;

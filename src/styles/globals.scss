@@ -74,9 +74,12 @@ html.theme-anim, html.theme-anim * {
 
 // ─── Mobile bottom bar spacing ─────────────────────────────────────────────
 // Ensure content isn't hidden behind the fixed bottom tab bar on mobile
+// --tabbar-h = the bar's real height (44 px + the home-indicator inset).
+:root { --tabbar-h: 0px; }
 @include respond-to(md) {
+  :root { --tabbar-h: calc(2.75rem + env(safe-area-inset-bottom, 0px)); }
   body {
-    padding-bottom: calc(3.25rem + env(safe-area-inset-bottom));
+    padding-bottom: var(--tabbar-h);
   }
 }
 

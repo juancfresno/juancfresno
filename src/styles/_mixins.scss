@@ -24,7 +24,7 @@
 @mixin container {
   width: 100%;
   margin-inline: auto;
-  padding-inline: $gutter;
+  padding-inline: max(#{$gutter}, env(safe-area-inset-left, 0px)) max(#{$gutter}, env(safe-area-inset-right, 0px));
 }
 
 @mixin grid($cols: $cols-12, $gap: $space-4) {
@@ -139,5 +139,20 @@
   &:focus-visible {
     outline: 2px solid $color;
     outline-offset: 3px;
+  }
+}
+
+// ─── Touch ────────────────────────────────────────────────────────────────────
+// Grows the hit area of a small control to ≥ 44 px on coarse pointers without
+// changing its look or the layout (an invisible ::after around it). Only for
+// elements that don't use their own ::after.
+@mixin touch-target($y: 14px, $x: 6px) {
+  @media (pointer: coarse) {
+    position: relative;
+    &::after {
+      content: '';
+      position: absolute;
+      inset: -#{$y} -#{$x};
+    }
   }
 }
