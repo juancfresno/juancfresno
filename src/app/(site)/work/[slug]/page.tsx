@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import Image from 'next/image'
 import { notFound } from 'next/navigation'
-import { CASES, CASE_PROJECTS, caseMedia, projectNumber, projectTotal } from '@/content/cases'
+import { CASES, CASE_PROJECTS, caseMedia, creditsLine, projectNumber, projectTotal } from '@/content/cases'
 import CaseBlock from '@/components/case/CaseBlock'
 import CaseClose from '@/components/close/CaseClose'
 import Pending from '@/components/blocks/Pending'
@@ -32,24 +33,22 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-function Mod({ label, className, aside, children }: { label: string; className?: string; aside?: React.ReactNode; children: React.ReactNode }) {
+// Text module on the case grid: label (cols 5–6) + content (cols 7–12).
+function Row({ label, n, className, children }: { label: string; n?: string; className?: string; children: React.ReactNode }) {
   return (
-    <section className={`${s.mod} ${className ?? ''}`}>
-      <ElasticLine className={s.rule} />
-      <div className={s.fila}>
-        <div className={s.colLabel}>
-          <p className={s.label}>{label}</p>
-          {aside}
-        </div>
-        <div className={s.colContent}>{children}</div>
+    <section className={`${s.row} ${className ?? ''}`}>
+      <div className={s.rowInner}>
+        <p className={s.rowLabel}><span>{label}</span>{n && <span className={s.rowN}>{n}</span>}</p>
+        <div className={s.rowContent}>{children}</div>
       </div>
     </section>
   )
 }
 
-// Case template v1.0 (copy doc "Case template (EN)"): header with ficha and
-// discipline chips, the question, context, decisions, ONE continuous image
-// block, in hindsight, credits (+ live site), next case, short close.
+// Case template v1.0 — Figma v1/case-top (6879:460) + "Caso · … · v1.0"
+// frames: case top (big number + ficha | title, chips, description, the
+// question), [Context, Decisions when the copy is in English], ONE continuous
+// image block, In hindsight, Credits, Next case (title + cover), case close.
 export default async function CasePage({ params }: Props) {
   const { slug } = await params
   const c = CASES[slug]
@@ -58,78 +57,99 @@ export default async function CasePage({ params }: Props) {
   if (!c || !m || i < 0) notFound()
   const next = CASE_PROJECTS[(i + 1) % CASE_PROJECTS.length]
   const nextCase = CASES[next.slug]
-
-  // Sections are numbered in the order they appear.
-  let k = 0
-  const num = () => String(++k).padStart(2, '0')
-  const total = c.decisions?.length ?? 0
+  const nextCover = caseMedia(next.slug)?.cover
   const f = c.ficha
+  const n = projectNumber(slug)
+  const kind = c.meta.split(' · ').slice(1).join(' · ')
+  const total = c.decisions?.length ?? 0
+  const pad = (x: number) => String(x).padStart(2, '0')
 
   return (
     <article className={v.page}>
-      <header className={s.header}>
-        <div className={s.metaRow}>
-          <span><Link href="/work">Work</Link> / {projectNumber(slug)}</span>
-          <span>{c.meta}</span>
+      <header className={s.top}>
+        <div className={s.fichaCol}>
+          <p className={s.bigN} aria-hidden="true">{n}</p>
+          <dl className={s.ficha}>
+            <div><dt>Client</dt><dd>{f.client}</dd></div>
+            {f.via && <div><dt>Via</dt><dd>{f.via}</dd></div>}
+            <div><dt>Year</dt><dd>{f.year}</dd></div>
+            <div><dt>Role</dt><dd>{f.role ?? <Pending>role</Pending>}</dd></div>
+            {f.team && <div><dt>Team</dt><dd>{f.team}</dd></div>}
+          </dl>
+          {c.live && <a className={s.live} href={c.live} target="_blank" rel="noopener noreferrer">Live site ↗</a>}
         </div>
-        <div className={s.titleBlock}>
+        <span className={s.divider} aria-hidden="true" />
+        <div className={s.headCol}>
+          <p className={s.crumb}><Link href="/work">Work</Link> / {n} · {kind} · {f.year}</p>
           <h1 className={s.title}>{c.title}</h1>
           <ul className={s.chips} aria-label="Disciplines">
             {c.chips.map((x) => <li key={x}>{x}</li>)}
           </ul>
+          <p className={s.lead}>{c.lead}</p>
+          {c.question && (
+            <div className={s.question}>
+              <p className={s.qLabel}><span>The question</span><span className={s.rowN}>01</span></p>
+              <p className={s.questionText}>{c.question}</p>
+            </div>
+          )}
         </div>
-        <p className={s.lead}>{c.lead}</p>
-        <dl className={s.ficha}>
-          <div><dt>Client</dt><dd>{f.client}</dd></div>
-          {f.via && <div><dt>Via</dt><dd>{f.via}</dd></div>}
-          <div><dt>Year</dt><dd>{f.year}</dd></div>
-          <div><dt>Role</dt><dd>{f.role ?? <Pending>role</Pending>}</dd></div>
-          {f.team && <div><dt>Team</dt><dd>{f.team}</dd></div>}
-        </dl>
       </header>
 
-      {c.question && (
-        <Mod label={`${num()} · The question`} className={s.modQuestion}>
-          <p className={s.question}>{c.question}</p>
-        </Mod>
-      )}
-
-      {c.context && (
-        <Mod label={`${num()} · Context`}>
+      {c.copyEn && c.context && (
+        <Row label="Context" n="02" className={s.rowFirst}>
           <p className={s.contextLead}>{c.context.lead}</p>
           <p className={s.text}>{c.context.text}</p>
-        </Mod>
+        </Row>
       )}
 
-      {c.decisions && (() => {
-        const n = num()
-        return c.decisions.map((d, j) => (
-          <Mod
-            key={d.title}
-            label={`${n} · Decisions — ${String(j + 1).padStart(2, '0')}/${String(total).padStart(2, '0')}`}
-            aside={<span className={s.bigNumber} aria-hidden="true">{String(j + 1).padStart(2, '0')}</span>}
-          >
-            <h2 className={s.decisionTitle}>{d.title}</h2>
-            <p className={s.text}>{d.text}</p>
-          </Mod>
-        ))
-      })()}
+      {c.copyEn && c.decisions && (
+        <Row label="Decisions" n="03">
+          <ol className={s.decisions}>
+            {c.decisions.map((d, j) => (
+              <li key={d.title}>
+                <span className={s.decN}>{pad(j + 1)}/{pad(total)}</span>
+                <span><span className={s.decTitle}>{d.title}</span><span className={s.decText}>{d.text}</span></span>
+              </li>
+            ))}
+          </ol>
+        </Row>
+      )}
 
       <CaseBlock images={m.images} title={c.title} notes={c.notes} />
 
-      <Mod label={`${num()} · In hindsight`} className={s.modHindsight}>
-        {c.hindsight ? <p className={s.contextLead}>{c.hindsight}</p> : <p className={s.text}><Pending>in hindsight · Juan writes it</Pending></p>}
-      </Mod>
+      <Row label="In hindsight" n="04" className={s.rowHindsight}>
+        {c.hindsight ? (
+          <p className={s.contextLead}>{c.hindsight}</p>
+        ) : (
+          <>
+            <p className={`${s.contextLead} ${s.faint}`}>What held up was ___. Today I’d ___.</p>
+            <p><Pending>Juan writes it</Pending></p>
+          </>
+        )}
+      </Row>
 
-      <Mod label="Credits" className={s.modCredits}>
-        <p className={s.credits}>{c.credits}</p>
-        {c.live && <a className={s.live} href={c.live} target="_blank" rel="noopener noreferrer">Live site ↗</a>}
-      </Mod>
+      <Row label="Credits" className={s.rowCredits}>
+        <p className={s.credits}>{creditsLine(c)}</p>
+      </Row>
 
-      <Link href={`/work/${next.slug}`} className={s.next}>
-        <span className={s.label}>Next · {projectNumber(next.slug)}/{projectTotal()}</span>
-        <span className={s.nextTitle}>{nextCase.title} ↗</span>
-      </Link>
+      <section className={s.nextMod} aria-label="Next case">
+        <div className={s.head}>
+          <ElasticLine className={s.headRule} />
+          <div className={s.headRow}><p>{'{ Next ↘'}</p><Link href="/work">All work ↗</Link></div>
+        </div>
+        <Link href={`/work/${next.slug}`} className={s.next}>
+          <span className={s.nextText}>
+            <span className={s.nextLabel}>Next · {projectNumber(next.slug)}/{projectTotal()}</span>
+            <span className={s.nextTitle}>{nextCase.title} <span className={s.nextArrow} aria-hidden="true">↗</span></span>
+            <span className={s.nextLead}>{nextCase.lead}</span>
+          </span>
+          {nextCover && (
+            <span className={s.nextCover}>
+              <Image src={nextCover.src} width={nextCover.w} height={nextCover.h} alt="" sizes="(max-width: 768px) 100vw, 33vw" unoptimized />
+            </span>
+          )}
+        </Link>
+      </section>
 
       <CaseClose />
     </article>

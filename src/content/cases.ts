@@ -28,8 +28,12 @@ export type Case = {
   question?: string
   context?: { lead: string; text: string }
   decisions?: { title: string; text: string }[]
-  hindsight: string | null // Juan writes it; null renders <Pending />
-  credits: string
+  hindsight: string | null // Juan writes it; null renders the guideline + <Pending />
+  // Context and decisions render only when the copy doc gives them in English
+  // (Figma v1.0: only Shoeciety). The rest keep a translated draft, hidden.
+  copyEn?: boolean
+  credits: string // kept from the copy doc; the page renders creditsLine()
+  recognition?: string
   live?: string // "Live site ↗" only when there is something live to see
   draft?: boolean
   behance?: string
@@ -55,7 +59,7 @@ export const caseMedia = (slug: string) => M[slug]
 export const SHOW_NDA = false
 
 // ─── Index (Work · v0, newest first) ──────────────────────────────────────────
-// `featured` = the Home Arco gallery and its short index, in this order.
+// Home selections (Arco, short index) are ARCO / FEATURED below.
 const ALL_PROJECTS: Project[] = [
   { slug: 'signflow', name: 'Signflow', discipline: 'SaaS · Fintech · Legal tech', client: 'Signflow', year: '2026', caseStudy: true, featured: true },
   { slug: 'access', name: 'Access', discipline: 'Visual Identity', client: 'Audax Studio', year: '2025', caseStudy: true },
@@ -165,6 +169,7 @@ export const CASES: Record<string, Case> = {
     chips: ['App', 'Interaction', 'Product Design'],
     lead: 'A sneaker app for people who live sneakers. Minimal design, so the product is the only thing that matters.',
     ficha: { client: 'Personal project', year: '2018', role: 'Product Design · UI' },
+    copyEn: true,
     question: 'How do you design a sneaker store where the sneaker is the only thing that matters?',
     context: {
       lead: 'A personal concept from 2018, made for people who live sneakers.',
@@ -177,6 +182,7 @@ export const CASES: Record<string, Case> = {
     ],
     hindsight: null,
     credits: 'Design & art direction: Juan C. Fresno · Personal project · 2018 · Featured on Behance.',
+    recognition: 'Featured on Behance.',
     behance: 'https://www.behance.net/juancfresno',
     // Annotations from "Caso · Shoeciety · v0" (6728:6380), block 6728:6425.
     notes: {
@@ -315,7 +321,7 @@ export const CASES: Record<string, Case> = {
     title: 'Correos',
     chips: ['UI', 'Web Design'],
     lead: 'Visual direction proposals for Correos Prepago: web, app and iconography.',
-    ficha: { client: 'Correos', via: 'Goodrebels', year: '2024', role: null },
+    ficha: { client: 'Correos', via: 'Goodrebels', year: '2024', role: 'UI · Web Design' },
     context: {
       lead: 'Interface proposals for Correos Prepago, presented for Goodrebels.',
       text: 'A prepaid card with its own website and app. The plates gather the proposed visual line: brand yellow, supporting blue, photography and line icons.',
@@ -357,7 +363,7 @@ export const CASES: Record<string, Case> = {
     title: 'Google Search',
     chips: ['UI', 'UX', 'Web'],
     lead: 'A concept redesign of Google Search: cleaner, more current, still unmistakably Google.',
-    ficha: { client: 'Personal project', year: '2016', role: 'Design' },
+    ficha: { client: 'Personal project', year: '2016', role: 'UI · UX' },
     question: 'How far can you modernise Google Search before it stops feeling like Google?',
     context: {
       lead: 'A personal concept from 2016. Not a commission.',
@@ -376,7 +382,7 @@ export const CASES: Record<string, Case> = {
     title: 'Nintendo Classics',
     chips: ['Web', 'UI', 'UX'],
     lead: 'A digital experience for Nintendo: a journey through NES, Game Boy and Super Nintendo.',
-    ficha: { client: 'Personal project', year: '2016', role: 'Design' },
+    ficha: { client: 'Personal project', year: '2016', role: 'Web · UI · UX' },
     question: 'How do you tell Nintendo’s history with today’s technology?',
     context: {
       lead: 'A personal concept from 2016. Not a commission.',
@@ -393,8 +399,26 @@ export const CASES: Record<string, Case> = {
   },
 }
 
+// Credits line (Figma v1.0, decision 9): uniform format built from the ficha.
+export const creditsLine = (c: Case) => {
+  const personal = c.ficha.client === 'Personal project'
+  const parts = ['Design & art direction: Juan C. Fresno']
+  if (personal) parts.push('Personal project')
+  else {
+    if (c.ficha.via) parts.push(`Studio: ${c.ficha.via}`)
+    parts.push(`Client: ${c.ficha.client}`)
+  }
+  parts.push(c.ficha.year)
+  return parts.join(' · ') + (c.recognition ? ` · ${c.recognition}` : '')
+}
+
 export const CASE_PROJECTS = PROJECTS.filter((p) => p.caseStudy && CASES[p.slug])
-export const FEATURED = PROJECTS.filter((p) => p.featured && CASES[p.slug])
+// Home (Figma Home v1.0, 6882:437): the Arco shows 7 cases with Shoeciety
+// centred (ARCO_START), and a 5-row short index under it.
+const bySlug = (slugs: string[]) => slugs.map((sl) => PROJECTS.find((p) => p.slug === sl)).filter((p): p is Project => !!p && !!CASES[p.slug])
+export const ARCO = bySlug(['signflow', 'likitech', 'casa-carbon', 'shoeciety', 'dinamo', 'google', 'super-nintendo'])
+export const ARCO_START = 3
+export const FEATURED = bySlug(['signflow', 'likitech', 'dinamo', 'casa-carbon', 'shoeciety'])
 const pad = (n: number) => String(n).padStart(2, '0')
 // Numbers follow the visible index (hidden NDA rows leave no gaps).
 export const projectNumber = (slug: string) => pad(PROJECTS.findIndex((p) => p.slug === slug) + 1)

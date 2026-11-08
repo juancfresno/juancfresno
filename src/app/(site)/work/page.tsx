@@ -14,22 +14,25 @@ export const metadata: Metadata = {
   alternates: { canonical: '/work' },
 }
 
-// Work v1.0: discreet intro, the case index (NDA rows hidden, SHOW_NDA in
-// cases.ts) with the List / Covers toggle, then the archive from the invoices.
+// Work v1.0 — Figma "Work · v1.0 · 1680" (6884:611): giant "Work" + intro,
+// View: List / Covers, the index renumbered 01–13 (NDA rows hidden,
+// SHOW_NDA in cases.ts), then the archive from the invoices.
 export default function WorkPage() {
   const rows = PROJECTS.map(toRow)
 
   return (
     <div className={v.page}>
-      <h1 className={v.srOnly}>Work</h1>
-      <p className={v.intro}>{INTROS.work}</p>
+      <header className={w.header}>
+        <h1 className={w.h1}>Work</h1>
+        <p className={w.intro}>{INTROS.work}</p>
+      </header>
 
-      <V0Section label={`{ Work · ${String(PROJECTS.length).padStart(2, '0')} ↘`}>
+      <section className={w.indexMod} aria-label="Selected work">
         <WorkViews rows={rows} />
-      </V0Section>
+      </section>
 
       <V0Section id="archive" label="{ Archive 2016—2026 ↘">
-        <p className={w.archiveIntro}>{INTROS.archive}</p>
+        <div className={w.archiveHead}><p className={w.archiveIntro}>{INTROS.archive}</p></div>
         <ArchiveTable rows={ARCHIVE} />
       </V0Section>
 

@@ -78,6 +78,14 @@ export const HOME = {
   title: 'Independent Art Director & Interactive Designer',
   disciplines: ['Art Direction', 'Digital Design', 'User Experience', 'Brand Identity', 'Motion & Interaction', 'Design Systems'],
   intro: 'I’ve been designing digital products, brands and websites since 2012. I work from Valencia, remotely, with studios, agencies and brands of every size — from the first visual idea to the last interaction. Just enough, done right.',
+  meta: ['Valencia, Spain · Remote', 'Studios · Agencies · Brands'],
+  signature: 'Just enough, done right.',
+  arcoHint: 'Drag ↔ · Scroll',
+  labLines: {
+    botones: 'Four buttons with a point of view: magnetic, columns, roller and scramble.',
+    transiciones: '22 page transitions, side by side. 11a is the one this site uses.',
+    galerias: 'Eight ways to show 200 images, built on the real feed.',
+  } as Record<string, string>,
   labels: {
     featured: '{ Featured work ↘',
     allWork: 'All work ↗',
@@ -125,15 +133,18 @@ export const CONTACT = {
   },
   talk: {
     label: 'Talk',
-    cta: 'Book a 15-min call ↗',
+    cta: 'Book a 15-min call',
     text: 'No pitch, no prep. We see if it’s a fit.',
   },
   monoTail: 'Valencia, Spain · Working remotely',
+  label: '{ Contact ↘',
+  doorWrite: 'Door 01 · Write',
+  doorTalk: 'Door 02 · Talk',
   modesLabel: '{ How I work with studios ↘',
   modes: [
-    { name: 'Embedded', text: 'Inside your team, with your tools and your rituals, for weeks or months.' },
-    { name: 'Overflow', text: 'When there’s more work than hands. White label if you need it.' },
-    { name: 'Whole project', text: 'From the first visual idea to the last interaction, with developers I trust.' },
+    { id: 'embedded', name: 'Embedded', text: 'Inside your team, with your tools and your rituals, for weeks or months.' },
+    { id: 'overflow', name: 'Overflow', text: 'When there’s more work than hands. White label if you need it.' },
+    { id: 'whole', name: 'Whole project', text: 'From the first visual idea to the last interaction, with developers I trust.' },
   ],
   small: 'Rates and agency dossier on request.',
 }
@@ -148,21 +159,42 @@ export const LAB_FEATURED = {
   code: 'Code on GitHub ↗',
 }
 
+// Featured specs table (Figma Lab v1.0, 6886:1142).
+export const LAB_FEATURED_SPECS = [
+  { k: 'Options', v: '22' },
+  { k: 'Grid-based', v: '11 — 16' },
+  { k: 'Picks', v: '★ 11a · 11d' },
+  { k: 'In production', v: '11a · The grid falls', accent: true },
+  { k: 'Duration', v: '≈ 750 ms + route' },
+]
+
+// The 4 frames of 11a drawn in the featured stage (real timings).
+export const LAB_FEATURED_FRAMES = [
+  { t: '0–186 ms', label: 'Grid lines drop' },
+  { t: '120–286 ms', label: 'Gutters open' },
+  { t: '190–355 ms', label: 'Columns fill' },
+  { t: '≈ 750 ms', label: 'Boxes morph · route' },
+]
+
+export const LAB_LOG = ['No brief · built by hand', 'Last change · 11a → production']
+
 export const LAB_LABELS = {
   featured: '{ Featured ↘',
   experiments: '{ Experiments ↘',
   products: '{ Own products ↘',
   resources: '{ Resources ↘',
   openSource: 'Open source · GitHub ↗',
+  runs: 'Runs on this site ↗',
+  repo: '$ git clone github.com/juancfresno/fresno-lab',
 }
 
 // Own products. `what: null` = Juan still owes the line (renders <Pending />).
 export const LAB = [
-  { name: 'Tracker', what: 'Time tracking for iPhone and Mac.' as string | null, status: 'In development · 2026' as string | null },
-  { name: 'Medida', what: 'Expense tracking for iOS.', status: 'iOS' },
-  { name: 'Panel', what: null, status: '2026' },
-  { name: 'FORMA', what: null, status: '—' },
-  { name: 'GLYF', what: null, status: '—' },
+  { name: 'Tracker', what: 'Time tracking for iPhone and Mac.' as string | null, status: 'In development · 2026', dot: 'live' as 'live' | 'on' | 'off' },
+  { name: 'Medida', what: 'Expense tracking for iOS.', status: 'iOS', dot: 'on' as const },
+  { name: 'Panel', what: null, status: '2026', dot: 'off' as const },
+  { name: 'FORMA', what: null, status: '—', dot: 'off' as const },
+  { name: 'GLYF', what: null, status: '—', dot: 'off' as const },
 ]
 
 // Lab experiments: each one is a live demo here plus its source in the public repo.
@@ -176,6 +208,8 @@ export const EXPERIMENTS = [
     year: '2026',
     what: 'Four buttons with a point of view: magnetic, columns, roller and scramble. No libraries, keyboard-friendly, respect reduced motion. Copy them, or hand the prompt to an AI agent.',
     built: 'CSS + ~80 lines of vanilla JS',
+    note: null as string | null,
+    card: 'Four buttons with a point of view: magnetic, columns, roller and scramble. No libraries, keyboard-friendly, respect reduced motion. Copy them, or hand the prompt to an AI agent.',
     how: 'CSS and about 80 lines of JavaScript, no libraries. They work with the keyboard, respect reduced motion and follow the theme through two variables.',
     css: 'buttons.css',
     js: 'buttons.js',
@@ -191,6 +225,8 @@ export const EXPERIMENTS = [
     year: '2026',
     what: '22 page transitions, side by side, to choose before committing. ★ 11a and 11d.',
     built: 'Web Animations API · no libraries',
+    note: '★ 11a and 11d',
+    card: '22 page transitions, side by side, to choose before committing.',
     how: 'JavaScript with no libraries, on the Web Animations API: an overlay above the page, and the page swaps while it is covered. The grid-based ones measure the real page (margins, gutter, columns and every element’s box; the grid is this site’s, margin 64 and gutter 16 at 1680, liquid) and work with clones clipped by cells or columns. With reduced motion everything is instant. This site uses 11a, “the grid falls”, between pages.',
     css: 'transitions.css',
     js: 'transitions.js',
@@ -206,6 +242,8 @@ export const EXPERIMENTS = [
     year: '2026',
     what: 'Eight ways to show 200 images, built on the real feed: arc, infinite canvas, plates, strip, deck, zoom grid, bars and runway. ★ 02 Infinite canvas now runs the Feed; ★ 01 Arc now runs the Home.',
     built: 'rAF loop that sleeps · virtualised · FLIP zoom',
+    note: '★ 02 Infinite canvas now runs the Feed · ★ 01 Arc now runs the Home',
+    card: 'Eight ways to show 200 images, built on the real feed: arc, infinite canvas, plates, strip, deck, zoom grid, bars and runway.',
     how: 'JavaScript with no libraries: one requestAnimationFrame loop per gallery that sleeps when nothing moves, only transform and opacity, and virtualisation (only the visible pieces exist in the DOM, so it holds 200). The arc and the runway are CSS 3D: each piece is cut into strips so it can curve or fold. Images load as they appear, with 600 px thumbnails and the large file only on zoom. The zoom is a FLIP from the thumbnail. With reduced motion every gallery becomes a still grid. The public version uses generated images.',
     css: 'galleries.css',
     js: 'galleries.js',
@@ -220,6 +258,7 @@ export const ABOUT = {
   role: 'Independent Art Director & Interactive Designer',
   professional: {
     label: '{ Professional ↘',
+    caption: 'Juan at work',
     paragraphs: [
       'I’m an independent art director and interactive designer based in Valencia. I’ve been designing for screens since 2012: first in-house at studios in Valencia and Madrid, on my own since 2016.',
       'I work with studios, agencies and brands, big and small. My focus is the same everywhere: a clear visual direction, interaction that’s thought through, and digital products that don’t just look good but make sense.',
@@ -227,6 +266,7 @@ export const ABOUT = {
   },
   personal: {
     label: '{ Personal ↘',
+    caption: 'Juan off screen',
     paragraph: 'Restless and mostly self-taught. I’ve been designing since 2012 and I still learn something every week; this job doesn’t sit still. When there’s no project, I make one up: my apps and experiments live in the Lab. I also taught UI/UX for two years, which taught me more than it taught anyone.',
     // Pending: comes from memory, not from Figma; Juan confirms.
     offScreen: { text: 'Off screen: mountain biking along the coast, a home gym and more PS5 hours than I’d admit.', pending: true },
@@ -248,9 +288,9 @@ export const ABOUT = {
   brandsTail: 'and others.',
   experienceLabel: '{ Experience ↘',
   figures: [
-    { value: '20+', label: 'Studios & agencies' },
+    { value: '20+', label: 'Studios & agencies' as string },
     { value: '60+', label: 'Brands' },
-    { value: 'Since 2012', label: null as string | null },
+    { value: '2012', label: 'Since' },
   ],
   // `draft: true` = role inferred from invoices (copy doc [borrador]); shown the same.
   experience: [

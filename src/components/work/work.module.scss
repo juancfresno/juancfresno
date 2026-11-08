@@ -8,12 +8,13 @@
 
 .row {
   display: grid;
-  // 72 · fluid · 360 · 360 · 96 at 1552 px (Figma)
-  grid-template-columns: 4.5rem minmax(0, 1fr) minmax(0, 23%) minmax(0, 23%) 6rem;
+  // v1/index-row: 1 · 5 · 3 · 2 · 1 on the 12-col grid, 64 px high
+  grid-template-columns: 1fr 5fr 3fr 2fr 1fr;
+  gap: 0 $space-4;
   align-items: center;
-  min-height: 3.6rem;
-  padding-block: $space-4;
-  border-top: 1px solid $color-line;
+  min-height: 4rem;
+  padding-block: 0.6rem;
+  border-bottom: 1px solid $color-line;
   color: $color-text;
   text-decoration: none;
   transition: border-color $duration-fast;
@@ -47,12 +48,12 @@
   @include respond-to(md) { display: none; }
 }
 
-.item:last-child .row { border-bottom: 1px solid $color-line; }
+.head + .list .row:first-child { border-top: 0; }
 
 .item.on .row,
 .item:hover > a.row,
 .item > a.row:focus-visible {
-  border-top-color: $color-line-hi;
+  border-bottom-color: $color-line-hi;
 }
 
 .row:focus-visible { outline: 1px solid $color-text; outline-offset: 2px; }
@@ -69,8 +70,9 @@
   gap: $space-3;
   min-width: 0;
   font-family: $font-body;
-  font-size: clamp(1rem, 0.4vw + 0.9rem, 1.125rem);
-  line-height: 1.4;
+  font-size: clamp(1.125rem, 1.3vw, 1.375rem);
+  line-height: 1.3;
+  letter-spacing: -0.015em;
 
   > span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 }
@@ -243,7 +245,7 @@
 // ─── Archive (compact) ────────────────────────────────────────────────────────
 // Index without the Nº column (Home).
 .noNumbers .row {
-  grid-template-columns: minmax(0, 1fr) minmax(0, 23%) minmax(0, 23%) 6rem;
+  grid-template-columns: 6fr 3fr 2fr 1fr;
 
   @include respond-to(lg) { grid-template-columns: minmax(0, 1fr) minmax(0, 30%) 4rem; }
 
@@ -253,67 +255,97 @@
   }
 }
 
-// ─── Archive table: Project · Via · Category · Role · Year ───────────────────
-.archiveIntro {
+// ─── Page header (Figma Work v1.0) ──────────────────────────────────────────
+.header {
+  @include container;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: $space-4;
+  align-items: end;
+  padding-top: clamp(4rem, 7vw, 7.5rem);
+  padding-bottom: clamp(2.5rem, 4vw, 4rem);
+
+  @include respond-to(md) { grid-template-columns: 1fr; gap: $space-6; }
+}
+
+.h1 {
+  grid-column: 1 / span 6;
   font-family: $font-body;
-  font-weight: $fw-light;
-  font-size: clamp(1rem, 0.4vw + 0.9rem, 1.125rem);
+  font-weight: 200;
+  font-size: clamp(5rem, 13.1vw, 13.75rem);
+  line-height: 0.84;
+  letter-spacing: -0.06em;
+  color: $color-text-hi;
+  margin-left: -0.04em;
+
+  @include respond-to(md) { grid-column: 1 / -1; }
+}
+
+.intro {
+  grid-column: 7 / span 5;
+  align-self: start;
+  padding-top: 1rem;
+  font-family: $font-body;
+  font-size: clamp(1.0625rem, 1.2vw, 1.25rem);
   line-height: 1.45;
+  letter-spacing: -0.01em;
   color: $color-text-mid;
-  max-width: 52ch;
+
+  @include respond-to(md) { grid-column: 1 / -1; padding-top: 0; }
 }
 
-.filters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: $space-2;
-  padding-block: $space-4 $space-2;
+.indexMod {
+  @include container;
+  padding-bottom: clamp(4.5rem, 8vw, 8rem);
 }
 
-.chip {
-  padding: 0.35rem 0.75rem;
-  border: 1px solid $color-line;
-  border-radius: 999px;
-  font-family: $font-mono;
-  font-size: 0.6875rem;
-  line-height: 1.2;
+// ─── Archive table: Project · Via · Category · Role · Year (4 · 3 · 2 · 2 · 1)
+.archiveHead {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: $space-4;
+  margin-bottom: clamp(2rem, 3.3vw, 3.5rem);
+
+  @include respond-to(md) { grid-template-columns: 1fr; }
+}
+
+.archiveIntro {
+  grid-column: 7 / span 5;
+  font-family: $font-body;
+  font-size: clamp(1.0625rem, 1.2vw, 1.25rem);
+  line-height: 1.45;
+  letter-spacing: -0.01em;
   color: $color-text-mid;
-  cursor: pointer;
-  transition: color $duration-fast, border-color $duration-fast, background $duration-fast;
 
-  sup { margin-left: 0.3em; font-size: 0.85em; color: $color-text-dim; vertical-align: baseline; }
-
-  &:hover, &:focus-visible { color: $color-text; border-color: $color-line-hi; }
-  &[aria-pressed='true'] { background: $color-text; border-color: $color-text; color: $color-bg; sup { color: inherit; opacity: 0.6; } }
-  @include focus-ring($color-text);
+  @include respond-to(md) { grid-column: 1 / -1; }
 }
 
-.table { width: 100%; border-collapse: collapse; }
+.table { width: 100%; border-collapse: collapse; table-layout: fixed; }
 
 .table th, .table td {
-  padding: 0.85rem $space-4 0.85rem 0;
+  padding: 0.7rem $space-4 0.7rem 0;
   text-align: left;
   vertical-align: baseline;
-  border-top: 1px solid $color-line;
+  border-bottom: 1px solid $color-line;
 }
+
+.table th:nth-child(1) { width: 33.3%; }
+.table th:nth-child(2) { width: 25%; }
+.table th:nth-child(3), .table th:nth-child(4) { width: 16.6%; }
 
 .table th {
   padding-top: 0;
-  border-top: 0;
   font-family: $font-mono;
-  font-size: 0.625rem;
+  font-size: 0.5625rem;
   font-weight: $fw-regular;
   letter-spacing: 0.03em;
   text-transform: uppercase;
   color: $color-text-mid;
 }
 
-.table tbody tr:last-child td { border-bottom: 1px solid $color-line; }
-.table tbody tr { transition: background $duration-fast; }
-.table tbody tr:hover td { border-top-color: $color-line-hi; }
+.table tbody tr:hover td { border-bottom-color: $color-line-hi; }
 
 .tProject {
-  width: 34%;
   font-family: $font-body;
   font-size: 0.9375rem;
   line-height: 1.35;
@@ -321,19 +353,24 @@
 }
 
 .tCell {
-  font-family: $font-body;
-  font-size: 0.875rem;
-  line-height: 1.35;
+  font-family: $font-mono;
+  font-size: 0.5625rem;
+  line-height: 1.5;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
   color: $color-text-mid;
 }
 
+.tVia { color: $color-text; }
+
 .tYear {
-  width: 7rem;
+  width: 8.3%;
   padding-right: 0 !important;
   text-align: right !important;
   font-family: $font-mono;
-  font-size: 0.75rem;
-  color: $color-text-mid;
+  font-size: 0.5625rem;
+  letter-spacing: 0.03em;
+  color: $color-text;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
 }
@@ -349,8 +386,9 @@
   vertical-align: 0.15em;
 }
 
-// Small screens: each row becomes a two-line block (project + year, then via · role).
+// Small screens: each row becomes a block (project + year, then via · role).
 @include respond-to(md) {
+  .table { table-layout: auto; }
   .table thead { display: none; }
   .table, .table tbody, .table tr, .table td { display: block; width: auto; }
   .table tr {
@@ -358,13 +396,11 @@
     grid-template-columns: minmax(0, 1fr) auto;
     grid-template-areas: 'p y' 'v v' 'r r';
     column-gap: $space-4;
-    row-gap: 2px;
+    row-gap: 4px;
     padding-block: 0.85rem;
-    border-top: 1px solid $color-line;
+    border-bottom: 1px solid $color-line;
   }
   .table td { padding: 0; border: 0; }
-  .table tbody tr:last-child td { border-bottom: 0; }
-  .table tbody tr:last-child { border-bottom: 1px solid $color-line; }
   .tProject { grid-area: p; }
   .tYear { grid-area: y; }
   .tVia { grid-area: v; }
@@ -372,19 +408,32 @@
   .tCat { display: none !important; }
 }
 
+.table tr[hidden] { display: none !important; }
+
+.moreRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: $space-4;
+  padding-top: 14px;
+}
+
 .more {
-  margin-top: $space-6;
   font-family: $font-mono;
-  font-size: 0.6875rem;
+  font-size: 0.625rem;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   color: $color-text;
   cursor: pointer;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  text-decoration-color: $color-line-hi;
 
-  &:hover, &:focus-visible { text-decoration-color: currentColor; }
+  &:is(button):hover, &:is(button):focus-visible { text-decoration: underline; text-underline-offset: 3px; }
   @include focus-ring($color-text);
 }
 
-.table tr[hidden] { display: none !important; }
+.count {
+  font-family: $font-mono;
+  font-size: 0.5625rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: $color-text-mid;
+}

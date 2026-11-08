@@ -1,42 +1,21 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import type { ArchiveRow } from '@/content/cases'
 import s from './work.module.scss'
 
 // ─── Archive table ────────────────────────────────────────────────────────────
-// Project · Via · Category · Role · Year, from the invoices (copy doc). Filter
-// chips by category (each category is split on " · ", so "Web · Art Direction"
-// counts for both; only categories with 3+ rows get a chip). With no filter
-// the list shows the first 20 rows and a "Show all" button.
+// Project · Via · Category · Role · Year, from the invoices (copy doc).
+// Figma Work v1.0 (6884:611): the first 20 rows, then "Show all · N projects ↓"
+// and the count "20 of N" on the right. Columns 4 · 3 · 2 · 2 · 1.
 const FIRST = 20
 
 export default function ArchiveTable({ rows }: { rows: ArchiveRow[] }) {
-  const [cat, setCat] = useState<string | null>(null)
   const [open, setOpen] = useState(false)
-
-  const cats = useMemo(() => {
-    const count = new Map<string, number>()
-    rows.forEach((r) => r.category.split(' · ').forEach((c) => { if (c !== '—') count.set(c, (count.get(c) ?? 0) + 1) }))
-    return [...count.entries()].filter(([, n]) => n >= 3).sort((a, b) => b[1] - a[1])
-  }, [rows])
-
-  const list = cat ? rows.filter((r) => r.category.split(' · ').includes(cat)) : rows
-  const collapsed = !cat && !open && list.length > FIRST
+  const collapsed = !open && rows.length > FIRST
 
   return (
     <div>
-      <div className={s.filters} role="group" aria-label="Filter by category">
-        <button type="button" className={s.chip} aria-pressed={cat === null} onClick={() => setCat(null)}>
-          All<sup>{rows.length}</sup>
-        </button>
-        {cats.map(([c, n]) => (
-          <button key={c} type="button" className={s.chip} aria-pressed={cat === c} onClick={() => setCat(cat === c ? null : c)}>
-            {c}<sup>{n}</sup>
-          </button>
-        ))}
-      </div>
-
       <table className={s.table}>
         <thead>
           <tr>
@@ -48,7 +27,7 @@ export default function ArchiveTable({ rows }: { rows: ArchiveRow[] }) {
           </tr>
         </thead>
         <tbody>
-          {list.map((r, i) => (
+          {rows.map((r, i) => (
             <tr key={`${r.project}-${r.via}-${r.year}`} hidden={collapsed && i >= FIRST}>
               <td className={s.tProject}>
                 {r.project}
@@ -63,11 +42,14 @@ export default function ArchiveTable({ rows }: { rows: ArchiveRow[] }) {
         </tbody>
       </table>
 
-      {collapsed && (
-        <button type="button" className={s.more} onClick={() => setOpen(true)}>
-          Show all {list.length} ↓
-        </button>
-      )}
+      <div className={s.moreRow}>
+        {collapsed ? (
+          <button type="button" className={s.more} onClick={() => setOpen(true)}>Show all · {rows.length} projects ↓</button>
+        ) : (
+          <span className={s.more} aria-hidden="true">{rows.length} projects</span>
+        )}
+        <span className={s.count}>{collapsed ? FIRST : rows.length} of {rows.length}</span>
+      </div>
     </div>
   )
 }

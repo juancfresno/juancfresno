@@ -7,37 +7,30 @@
   @include container;
   display: flex;
   flex-direction: column;
-  gap: clamp(1.5rem, 2.4vw, 2.5rem);
-  padding-top: clamp(3rem, 6vw, 6.5rem);
-  padding-bottom: clamp(4rem, 9vw, 10rem);
+  padding-top: clamp(4rem, 8.1vw, 8.5rem);
+  padding-bottom: clamp(4.5rem, 8.6vw, 9rem);
 }
 
-.heroHead {
-  display: flex;
-  flex-direction: column;
-  gap: 0.15em;
-  font-weight: $fw-regular;
-}
+.heroHead { display: flex; flex-direction: column; font-weight: $fw-regular; }
 
 .name {
   font-family: $font-body;
-  font-weight: $fw-light;
-  font-size: clamp(1.375rem, 1.4vw + 0.85rem, 2.25rem);
-  line-height: 1.15;
-  letter-spacing: -0.02em;
-  color: $color-text-mid;
-  margin-bottom: 0.4em;
+  font-weight: $fw-regular;
+  font-size: clamp(1.375rem, 1.8vw, 1.875rem);
+  line-height: 1.3;
+  letter-spacing: -0.015em;
+  color: $color-text;
 }
 
 .title {
+  margin-top: 28px;
   font-family: $font-body;
   font-weight: $fw-light;
-  font-size: clamp(2.25rem, 4.6vw, 5.25rem);
-  line-height: 1.02;
-  letter-spacing: -0.035em;
+  font-size: clamp(2.75rem, 7.15vw, 7.5rem);
+  line-height: 0.92;
+  letter-spacing: -0.045em;
   color: $color-text-hi;
-  max-width: 17ch;
-  text-wrap: balance;
+  max-width: min(100%, 76.8vw);
 }
 
 // ─── "Hello" slot: width eases to the measured width of each greeting ──────
@@ -87,26 +80,50 @@
 }
 
 .disciplines {
+  margin-top: 44px;
   font-family: $font-mono;
   font-size: 0.6875rem;
-  line-height: 1.4;
+  line-height: 1.6;
+  letter-spacing: 0.03em;
   text-transform: uppercase;
-  color: $color-text-hi;
-  max-width: 64rem;
+  color: $color-text;
 }
 
 .disc { white-space: nowrap; }
-.dash { color: $color-text-dim; white-space: pre; }
+.dash { color: $color-text-mid; white-space: pre; }
+
+.introRow {
+  margin-top: clamp(4rem, 7.1vw, 7.5rem);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: $space-4;
+
+  @include respond-to(md) { grid-template-columns: 1fr; gap: $space-6; }
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-family: $font-mono;
+  font-size: 0.625rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: $color-text-mid;
+
+  @include respond-to(md) { order: 2; }
+}
 
 .intro {
   font-family: $font-body;
-  font-weight: $fw-light;
-  font-size: clamp(1.125rem, 0.7vw + 0.95rem, 1.5rem);
+  font-size: clamp(1.1875rem, 1.45vw, 1.5rem);
   line-height: 1.4;
-  color: $color-text-mid;
-  max-width: 44ch;
-  margin-top: clamp(1rem, 3vw, 3rem);
+  letter-spacing: -0.01em;
+  color: $color-text;
+  max-width: 48rem;
 }
+
+.signature { color: $color-text-hi; }
 
 .srOnly {
   position: absolute;
@@ -128,60 +145,62 @@
   padding-bottom: clamp(4rem, 8vw, 8rem);
 }
 
-// Feed strip: latest pieces, full bleed to the right edge.
-.feedSection { overflow: hidden; }
-
+// Feed strip: 6 portrait pieces on the 12-col grid (2 cols each), caption under.
 .strip {
-  display: flex;
-  gap: 6px;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: $space-4;
   list-style: none;
-  overflow-x: auto;
-  scrollbar-width: none;
-  padding-block: $space-2 $space-4;
-  margin-right: calc(-1 * #{$gutter});
+  padding-top: 24px;
 
-  &::-webkit-scrollbar { display: none; }
-
-  li { flex: 0 0 auto; }
+  @include respond-to(lg) { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: $space-8; }
+  @include respond-to(sm) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
-.stripLink { width: clamp(9rem, 14vw, 15rem); border-radius: 2px; }
+.stripLink { display: flex; flex-direction: column; gap: 10px; }
 
 .stripMedia {
-  aspect-ratio: 3 / 2;
+  aspect-ratio: 4 / 5;
   overflow: hidden;
 
   img { width: 100%; height: 100%; object-fit: cover; }
 }
 
-// Lab teaser rows
-.lab { list-style: none; }
+.stripCap {
+  font-family: $font-mono;
+  font-size: 0.5625rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: $color-text-mid;
+  line-height: 1.4;
+}
 
-.labRow {
+// Lab teaser: three cards (Figma 6882:617)
+.lab {
+  list-style: none;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: $space-4;
-  align-items: center;
-  padding-block: $space-4;
+  padding-top: 24px;
+
+  @include respond-to(md) { grid-template-columns: 1fr; gap: $space-8; }
+}
+
+.labCard {
+  display: flex;
+  flex-direction: column;
+  padding-top: 20px;
   border-top: 1px solid $color-line;
   color: $color-text;
   text-decoration: none;
+  transition: border-color $duration-fast;
 
-  li:last-child & { border-bottom: 1px solid $color-line; }
-  &:hover, &:focus-visible { border-top-color: $color-line-hi; }
-
-  @include respond-to(md) { grid-template-columns: minmax(0, 1fr) auto; }
+  &:hover, &:focus-visible { border-top-color: $color-line-hi; .labName { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.15em; } }
+  @include focus-ring($color-text);
 }
 
-.labWhat {
-  font-family: $font-mono;
-  font-size: 0.6875rem;
-  color: $color-text-mid;
-
-  @include respond-to(md) { display: none; }
-}
-
-.labName {
-  font-family: $font-body;
-  font-size: clamp(1rem, 0.4vw + 0.9rem, 1.125rem);
-}
+.labTop { display: flex; justify-content: space-between; align-items: flex-start; gap: $space-4; }
+.labN { font-family: $font-mono; font-size: clamp(2.5rem, 3.3vw, 3.5rem); line-height: 1; letter-spacing: -0.02em; }
+.labMeta { font-family: $font-mono; font-size: 0.5625rem; letter-spacing: 0.03em; text-transform: uppercase; color: $color-text-mid; text-align: right; }
+.labName { margin-top: 28px; font-family: $font-body; font-size: 1.75rem; letter-spacing: -0.015em; }
+.labWhat { margin-top: 10px; font-family: $font-body; font-size: 1rem; line-height: 1.45; letter-spacing: -0.01em; color: $color-text-mid; max-width: 24rem; }

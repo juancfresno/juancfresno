@@ -26,12 +26,12 @@ const mod = (n: number, m: number) => ((n % m) + m) % m
 const clamp = (v: number, a: number, b: number) => (v < a ? a : v > b ? b : v)
 const pad = (n: number) => String(n).padStart(2, '0')
 
-export default function Arco({ items, label = 'Featured work' }: { items: ArcoItem[]; label?: string }) {
+export default function Arco({ items, label = 'Featured work', start = 0, hint = 'Drag ↔ · Scroll' }: { items: ArcoItem[]; label?: string; start?: number; hint?: string }) {
   const wrapRef = useRef<HTMLDivElement>(null)
   const innerRef = useRef<HTMLDivElement>(null)
   const viewRef = useRef<HTMLDivElement>(null)
   const ringRef = useRef<HTMLDivElement>(null)
-  const dialRef = useRef<SVGPathElement>(null)
+  const ticksRef = useRef<SVGGElement>(null)
   const nRef = useRef<HTMLSpanElement>(null)
   const tRef = useRef<HTMLAnchorElement>(null)
   const dRef = useRef<HTMLSpanElement>(null)
@@ -51,10 +51,10 @@ export default function Arco({ items, label = 'Featured work' }: { items: ArcoIt
       offs.push(() => el.removeEventListener(ev, fn, opt))
     }
 
-    type Card = { el: HTMLDivElement; strips: HTMLSpanElement[]; i: number | null; mono: boolean | null; vis: boolean | null }
+    type Card = { el: HTMLDivElement; strips: HTMLSpanElement[]; i: number | null; mono: boolean | null; vis: boolean | null; b: number }
     let G = { W: 0, H: 0, CW: 0, CH: 0, R: 0, dTh: 0, HALF: 0, g: 16, small: false }
     let pool: Card[] = []
-    let r = 0, prevR = 0, offset = 0, lastInput = 0, cur = -1, raf = 0, top = 72
+    let r = 0, prevR = 0, offset = start, lastInput = 0, cur = -1, raf = 0, top = 72
 
     // ── Pin: wrapper tall enough for RANGE cards of page scroll ──
     const size = () => {
@@ -75,16 +75,17 @@ export default function Arco({ items, label = 'Featured work' }: { items: ArcoIt
     }
     const geo = () => {
       const W = inner.clientWidth, H = view.clientHeight, small = W <= 720
-      const g = small ? 24 : 48
-      const AR = small ? 0.86 : 1.5
-      let CW = small ? W * 0.74 : W * 0.46, CH = CW / AR
-      if (CH > H * 0.78) { CH = H * 0.78; CW = CH * AR }
-      const R = CW * (small ? 1.5 : 1.9)
+      const g = small ? 16 : 22
+      // Portrait panels (Figma: 500 × 625 at 1680, 4:5).
+      const AR = 0.8
+      let CW = small ? W * 0.66 : W * 0.3, CH = CW / AR
+      if (CH > H * 0.86) { CH = H * 0.86; CW = CH * AR }
+      const R = CW * (small ? 2.2 : 3.4) // flat oval: 3 panels each side (Figma)
       const K = Math.max(8, Math.floor((2 * Math.PI * R) / (CW + g))), dTh = (2 * Math.PI) / K
       const st = CW / R / S, sw = 2 * R * Math.sin(st / 2) + 1.2
       const HALF = Math.ceil((Math.PI * 0.55) / dTh)
       G = { W, H, CW, CH, R, dTh, HALF, g, small }
-      view.style.perspective = `${Math.round(CW * (small ? 1.8 : 2.2))}px`
+      view.style.perspective = `${Math.round(CW * (small ? 2.4 : 3.2))}px`
       ring.textContent = ''
       pool = []
       for (let p = 0; p < HALF * 2 + 2; p++) {
@@ -100,7 +101,7 @@ export default function Arco({ items, label = 'Featured work' }: { items: ArcoIt
           el.appendChild(sp); strips.push(sp)
         }
         ring.appendChild(el)
-        pool.push({ el, strips, i: null, mono: null, vis: null })
+        pool.push({ el, strips, i: null, mono: null, vis: null, b: -1 })
       }
     }
     const assign = (c: Card, i: number) => {
@@ -121,7 +122,8 @@ export default function Arco({ items, label = 'Featured work' }: { items: ArcoIt
     const read = (j: number) => {
       const it = items[j]
       nRef.current!.textContent = `${pad(j + 1)} / ${pad(N)}`
-      dRef.current!.textContent = it.meta
+      dRef.current!.textContent = `— ${it.meta}`
+      ticksRef.current?.querySelectorAll('circle').forEach((c, k) => c.setAttribute('data-on', String(k === j)))
       const t = tRef.current!
       t.href = it.href
       t.setAttribute('aria-label', `${it.title} · ${it.meta} · open the case`)
@@ -152,16 +154,17 @@ export default function Arco({ items, label = 'Featured work' }: { items: ArcoIt
       for (let i = base - G.HALF; i <= base + G.HALF + 1; i++) {
         const c = pool[mod(i, pool.length)]
         if (c.i !== i) assign(c, i)
-        const a = (i - r) * G.dTh, vis = Math.abs(a) < Math.PI * 0.55
+        const a = (i - r) * G.dTh, vis = Math.abs(a) < Math.PI * 0.55 && Math.abs(i - r) < N / 2
         if (vis !== c.vis) { c.vis = vis; c.el.style.visibility = vis ? '' : 'hidden' }
         if (!vis) continue
         c.el.style.transform = `translateZ(${-G.R}px) rotateY(${a}rad)`
-        const mono = moving || Math.abs(i - r) > 0.5
-        if (mono !== c.mono) { c.mono = mono; c.el.classList.toggle(s.mono, mono) }
+        // Sides dim by distance from the centre (Figma: 0.29 · 0.55 · 0.74).
+        const b = Math.round((1 - Math.min(0.74, Math.abs(i - r) * 0.29)) * 100) / 100
+        if (b !== c.b) { c.b = b; c.el.style.setProperty('--b', String(b)) }
+        if (moving !== c.mono) { c.mono = moving; c.el.classList.toggle(s.mono, moving) }
       }
       const ci = Math.round(r)
       if (ci !== cur) { cur = ci; read(mod(ci, N)) }
-      dialRef.current?.setAttribute('stroke-dashoffset', String((-mod(r, N) / N) * 0.96))
       if (r !== t || performance.now() - lastInput < 400) raf = requestAnimationFrame(step)
     }
     const wake = () => { if (!raf) raf = requestAnimationFrame(step) }
@@ -244,17 +247,23 @@ export default function Arco({ items, label = 'Featured work' }: { items: ArcoIt
           >
             <div ref={ringRef} className={s.ring} />
           </div>
+          <svg viewBox="0 0 1552 80" className={s.dial} aria-hidden="true">
+            <path d="M0 76 Q776 -20 1552 76" fill="none" stroke="currentColor" strokeOpacity="0.35" vectorEffect="non-scaling-stroke" />
+            <g ref={ticksRef}>
+              {items.map((it, k) => {
+                const t = 0.17 + (0.66 * k) / Math.max(1, items.length - 1)
+                const x = 1552 * t, y = (1 - t) * (1 - t) * 76 + 2 * (1 - t) * t * -20 + t * t * 76
+                return <circle key={it.key} cx={x} cy={y} r={k === start ? 4.5 : 2.5} data-on={String(k === start)} />
+              })}
+            </g>
+          </svg>
           <div className={s.hud}>
-            <svg viewBox="0 0 120 34" className={s.dial} aria-hidden="true">
-              <path d="M6 30 A60 60 0 0 1 114 30" fill="none" stroke="currentColor" strokeOpacity="0.25" />
-              <path ref={dialRef} d="M6 30 A60 60 0 0 1 114 30" fill="none" stroke="currentColor" pathLength={1} strokeDasharray="0.04 1" />
-            </svg>
+            <span ref={nRef} className={s.readN}>{first ? `${pad(start + 1)} / ${pad(items.length)}` : ''}</span>
             <p className={s.read} aria-live="polite">
-              <span ref={nRef} className={s.readN}>{first ? `01 / ${pad(items.length)}` : ''}</span>
-              <a ref={tRef} href={first?.href ?? '/work'} className={s.readT}>{first?.title}</a>
-              <span ref={dRef} className={s.readD}>{first?.meta}</span>
+              <a ref={tRef} href={items[start]?.href ?? '/work'} className={s.readT}>{items[start]?.title}</a>{' '}
+              <span ref={dRef} className={s.readD}>— {items[start]?.meta}</span>
             </p>
-            <span className={s.hint} aria-hidden="true">Drag ↔ · Click to open</span>
+            <span className={s.hint} aria-hidden="true">{hint}</span>
           </div>
         </div>
       </div>

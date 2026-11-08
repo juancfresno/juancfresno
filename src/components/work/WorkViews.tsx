@@ -36,12 +36,10 @@ export default function WorkViews({ rows }: { rows: IndexRow[] }) {
 
   return (
     <div className={s.views}>
-      <div className={v.segmented} role="group" aria-label="View">
-        <span>View:</span>
-        <span className={v.segment}>
-          <button type="button" aria-pressed={view === 'lista'} onClick={() => choose('lista')}>List</button>
-          <button type="button" aria-pressed={view === 'portadas'} onClick={() => choose('portadas')}>Covers</button>
-        </span>
+      <div className={v.chipToggle} role="group" aria-label="View">
+        <span>View</span>
+        <button type="button" aria-pressed={view === 'lista'} onClick={() => choose('lista')}>List</button>
+        <button type="button" aria-pressed={view === 'portadas'} onClick={() => choose('portadas')}>Covers</button>
       </div>
 
       {view === 'lista' ? (
