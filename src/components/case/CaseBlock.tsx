@@ -5,6 +5,7 @@ import Image from 'next/image'
 import type { Img, Note } from '@/content/cases'
 import s from './case.module.scss'
 import v from '@/components/blocks/v0.module.scss'
+import { useUi } from '@/i18n/client'
 
 // ─── Behance block ────────────────────────────────────────────────────────────
 // One continuous column: every image in Behance order, content width, gap 0,
@@ -15,20 +16,21 @@ import v from '@/components/blocks/v0.module.scss'
 const BLOCK_W = 1552
 
 export default function CaseBlock({ images, title, notes }: { images: Img[]; title: string; notes?: { blockHeight: number; items: Note[] } }) {
+  const t = useUi().case
   const [on, setOn] = useState(true)
   const H = notes?.blockHeight ?? 1
   const px = (x: number) => `${(x / BLOCK_W) * 100}%`
   const py = (y: number) => `${(y / H) * 100}%`
 
   return (
-    <section className={s.blockWrap} aria-label={`${title}: project images`}>
+    <section className={s.blockWrap} aria-label={t.images(title)}>
       {notes && (
         <div className={s.notesBar}>
-          <div className={v.segmented} role="group" aria-label="Notes over the images">
-            <span>Notes:</span>
+          <div className={v.segmented} role="group" aria-label={t.notesGroup}>
+            <span>{t.notes}</span>
             <span className={v.segment}>
-              <button type="button" aria-pressed={on} onClick={() => setOn(true)}>ON</button>
-              <button type="button" aria-pressed={!on} onClick={() => setOn(false)}>OFF</button>
+              <button type="button" aria-pressed={on} onClick={() => setOn(true)}>{t.on}</button>
+              <button type="button" aria-pressed={!on} onClick={() => setOn(false)}>{t.off}</button>
             </span>
           </div>
         </div>
@@ -41,7 +43,7 @@ export default function CaseBlock({ images, title, notes }: { images: Img[]; tit
             src={img.src}
             width={img.w}
             height={img.h}
-            alt={`${title} — image ${String(i + 1).padStart(2, '0')}`}
+            alt={t.image(title, String(i + 1).padStart(2, '0'))}
             className={s.blockImg}
             sizes="(max-width: 768px) 100vw, calc(100vw - 8rem)"
             loading={i < 1 ? 'eager' : 'lazy'}

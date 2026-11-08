@@ -5,6 +5,7 @@ import ElasticLine from '@/components/ui/ElasticLine/ElasticLine'
 import LiveClock from '@/components/ui/LiveClock/LiveClock'
 import { BehanceLogo, InstagramLogo, DribbbleLogo, LinkedInLogo } from '@/components/ui/SocialLogos/SocialLogos'
 import GlitchSocialIcon from '@/components/ui/GlitchSocialIcon/GlitchSocialIcon'
+import { useHref, useUi } from '@/i18n/client'
 
 // ─── Social links data ─────────────────────────────────────────────────────────
 const SOCIALS = [
@@ -16,16 +17,18 @@ const SOCIALS = [
 
 // ─── Component ────────────────────────────────────────────────────────────────
 export default function Footer() {
+  const ui = useUi()
+  const href = useHref()
   return (
     <footer className={s.footer}>
       <div className={s.inner}>
 
         {/* Social wordmarks */}
-        <nav className={s.social} aria-label="Social profiles">
-            {SOCIALS.map(({ id, label, href, Icon }) => (
+        <nav className={s.social} aria-label={ui.footer.socials}>
+            {SOCIALS.map(({ id, label, href: url, Icon }) => (
               <GlitchSocialIcon
                 key={id}
-                href={href}
+                href={url}
                 label={label}
                 icon={<Icon />}
                 className={s.socialLink}
@@ -40,11 +43,11 @@ export default function Footer() {
 
         {/* Meta row */}
         <div className={s.meta}>
-          <span className={s.copyright}>© 2012 — 2026 · <a href="/legal" style={{ color: 'inherit' }}>Legal</a></span>
+          <span className={s.copyright}>© 2012 — 2026 · <a href={href('/legal')} style={{ color: 'inherit' }}>{ui.footer.legal}</a></span>
           <div className={s.metaRight}>
             <LiveClock />
             <span className={s.location}>
-              ⌖ Valencia &#123;Spain&#125;&nbsp;&nbsp;39.6649° N , 0.2126° W
+              ⌖ {ui.footer.place}&nbsp;&nbsp;39.6649° N , 0.2126° W
             </span>
           </div>
         </div>

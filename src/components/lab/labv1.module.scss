@@ -222,7 +222,13 @@
 }
 
 .frameT { margin-top: 16px; color: var(--c-g); }
-.frameL { margin-top: 5px; color: $color-text; }
+.frameL {
+  margin-top: 5px;
+  color: $color-text;
+  // Longer Spanish labels («Se abren los medianiles») wrap instead of overflowing.
+  white-space: normal;
+  text-wrap: balance;
+}
 
 .info {
   grid-column: 9 / -1;

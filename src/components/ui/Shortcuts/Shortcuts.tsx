@@ -2,15 +2,16 @@
 
 import { useEffect, useRef, useState } from 'react'
 import s from './Shortcuts.module.scss'
+import { useUi } from '@/i18n/client'
 
 // ─── Keyboard shortcuts legend ────────────────────────────────────────────────
 // "?" opens it, Esc closes it. G (grid) and D (theme) are handled by their own
 // components; M (modes) is announced as coming soon. Ignored while typing.
-const KEYS: { k: string; label: string; soon?: boolean }[] = [
-  { k: 'G', label: 'Layout grid' },
-  { k: 'D', label: 'Light / dark theme' },
-  { k: 'M', label: 'Modes', soon: true },
-  { k: '?', label: 'Help' },
+const KEYS: { k: string; id: 'grid' | 'theme' | 'modes' | 'help'; soon?: boolean }[] = [
+  { k: 'G', id: 'grid' },
+  { k: 'D', id: 'theme' },
+  { k: 'M', id: 'modes', soon: true },
+  { k: '?', id: 'help' },
 ]
 
 const isTyping = (t: EventTarget | null) => {
@@ -19,6 +20,7 @@ const isTyping = (t: EventTarget | null) => {
 }
 
 export default function Shortcuts() {
+  const t = useUi().shortcuts
   const [open, setOpen] = useState(false)
   const [toast, setToast] = useState(false)
   const panelRef = useRef<HTMLDivElement>(null)
@@ -70,17 +72,17 @@ export default function Shortcuts() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className={s.head}>
-              <p id="shortcuts-title" className={s.title}>{'{ shortcuts ↘'}</p>
-              <button type="button" className={s.close} onClick={() => setOpen(false)} aria-label="Close shortcuts">
+              <p id="shortcuts-title" className={s.title}>{t.title}</p>
+              <button type="button" className={s.close} onClick={() => setOpen(false)} aria-label={t.close}>
                 Esc
               </button>
             </div>
             <ul className={s.list}>
-              {KEYS.map(({ k, label, soon }) => (
+              {KEYS.map(({ k, id, soon }) => (
                 <li key={k} className={s.row}>
                   <kbd className={s.key}>{k}</kbd>
-                  <span className={s.label}>{label}</span>
-                  {soon && <span className={s.soon}>coming soon</span>}
+                  <span className={s.label}>{t[id]}</span>
+                  {soon && <span className={s.soon}>{t.soon}</span>}
                 </li>
               ))}
             </ul>
@@ -88,7 +90,7 @@ export default function Shortcuts() {
         </div>
       )}
       <div className={s.toast} data-on={toast || undefined} role="status" aria-live="polite">
-        {toast ? 'Modes · coming soon' : ''}
+        {toast ? t.toast : ''}
       </div>
     </>
   )

@@ -10,6 +10,7 @@
 import type { FeedItem } from '@/content/feed'
 import { FEED, monthYear, groupFeed } from '@/content/feed'
 import s from './zoom.module.scss'
+import type { UiDict } from '@/content/ui'
 
 const EASE = 'cubic-bezier(0.19, 1, 0.22, 1)'
 type Rect = { left: number; top: number; width: number; height: number }
@@ -30,10 +31,12 @@ function el<K extends keyof HTMLElementTagNameMap>(tag: K, cls?: string, text?: 
   return e
 }
 
-export function createZoom(items: FeedItem[], hooks: ZoomHooks) {
+// `ui` = the locale's UI strings (zoom labels, session words).
+export function createZoom(items: FeedItem[], ui: UiDict, hooks: ZoomHooks) {
+  const t = ui.feed.zoom
   // Session of each piece (computed on the full feed), for the meta line.
   const session = new Map<string, string>()
-  for (const g of groupFeed(FEED)) for (const it of g.items) session.set(it.id, g.session ? g.label.replace('Session · ', 'Session ') : 'Singles')
+  for (const g of groupFeed(FEED, ui.feed)) for (const it of g.items) session.set(it.id, g.session ? `${ui.feed.session} ${g.project}` : ui.feed.singles)
 
   let z: null | {
     i: number; wrap: HTMLDivElement; back: HTMLDivElement; img: HTMLDivElement; pic: HTMLImageElement
@@ -84,7 +87,7 @@ export function createZoom(items: FeedItem[], hooks: ZoomHooks) {
     z!.title.textContent = `${pad3(i + 1)} · ${it.title}`
     z!.meta.textContent = `${monthYear(it.date)} · ${SOURCE[it.source]} · ${session.get(it.id) ?? ''}`
     z!.link.href = it.url
-    z!.link.setAttribute('aria-label', `View the original post on ${SOURCE[it.source]} (opens in a new tab)`)
+    z!.link.setAttribute('aria-label', t.originalAria(SOURCE[it.source]))
     z!.count.textContent = `${pad3(i + 1)} / ${items.length}`
     return place(it)
   }
@@ -130,7 +133,7 @@ export function createZoom(items: FeedItem[], hooks: ZoomHooks) {
     const wrap = el('div', s.zoom)
     wrap.setAttribute('role', 'dialog')
     wrap.setAttribute('aria-modal', 'true')
-    wrap.setAttribute('aria-label', 'Enlarged piece')
+    wrap.setAttribute('aria-label', t.dialog)
     const back = el('div', s.back)
     const slot = el('div', s.slot)
     const img = el('div', s.img)
@@ -140,7 +143,7 @@ export function createZoom(items: FeedItem[], hooks: ZoomHooks) {
     const info = el('div', s.info)
     const left = el('div', s.col), right = el('div', `${s.col} ${s.right}`)
     const title = el('p', s.title), meta = el('p', s.meta)
-    const link = el('a', s.link, 'View original post ↗')
+    const link = el('a', s.link, t.original)
     link.target = '_blank'
     link.rel = 'noopener noreferrer'
     link.setAttribute('data-no-transition', '')
@@ -148,15 +151,15 @@ export function createZoom(items: FeedItem[], hooks: ZoomHooks) {
     left.append(title, meta)
     right.append(link, count)
     info.append(left, right)
-    const hint = el('p', s.hint, 'Esc close · ← → previous / next · click outside closes')
+    const hint = el('p', s.hint, t.hint)
     hint.setAttribute('aria-hidden', 'true')
     // Keyboard / touch controls: visually hidden until focused; on touch all three show (and a horizontal swipe browses).
     const ctl = el('div', s.ctl)
-    const prev = el('button', s.btn, '←'), next = el('button', s.btn, '→'), x = el('button', `${s.btn} ${s.x}`, 'Close ✕')
+    const prev = el('button', s.btn, '←'), next = el('button', s.btn, '→'), x = el('button', `${s.btn} ${s.x}`, t.close)
     prev.type = next.type = x.type = 'button'
-    prev.setAttribute('aria-label', 'Previous')
-    next.setAttribute('aria-label', 'Next')
-    x.setAttribute('aria-label', 'Close (Esc)')
+    prev.setAttribute('aria-label', t.prev)
+    next.setAttribute('aria-label', t.next)
+    x.setAttribute('aria-label', t.closeAria)
     ctl.append(prev, next, x)
     wrap.append(back, slot, img, info, hint, ctl)
     document.body.appendChild(wrap)

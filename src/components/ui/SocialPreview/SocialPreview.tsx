@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 import { usePathname } from 'next/navigation'
-import { SOCIALS, SOCIAL_PREVIEWS, type SocialId } from '@/content/site'
+import { SOCIALS, SOCIAL_PREVIEWS, type SocialId } from '@/content/socials'
 import s from './SocialPreview.module.scss'
 
 // ─── Social hover preview ─────────────────────────────────────────────────────

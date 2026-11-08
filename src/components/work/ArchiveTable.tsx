@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import type { ArchiveRow } from '@/content/cases'
 import s from './work.module.scss'
+import { useUi } from '@/i18n/client'
 
 // ─── Archive table ────────────────────────────────────────────────────────────
 // Project · Via · Category · Role · Year, from the invoices (copy doc).
@@ -11,6 +12,8 @@ import s from './work.module.scss'
 const FIRST = 20
 
 export default function ArchiveTable({ rows }: { rows: ArchiveRow[] }) {
+  const ui = useUi()
+  const t = ui.archive
   const [open, setOpen] = useState(false)
   const collapsed = !open && rows.length > FIRST
 
@@ -19,11 +22,11 @@ export default function ArchiveTable({ rows }: { rows: ArchiveRow[] }) {
       <table className={s.table}>
         <thead>
           <tr>
-            <th scope="col">Project</th>
-            <th scope="col">Via</th>
-            <th scope="col" className={s.tCat}>Category</th>
-            <th scope="col">Role</th>
-            <th scope="col" className={s.tYear}>Year</th>
+            <th scope="col">{t.project}</th>
+            <th scope="col">{t.via}</th>
+            <th scope="col" className={s.tCat}>{t.category}</th>
+            <th scope="col">{t.role}</th>
+            <th scope="col" className={s.tYear}>{t.year}</th>
           </tr>
         </thead>
         <tbody>
@@ -31,7 +34,7 @@ export default function ArchiveTable({ rows }: { rows: ArchiveRow[] }) {
             <tr key={`${r.project}-${r.via}-${r.year}`} hidden={collapsed && i >= FIRST}>
               <td className={s.tProject}>
                 {r.project}
-                {r.nda && <span className={s.ndaTag}>NDA</span>}
+                {r.nda && <span className={s.ndaTag}>{ui.index.nda}</span>}
               </td>
               <td className={`${s.tCell} ${s.tVia}`}>{r.via}</td>
               <td className={`${s.tCell} ${s.tCat}`}>{r.category}</td>
@@ -44,11 +47,11 @@ export default function ArchiveTable({ rows }: { rows: ArchiveRow[] }) {
 
       <div className={s.moreRow}>
         {collapsed ? (
-          <button type="button" className={s.more} onClick={() => setOpen(true)}>Show all · {rows.length} projects ↓</button>
+          <button type="button" className={s.more} onClick={() => setOpen(true)}>{t.showAll(rows.length)}</button>
         ) : (
-          <span className={s.more} aria-hidden="true">{rows.length} projects</span>
+          <span className={s.more} aria-hidden="true">{t.total(rows.length)}</span>
         )}
-        <span className={s.count}>{collapsed ? FIRST : rows.length} of {rows.length}</span>
+        <span className={s.count}>{t.count(collapsed ? FIRST : rows.length, rows.length)}</span>
       </div>
     </div>
   )

@@ -5,6 +5,7 @@ import Link from 'next/link'
 import clsx from 'clsx'
 import type { Img } from '@/content/cases'
 import s from './work.module.scss'
+import { useUi } from '@/i18n/client'
 
 // ─── Project index with a floating preview ────────────────────────────────────
 // Figma "Work · v0" → "02 · Índice": Nº · Project · Discipline · Client /
@@ -25,6 +26,8 @@ export type IndexRow = {
 }
 
 export default function HoverIndex({ rows, head = true, label, numbers = true }: { rows: IndexRow[]; head?: boolean; label?: string; numbers?: boolean }) {
+  const ui = useUi()
+  const t = ui.index
   const [active, setActive] = useState<number | null>(null)
   const floatRef = useRef<HTMLDivElement>(null)
   const pos = useRef({ x: 0, y: 0, tx: 0, ty: 0 })
@@ -66,11 +69,11 @@ export default function HoverIndex({ rows, head = true, label, numbers = true }:
     <div className={clsx(s.index, !numbers && s.noNumbers)} onPointerMove={onMove} onPointerLeave={() => setActive(null)} aria-label={label}>
       {head && (
         <div className={clsx(s.row, s.head)} aria-hidden="true">
-          {numbers && <span>Nº</span>}
-          <span>Project</span>
-          <span className={s.colDisc}>Discipline</span>
-          <span className={s.colClient}>Client / Studio</span>
-          <span className={s.colYear}>Year</span>
+          {numbers && <span>{t.n}</span>}
+          <span>{t.project}</span>
+          <span className={s.colDisc}>{t.discipline}</span>
+          <span className={s.colClient}>{t.client}</span>
+          <span className={s.colYear}>{t.year}</span>
         </div>
       )}
       <ol className={s.list}>
@@ -80,7 +83,7 @@ export default function HoverIndex({ rows, head = true, label, numbers = true }:
               {numbers && <span className={s.n}>{r.n}</span>}
               <span className={s.name}>
                 <span className={clsx(r.nda && s.blur)}>{r.name}</span>
-                {r.nda && <span className={s.pill}>NDA · Details on a call</span>}
+                {r.nda && <span className={s.pill}>{t.ndaPill}</span>}
                 {r.href && <span className={s.arrow} aria-hidden="true">↗</span>}
               </span>
               <span className={clsx(s.cell, s.colDisc)}>{r.discipline}</span>
@@ -103,7 +106,7 @@ export default function HoverIndex({ rows, head = true, label, numbers = true }:
                   {inner}
                 </Link>
               ) : (
-                <div className={s.row} aria-label={r.nda ? `${r.discipline}, ${r.year} · project under NDA` : undefined}>
+                <div className={s.row} aria-label={r.nda ? t.ndaRow(r.discipline, r.year) : undefined}>
                   {inner}
                 </div>
               )}

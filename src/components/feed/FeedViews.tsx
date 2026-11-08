@@ -14,6 +14,7 @@ import type { FeedItem } from '@/content/feed'
 import FeedCanvas from './canvas/FeedCanvas'
 import v from '@/components/blocks/v0.module.scss'
 import f from './feed.module.scss'
+import { useUi } from '@/i18n/client'
 
 type View = 'canvas' | 'rejilla'
 import { FEED_VIEW_KEY as KEY } from './feedView'
@@ -34,6 +35,7 @@ function decide(): View {
 const useIsoLayout = typeof window === 'undefined' ? useEffect : useLayoutEffect
 
 export default function FeedViews({ items, intro, children }: { items: FeedItem[]; intro: string; children: React.ReactNode }) {
+  const ui = useUi()
   const [view, setView] = useState<View | null>(null)
 
   useIsoLayout(() => {
@@ -54,18 +56,18 @@ export default function FeedViews({ items, intro, children }: { items: FeedItem[
   }
 
   const toggle = (
-    <div className={v.segmented} role="group" aria-label="View">
-      <span>View:</span>
+    <div className={v.segmented} role="group" aria-label={ui.view}>
+      <span>{ui.view}:</span>
       <span className={v.segment}>
-        <button type="button" aria-pressed={view === 'canvas'} onClick={() => choose('canvas')}>Canvas</button>
-        <button type="button" aria-pressed={view !== 'canvas'} onClick={() => choose('rejilla')}>Grid</button>
+        <button type="button" aria-pressed={view === 'canvas'} onClick={() => choose('canvas')}>{ui.views.canvas}</button>
+        <button type="button" aria-pressed={view !== 'canvas'} onClick={() => choose('rejilla')}>{ui.views.grid}</button>
       </span>
     </div>
   )
 
   return (
     <div className={f.views}>
-      <h1 className={f.srOnly}>Feed</h1>
+      <h1 className={f.srOnly}>{ui.feed.h1}</h1>
       <div className={f.top}>
         <p className={f.intro}>{intro}</p>
         <div className={f.toggle}>{toggle}</div>

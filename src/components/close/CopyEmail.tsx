@@ -2,13 +2,15 @@
 
 import { useEffect, useRef, useState } from 'react'
 import clsx from 'clsx'
-import { CLOSE, PERSON } from '@/content/site'
+import { PERSON_BASE as PERSON } from '@/content/person'
+import { useUi } from '@/i18n/client'
 import s from './close.module.scss'
 
 // Big email (mailto) + a "Copy" button that turns into "Copied" for 1.6 s.
 // Falls back to a hidden textarea + execCommand when the Clipboard API is
 // missing or blocked (http previews, old Safari).
 export default function CopyEmail({ size = 'xl', className }: { size?: 'xl' | 'md'; className?: string }) {
+  const ui = useUi()
   const [done, setDone] = useState(false)
   const timer = useRef<number>(0)
   useEffect(() => () => window.clearTimeout(timer.current), [])
@@ -41,10 +43,10 @@ export default function CopyEmail({ size = 'xl', className }: { size?: 'xl' | 'm
       <a className={s.emailLink} href={`mailto:${PERSON.email}`} data-no-transition>
         {PERSON.email}
       </a>
-      <button type="button" className={clsx(s.copy, done && s.copyDone)} onClick={copy} aria-label={done ? 'Email copied' : `Copy ${PERSON.email}`}>
-        <span aria-hidden="true">[ {done ? CLOSE.copied : CLOSE.copy} ]</span>
+      <button type="button" className={clsx(s.copy, done && s.copyDone)} onClick={copy} aria-label={done ? ui.copy.copied : ui.copy.copyEmail(PERSON.email)}>
+        <span aria-hidden="true">[ {done ? ui.copy.done : ui.copy.copy} ]</span>
       </button>
-      <span className={s.srOnly} role="status" aria-live="polite">{done ? 'Email copied to clipboard' : ''}</span>
+      <span className={s.srOnly} role="status" aria-live="polite">{done ? ui.copy.status : ''}</span>
     </div>
   )
 }

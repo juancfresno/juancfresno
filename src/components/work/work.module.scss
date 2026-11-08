@@ -438,3 +438,9 @@
   text-transform: uppercase;
   color: $color-text-mid;
 }
+
+// «Proyectos» (9 letters) is wider than "Work": scaled so it fits its six
+// columns on desktop and the screen on phones, never broken mid-word.
+:global(html[lang='es']) .h1 {
+  font-size: min(clamp(4rem, 11.4vw, 12rem), 22.5vw);
+}

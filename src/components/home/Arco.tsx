@@ -26,7 +26,7 @@ const mod = (n: number, m: number) => ((n % m) + m) % m
 const clamp = (v: number, a: number, b: number) => (v < a ? a : v > b ? b : v)
 const pad = (n: number) => String(n).padStart(2, '0')
 
-export default function Arco({ items, label = 'Featured work', start = 0, hint = 'Drag ↔ · Scroll' }: { items: ArcoItem[]; label?: string; start?: number; hint?: string }) {
+export default function Arco({ items, label = 'Featured work', start = 0, hint = 'Drag ↔ · Scroll', aria, open = 'open the case', workHref = '/work' }: { items: ArcoItem[]; label?: string; start?: number; hint?: string; aria?: string; open?: string; workHref?: string }) {
   const wrapRef = useRef<HTMLDivElement>(null)
   const innerRef = useRef<HTMLDivElement>(null)
   const viewRef = useRef<HTMLDivElement>(null)
@@ -131,7 +131,7 @@ export default function Arco({ items, label = 'Featured work', start = 0, hint =
       ticksRef.current?.querySelectorAll('circle').forEach((c, k) => c.setAttribute('data-on', String(k === j)))
       const t = tRef.current!
       t.href = it.href
-      t.setAttribute('aria-label', `${it.title} · ${it.meta} · open the case`)
+      t.setAttribute('aria-label', `${it.title} · ${it.meta} · ${open}`)
       cancelAnimationFrame(scrambleRaf)
       const text = it.title, t0 = performance.now(), dur = 280
       const f = (now: number) => {
@@ -253,7 +253,7 @@ export default function Arco({ items, label = 'Featured work', start = 0, hint =
             tabIndex={0}
             role="group"
             aria-roledescription="carousel"
-            aria-label={`${label}: drag, scroll or use ← →. Enter opens the case in the centre.`}
+            aria-label={aria ?? `${label}: drag, scroll or use ← →. Enter opens the case in the centre.`}
           >
             <div ref={ringRef} className={s.ring} />
           </div>
@@ -270,7 +270,7 @@ export default function Arco({ items, label = 'Featured work', start = 0, hint =
           <div className={s.hud}>
             <span ref={nRef} className={s.readN}>{first ? `${pad(start + 1)} / ${pad(items.length)}` : ''}</span>
             <p className={s.read} aria-live="polite">
-              <a ref={tRef} href={items[start]?.href ?? '/work'} className={s.readT}>{items[start]?.title}</a>{' '}
+              <a ref={tRef} href={items[start]?.href ?? workHref} className={s.readT}>{items[start]?.title}</a>{' '}
               <span ref={dRef} className={s.readD}>— {items[start]?.meta}</span>
             </p>
             <span className={s.hint} aria-hidden="true">{hint}</span>

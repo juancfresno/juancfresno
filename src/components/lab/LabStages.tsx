@@ -41,31 +41,31 @@ export function FramesStage({ caption, frames }: { caption: string; frames: { t:
   )
 }
 
-export function ButtonsStage() {
+export function ButtonsStage({ labels: L }: { labels: string[] }) {
   return (
     <div className={`${s.stage} ${s.stageButtons}`} aria-hidden="true">
       <div className={s.bCell}>
-        <span className={s.btn}>Magnetic</span><span className={s.btnDot} />
-        <p className={s.cap}>01 Magnetic</p>
+        <span className={s.btn}>{L[0]}</span><span className={s.btnDot} />
+        <p className={s.cap}>01 {L[0]}</p>
       </div>
       <div className={s.bCell}>
-        <span className={`${s.btn} ${s.btnCols}`}>{COLS.map((_, i) => <i key={i} />)}<b>Columns</b></span>
-        <p className={s.cap}>02 Columns</p>
+        <span className={`${s.btn} ${s.btnCols}`}>{COLS.map((_, i) => <i key={i} />)}<b>{L[1]}</b></span>
+        <p className={s.cap}>02 {L[1]}</p>
       </div>
       <div className={s.bCell}>
-        <span className={`${s.btn} ${s.btnRoll}`}><b>Roller</b><b>Roller</b></span>
-        <p className={s.cap}>03 Roller</p>
+        <span className={`${s.btn} ${s.btnRoll}`}><b>{L[2]}</b><b>{L[2]}</b></span>
+        <p className={s.cap}>03 {L[2]}</p>
       </div>
       <div className={s.bCell}>
         <span className={s.btn}>SCR#MB!E</span>
-        <p className={s.cap}>04 Scramble</p>
+        <p className={s.cap}>04 {L[3]}</p>
       </div>
     </div>
   )
 }
 
 const OPTS = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '11a', '11b', '11c', '11d', '11e', '11f', '12', '13', '14', '15', '16']
-export function TransitionsStage() {
+export function TransitionsStage(_: { labels?: string[] }) {
   return (
     <div className={`${s.stage} ${s.stageTrans}`} aria-hidden="true">
       <p className={s.cap}>01 — 22 · ★ 11a · 11d</p>
@@ -80,22 +80,23 @@ export function TransitionsStage() {
   )
 }
 
-const GLYPHS: { n: string; star?: boolean; kind: string }[] = [
-  { n: '01 Arc', star: true, kind: 'arc' }, { n: '02 Canvas', star: true, kind: 'canvas' },
-  { n: '03 Plates', kind: 'plates' }, { n: '04 Strip', kind: 'strip' },
-  { n: '05 Deck', kind: 'deck' }, { n: '06 Zoom grid', kind: 'zoom' },
-  { n: '07 Bars', kind: 'bars' }, { n: '08 Runway', kind: 'runway' },
+// Names come per locale (getUi(l).lab.galleries), in this order.
+const GLYPHS: { star?: boolean; kind: string }[] = [
+  { star: true, kind: 'arc' }, { star: true, kind: 'canvas' },
+  { kind: 'plates' }, { kind: 'strip' },
+  { kind: 'deck' }, { kind: 'zoom' },
+  { kind: 'bars' }, { kind: 'runway' },
 ]
 const COUNT: Record<string, number> = { arc: 5, canvas: 12, plates: 3, strip: 5, deck: 4, zoom: 9, bars: 8, runway: 3 }
-export function GalleriesStage() {
+export function GalleriesStage({ labels: L }: { labels: string[] }) {
   return (
     <div className={`${s.stage} ${s.stageGal}`} aria-hidden="true">
-      {GLYPHS.map((g) => (
-        <div key={g.n} className={s.gCell}>
+      {GLYPHS.map((g, i) => (
+        <div key={g.kind} className={s.gCell}>
           <span className={s.glyph} data-kind={g.kind}>
             {Array.from({ length: COUNT[g.kind] }, (_, i) => <i key={i} style={{ ['--i' as string]: i }} />)}
           </span>
-          <p className={`${s.cap} ${g.star ? s.capStar : ''}`}>{g.n}{g.star ? ' ★' : ''}</p>
+          <p className={`${s.cap} ${g.star ? s.capStar : ''}`}>{String(i + 1).padStart(2, '0')} {L[i]}{g.star ? ' ★' : ''}</p>
         </div>
       ))}
     </div>

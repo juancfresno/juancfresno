@@ -2,29 +2,27 @@
 
 import { useState } from 'react'
 import s from './about.module.scss'
+import { useUi } from '@/i18n/client'
 
 // "View: Both · Professional · Personal" (Figma About v1.0, 6888:1169).
 // Both = the two views side by side with a 1 px divider (stacked on mobile);
 // the other two show one. Both panes are always in the HTML; the hidden one
 // gets `hidden`, so search engines and screen readers still have both.
 type View = 'both' | 'professional' | 'personal'
-const VIEWS: { id: View; label: string }[] = [
-  { id: 'both', label: 'Both' },
-  { id: 'professional', label: 'Professional' },
-  { id: 'personal', label: 'Personal' },
-]
+const VIEWS: View[] = ['both', 'professional', 'personal']
 
 export default function AboutViews({ title, professional, personal }: { title: React.ReactNode; professional: React.ReactNode; personal: React.ReactNode }) {
+  const ui = useUi()
   const [view, setView] = useState<View>('both')
 
   return (
     <>
       <div className={s.heroRow}>
         {title}
-        <div className={s.toggle} role="group" aria-label="About view">
-          <span className={s.toggleLabel}>View</span>
+        <div className={s.toggle} role="group" aria-label={ui.views.aboutGroup}>
+          <span className={s.toggleLabel}>{ui.view}</span>
           {VIEWS.map((x) => (
-            <button key={x.id} type="button" aria-pressed={view === x.id} onClick={() => setView(x.id)}>{x.label}</button>
+            <button key={x} type="button" aria-pressed={view === x} onClick={() => setView(x)}>{ui.views[x]}</button>
           ))}
         </div>
       </div>

@@ -8,6 +8,9 @@ import ElasticLine from '@/components/ui/ElasticLine/ElasticLine'
 import ThemeToggle from '@/components/ui/ThemeToggle/ThemeToggle'
 import NavClock from '@/components/ui/NavClock/NavClock'
 import { usePageTransition } from '@/providers/PageTransition'
+import LocaleSwitch from '@/components/ui/LocaleSwitch/LocaleSwitch'
+import { useHref, useUi } from '@/i18n/client'
+import { parsePath } from '@/i18n/config'
 
 // ─── Scramble character pool ───────────────────────────────────────────────────
 const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%?'
@@ -154,17 +157,15 @@ const NavArrow = () => (
 )
 
 // ─── Nav links data ───────────────────────────────────────────────────────────
+// Internal paths; labels per locale (getUi(l).nav.links), hrefs via localePath.
 const NAV_LINKS = [
-  { label: 'About',   href: '/about'   },
-  { label: 'Work',    href: '/work'    },
-  { label: 'Feed',    href: '/feed'    },
-  { label: 'Lab',     href: '/lab'     },
-  { label: 'Journal', href: '/journal' },
-  { label: 'Contact', href: '/contact' },
+  { id: 'about',   href: '/about'   },
+  { id: 'work',    href: '/work'    },
+  { id: 'feed',    href: '/feed'    },
+  { id: 'lab',     href: '/lab'     },
+  { id: 'journal', href: '/journal' },
+  { id: 'contact', href: '/contact' },
 ] as const
-
-// ─── Mobile bottom tab bar — same links as desktop (face/wordmark go home) ──
-const MOBILE_LINKS = NAV_LINKS
 
 // ─── NavLinkItem — scramble + chip + transition ───────────────────────────────
 function NavLinkItem({
@@ -206,7 +207,12 @@ export default function Nav() {
   const [hidden,   setHidden]   = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const lastY    = useRef(0)
-  const pathname = usePathname()
+  const ui       = useUi()
+  const href     = useHref()
+  // Internal path (no /es, no rewritten /en) for the active state.
+  const pathname = parsePath(usePathname() || '/').path
+  const links    = NAV_LINKS.map((x) => ({ ...x, label: ui.nav.links[x.id], url: href(x.href) }))
+  const home     = href('/')
 
   useEffect(() => {
     const onScroll = () => {
@@ -226,13 +232,13 @@ export default function Nav() {
 
   const logoLink = (
     <a
-      href="/"
+      href={home}
       className={s.logo}
-      aria-label="Fresno — home"
+      aria-label={ui.nav.logo}
       onClick={(e) => {
         if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
         e.preventDefault()
-        navigate('/')
+        navigate(home)
       }}
     >
       <GlitchLogo />
@@ -241,13 +247,13 @@ export default function Nav() {
 
   const faceLink = (
     <a
-      href="/"
+      href={home}
       className={s.face}
-      aria-label="Home"
+      aria-label={ui.nav.home}
       onClick={(e) => {
         if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
         e.preventDefault()
-        navigate('/')
+        navigate(home)
       }}
     >
       <GlitchFace />
@@ -262,18 +268,19 @@ export default function Nav() {
           <div className={s.left}>
             {faceLink}
 
-            <nav className={s.navMenu} aria-label="Main">
-              {NAV_LINKS.map(({ label, href }) => (
+            <nav className={s.navMenu} aria-label={ui.nav.main}>
+              {links.map(({ label, href, url }) => (
                 <NavLinkItem
                   key={href}
                   label={label}
-                  href={href}
+                  href={url}
                   active={pathname === href || pathname.startsWith(href + '/')}
                 />
               ))}
             </nav>
 
             <ThemeToggle className={s.theme} />
+            <LocaleSwitch className={s.lang} />
           </div>
 
           {/* ── Right: local time + shortcuts, then the wordmark ── */}
@@ -282,7 +289,7 @@ export default function Nav() {
             <button
               type="button"
               className={s.help}
-              aria-label="Keyboard shortcuts"
+              aria-label={ui.nav.shortcuts}
               aria-keyshortcuts="?"
               onClick={() => window.dispatchEvent(new Event('fresno:shortcuts'))}
             >
@@ -297,19 +304,19 @@ export default function Nav() {
       </header>
 
       {/* ── Mobile bottom tab bar ── */}
-      <nav className={s.bottomBar} aria-label="Main (mobile)">
-          {MOBILE_LINKS.map(({ label, href }) => {
+      <nav className={s.bottomBar} aria-label={ui.nav.mainMobile}>
+          {links.map(({ label, href, url }) => {
             const isActive = pathname === href || pathname.startsWith(href + '/')
             return (
               <a
                 key={href}
-                href={href}
+                href={url}
                 className={clsx(s.bottomTab, isActive && s.bottomTabActive)}
                 aria-current={isActive ? 'page' : undefined}
                 onClick={(e) => {
                   if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
                   e.preventDefault()
-                  navigate(href)
+                  navigate(url)
                 }}
               >
                 {label}

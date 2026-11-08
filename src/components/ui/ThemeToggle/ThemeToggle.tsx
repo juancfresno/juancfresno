@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import clsx from 'clsx'
 import s from './ThemeToggle.module.scss'
+import { useUi } from '@/i18n/client'
 
 // ─── Theme toggle ─────────────────────────────────────────────────────────────
 // Dark is the default; the choice is saved in localStorage ('theme') and
@@ -21,6 +22,7 @@ function apply(theme: Theme) {
 }
 
 export default function ThemeToggle({ className }: { className?: string }) {
+  const ui = useUi()
   const [theme, setTheme] = useState<Theme>('dark')
 
   useEffect(() => {
@@ -46,7 +48,7 @@ export default function ThemeToggle({ className }: { className?: string }) {
   }, [])
 
   return (
-    <div className={clsx(s.toggle, className)} role="group" aria-label="Colour theme">
+    <div className={clsx(s.toggle, className)} role="group" aria-label={ui.theme.group}>
       {THEMES.map((t, i) => (
         <span key={t} className={s.item}>
           {i > 0 && <span className={s.sep} aria-hidden="true">/</span>}
@@ -56,7 +58,7 @@ export default function ThemeToggle({ className }: { className?: string }) {
             aria-pressed={theme === t}
             onClick={() => { setTheme(t); apply(t) }}
           >
-            {t}
+            {ui.theme[t]}
           </button>
         </span>
       ))}

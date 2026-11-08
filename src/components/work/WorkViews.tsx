@@ -5,6 +5,7 @@ import Link from 'next/link'
 import HoverIndex, { type IndexRow } from './HoverIndex'
 import s from './work.module.scss'
 import v from '@/components/blocks/v0.module.scss'
+import { useUi } from '@/i18n/client'
 
 // ─── Lista / Portadas ─────────────────────────────────────────────────────────
 // State lives in the URL (?view=covers; the old ?view=portadas still works) and is remembered per viewer in
@@ -14,6 +15,7 @@ type View = 'lista' | 'portadas'
 const KEY = 'work:view'
 
 export default function WorkViews({ rows }: { rows: IndexRow[] }) {
+  const ui = useUi()
   const [view, setView] = useState<View>('lista')
 
   useEffect(() => {
@@ -36,16 +38,16 @@ export default function WorkViews({ rows }: { rows: IndexRow[] }) {
 
   return (
     <div className={s.views}>
-      <div className={v.chipToggle} role="group" aria-label="View">
-        <span>View</span>
-        <button type="button" aria-pressed={view === 'lista'} onClick={() => choose('lista')}>List</button>
-        <button type="button" aria-pressed={view === 'portadas'} onClick={() => choose('portadas')}>Covers</button>
+      <div className={v.chipToggle} role="group" aria-label={ui.view}>
+        <span>{ui.view}</span>
+        <button type="button" aria-pressed={view === 'lista'} onClick={() => choose('lista')}>{ui.views.list}</button>
+        <button type="button" aria-pressed={view === 'portadas'} onClick={() => choose('portadas')}>{ui.views.covers}</button>
       </div>
 
       {view === 'lista' ? (
-        <HoverIndex rows={rows} label="Projects" />
+        <HoverIndex rows={rows} label={ui.index.projects} />
       ) : (
-        <ul className={s.covers} aria-label="Projects as covers">
+        <ul className={s.covers} aria-label={ui.index.covers}>
           {rows.map((r, i) => {
             const meta = (
               <div className={s.coverMeta}>
@@ -68,7 +70,7 @@ export default function WorkViews({ rows }: { rows: IndexRow[] }) {
                 ) : (
                   <div className={s.cover}>
                     <div className={`${s.coverMedia} ${s.coverNda}`}>
-                      <span className={s.pill}>NDA</span>
+                      <span className={s.pill}>{ui.index.nda}</span>
                     </div>
                     {meta}
                   </div>

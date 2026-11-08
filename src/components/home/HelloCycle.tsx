@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { HOME } from '@/content/site'
 import s from './home.module.scss'
 
 // "Hello" in the hero: on hover (or keyboard focus) it cycles through the
@@ -9,12 +8,12 @@ import s from './home.module.scss'
 // touch, each tap advances one word. Reduced motion = static "Hello".
 // The slot's width eases to each word's measured width, so the rest of the
 // line glides instead of jumping (and there is no gap at rest). Screen
-// readers get "Hello," only; the variants are aria-hidden.
-const WORDS = HOME.greetings
+// readers get the first word only ("Hello," / "Hola,"); the variants are
+// aria-hidden. `words` = HOME.greetings of the locale (the first one is home).
 const STEP = 350
 const useIsoLayout = typeof window === 'undefined' ? useEffect : useLayoutEffect
 
-export default function HelloCycle() {
+export default function HelloCycle({ words: WORDS }: { words: string[] }) {
   const [i, setI] = useState(0)
   const [active, setActive] = useState(false)
   const [widths, setWidths] = useState<number[] | null>(null)

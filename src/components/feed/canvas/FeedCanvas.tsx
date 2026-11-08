@@ -15,6 +15,7 @@ import { TILE, makeLayout, visible, gridMetrics, mod, type Layout, type Placed }
 import { createRenderer, type DrawPiece, type Renderer, type Theme } from './gl'
 import { createZoom } from './zoom'
 import c from './FeedCanvas.module.scss'
+import { useLocale, useUi } from '@/i18n/client'
 
 const MAXV = 1.8 // px/ms cap for the release inertia
 const THROW = 260 // ms of travel per px/ms of release speed
@@ -52,6 +53,8 @@ function readTheme(): Theme {
 }
 
 export default function FeedCanvas({ items, active }: Props) {
+  const ui = useUi()
+  const locale = useLocale()
   const stageRef = useRef<HTMLDivElement>(null)
   const glRef = useRef<HTMLCanvasElement>(null)
   const domRef = useRef<HTMLDivElement>(null)
@@ -142,7 +145,7 @@ export default function FeedCanvas({ items, active }: Props) {
       MH = Math.round(MW * TILE.rows / TILE.cols)
       for (const cnv of [mini, mapBase]) { cnv.width = MW * 2; cnv.height = MH * 2 }
       mini.style.width = `${MW}px`; mini.style.height = `${MH}px`
-      tileCap.textContent = `Tile ${Math.round(L.TW)} × ${Math.round(L.TH)} · repeats`
+      tileCap.textContent = ui.feed.tile(Math.round(L.TW), Math.round(L.TH))
       const x = mapBase.getContext('2d')!, s = (MW * 2) / TILE.cols
       const cs = getComputedStyle(stage)
       x.clearRect(0, 0, mapBase.width, mapBase.height)
@@ -286,7 +289,7 @@ export default function FeedCanvas({ items, active }: Props) {
     }
 
     // ── zoom ──
-    const zoom = createZoom(items, {
+    const zoom = createZoom(items, ui, {
       rectOf: (idx) => {
         const b = stage.getBoundingClientRect()
         let best: (typeof placed)[number] | null = null, bd = Infinity
@@ -427,7 +430,7 @@ export default function FeedCanvas({ items, active }: Props) {
       delete stage.dataset.mode
       if (window.__feedCanvas === stats) delete window.__feedCanvas
     }
-  }, [active, items])
+  }, [active, items, locale])
 
   return (
     <div
@@ -436,7 +439,7 @@ export default function FeedCanvas({ items, active }: Props) {
       tabIndex={0}
       role="region"
       aria-roledescription="canvas"
-      aria-label={`Infinite canvas with ${items.length} pieces. Drag, use the wheel or the arrow keys to move; Enter opens the piece in the centre; 0 goes back home. The Grid view lists every piece.`}
+      aria-label={ui.feed.canvasAria(items.length)}
     >
       <canvas ref={glRef} className={c.gl} aria-hidden="true" data-wf-label={`CANVAS · ${items.length}`} />
       <div ref={domRef} className={c.dom} aria-hidden="true" hidden />
@@ -444,7 +447,7 @@ export default function FeedCanvas({ items, active }: Props) {
       <div ref={capsRef} className={c.caps} aria-hidden="true" />
       <span className={c.cross} aria-hidden="true" />
       <div className={c.hud} data-hud aria-hidden="true">
-        <span className={c.chip}>Feed · {items.length} pieces<span className={c.hint}> · Drag ↔ ↕</span></span>
+        <span className={c.chip}>{ui.feed.hud(items.length)}<span className={c.hint}>{ui.feed.hudHint}</span></span>
         <span ref={xyRef} className={c.chip}>X 0 · Y 0</span>
         <span ref={velRef} className={`${c.chip} ${c.vel}`}>VEL → 0 ↓ 0 PX/F</span>
       </div>
