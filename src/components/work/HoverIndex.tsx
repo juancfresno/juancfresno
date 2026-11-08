@@ -7,8 +7,8 @@ import type { Img } from '@/content/cases'
 import s from './work.module.scss'
 
 // ─── Project index with a floating preview ────────────────────────────────────
-// Figma "Work · v0" → "02 · Índice": Nº · Proyecto · Disciplina · Cliente /
-// estudio · Año. On pointer devices a thumbnail follows the cursor over rows
+// Figma "Work · v0" → "02 · Índice": Nº · Project · Discipline · Client /
+// Studio · Year (`numbers={false}` drops Nº, as on Home). On pointer devices a thumbnail follows the cursor over rows
 // that have a cover (plus a small "Name · Year" label). On touch devices each
 // row shows its own small fixed thumbnail instead. NDA rows: name and client
 // blurred, NDA pill, no link and no preview.
@@ -24,7 +24,7 @@ export type IndexRow = {
   cover?: Img
 }
 
-export default function HoverIndex({ rows, head = true, label }: { rows: IndexRow[]; head?: boolean; label?: string }) {
+export default function HoverIndex({ rows, head = true, label, numbers = true }: { rows: IndexRow[]; head?: boolean; label?: string; numbers?: boolean }) {
   const [active, setActive] = useState<number | null>(null)
   const floatRef = useRef<HTMLDivElement>(null)
   const pos = useRef({ x: 0, y: 0, tx: 0, ty: 0 })
@@ -63,24 +63,24 @@ export default function HoverIndex({ rows, head = true, label }: { rows: IndexRo
   const current = active !== null ? rows[active] : null
 
   return (
-    <div className={s.index} onPointerMove={onMove} onPointerLeave={() => setActive(null)} aria-label={label}>
+    <div className={clsx(s.index, !numbers && s.noNumbers)} onPointerMove={onMove} onPointerLeave={() => setActive(null)} aria-label={label}>
       {head && (
         <div className={clsx(s.row, s.head)} aria-hidden="true">
-          <span>Nº</span>
-          <span>Proyecto</span>
-          <span className={s.colDisc}>Disciplina</span>
-          <span className={s.colClient}>Cliente / estudio</span>
-          <span className={s.colYear}>Año</span>
+          {numbers && <span>Nº</span>}
+          <span>Project</span>
+          <span className={s.colDisc}>Discipline</span>
+          <span className={s.colClient}>Client / Studio</span>
+          <span className={s.colYear}>Year</span>
         </div>
       )}
       <ol className={s.list}>
         {rows.map((r, i) => {
           const inner = (
             <>
-              <span className={s.n}>{r.n}</span>
+              {numbers && <span className={s.n}>{r.n}</span>}
               <span className={s.name}>
                 <span className={clsx(r.nda && s.blur)}>{r.name}</span>
-                {r.nda && <span className={s.pill}>NDA</span>}
+                {r.nda && <span className={s.pill}>NDA · Details on a call</span>}
                 {r.href && <span className={s.arrow} aria-hidden="true">↗</span>}
               </span>
               <span className={clsx(s.cell, s.colDisc)}>{r.discipline}</span>
@@ -103,7 +103,7 @@ export default function HoverIndex({ rows, head = true, label }: { rows: IndexRo
                   {inner}
                 </Link>
               ) : (
-                <div className={s.row} aria-label={r.nda ? `${r.discipline}, ${r.year} · proyecto bajo NDA` : undefined}>
+                <div className={s.row} aria-label={r.nda ? `${r.discipline}, ${r.year} · project under NDA` : undefined}>
                   {inner}
                 </div>
               )}
