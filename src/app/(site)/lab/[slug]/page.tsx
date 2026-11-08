@@ -53,7 +53,7 @@ export default async function ExperimentPage({ params }: { params: Promise<Param
           {e.repo ? (
             <a className={l.action} href={e.repo} target="_blank" rel="noreferrer">View on GitHub ↗</a>
           ) : (
-            <span className={s.text}>GitHub <Pending>public repo</Pending></span>
+            <span className={s.text}>GitHub <Pending>repo public</Pending></span>
           )}
         </div>
         <pre className={l.code}><code>{html}</code></pre>

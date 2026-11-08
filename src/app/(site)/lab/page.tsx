@@ -1,11 +1,12 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { LAB, LAB_FEATURED, LAB_LABELS, EXPERIMENTS, INTROS, META } from '@/content/site'
-import V0Section from '@/components/blocks/V0Section'
+import { LAB, LAB_FEATURED, LAB_FEATURED_SPECS, LAB_FEATURED_FRAMES, LAB_LABELS, LAB_LOG, EXPERIMENTS, INTROS, META } from '@/content/site'
 import ContactBlock from '@/components/blocks/ContactBlock'
 import Pending from '@/components/blocks/Pending'
+import ElasticLine from '@/components/ui/ElasticLine/ElasticLine'
+import { FramesStage, ButtonsStage, TransitionsStage, GalleriesStage } from '@/components/lab/LabStages'
 import v from '@/components/blocks/v0.module.scss'
-import l from '@/components/lab/lab.module.scss'
+import l from '@/components/lab/labv1.module.scss'
 
 export const metadata: Metadata = {
   title: META.lab.title,
@@ -13,76 +14,114 @@ export const metadata: Metadata = {
   alternates: { canonical: '/lab' },
 }
 
-// Lab v1.0 (copy doc): intro, featured 002 Transitions (11a runs this site),
-// experiments with a one-line "how it's built", own products, resources.
-// Layout of our own until the Figma "↪ Visual v1.0" frame lands.
+const STAGES: Record<string, () => React.ReactElement> = { botones: ButtonsStage, transiciones: TransitionsStage, galerias: GalleriesStage }
+
+function Head({ label, link }: { label: string; link?: React.ReactNode }) {
+  return (
+    <div className={l.head}>
+      <ElasticLine className={l.headRule} />
+      <div className={l.headRowLabel}><p>{label}</p>{link}</div>
+    </div>
+  )
+}
+
+// Lab v1.0 — Figma "Lab · v1.0 · 1680" (6886:981): giant "Lab" + page index
+// + log, intro; featured 002 with the 4 frames of 11a and a specs table;
+// experiments as specimen cards with drawn stages; own products as a shelf
+// with status dots; resources; global close.
 export default function LabPage() {
   const F = LAB_FEATURED
 
   return (
     <div className={v.page}>
-      <h1 className={v.srOnly}>Lab</h1>
-      <p className={v.intro}>{INTROS.lab}</p>
+      <header className={`${l.mod} ${l.header}`}>
+        <div className={l.headRow}>
+          <h1 className={l.h1}>Lab</h1>
+          <ul className={l.index} aria-label="On this page">
+            {EXPERIMENTS.map((e) => (
+              <li key={e.slug}>
+                <Link href={`/lab/${e.slug}`}>
+                  <span className={l.ixN}>{e.n}</span>
+                  <span className={l.ixName}>{e.name}</span>
+                  <span className={l.ixK} data-star={e.slug === F.slug || undefined}>{e.kind}{e.slug === F.slug ? ' · ★' : ''}</span>
+                </Link>
+              </li>
+            ))}
+            <li><a href="#products"><span className={l.ixN}>—</span><span className={l.ixName}>Own products</span><span className={l.ixK}>{String(LAB.length).padStart(2, '0')}</span></a></li>
+            <li><a href="#resources"><span className={l.ixN}>—</span><span className={l.ixName}>Resources</span><span className={l.ixK}>Open source</span></a></li>
+          </ul>
+          <div className={l.log}>{LAB_LOG.map((x) => <p key={x}>{x}</p>)}</div>
+        </div>
+        <div className={l.intro}><p>{INTROS.lab}</p></div>
+      </header>
 
-      <V0Section label={LAB_LABELS.featured}>
-        <article className={l.featured}>
-          <Link href={`/lab/${F.slug}`} className={l.featuredVisual} aria-label="Open 002 · Transitions" tabIndex={-1}>
-            <span className={l.wire} aria-hidden="true">
-              {Array.from({ length: 12 }, (_, i) => <span key={i} className={l.wireCol} style={{ ['--i' as string]: i }} />)}
-              <span className={`${l.wireBox} ${l.wireBoxA}`}><em>H1 · 40/46</em></span>
-              <span className={`${l.wireBox} ${l.wireBoxB}`}><em>P · 18</em></span>
-              <span className={`${l.wireBox} ${l.wireBoxC}`}><em>IMG 16:9</em></span>
-            </span>
-          </Link>
-          <div className={l.featuredText}>
-            <p className={l.featuredMeta}>{F.meta}</p>
-            <h2 className={l.featuredTitle}>{F.head}</h2>
-            <p className={l.featuredBody}>{F.text}</p>
-            <p className={l.featuredLinks}>
-              <Link href={`/lab/${F.slug}`} className={v.label}>{F.live}</Link>
-              <span className={v.label}>{F.code}<Pending>public repo</Pending></span>
+      <section className={`${l.mod} ${l.alt}`} aria-labelledby="lab-featured">
+        <Head label={LAB_LABELS.featured} link={<Link href={`/lab/${F.slug}`}>{LAB_LABELS.runs}</Link>} />
+        <div className={l.specimen}>
+          <FramesStage caption="Lab 002 · option 11a · the real 12-col grid (64 / 16 at 1680) in the G orange" frames={LAB_FEATURED_FRAMES} />
+          <div className={l.info}>
+            <p className={l.bigN} aria-hidden="true">002</p>
+            <h2 id="lab-featured" className={l.infoTitle}><span className={v.srOnly}>002 · </span>Transitions</h2>
+            <p className={l.infoMeta}>{F.meta}</p>
+            <p className={l.body}>{F.text}</p>
+            <ul className={l.specs}>
+              {LAB_FEATURED_SPECS.map((x) => (
+                <li key={x.k} data-accent={x.accent || undefined}><span>{x.k}</span><span>{x.v}</span></li>
+              ))}
+            </ul>
+            <p className={l.links}>
+              <Link href={`/lab/${F.slug}`}>{F.live}</Link>
+              <span>{F.code}</span>
+              <Pending>repo public</Pending>
             </p>
           </div>
-        </article>
-      </V0Section>
+        </div>
+      </section>
 
-      <V0Section label={LAB_LABELS.experiments}>
-        <ol className={l.rows}>
-          {EXPERIMENTS.map((e) => (
-            <li key={e.slug}>
-              <Link href={`/lab/${e.slug}`} className={l.exp}>
-                <span className={l.n}>{e.n}</span>
-                <span className={l.expMain}>
-                  <span className={l.rowName}>{e.name} <span aria-hidden="true" className={l.arrow}>↗</span></span>
-                  <span className={l.expWhat}>{e.what}</span>
-                </span>
-                <span className={l.spec}>{e.kind}</span>
-                <span className={l.spec}>{e.built}</span>
-                <span className={`${l.spec} ${l.end}`}>{e.year}</span>
-              </Link>
-            </li>
-          ))}
-        </ol>
-      </V0Section>
+      <section className={l.mod} aria-label="Experiments">
+        <Head label={LAB_LABELS.experiments} />
+        <ul className={l.cards}>
+          {EXPERIMENTS.map((e) => {
+            const Stage = STAGES[e.slug]
+            return (
+              <li key={e.slug}>
+                <Link href={`/lab/${e.slug}`} className={l.card}>
+                  {Stage && <Stage />}
+                  <span className={l.cardTitle}><span className={l.cardN}>{e.n}</span><span className={l.cardName}>{e.name}</span></span>
+                  <span className={l.cardMeta}>{e.kind} · {e.year}</span>
+                  <span className={l.cardText}>{e.card}</span>
+                  <span className={l.built}><span>How it’s built</span><span>{e.built}</span></span>
+                  {e.note && <span className={l.note}>{e.note}</span>}
+                </Link>
+              </li>
+            )
+          })}
+        </ul>
+      </section>
 
-      <V0Section label={LAB_LABELS.products}>
-        <ol className={l.rows}>
+      <section id="products" className={`${l.mod} ${l.alt}`} aria-label="Own products">
+        <Head label={LAB_LABELS.products} />
+        <ol className={l.shelf}>
           {LAB.map((x, i) => (
-            <li key={x.name}>
-              <div className={l.row}>
-                <span className={l.n}>{String(i + 1).padStart(2, '0')}</span>
-                <span className={l.rowName}>{x.name}</span>
-                <span className={l.whatCell}>{x.what ?? <Pending>one line · Juan</Pending>}</span>
-                <span className={`${l.spec} ${l.end}`}>{x.status}</span>
-              </div>
+            <li key={x.name} className={l.product}>
+              <span className={l.mono10}>{String(i + 1).padStart(2, '0')}</span>
+              <span className={l.pName}>{x.name}</span>
+              <span className={l.pWhat} data-pending={x.what ? undefined : ''}>
+                {x.what ?? <>One line from Juan. <Pending>one line</Pending></>}
+              </span>
+              <span className={l.pStatus} data-dot={x.dot}><i aria-hidden="true" />{x.status}</span>
             </li>
           ))}
         </ol>
-      </V0Section>
+      </section>
 
-      <V0Section label={LAB_LABELS.resources}>
-        <p className={v.mono}>{LAB_LABELS.openSource}<Pending>public repo</Pending></p>
-      </V0Section>
+      <section id="resources" className={l.mod} aria-label="Resources">
+        <Head label={LAB_LABELS.resources} />
+        <div className={l.resRow}>
+          <p className={l.resLink}>{LAB_LABELS.openSource}<Pending>repo public</Pending></p>
+          <code className={l.repo}>{LAB_LABELS.repo}</code>
+        </div>
+      </section>
 
       <ContactBlock />
     </div>
