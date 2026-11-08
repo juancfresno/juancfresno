@@ -16,21 +16,17 @@ export default function ContactBlock() {
     <section className={s.close} aria-labelledby="close-title">
       <ElasticLine className={s.rule} />
       <p className={s.label}>{CLOSE.label}</p>
-      <div className={s.grid}>
-        <div className={s.head}>
-          <h2 id="close-title" className={s.headline}>{CLOSE.headline}</h2>
-          <p className={s.sub}>{CLOSE.sub}</p>
-        </div>
-        <div className={s.actions}>
-          <CopyEmail />
-          <CallLink label={CLOSE.call} />
-        </div>
+      <h2 id="close-title" className={s.headline}>{CLOSE.headline.replace(', ', ',\n')}</h2>
+      <p className={s.sub}>{CLOSE.sub}</p>
+      <div className={s.actions}>
+        <CopyEmail />
+        <CallLink label={CLOSE.call} />
       </div>
       <div className={s.foot}>
         <p className={s.mono}>
-          <NavClock /> · {PERSON.replies.text}{PERSON.replies.pending && <Pending>confirm</Pending>}
+          <NavClock /> · {PERSON.replies.text}{PERSON.replies.pending && <Pending>24 h</Pending>}
         </p>
-        <p className={s.small}>{CLOSE.small}</p>
+        <p className={`${s.small} ${s.smallBody}`}>{CLOSE.small}</p>
         <Socials />
       </div>
     </section>

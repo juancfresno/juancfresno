@@ -20,6 +20,9 @@
   --c-line:       #3c3c3a;   // row and section rules (Figma v0)
   --c-line-hi:    #{$raw-pearl};
   --c-overlay:    rgba(16, 16, 14, 0.92); // chips inside images
+  --c-stage:      #0c0c0b;   // media stages inside alt modules (Figma v1.0 #0E0E0E)
+  --c-faint:      #5a5a56;   // faint labels (Figma v1.0)
+  --c-g:          #ff5c1f;   // G orange: grid, annotations, live dots
   color-scheme: dark;
 }
 
@@ -37,6 +40,9 @@
   --c-line:       rgba(16, 16, 14, 0.16);
   --c-line-hi:    #{$raw-ink};
   --c-overlay:    rgba(252, 252, 247, 0.92);
+  --c-stage:      #e9e8e1;
+  --c-faint:      rgba(16, 16, 14, 0.4);
+  --c-g:          #e5480e;
   color-scheme: light;
 }
 

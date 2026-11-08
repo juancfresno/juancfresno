@@ -9,8 +9,8 @@
   display: flex;
   flex-direction: column;
   gap: $space-4;
-  padding-top: clamp(4rem, 8vw, 8rem);
-  padding-bottom: clamp(4rem, 7vw, 7rem);
+  padding-top: clamp(5rem, 9.5vw, 10rem);
+  padding-bottom: clamp(4.5rem, 7vw, 7.5rem);
   color: $color-text;
 }
 
@@ -25,51 +25,34 @@
   color: $color-text-hi;
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  column-gap: $space-4;
-  row-gap: clamp(2.5rem, 5vw, 4rem);
-  padding-top: clamp(2rem, 4vw, 4rem);
-
-  @include respond-to(md) { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-}
-
-.head {
-  grid-column: 1 / span 7;
-  display: flex;
-  flex-direction: column;
-  gap: $space-6;
-
-  @include respond-to(lg) { grid-column: 1 / -1; }
-}
-
 .headline {
+  margin-top: clamp(2.5rem, 4.3vw, 4.5rem);
   font-family: $font-body;
   font-weight: $fw-light;
-  font-size: clamp(2.25rem, 4.2vw, 4.75rem);
-  line-height: 1.02;
-  letter-spacing: -0.03em;
-  color: $color-text;
-  max-width: 14ch;
-  text-wrap: balance;
+  font-size: clamp(2.5rem, 6.2vw, 6.5rem);
+  line-height: 0.96;
+  letter-spacing: -0.04em;
+  color: $color-text-hi;
+  white-space: pre-line;
 }
 
 .sub {
+  margin-top: 36px;
   font-family: $font-body;
-  font-weight: $fw-light;
-  font-size: clamp(1.0625rem, 0.6vw + 0.9rem, 1.375rem);
-  line-height: 1.4;
+  font-size: clamp(1.0625rem, 0.5vw + 0.95rem, 1.25rem);
+  line-height: 1.45;
+  letter-spacing: -0.01em;
   color: $color-text-mid;
-  max-width: 34ch;
+  max-width: 40rem;
 }
 
 .actions {
-  grid-column: 1 / -1;
+  margin-top: clamp(4rem, 6.7vw, 7rem);
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: $space-6;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: $space-6 $space-8;
 }
 
 // ─── Email + Copy ────────────────────────────────────────────────────────────
@@ -84,9 +67,9 @@
 .emailLink {
   font-family: $font-body;
   font-weight: $fw-light;
-  font-size: clamp(1.875rem, 6.4vw, 7.5rem);
-  line-height: 1;
-  letter-spacing: -0.04em;
+  font-size: clamp(1.75rem, 3.8vw, 4rem);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
   color: $color-text;
   text-decoration: none;
   overflow-wrap: anywhere;
@@ -97,30 +80,34 @@
   @include focus-ring($color-text);
 }
 
-.emailMd .emailLink { font-size: clamp(1.5rem, 3vw, 3rem); letter-spacing: -0.03em; }
+.emailMd .emailLink { font-size: clamp(1.5rem, 2.15vw, 2.25rem); letter-spacing: -0.02em; }
 
 .copy {
   flex-shrink: 0;
-  padding: 0.35rem 0.1rem;
+  align-self: center;
+  padding: 4px 8px;
+  border: 1px solid $color-text-mid;
+  border-radius: 2px;
   font-family: $font-mono;
-  font-size: 0.75rem;
-  line-height: 1;
+  font-size: 0.625rem;
+  letter-spacing: 0.03em;
+  line-height: 1.2;
   text-transform: uppercase;
-  color: $color-text-mid;
+  color: $color-text;
   cursor: pointer;
-  transition: color $duration-fast;
+  transition: background $duration-fast, color $duration-fast, border-color $duration-fast;
 
-  &:hover, &:focus-visible { color: $color-text; }
+  &:hover, &:focus-visible { border-color: $color-text; }
   @include focus-ring($color-text);
 }
 
-.copyDone { color: $color-text; }
+.copyDone { background: $color-text; color: $color-bg; border-color: $color-text; }
 
 .call {
   display: inline-flex;
   align-items: center;
   font-family: $font-body;
-  font-size: clamp(1.0625rem, 0.6vw + 0.9rem, 1.375rem);
+  font-size: clamp(1.125rem, 0.6vw + 0.95rem, 1.375rem);
   color: $color-text;
   text-decoration: underline;
   text-decoration-thickness: 1px;
@@ -129,7 +116,7 @@
   transition: text-decoration-color $duration-fast;
 
   &:is(a):hover, &:is(a):focus-visible { text-decoration-color: currentColor; }
-  &[aria-disabled='true'] { color: $color-text-mid; text-decoration: none; }
+  &[aria-disabled='true'] { text-decoration-color: currentColor; }
   @include focus-ring($color-text);
 }
 
@@ -140,21 +127,25 @@
   align-items: center;
   justify-content: space-between;
   gap: $space-4 $space-8;
-  margin-top: clamp(3rem, 6vw, 5rem);
-  padding-top: $space-4;
+  margin-top: clamp(3rem, 4.8vw, 5rem);
+  padding-top: 20px;
   border-top: 1px solid $color-line;
 }
 
 .mono, .small {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 0;
   font-family: $font-mono;
   font-size: 0.6875rem;
   line-height: 1.4;
-  text-transform: uppercase;
+  letter-spacing: 0.02em;
   color: $color-text-mid;
   font-variant-numeric: tabular-nums;
 }
 
-.small { text-transform: none; font-family: $font-body; font-size: 0.875rem; }
+.smallBody { font-family: $font-body; font-size: 0.875rem; letter-spacing: 0; }
 
 .socials {
   display: flex;
@@ -165,8 +156,9 @@
   a {
     font-family: $font-mono;
     font-size: 0.6875rem;
+    letter-spacing: 0.02em;
     text-transform: uppercase;
-    color: $color-text-mid;
+    color: $color-text;
     text-decoration: none;
     transition: color $duration-fast;
 
@@ -175,23 +167,33 @@
   }
 }
 
-// ─── Case close ──────────────────────────────────────────────────────────────
+// ─── Case close (v1/close Type=Case) ────────────────────────────────────────
 .caseClose {
   @include container;
   display: flex;
   flex-direction: column;
-  gap: $space-6;
-  padding-top: clamp(4rem, 8vw, 8rem);
-  padding-bottom: clamp(4rem, 8vw, 8rem);
+  gap: $space-4;
+  padding-top: clamp(4rem, 6vw, 6rem);
+  padding-bottom: clamp(4.5rem, 7vw, 7.5rem);
+}
+
+.caseRow {
+  margin-top: clamp(2rem, 3vw, 3rem);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: $space-6 $space-8;
 }
 
 .caseCloseText {
   font-family: $font-body;
   font-weight: $fw-light;
-  font-size: clamp(1.25rem, 1vw + 0.95rem, 1.75rem);
-  line-height: 1.25;
-  color: $color-text-mid;
-  max-width: 28ch;
+  font-size: clamp(1.75rem, 2.9vw, 3rem);
+  line-height: 1.04;
+  letter-spacing: -0.03em;
+  color: $color-text-hi;
+  white-space: pre-line;
 }
 
 .srOnly {

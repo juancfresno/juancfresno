@@ -157,7 +157,8 @@
   }
 
   // Entry: chip aparece primero con spring, luego viene la flecha
-  &:hover::before {
+  &:hover::before,
+  &.active::before {
     opacity: 1;
     transform: scale(1);
     transition:
@@ -166,20 +167,9 @@
   }
 
   // Texto oscuro sobre el chip claro
-  &:hover {
+  &:hover,
+  &.active {
     color: $raw-ink;               // dark text on the light chip, both themes
-  }
-
-  // Active page: Fragment Mono has one weight, so full colour + underline
-  // instead of bold. Hover still brings the chip.
-  &.active:not(:hover) {
-    color: $color-text;
-
-    .navLinkText {
-      text-decoration: underline;
-      text-decoration-thickness: 1px;
-      text-underline-offset: 4px;
-    }
   }
 
   @include focus-ring;
@@ -230,7 +220,8 @@
   transition: stroke-dashoffset 0.2s ease-in;
 
   // Entry: espera a que el chip aparezca, luego se dibuja (delay 0.15s)
-  .navLink:hover & {
+  .navLink:hover &,
+  .navLink.active & {
     stroke-dashoffset: 0;
     transition: stroke-dashoffset 0.36s $ease-out-expo 0.15s;
   }
@@ -245,7 +236,8 @@
   transition: stroke-dashoffset 0.18s ease-in;
 
   // Entry: arranca cuando el shaft lleva 0.16s corriendo → delay total 0.31s
-  .navLink:hover & {
+  .navLink:hover &,
+  .navLink.active & {
     stroke-dashoffset: 0;
     transition: stroke-dashoffset 0.32s $ease-out-expo 0.31s;
   }
@@ -424,10 +416,8 @@
 }
 
 .bottomTabActive {
-  color: $color-text;
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 4px;
+  color: $raw-ink;
+  background: $raw-chip;
 }
 
 // Light theme: the face SVG has hardcoded light strokes, so darken it.

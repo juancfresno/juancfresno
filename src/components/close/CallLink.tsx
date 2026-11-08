@@ -8,5 +8,5 @@ export default function CallLink({ label }: { label: string }) {
   if (PERSON.callUrl) {
     return <a className={s.call} href={PERSON.callUrl} target="_blank" rel="noopener noreferrer" data-no-transition>{label}</a>
   }
-  return <span className={s.call} aria-disabled="true">{label}<Pending>link</Pending></span>
+  return <span className={s.call} aria-disabled="true">{label}<Pending>call link</Pending></span>
 }

@@ -155,3 +155,36 @@
   clip: rect(0 0 0 0);
   white-space: nowrap;
 }
+
+// ─── Chip toggle (Figma v1.0 "View · chips": Work, About) ────────────────────
+.chipToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  > span {
+    margin-right: 6px;
+    font-family: $font-mono;
+    font-size: 0.625rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: $color-text-mid;
+  }
+
+  button {
+    padding: 4px 8px;
+    border: 1px solid $color-text-mid;
+    border-radius: 3px;
+    font-family: $font-mono;
+    font-size: 0.625rem;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: $color-text;
+    cursor: pointer;
+    transition: background $duration-fast, color $duration-fast, border-color $duration-fast;
+
+    &[aria-pressed='true'] { background: $color-text; border-color: $color-text; color: $color-bg; }
+    &:hover:not([aria-pressed='true']) { border-color: $color-text; }
+    @include focus-ring($color-text);
+  }
+}
