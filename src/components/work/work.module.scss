@@ -241,19 +241,150 @@
 }
 
 // ─── Archive (compact) ────────────────────────────────────────────────────────
-.archive {
-  list-style: none;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
-  column-gap: $space-4;
+// Index without the Nº column (Home).
+.noNumbers .row {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 23%) minmax(0, 23%) 6rem;
 
-  li {
-    display: flex;
-    justify-content: space-between;
-    gap: $space-4;
-    padding-block: $space-3;
-    border-top: 1px solid $color-line;
-    font-family: $font-body;
-    font-size: 0.9375rem;
+  @include respond-to(lg) { grid-template-columns: minmax(0, 1fr) minmax(0, 30%) 4rem; }
+
+  @include respond-to(md) {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: 'name year' 'disc disc';
   }
 }
+
+// ─── Archive table: Project · Via · Category · Role · Year ───────────────────
+.archiveIntro {
+  font-family: $font-body;
+  font-weight: $fw-light;
+  font-size: clamp(1rem, 0.4vw + 0.9rem, 1.125rem);
+  line-height: 1.45;
+  color: $color-text-mid;
+  max-width: 52ch;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-2;
+  padding-block: $space-4 $space-2;
+}
+
+.chip {
+  padding: 0.35rem 0.75rem;
+  border: 1px solid $color-line;
+  border-radius: 999px;
+  font-family: $font-mono;
+  font-size: 0.6875rem;
+  line-height: 1.2;
+  color: $color-text-mid;
+  cursor: pointer;
+  transition: color $duration-fast, border-color $duration-fast, background $duration-fast;
+
+  sup { margin-left: 0.3em; font-size: 0.85em; color: $color-text-dim; vertical-align: baseline; }
+
+  &:hover, &:focus-visible { color: $color-text; border-color: $color-line-hi; }
+  &[aria-pressed='true'] { background: $color-text; border-color: $color-text; color: $color-bg; sup { color: inherit; opacity: 0.6; } }
+  @include focus-ring($color-text);
+}
+
+.table { width: 100%; border-collapse: collapse; }
+
+.table th, .table td {
+  padding: 0.85rem $space-4 0.85rem 0;
+  text-align: left;
+  vertical-align: baseline;
+  border-top: 1px solid $color-line;
+}
+
+.table th {
+  padding-top: 0;
+  border-top: 0;
+  font-family: $font-mono;
+  font-size: 0.625rem;
+  font-weight: $fw-regular;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: $color-text-mid;
+}
+
+.table tbody tr:last-child td { border-bottom: 1px solid $color-line; }
+.table tbody tr { transition: background $duration-fast; }
+.table tbody tr:hover td { border-top-color: $color-line-hi; }
+
+.tProject {
+  width: 34%;
+  font-family: $font-body;
+  font-size: 0.9375rem;
+  line-height: 1.35;
+  color: $color-text;
+}
+
+.tCell {
+  font-family: $font-body;
+  font-size: 0.875rem;
+  line-height: 1.35;
+  color: $color-text-mid;
+}
+
+.tYear {
+  width: 7rem;
+  padding-right: 0 !important;
+  text-align: right !important;
+  font-family: $font-mono;
+  font-size: 0.75rem;
+  color: $color-text-mid;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.ndaTag {
+  margin-left: $space-2;
+  padding: 0.1rem 0.4rem;
+  border: 1px solid $color-line;
+  border-radius: 999px;
+  font-family: $font-mono;
+  font-size: 0.5625rem;
+  color: $color-text-mid;
+  vertical-align: 0.15em;
+}
+
+// Small screens: each row becomes a two-line block (project + year, then via · role).
+@include respond-to(md) {
+  .table thead { display: none; }
+  .table, .table tbody, .table tr, .table td { display: block; width: auto; }
+  .table tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: 'p y' 'v v' 'r r';
+    column-gap: $space-4;
+    row-gap: 2px;
+    padding-block: 0.85rem;
+    border-top: 1px solid $color-line;
+  }
+  .table td { padding: 0; border: 0; }
+  .table tbody tr:last-child td { border-bottom: 0; }
+  .table tbody tr:last-child { border-bottom: 1px solid $color-line; }
+  .tProject { grid-area: p; }
+  .tYear { grid-area: y; }
+  .tVia { grid-area: v; }
+  .tRole { grid-area: r; }
+  .tCat { display: none !important; }
+}
+
+.more {
+  margin-top: $space-6;
+  font-family: $font-mono;
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  color: $color-text;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: $color-line-hi;
+
+  &:hover, &:focus-visible { text-decoration-color: currentColor; }
+  @include focus-ring($color-text);
+}
+
+.table tr[hidden] { display: none !important; }

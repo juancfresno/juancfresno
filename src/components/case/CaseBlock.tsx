@@ -9,7 +9,7 @@ import v from '@/components/blocks/v0.module.scss'
 // ─── Behance block ────────────────────────────────────────────────────────────
 // One continuous column: every image in Behance order, content width, gap 0,
 // no captions, no cropping (intrinsic aspect ratio). When the case has
-// annotations (Shoeciety v0), a "Notas: ON/OFF" toggle draws them over it.
+// annotations (Shoeciety v0), a "Notes: ON/OFF" toggle draws them over it.
 // Note coordinates come from Figma (block 1552 px wide), so they are placed in
 // percentages of the block and scale with it.
 const BLOCK_W = 1552
@@ -21,11 +21,11 @@ export default function CaseBlock({ images, title, notes }: { images: Img[]; tit
   const py = (y: number) => `${(y / H) * 100}%`
 
   return (
-    <section className={s.blockWrap} aria-label={`Imágenes del proyecto ${title}`}>
+    <section className={s.blockWrap} aria-label={`${title}: project images`}>
       {notes && (
         <div className={s.notesBar}>
-          <div className={v.segmented} role="group" aria-label="Notas sobre las imágenes">
-            <span>Notas:</span>
+          <div className={v.segmented} role="group" aria-label="Notes over the images">
+            <span>Notes:</span>
             <span className={v.segment}>
               <button type="button" aria-pressed={on} onClick={() => setOn(true)}>ON</button>
               <button type="button" aria-pressed={!on} onClick={() => setOn(false)}>OFF</button>

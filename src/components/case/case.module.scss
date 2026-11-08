@@ -32,11 +32,30 @@
 
 .title {
   font-family: $font-body;
-  font-weight: $fw-regular;
-  font-size: clamp(2rem, 1.6vw + 1.4rem, 2.5rem);
-  line-height: 1.15;
-  letter-spacing: -0.02em;
+  font-weight: $fw-light;
+  font-size: clamp(2.75rem, 6vw, 7rem);
+  line-height: 0.98;
+  letter-spacing: -0.04em;
   color: $color-text-hi;
+}
+
+.titleBlock { display: flex; flex-direction: column; gap: $space-4; }
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-2;
+  list-style: none;
+
+  li {
+    padding: 0.3rem 0.7rem;
+    border: 1px solid $color-line;
+    border-radius: 999px;
+    font-family: $font-mono;
+    font-size: 0.6875rem;
+    line-height: 1.2;
+    color: $color-text-mid;
+  }
 }
 
 .lead {
@@ -255,42 +274,8 @@
 
 .noteTitle { font-weight: $fw-medium; }
 
-// ─── Result ───────────────────────────────────────────────────────────────────
-.modResult { padding-top: clamp(5rem, 14.3vw, 15rem); padding-bottom: clamp(4rem, 11.9vw, 12.5rem); }
-
-.stats { display: flex; flex-direction: column; }
-
-.stat {
-  display: grid;
-  grid-template-columns: minmax(0, 62%) auto;
-  align-items: baseline;
-  gap: $space-4;
-  padding-block: $space-6;
-  border-bottom: 1px solid $color-line;
-
-  @include respond-to(sm) { grid-template-columns: 1fr; gap: $space-2; }
-}
-
-.statValue {
-  font-family: $font-body;
-  font-weight: $fw-light;
-  font-size: clamp(3.5rem, 9.5vw, 10rem);
-  line-height: 0.9;
-  letter-spacing: -0.04em;
-  color: $color-text;
-  white-space: nowrap;
-}
-
-.published {
-  font-family: $font-body;
-  font-weight: $fw-light;
-  font-size: clamp(1rem, 0.4vw + 0.9rem, 1.125rem);
-  line-height: 1.5;
-  color: $color-text-mid;
-  max-width: 640px;
-
-  a { color: $color-text; }
-}
+// ─── In hindsight ─────────────────────────────────────────────────────────────
+.modHindsight { padding-top: clamp(5rem, 11vw, 12rem); }
 
 .credits {
   font-family: $font-body;
@@ -298,7 +283,16 @@
   line-height: 1.3;
 }
 
-.modCredits { padding-bottom: clamp(4rem, 11.9vw, 12.5rem); }
+.modCredits { padding-bottom: clamp(4rem, 9vw, 9rem); }
+
+.live {
+  align-self: flex-start;
+  font-family: $font-mono;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: $color-text;
+  text-underline-offset: 3px;
+}
 
 // ─── Next case ────────────────────────────────────────────────────────────────
 .next {
