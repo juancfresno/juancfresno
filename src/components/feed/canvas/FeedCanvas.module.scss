@@ -17,8 +17,12 @@
   -webkit-user-select: none;
   outline: none;
 
+  // Phones/tablets: the stage runs to the bottom edge and the (translucent) tab
+  // bar floats over it, so no strip of footer shows between them; the HUD and
+  // the minimap sit above the bar.
   @include respond-to(md) {
-    height: calc(100svh - #{$nav-height} - 3.25rem - env(safe-area-inset-bottom, 0px));
+    --fc-bottom: calc(var(--tabbar-h) + #{$space-3});
+    height: calc(100svh - #{$nav-height});
   }
 
   &:focus-visible { box-shadow: inset 0 0 0 1px $color-text; }
@@ -132,7 +136,13 @@
   gap: 6px;
   pointer-events: none;
 
-  @include respond-to(md) { right: calc(#{$gutter} + 110px); }
+  @include respond-to(md) {
+    bottom: var(--fc-bottom);
+    right: calc(#{$gutter} + 96px);
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
 }
 
 .chip {
@@ -147,6 +157,8 @@
   letter-spacing: 0.04em;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
+
+  @include respond-to(md) { padding: 3px 6px; font-size: 0.625rem; }
 }
 
 // Velocity readout: only while moving, in the G orange.
@@ -169,7 +181,7 @@
   align-items: flex-end;
   gap: 6px;
 
-  @include respond-to(md) { transform: scale(0.75); transform-origin: 100% 100%; }
+  @include respond-to(md) { bottom: var(--fc-bottom); transform: scale(0.6); transform-origin: 100% 100%; }
 }
 
 .mapCap {

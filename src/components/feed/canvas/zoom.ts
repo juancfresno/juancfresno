@@ -150,7 +150,7 @@ export function createZoom(items: FeedItem[], hooks: ZoomHooks) {
     info.append(left, right)
     const hint = el('p', s.hint, 'Esc close · ← → previous / next · click outside closes')
     hint.setAttribute('aria-hidden', 'true')
-    // Keyboard / touch controls: visually hidden until focused, the close button visible on touch.
+    // Keyboard / touch controls: visually hidden until focused; on touch all three show (and a horizontal swipe browses).
     const ctl = el('div', s.ctl)
     const prev = el('button', s.btn, '←'), next = el('button', s.btn, '→'), x = el('button', `${s.btn} ${s.x}`, 'Close ✕')
     prev.type = next.type = x.type = 'button'
@@ -200,6 +200,12 @@ export function createZoom(items: FeedItem[], hooks: ZoomHooks) {
       if (e.pointerId !== id) return
       id = null
       if (Math.abs(dy) > 120 || Math.abs(vy) > 0.6) close()
+      // Touch: a horizontal swipe browses (← →), like the arrow keys.
+      else if (Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+        img.style.transform = ''
+        back.style.opacity = ''
+        nav(dx < 0 ? 1 : -1)
+      }
       else {
         img.animate([{ transform: img.style.transform || 'none' }, { transform: 'none' }], { duration: 300, easing: EASE })
         img.style.transform = ''

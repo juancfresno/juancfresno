@@ -2,14 +2,20 @@
 @use '../../styles/mixins' as *;
 
 // Arco (Lab 003 · 01) on the site: pinned under the 72px header, above the
-// mobile tab bar. The drum fills the content width; the readout sits under it.
+// mobile tab bar (≤ 768: not pinned, swipe only; see Arco.tsx). The drum fills
+// the content width; the readout sits under it.
 
 .arco {
   --arco-top: 72px;
   --arco-bottom: 0px;
   --arco-pin-h: calc(100svh - var(--arco-top) - var(--arco-bottom));
 
-  @include respond-to(md) { --arco-bottom: 64px; }
+  // Phones/tablets: the bar is var(--tabbar-h); the pinned stage only needs the
+  // portrait panel (66 % of the width, 4:5) + dial + readout, not a full screen.
+  @include respond-to(md) {
+    --arco-bottom: var(--tabbar-h);
+    --arco-pin-h: min(calc(100svh - var(--arco-top) - var(--arco-bottom)), calc(66vw * 1.25 + 8.5rem));
+  }
   position: relative;
 }
 

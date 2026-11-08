@@ -57,11 +57,16 @@ export default function Arco({ items, label = 'Featured work', start = 0, hint =
     let r = 0, prevR = 0, offset = start, lastInput = 0, cur = -1, raf = 0, top = 72
 
     // ── Pin: wrapper tall enough for RANGE cards of page scroll ──
+    // Phones/tablets portrait (≤ 768): no pinned runway — page scroll stays page
+    // scroll and a horizontal swipe turns the drum (touch-action: pan-y).
+    let scrollTurn = true
     const size = () => {
-      wrap.style.height = `calc(var(--arco-pin-h) + ${Math.round(RANGE * PX)}px)`
+      scrollTurn = !window.matchMedia('(max-width: 768px)').matches
+      wrap.style.height = scrollTurn ? `calc(var(--arco-pin-h) + ${Math.round(RANGE * PX)}px)` : ''
       top = parseFloat(getComputedStyle(inner).top) || 0
     }
     const progress = () => {
+      if (!scrollTurn) return 0
       const b = wrap.getBoundingClientRect(), span = b.height - inner.offsetHeight
       return span > 0 ? clamp((top - b.top) / span, 0, 1) : 0
     }
@@ -219,7 +224,12 @@ export default function Arco({ items, label = 'Featured work', start = 0, hint =
     let rz = 0
     on(window, 'resize', () => {
       cancelAnimationFrame(rz)
-      rz = requestAnimationFrame(() => { size(); geo(); cur = -1; wake() })
+      rz = requestAnimationFrame(() => {
+        size()
+        // Mobile URL-bar show/hide fires resize without changing the stage (svh): skip the rebuild.
+        if (inner.clientWidth === G.W && view.clientHeight === G.H) { wake(); return }
+        geo(); cur = -1; wake()
+      })
     })
 
     size(); geo(); r = prevR = target(); wake()

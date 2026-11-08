@@ -73,6 +73,7 @@
 
 .col { display: flex; flex-direction: column; gap: 0.6rem; min-width: 0; }
 .right { align-items: flex-end; flex-shrink: 0; }
+@media (max-width: 720px) { .right { align-items: flex-start; } }
 
 .title {
   font-family: $font-body;
@@ -125,7 +126,7 @@
 .ctl {
   position: absolute;
   right: $gutter;
-  bottom: $space-4;
+  bottom: calc(var(--tabbar-h, 0px) + #{$space-4}); // above the mobile tab bar
   display: flex;
   gap: 0.4rem;
 }
@@ -160,11 +161,11 @@
 }
 
 @media (hover: none), (max-width: 720px) {
-  .x:not(:focus-visible) {
+  .btn:not(:focus-visible) {
     position: static;
     width: auto;
     height: auto;
-    min-height: 2.25rem;
+    min-height: 2.75rem;
     padding: 0 0.9rem;
     clip: auto;
     border: 1px solid $color-line;

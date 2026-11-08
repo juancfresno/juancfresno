@@ -89,11 +89,11 @@ export default function AboutPage() {
         <div className={a.lists}>
           <div>
             <p className={v.label}>{ABOUT.studiosLabel}</p>
-            <p className={a.names}>{ABOUT.studios.join(' · ')}</p>
+            <p className={a.names}>{ABOUT.studios.join('\u00a0· ')}</p>
           </div>
           <div>
             <p className={v.label}>{ABOUT.brandsLabel}</p>
-            <p className={a.names}>{ABOUT.brands.join(' · ')} <span className={a.namesTail}>{ABOUT.brandsTail}</span></p>
+            <p className={a.names}>{ABOUT.brands.join('\u00a0· ')} <span className={a.namesTail}>{ABOUT.brandsTail}</span></p>
           </div>
         </div>
       </V0Section>

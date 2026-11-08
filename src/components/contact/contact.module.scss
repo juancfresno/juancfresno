@@ -26,17 +26,17 @@
   gap: $space-3 $space-8;
 }
 
+// Block, not flex: the clock and the tail are inline text, so on a phone the
+// line wraps as one sentence instead of splitting into columns.
 .time {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
+  display: block;
   font-family: $font-mono;
   font-size: 0.6875rem;
   letter-spacing: 0.02em;
   color: $color-text;
   font-variant-numeric: tabular-nums;
 
-  i { width: 7px; height: 7px; border-radius: 50%; background: var(--c-g); flex-shrink: 0; }
+  i { display: inline-block; width: 7px; height: 7px; margin-right: 10px; vertical-align: 0.05em; border-radius: 50%; background: var(--c-g); }
 }
 
 .title {

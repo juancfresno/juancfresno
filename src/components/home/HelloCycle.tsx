@@ -53,7 +53,9 @@ export default function HelloCycle() {
       onPointerEnter={(e) => { if (e.pointerType === 'mouse') start() }}
       onPointerLeave={(e) => { if (e.pointerType === 'mouse') stop() }}
       onPointerUp={(e) => { if (e.pointerType !== 'mouse' && !reduce.current) setI((n) => (n + 1) % WORDS.length) }}
-      onFocus={start}
+      // Keyboard focus cycles; a tap also focuses the span, but that must not
+      // start the loop (touch = one word per tap), so only :focus-visible counts.
+      onFocus={(e) => { if (e.currentTarget.matches(':focus-visible')) start() }}
       onBlur={stop}
       data-active={active || undefined}
     >
