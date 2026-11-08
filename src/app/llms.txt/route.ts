@@ -1,6 +1,7 @@
 import { SITE_URL } from '@/lib/site'
 import { getSite, SOCIALS } from '@/content/site'
 import { getCases, getCaseProjects } from '@/content/cases'
+import { WIP } from '@/lib/wip'
 
 // /llms.txt — plain summary for language models (llmstxt.org format), built
 // from the same content files as the site, so it never says anything new.
@@ -25,6 +26,13 @@ export function GET() {
     '',
     ...ABOUT.services.map((s) => `- ${s.name}: ${s.text}`),
     '',
+    // WIP landing (lib/wip.ts): case and section pages are not live yet.
+    ...(WIP ? [
+    '## Site',
+    '',
+    `- The full site (v1.0) is coming soon. Spanish: ${SITE_URL}/es`,
+    '',
+    ] : [
     '## Case studies',
     '',
     ...cases,
@@ -38,6 +46,7 @@ export function GET() {
     `- [Contact](${SITE_URL}/contact): ${META.contact.description}`,
     `- [Versión en español](${SITE_URL}/es): the same site in Spanish (/es/…, same paths).`,
     '',
+    ]),
     '## Contact',
     '',
     `- Email: ${PERSON.email}`,

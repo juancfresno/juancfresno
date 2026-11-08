@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { FDS_COOKIE, FDS_HOST, fdsToken, safeEqual } from '@/lib/fds-auth'
 import { DEFAULT_LOCALE, LOCALE_COOKIE, SEGMENTS, isLocale, parsePath } from '@/i18n/config'
+import { WIP } from '@/lib/wip'
 
 // Two jobs:
 // 1. FDS docs live at fds.juancfresno.com behind a password cover. The static
@@ -67,6 +68,21 @@ function locale(request: NextRequest) {
   if (PASSTHROUGH.test(pathname)) return NextResponse.next()
 
   const first = pathname.split('/')[1]
+
+  // WIP landing (lib/wip.ts): only the locale roots (and their og image)
+  // exist; any other page → / or /es. Temporary (307) so v1.0 URLs keep their
+  // standing for when they go live.
+  if (WIP) {
+    const prefixed = isLocale(first)
+    const rest = prefixed ? pathname.slice(first.length + 1) : pathname
+    const ok = rest === '' || rest === '/' || METADATA_ROUTE.test(rest)
+    if (!ok) {
+      const to = url.clone()
+      to.pathname = prefixed && first !== DEFAULT_LOCALE ? `/${first}` : '/'
+      to.search = ''
+      return NextResponse.redirect(to, 307)
+    }
+  }
 
   // Public /en/… → bare path (English has no prefix).
   if (first === DEFAULT_LOCALE) {

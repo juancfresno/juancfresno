@@ -14,6 +14,8 @@ import Arco, { type ArcoItem } from '@/components/home/Arco'
 import v from '@/components/blocks/v0.module.scss'
 import h from '@/components/home/home.module.scss'
 import f from '@/components/feed/feed.module.scss'
+import WipLanding from '@/components/wip/WipLanding'
+import { WIP } from '@/lib/wip'
 
 type Props = { params: Promise<LangParams> }
 
@@ -29,6 +31,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 // teaser and the global close.
 export default async function HomePage({ params }: Props) {
   const l = await localeOf(params)
+  // Temporary landing while v1.0 is finished (lib/wip.ts).
+  if (WIP) return <WipLanding locale={l} />
   const { HOME, EXPERIMENTS, LAB_FEATURED } = getSite(l)
   const ui = getUi(l)
   const CASES = getCases(l)

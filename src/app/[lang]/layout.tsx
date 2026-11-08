@@ -16,6 +16,7 @@ import { HTML_LANG, LOCALES, OG_LOCALE, isLocale, DEFAULT_LOCALE, type Locale } 
 import { LocaleProvider } from '@/i18n/client'
 import { getSite, getUi } from '@/content/site'
 import { LANG_SWITCH_SCRIPT } from '@/providers/langSwitch'
+import { WIP } from '@/lib/wip'
 
 // UI mono: Fragment Mono (one weight, 400 + italic). Body: Switzer.
 const fragmentMono = Fragment_Mono({
@@ -78,7 +79,7 @@ export default async function RootLayout({ children, params }: Props) {
   const l = pick((await params).lang)
   const ui = getUi(l)
   return (
-    <html lang={HTML_LANG[l]} suppressHydrationWarning className={`${fragmentMono.variable} ${switzer.variable}`}>
+    <html lang={HTML_LANG[l]} data-wip={WIP ? '' : undefined} suppressHydrationWarning className={`${fragmentMono.variable} ${switzer.variable}`}>
       <head>
         {/* Theme before paint: saved choice, else dark (brand default). */}
         <script

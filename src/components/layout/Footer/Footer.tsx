@@ -6,6 +6,8 @@ import LiveClock from '@/components/ui/LiveClock/LiveClock'
 import { BehanceLogo, InstagramLogo, DribbbleLogo, LinkedInLogo } from '@/components/ui/SocialLogos/SocialLogos'
 import GlitchSocialIcon from '@/components/ui/GlitchSocialIcon/GlitchSocialIcon'
 import { useHref, useUi } from '@/i18n/client'
+import CopyEmail from '@/components/close/CopyEmail'
+import { WIP } from '@/lib/wip'
 
 // ─── Social links data ─────────────────────────────────────────────────────────
 const SOCIALS = [
@@ -22,6 +24,9 @@ export default function Footer() {
   return (
     <footer className={s.footer}>
       <div className={s.inner}>
+
+        {/* WIP landing (lib/wip.ts): the email lives here, there is no close block. */}
+        {WIP && <CopyEmail size="md" className={s.email} />}
 
         {/* Social wordmarks */}
         <nav className={s.social} aria-label={ui.footer.socials}>
@@ -43,7 +48,7 @@ export default function Footer() {
 
         {/* Meta row */}
         <div className={s.meta}>
-          <span className={s.copyright}>© 2012 — 2026 · <a href={href('/legal')} style={{ color: 'inherit' }}>{ui.footer.legal}</a></span>
+          <span className={s.copyright}>© 2012 — 2026{!WIP && <> · <a href={href('/legal')} style={{ color: 'inherit' }}>{ui.footer.legal}</a></>}</span>
           <div className={s.metaRight}>
             <LiveClock />
             <span className={s.location}>

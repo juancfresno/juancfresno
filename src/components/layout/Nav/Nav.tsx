@@ -11,6 +11,7 @@ import { usePageTransition } from '@/providers/PageTransition'
 import LocaleSwitch from '@/components/ui/LocaleSwitch/LocaleSwitch'
 import { useHref, useUi } from '@/i18n/client'
 import { parsePath } from '@/i18n/config'
+import { WIP } from '@/lib/wip'
 
 // ─── Scramble character pool ───────────────────────────────────────────────────
 const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%?'
@@ -268,7 +269,8 @@ export default function Nav() {
           <div className={s.left}>
             {faceLink}
 
-            <nav className={s.navMenu} aria-label={ui.nav.main}>
+            {/* WIP landing (lib/wip.ts): no menu, only the home page exists. */}
+            {!WIP && <nav className={s.navMenu} aria-label={ui.nav.main}>
               {links.map(({ label, href, url }) => (
                 <NavLinkItem
                   key={href}
@@ -277,7 +279,7 @@ export default function Nav() {
                   active={pathname === href || pathname.startsWith(href + '/')}
                 />
               ))}
-            </nav>
+            </nav>}
 
             <ThemeToggle className={s.theme} />
             <LocaleSwitch className={s.lang} />
@@ -303,8 +305,8 @@ export default function Nav() {
         </div>
       </header>
 
-      {/* ── Mobile bottom tab bar ── */}
-      <nav className={s.bottomBar} aria-label={ui.nav.mainMobile}>
+      {/* ── Mobile bottom tab bar (none on the WIP landing) ── */}
+      {!WIP && <nav className={s.bottomBar} aria-label={ui.nav.mainMobile}>
           {links.map(({ label, href, url }) => {
             const isActive = pathname === href || pathname.startsWith(href + '/')
             return (
@@ -323,7 +325,7 @@ export default function Nav() {
               </a>
             )
           })}
-        </nav>
+        </nav>}
 
     </>
   )

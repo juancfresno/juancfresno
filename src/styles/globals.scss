@@ -81,6 +81,8 @@ html.theme-anim, html.theme-anim * {
   body {
     padding-bottom: var(--tabbar-h);
   }
+  // WIP landing (lib/wip.ts): no tab bar.
+  :root[data-wip] { --tabbar-h: 0px; }
 }
 
 // ─── Main content — above pixel canvas (z-index: 5) ─────────────────────────
