@@ -1,9 +1,17 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { FDS_COOKIE, FDS_HOST, fdsToken, safeEqual } from '@/lib/fds-auth'
+import { DEFAULT_LOCALE, LOCALE_COOKIE, SEGMENTS, isLocale, parsePath } from '@/i18n/config'
 
-// FDS docs live at fds.juancfresno.com behind a password cover.
-// The static files stay in public/FDS; this proxy serves them on the
-// subdomain and closes the old public path www.juancfresno.com/FDS.
+// Two jobs:
+// 1. FDS docs live at fds.juancfresno.com behind a password cover. The static
+//    files stay in public/FDS; this proxy serves them on the subdomain and
+//    closes the old public path www.juancfresno.com/FDS.
+// 2. Locales (src/i18n/config.ts): English URLs have no prefix and are
+//    rewritten to app/[lang]=en; /es/… is served as is (translated slugs are
+//    mapped back to the internal folder); public /en/… redirects to the bare
+//    path. The only redirect by preference: / with the selector's cookie
+//    lang=es → /es. No Accept-Language detection (copy-web-v1-es.md, decision
+//    3): crawlers and shared links always get the URL they asked for.
 
 const PRIVATE_HEADERS = {
   'X-Robots-Tag': 'noindex, nofollow',
@@ -15,8 +23,7 @@ function withHeaders(res: NextResponse) {
   return res
 }
 
-export async function proxy(request: NextRequest) {
-  const host = (request.headers.get('host') || '').split(':')[0].toLowerCase()
+async function fds(request: NextRequest, host: string) {
   const { pathname } = request.nextUrl
 
   // Old path on the main site → the subdomain (no open copy left).
@@ -49,11 +56,72 @@ export async function proxy(request: NextRequest) {
   return NextResponse.redirect(new URL('/', request.url), 307)
 }
 
+// Static HTML in public/ served through next.config rewrites: not localized.
+const PASSTHROUGH = /^\/(medida|glyf)(\/|$)/
+// Metadata routes generated per locale (og images): fetched by their /en/… URL.
+const METADATA_ROUTE = /\/(opengraph-image|twitter-image)(-\w+)?$/
+
+function locale(request: NextRequest) {
+  const url = request.nextUrl
+  const { pathname } = url
+  if (PASSTHROUGH.test(pathname)) return NextResponse.next()
+
+  const first = pathname.split('/')[1]
+
+  // Public /en/… → bare path (English has no prefix).
+  if (first === DEFAULT_LOCALE) {
+    if (METADATA_ROUTE.test(pathname)) return NextResponse.next()
+    const to = url.clone()
+    to.pathname = pathname.slice(DEFAULT_LOCALE.length + 1) || '/'
+    return NextResponse.redirect(to, 308)
+  }
+
+  if (isLocale(first)) {
+    // Translated first segment → internal folder.
+    const { path } = parsePath(pathname)
+    const internal = `/${first}${path === '/' ? '' : path}`
+    if (internal === pathname) return NextResponse.next()
+    // An internal id typed under /es when Spanish has its own slug → the public one.
+    const seg = pathname.split('/')[2]
+    if (seg && SEGMENTS[seg] && SEGMENTS[seg][first] !== seg) {
+      const to = url.clone()
+      to.pathname = pathname.replace(`/${first}/${seg}`, `/${first}/${SEGMENTS[seg][first]}`)
+      return NextResponse.redirect(to, 308)
+    }
+    const to = url.clone()
+    to.pathname = internal
+    return NextResponse.rewrite(to)
+  }
+
+  // English URL. Home only: the language chosen in the selector.
+  if (pathname === '/') {
+    const saved = request.cookies.get(LOCALE_COOKIE)?.value
+    if (isLocale(saved) && saved !== DEFAULT_LOCALE) {
+      const to = url.clone()
+      to.pathname = `/${saved}`
+      return NextResponse.redirect(to, 307)
+    }
+  }
+
+  const to = url.clone()
+  to.pathname = `/${DEFAULT_LOCALE}${pathname === '/' ? '' : pathname}`
+  return NextResponse.rewrite(to)
+}
+
+export async function proxy(request: NextRequest) {
+  const host = (request.headers.get('host') || '').split(':')[0].toLowerCase()
+  const { pathname } = request.nextUrl
+  if (host === FDS_HOST || pathname === '/FDS' || pathname.startsWith('/FDS/')) return fds(request, host)
+  return locale(request)
+}
+
 export const config = {
   matcher: [
     '/FDS',
     '/FDS/:path*',
     // Must be a literal (statically parsed); keep in sync with FDS_HOST.
     { source: '/:path*', has: [{ type: 'host', value: 'fds.juancfresno.com' }] },
+    // Pages: everything except API, Next internals, Vercel and files with an extension.
+    '/((?!api|_next|_vercel|.*\\..*).*)',
   ],
 }

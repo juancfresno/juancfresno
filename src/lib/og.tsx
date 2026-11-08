@@ -1,6 +1,8 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import { ImageResponse } from 'next/og'
+import type { Locale } from '@/i18n/config'
+import { getSite, getUi } from '@/content/site'
 
 // Open Graph cards (1200 × 630), rendered at build time with next/og.
 // Fresno style: ink background, pearl text, Fragment Mono only (no bold),
@@ -51,14 +53,16 @@ function Frame({ top, children, foot }: { top: [string, string]; children: React
   )
 }
 
-export async function defaultOg() {
+export async function defaultOg(l: Locale = 'en') {
+  const ui = getUi(l)
+  const { HOME, PERSON } = getSite(l)
   return new ImageResponse(
     (
-      <Frame top={['Juan C. Fresno', 'Valencia · Remote']} foot={['juancfresno.com', 'Just enough, done right.']}>
+      <Frame top={['Juan C. Fresno', ui.og.place]} foot={[ui.og.domain, HOME.signature]}>
         <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', flex: 1 }}>
-          <div style={{ display: 'flex', fontSize: 22, letterSpacing: 2, textTransform: 'uppercase', color: G, marginBottom: 28 }}>{'{ Hello, I’m Juan C. Fresno'}</div>
-          <div style={{ display: 'flex', fontSize: 64, lineHeight: 1.12, letterSpacing: -1.5, maxWidth: 1000 }}>Independent Art Director &amp; Interactive Designer</div>
-          <div style={{ display: 'flex', fontSize: 20, letterSpacing: 1.5, textTransform: 'uppercase', color: MID, marginTop: 36 }}>Studios · Agencies · Brands</div>
+          <div style={{ display: 'flex', fontSize: 22, letterSpacing: 2, textTransform: 'uppercase', color: G, marginBottom: 28 }}>{ui.og.hello}</div>
+          <div style={{ display: 'flex', fontSize: 64, lineHeight: 1.12, letterSpacing: -1.5, maxWidth: 1000 }}>{PERSON.role}</div>
+          <div style={{ display: 'flex', fontSize: 20, letterSpacing: 1.5, textTransform: 'uppercase', color: MID, marginTop: 36 }}>{HOME.meta[1]}</div>
         </div>
       </Frame>
     ),
@@ -66,14 +70,15 @@ export async function defaultOg() {
   )
 }
 
-export async function caseOg({ n, total, title, chips, year, cover, slug }: { n: string; total: string; title: string; chips: string[]; year: string; cover?: { src: string }; slug: string }) {
+export async function caseOg({ locale: l = 'en', n, total, title, chips, year, cover, slug }: { locale?: Locale; n: string; total: string; title: string; chips: string[]; year: string; cover?: { src: string }; slug: string }) {
+  const ui = getUi(l)
   const IMG_W = 600
   const IMG_H = 438
   const img = cover ? await coverPng(cover.src, IMG_W, IMG_H) : null
   const size = title.length > 14 ? 56 : 72
   return new ImageResponse(
     (
-      <Frame top={['Juan C. Fresno', `Work · ${n} / ${total}`]} foot={[`juancfresno.com/work/${slug}`, year]}>
+      <Frame top={['Juan C. Fresno', `${ui.og.work} · ${n} / ${total}`]} foot={[`${ui.og.domain}/work/${slug}`, year]}>
         <div style={{ display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', flexDirection: 'column', width: 460 }}>
             <div style={{ display: 'flex', fontSize: 22, color: G, marginBottom: 20 }}>{n}</div>

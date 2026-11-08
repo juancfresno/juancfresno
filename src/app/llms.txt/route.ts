@@ -1,12 +1,15 @@
 import { SITE_URL } from '@/lib/site'
-import { META, PERSON, SOCIALS, HOME, ABOUT } from '@/content/site'
-import { CASES, CASE_PROJECTS } from '@/content/cases'
+import { getSite, SOCIALS } from '@/content/site'
+import { getCases, getCaseProjects } from '@/content/cases'
 
 // /llms.txt — plain summary for language models (llmstxt.org format), built
 // from the same content files as the site, so it never says anything new.
 export const dynamic = 'force-static'
 
 export function GET() {
+  const { META, PERSON, HOME, ABOUT } = getSite('en')
+  const CASES = getCases('en')
+  const CASE_PROJECTS = getCaseProjects('en')
   const cases = CASE_PROJECTS.map((p) => {
     const c = CASES[p.slug]
     return `- [${c.title}](${SITE_URL}/work/${p.slug}): ${c.lead} (${p.discipline}, ${c.ficha.year})`
@@ -33,6 +36,7 @@ export function GET() {
     `- [Lab](${SITE_URL}/lab): ${META.lab.description}`,
     `- [Feed](${SITE_URL}/feed): ${META.feed.description}`,
     `- [Contact](${SITE_URL}/contact): ${META.contact.description}`,
+    `- [Versión en español](${SITE_URL}/es): the same site in Spanish (/es/…, same paths).`,
     '',
     '## Contact',
     '',

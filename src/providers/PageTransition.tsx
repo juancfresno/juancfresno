@@ -4,6 +4,8 @@ import { createContext, useCallback, useContext, useEffect, useRef, type ReactNo
 import { usePathname, useRouter } from 'next/navigation'
 import { EFFECTS, SITE_TRANSITION, type TransitionEffect } from '@/components/transition/effects'
 import s from '@/components/transition/SiteTransition.module.scss'
+import { parsePath } from '@/i18n/config'
+import { LANG_SWITCH_KEY } from './langSwitch'
 
 // ─── Context ──────────────────────────────────────────────────────────────────
 type TransitionCtx = { navigate: (href: string) => void }
@@ -62,7 +64,26 @@ export default function PageTransitionProvider({ children }: { children: ReactNo
 
   useEffect(() => {
     if (canvasRef.current) effect.current = EFFECTS[SITE_TRANSITION](canvasRef.current)
-    return () => effect.current?.cancel()
+    // Arriving from a language switch (full load): reveal this page with the effect.
+    let flagged = false
+    try { flagged = !!sessionStorage.getItem(LANG_SWITCH_KEY); sessionStorage.removeItem(LANG_SWITCH_KEY) } catch {}
+    const root = document.documentElement
+    if (flagged && effect.current && !reduced()) {
+      busy.current = true
+      const fx = effect.current
+      fx.cover({ back: false }).then(async () => {
+        delete root.dataset.langSwitch
+        await frame()
+        await fx.reveal()
+        busy.current = false
+      })
+    } else {
+      delete root.dataset.langSwitch
+    }
+    // Back to this page from the bfcache after a language switch: drop the cover.
+    const onShow = (e: PageTransitionEvent) => { if (e.persisted) { effect.current?.cancel(); busy.current = false } }
+    window.addEventListener('pageshow', onShow)
+    return () => { window.removeEventListener('pageshow', onShow); effect.current?.cancel() }
   }, [])
 
   // Resolve anyone waiting for the route to change once the new page has committed.
@@ -101,6 +122,15 @@ export default function PageTransitionProvider({ children }: { children: ReactNo
     if (url.pathname === from) { router.push(to); return }
     busy.current = true
     const animate = !reduced() && !!effect.current
+    // Another language = another root layout: cover, then a full page load.
+    if (parsePath(url.pathname).locale !== parsePath(location.pathname).locale) {
+      if (animate) {
+        await effect.current!.cover({ back: false })
+        try { sessionStorage.setItem(LANG_SWITCH_KEY, '1') } catch {}
+      }
+      location.assign(to)
+      return
+    }
     stack.current = stack.current.slice(0, at.current + 1).concat(url.pathname)
     at.current = stack.current.length - 1
     if (animate) await effect.current!.cover({ back: false })

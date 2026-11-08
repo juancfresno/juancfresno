@@ -20,6 +20,12 @@ const nextConfig: NextConfig = {
       { source: '/projects/:slug(bbva|la-liga|acciona|coca-cola|iberdrola|repsol|telefonica|vodafone)', destination: '/work', permanent: true },
       { source: '/projects/:slug', destination: '/work/:slug', permanent: true },
       { source: '/playground', destination: '/lab', permanent: true },
+      // Same redirects under the Spanish prefix (/es/…).
+      { source: '/es/projects', destination: '/es/work', permanent: true },
+      { source: '/es/projects/:slug(bbva|la-liga|acciona|coca-cola|iberdrola|repsol|telefonica|vodafone)', destination: '/es/work', permanent: true },
+      { source: '/es/projects/:slug', destination: '/es/work/:slug', permanent: true },
+      { source: '/es/playground', destination: '/es/lab', permanent: true },
+      { source: '/es/work/:slug(bbva|la-liga|acciona|coca-cola|iberdrola|repsol|telefonica|vodafone)', destination: '/es/work', permanent: true },
       // Old v1 home variant and placeholder case pages removed in v2.
       { source: '/index2', destination: '/', permanent: true },
       { source: '/work/:slug(bbva|la-liga|acciona|coca-cola|iberdrola|repsol|telefonica|vodafone)', destination: '/work', permanent: true },

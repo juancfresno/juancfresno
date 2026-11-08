@@ -120,3 +120,7 @@ main {
 }
 
 #content:focus { outline: none; }
+
+// ─── Language switch (providers/langSwitch.ts) ───────────────────────────────
+// The new page stays hidden until the site transition reveals it.
+html[data-lang-switch] main { visibility: hidden; }
