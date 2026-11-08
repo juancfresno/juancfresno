@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { pageMeta } from '@/lib/seo'
 import Link from 'next/link'
 import { HOME, META, EXPERIMENTS, LAB_FEATURED } from '@/content/site'
 import { ARCO, ARCO_START, FEATURED, CASES, caseMedia, toRow } from '@/content/cases'
@@ -12,11 +13,7 @@ import v from '@/components/blocks/v0.module.scss'
 import h from '@/components/home/home.module.scss'
 import f from '@/components/feed/feed.module.scss'
 
-export const metadata: Metadata = {
-  title: { absolute: META.home.title },
-  description: META.home.description,
-  alternates: { canonical: '/' },
-}
+export const metadata: Metadata = pageMeta({ path: '/', title: META.home.title, description: META.home.description, absoluteTitle: true })
 
 // Home v1.0 — Figma "Home · v1.0 · 1680" (6882:437): hero ("Hello" cycles,
 // role as H1, disciplines, meta + paragraph), the Arco with 7 cases
@@ -74,12 +71,12 @@ export default function HomePage() {
         <ul className={h.strip}>
           {latest.map(({ it, n }) => (
             <li key={it.id}>
-              <a href={it.url} target="_blank" rel="noopener noreferrer" className={`${f.link} ${h.stripLink}`} aria-label={`${it.title} · ${monthYear(it.date)} (opens in a new tab)`}>
+              <a href={it.url} target="_blank" rel="noopener noreferrer" className={`${f.link} ${h.stripLink}`}>
                 <span className={`${f.media} ${h.stripMedia}`}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={it.src} alt="" width={it.w} height={it.h} className={f.img} loading="lazy" decoding="async" />
                 </span>
-                <span className={h.stripCap}>{n} · {it.title} · {monthYear(it.date)}</span>
+                <span className={h.stripCap}>{n} · {it.title} · {monthYear(it.date)}<span className={v.srOnly}> (opens in a new tab)</span></span>
               </a>
             </li>
           ))}

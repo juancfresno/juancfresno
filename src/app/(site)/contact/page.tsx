@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { pageMeta } from '@/lib/seo'
 import { CONTACT, META, PERSON } from '@/content/site'
 import Pending from '@/components/blocks/Pending'
 import NavClock from '@/components/ui/NavClock/NavClock'
@@ -8,11 +9,7 @@ import Socials from '@/components/close/Socials'
 import v from '@/components/blocks/v0.module.scss'
 import c from '@/components/contact/contact.module.scss'
 
-export const metadata: Metadata = {
-  title: META.contact.title,
-  description: META.contact.description,
-  alternates: { canonical: '/contact' },
-}
+export const metadata: Metadata = pageMeta({ path: '/contact', title: META.contact.title, description: META.contact.description })
 
 // Mini diagrams of the three ways of working (Figma 6889:1437).
 function Diagram({ id }: { id: string }) {

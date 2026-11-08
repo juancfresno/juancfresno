@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { pageMeta } from '@/lib/seo'
 import Link from 'next/link'
 import { LAB, LAB_FEATURED, LAB_FEATURED_SPECS, LAB_FEATURED_FRAMES, LAB_LABELS, LAB_LOG, EXPERIMENTS, INTROS, META } from '@/content/site'
 import ContactBlock from '@/components/blocks/ContactBlock'
@@ -8,11 +9,7 @@ import { FramesStage, ButtonsStage, TransitionsStage, GalleriesStage } from '@/c
 import v from '@/components/blocks/v0.module.scss'
 import l from '@/components/lab/labv1.module.scss'
 
-export const metadata: Metadata = {
-  title: META.lab.title,
-  description: META.lab.description,
-  alternates: { canonical: '/lab' },
-}
+export const metadata: Metadata = pageMeta({ path: '/lab', title: META.lab.title, description: META.lab.description })
 
 const STAGES: Record<string, () => React.ReactElement> = { botones: ButtonsStage, transiciones: TransitionsStage, galerias: GalleriesStage }
 

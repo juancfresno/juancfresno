@@ -40,7 +40,7 @@ export default function Footer() {
 
         {/* Meta row */}
         <div className={s.meta}>
-          <span className={s.copyright}>© 2012 — 2026</span>
+          <span className={s.copyright}>© 2012 — 2026 · <a href="/legal" style={{ color: 'inherit' }}>Legal</a></span>
           <div className={s.metaRight}>
             <LiveClock />
             <span className={s.location}>

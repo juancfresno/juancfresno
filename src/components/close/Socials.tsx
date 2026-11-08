@@ -8,7 +8,7 @@ export default function Socials({ className }: { className?: string }) {
     <ul className={`${s.socials} ${className ?? ''}`} aria-label="Social profiles">
       {SOCIALS.map((x) => (
         <li key={x.id}>
-          <a href={x.href} target="_blank" rel="noreferrer" data-social={x.id}>{x.label} ↗</a>
+          <a href={x.href} target="_blank" rel="noopener noreferrer" data-social={x.id}>{x.label} ↗</a>
         </li>
       ))}
     </ul>

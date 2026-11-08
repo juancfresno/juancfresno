@@ -1,15 +1,12 @@
 import type { Metadata } from 'next'
+import { pageMeta } from '@/lib/seo'
 import { INTROS, META } from '@/content/site'
 import ContactBlock from '@/components/blocks/ContactBlock'
 import Pending from '@/components/blocks/Pending'
 import v from '@/components/blocks/v0.module.scss'
 import n from '@/components/blocks/notFound.module.scss'
 
-export const metadata: Metadata = {
-  title: META.journal.title,
-  description: META.journal.description,
-  alternates: { canonical: '/journal' },
-}
+export const metadata: Metadata = pageMeta({ path: '/journal', title: META.journal.title, description: META.journal.description })
 
 // Placeholder: intro from the copy doc; entries and layout come later.
 export default function JournalPage() {

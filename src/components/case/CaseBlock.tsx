@@ -41,7 +41,7 @@ export default function CaseBlock({ images, title, notes }: { images: Img[]; tit
             src={img.src}
             width={img.w}
             height={img.h}
-            alt={i === 0 ? title : ''}
+            alt={`${title} — image ${String(i + 1).padStart(2, '0')}`}
             className={s.blockImg}
             sizes="(max-width: 768px) 100vw, calc(100vw - 8rem)"
             loading={i < 1 ? 'eager' : 'lazy'}

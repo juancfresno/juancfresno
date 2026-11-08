@@ -1,6 +1,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import type { Metadata } from 'next'
+import { pageMeta } from '@/lib/seo'
 import { notFound } from 'next/navigation'
 import { EXPERIMENTS } from '@/content/site'
 import Section from '@/components/blocks/Section'
@@ -20,7 +21,7 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { slug } = await params
   const e = EXPERIMENTS.find((x) => x.slug === slug)
-  return e ? { title: `${e.n} ${e.name} · Lab`, description: e.what, alternates: { canonical: `/lab/${e.slug}` } } : {}
+  return e ? pageMeta({ path: `/lab/${e.slug}`, title: `${e.n} ${e.name} · Lab`, description: e.what }) : {}
 }
 
 const read = (slug: string, file: string) =>
@@ -56,7 +57,7 @@ export default async function ExperimentPage({ params }: { params: Promise<Param
             <span className={s.text}>GitHub <Pending>repo public</Pending></span>
           )}
         </div>
-        <pre className={l.code}><code>{html}</code></pre>
+        <pre className={l.code} tabIndex={0} aria-label="Source code"><code>{html}</code></pre>
       </Section>
 
       <Section label="How it’s built">

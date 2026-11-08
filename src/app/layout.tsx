@@ -10,6 +10,8 @@ import Shortcuts from '@/components/ui/Shortcuts/Shortcuts'
 import SocialPreview from '@/components/ui/SocialPreview/SocialPreview'
 import PageTransitionProvider from '@/providers/PageTransition'
 import { SITE_URL } from '@/lib/site'
+import { IS_INDEXABLE } from '@/lib/seo'
+import { personJsonLd } from '@/lib/jsonld'
 
 // UI mono: Fragment Mono (one weight, 400 + italic). Body: Switzer.
 const fragmentMono = Fragment_Mono({
@@ -29,6 +31,7 @@ const switzer = localFont({
   ],
 })
 
+
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
@@ -44,23 +47,8 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
   },
-}
-
-const personJsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'Person',
-  name: 'Juan C. Fresno',
-  jobTitle: 'Independent Art Director & Interactive Designer',
-  url: SITE_URL,
-  email: 'mailto:hello@juancfresno.com',
-  address: { '@type': 'PostalAddress', addressLocality: 'Valencia', addressCountry: 'ES' },
-  sameAs: [
-    'https://www.linkedin.com/in/juancfresno',
-    'https://www.behance.net/juancfresno',
-    'https://dribbble.com/JuanCFresno',
-    'https://instagram.com/juanc.fresno',
-    'https://x.com/JuanCFresno',
-  ],
+  // Vercel previews: noindex (production and local builds stay indexable).
+  ...(IS_INDEXABLE ? {} : { robots: { index: false, follow: false } }),
 }
 
 export default function RootLayout({
@@ -83,9 +71,10 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
         />
+        <a href="#content" className="skip-link" data-no-transition>Skip to content</a>
         <PageTransitionProvider>
           <Nav />
-          <main style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>{children}</main>
+          <main id="content" tabIndex={-1} style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>{children}</main>
           <Footer />
         </PageTransitionProvider>
         <GridOverlay />

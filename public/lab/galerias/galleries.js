@@ -324,8 +324,8 @@
   /* ─── 01 · Arco ──────────────────────────────────────────────────────── */
   function viewArco(ctx) {
     var list = ctx.list, N = list.length, offs = [], S = 8, RANGE = Math.min(N, 30) - 1, PX = 150;
-    var pin = makePin(ctx.stage, function () { return RANGE * PX; });
-    var view = h('div', 'fg-arc', { tabindex: '0', 'aria-label': 'Arc: drag, scroll or use ← → · Enter enlarges' });
+    var pin = makePin(ctx.stage, function () { return RANGE * (matchMedia("(max-width: 768px)").matches ? 70 : PX); });
+    var view = h('div', 'fg-arc', { tabindex: '0', role: 'region', 'aria-label': 'Arc: drag, scroll or use ← → · Enter enlarges' });
     var ring = h('div', 'fg-arc__ring'), hud = h('div', 'fg-arc__hud');
     var arc = doc.createElementNS('http://www.w3.org/2000/svg', 'svg');
     arc.setAttribute('viewBox', '0 0 120 34'); arc.setAttribute('class', 'fg-arc__dial'); arc.setAttribute('aria-hidden', 'true');
@@ -415,7 +415,7 @@
   /* ─── 02 · Canvas infinito ───────────────────────────────────────────── */
   function viewCanvas(ctx) {
     var list = ctx.list, N = list.length, offs = [], m = ctx.m, grid = false;
-    var box = h('div', 'fg-cv', { tabindex: '0', 'aria-label': 'Infinite canvas: drag, wheel or arrow keys · Enter enlarges the centre piece' });
+    var box = h('div', 'fg-cv', { tabindex: '0', role: 'region', 'aria-label': 'Infinite canvas: drag, wheel or arrow keys · Enter enlarges the centre piece' });
     var plane = h('div', 'fg-cv__plane'), hud = h('div', 'fg-cv__hud');
     var mini = h('canvas', 'fg-cv__mini', { 'aria-hidden': 'true' }), coords = h('span', 'fg-cv__xy');
     var cross = h('span', 'fg-cv__cross', { 'aria-hidden': 'true' });
@@ -633,7 +633,7 @@
     var list = ctx.list, N = list.length, offs = [], m = ctx.m;
     var travel = 0, H, xs = [], ws = [], items = [], cur = 0, prev = 0, skew = 0, sc = 1, ci = -1;
     var pin = makePin(ctx.stage, function () { return Math.min(travel, innerHeight * 6); });
-    var box = h('div', 'fg-tr', { tabindex: '0', 'aria-label': 'Strip: scroll or use ← →' });
+    var box = h('div', 'fg-tr', { tabindex: '0', role: 'region', 'aria-label': 'Strip: scroll or use ← →' });
     var track = h('div', 'fg-tr__track'), hud = h('div', 'fg-tr__hud'), bar = h('span', 'fg-tr__bar'), fill = h('span', 'fg-tr__fill');
     bar.appendChild(fill); hud.appendChild(bar);
     box.appendChild(track); pin.inner.appendChild(box); pin.inner.appendChild(hud);
@@ -865,7 +865,7 @@
   /* ─── 08 · Pasarela (Jesper Landberg-style runway) ───────────────────── */
   function viewPasarela(ctx) {
     var list = ctx.list, N = list.length, offs = [], m = ctx.m, S2 = 4, RANGE = Math.min(N, 30) - 1, PX = 130;
-    var pin = makePin(ctx.stage, function () { return RANGE * PX; });
+    var pin = makePin(ctx.stage, function () { return RANGE * (matchMedia("(max-width: 768px)").matches ? 70 : PX); });
     var world = h('div', 'fg-pw', { tabindex: '0', 'aria-label': 'Runway: scroll, drag or use ← → · Enter enlarges' });
     var floor = h('div', 'fg-pw__floor', { 'aria-hidden': 'true' }), cardsBox = h('div', 'fg-pw__cards'), hud = h('div', 'fg-pw__hud');
     world.appendChild(floor); world.appendChild(cardsBox); pin.inner.appendChild(world); pin.inner.appendChild(hud);

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { pageMeta } from '@/lib/seo'
 import Image from 'next/image'
 import Link from 'next/link'
 import { ABOUT, META } from '@/content/site'
@@ -9,11 +10,7 @@ import AboutViews from '@/components/about/AboutViews'
 import v from '@/components/blocks/v0.module.scss'
 import a from '@/components/about/about.module.scss'
 
-export const metadata: Metadata = {
-  title: META.about.title,
-  description: META.about.description,
-  alternates: { canonical: '/about' },
-}
+export const metadata: Metadata = pageMeta({ path: '/about', title: META.about.title, description: META.about.description })
 
 const pad = (n: number) => String(n).padStart(2, '0')
 

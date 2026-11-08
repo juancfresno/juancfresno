@@ -1,4 +1,6 @@
 import type { Metadata } from 'next'
+import { pageMeta } from '@/lib/seo'
+import { caseJsonLd } from '@/lib/jsonld'
 import Link from 'next/link'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
@@ -23,14 +25,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const c = CASES[slug]
   if (!c) return { title: 'Work' }
-  const cover = caseMedia(slug)?.cover
   const description = c.lead.length > 155 ? `${c.lead.slice(0, 154).trimEnd()}…` : c.lead
-  return {
-    title: { absolute: `${c.title} — ${c.chips[0]} · Juan C. Fresno` },
-    description,
-    alternates: { canonical: `/work/${slug}` },
-    openGraph: cover ? { images: [{ url: cover.src, width: cover.w, height: cover.h }] } : undefined,
-  }
+  // og:image = work/[slug]/opengraph-image.tsx (the case cover on the brand card).
+  return pageMeta({ path: `/work/${slug}`, title: `${c.title} — ${c.chips[0]} · Juan C. Fresno`, description, absoluteTitle: true, type: 'article' })
 }
 
 // Text module on the case grid: label (cols 5–6) + content (cols 7–12).
@@ -64,8 +61,11 @@ export default async function CasePage({ params }: Props) {
   const total = c.decisions?.length ?? 0
   const pad = (x: number) => String(x).padStart(2, '0')
 
+  const ld = caseJsonLd(slug)
+
   return (
     <article className={v.page}>
+      {ld && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />}
       <header className={s.top}>
         <div className={s.fichaCol}>
           <p className={s.bigN} aria-hidden="true">{n}</p>

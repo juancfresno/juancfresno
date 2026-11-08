@@ -17,9 +17,21 @@ const nextConfig: NextConfig = {
       },
       // v2 sections: Projects → Work, Playground → Lab.
       { source: '/projects', destination: '/work', permanent: true },
+      { source: '/projects/:slug(bbva|la-liga|acciona|coca-cola|iberdrola|repsol|telefonica|vodafone)', destination: '/work', permanent: true },
       { source: '/projects/:slug', destination: '/work/:slug', permanent: true },
       { source: '/playground', destination: '/lab', permanent: true },
+      // Old v1 home variant and placeholder case pages removed in v2.
+      { source: '/index2', destination: '/', permanent: true },
+      { source: '/work/:slug(bbva|la-liga|acciona|coca-cola|iberdrola|repsol|telefonica|vodafone)', destination: '/work', permanent: true },
     ]
+  },
+  async headers() {
+    // Vercel preview deployments must never be indexed. Vercel already sends
+    // X-Robots-Tag: noindex on preview URLs; this guard makes it explicit.
+    // Production (VERCEL_ENV=production) and local builds send nothing.
+    const env = process.env.VERCEL_ENV
+    if (!env || env === 'production') return []
+    return [{ source: '/:path*', headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }] }]
   },
   async rewrites() {
     return [

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { pageMeta } from '@/lib/seo'
 import { INTROS, META } from '@/content/site'
 import { PROJECTS, ARCHIVE, toRow } from '@/content/cases'
 import WorkViews from '@/components/work/WorkViews'
@@ -8,11 +9,7 @@ import ContactBlock from '@/components/blocks/ContactBlock'
 import v from '@/components/blocks/v0.module.scss'
 import w from '@/components/work/work.module.scss'
 
-export const metadata: Metadata = {
-  title: META.work.title,
-  description: META.work.description,
-  alternates: { canonical: '/work' },
-}
+export const metadata: Metadata = pageMeta({ path: '/work', title: META.work.title, description: META.work.description })
 
 // Work v1.0 — Figma "Work · v1.0 · 1680" (6884:611): giant "Work" + intro,
 // View: List / Covers, the index renumbered 01–13 (NDA rows hidden,

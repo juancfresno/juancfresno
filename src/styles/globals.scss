@@ -97,3 +97,23 @@ main {
 .container {
   @include container;
 }
+
+// Skip link (a11y): hidden until it gets keyboard focus, then a chip top-left.
+.skip-link {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: $z-toast;
+  padding: 8px 12px;
+  border-radius: 2px;
+  background: $color-text;
+  color: $color-bg;
+  font-family: $font-mono;
+  font-size: 0.75rem;
+  text-decoration: none;
+  transform: translateY(-200%);
+
+  &:focus-visible { transform: none; }
+}
+
+#content:focus { outline: none; }
