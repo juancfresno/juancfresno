@@ -28,7 +28,7 @@ $color-accent-2:    #ff3d00;
 // ─── Typography ───────────────────────────────────────────────────────────────
 $font-sans:         'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 $font-display:      'ClashDisplay', $font-sans;
-$font-mono:         var(--font-geist-mono), 'JetBrains Mono', monospace;
+$font-mono:         var(--font-fragment-mono), ui-monospace, 'SFMono-Regular', Menlo, monospace;
 $font-body:         var(--font-switzer), $font-sans;
 
 $fs-xs:    clamp(0.625rem,  0.5vw + 0.5rem, 0.75rem);

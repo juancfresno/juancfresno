@@ -22,7 +22,7 @@ function format(now: Date) {
 }
 
 export default function NavClock({ className }: { className?: string }) {
-  const [text, setText] = useState('')
+  const [text, setText] = useState('VLC --:--')
 
   useEffect(() => {
     let id: number

@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { GeistMono } from 'geist/font/mono'
+import { Fragment_Mono } from 'next/font/google'
 import localFont from 'next/font/local'
 import { Analytics } from '@vercel/analytics/next'
 import '@/styles/globals.scss'
@@ -10,6 +10,15 @@ import Shortcuts from '@/components/ui/Shortcuts/Shortcuts'
 import SocialPreview from '@/components/ui/SocialPreview/SocialPreview'
 import PageTransitionProvider from '@/providers/PageTransition'
 import { SITE_URL } from '@/lib/site'
+
+// UI mono: Fragment Mono (one weight, 400 + italic). Body: Switzer.
+const fragmentMono = Fragment_Mono({
+  variable: '--font-fragment-mono',
+  weight: '400',
+  style: ['normal', 'italic'],
+  subsets: ['latin', 'latin-ext'],
+  display: 'swap',
+})
 
 const switzer = localFont({
   variable: '--font-switzer',
@@ -26,10 +35,10 @@ export const metadata: Metadata = {
     template: '%s — Juan C. Fresno',
     default: 'Juan C. Fresno — Independent Art Director & Interactive Designer',
   },
-  description: 'Juan C. Fresno, independent art director and interactive designer for studios and brands. Valencia, Spain.',
+  description: 'Independent Art Director & Interactive Designer based in Valencia. 15+ years shaping digital products, brands and websites.',
   openGraph: {
     siteName: 'Juan C. Fresno',
-    locale: 'es_ES',
+    locale: 'en_GB',
     type: 'website',
   },
   twitter: {
@@ -43,11 +52,14 @@ const personJsonLd = {
   name: 'Juan C. Fresno',
   jobTitle: 'Independent Art Director & Interactive Designer',
   url: SITE_URL,
+  email: 'mailto:hello@juancfresno.com',
+  address: { '@type': 'PostalAddress', addressLocality: 'Valencia', addressCountry: 'ES' },
   sameAs: [
     'https://www.linkedin.com/in/juancfresno',
     'https://www.behance.net/juancfresno',
     'https://dribbble.com/JuanCFresno',
     'https://instagram.com/juanc.fresno',
+    'https://x.com/JuanCFresno',
   ],
 }
 
@@ -57,7 +69,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="es" suppressHydrationWarning className={`${GeistMono.variable} ${switzer.variable}`}>
+    <html lang="en" suppressHydrationWarning className={`${fragmentMono.variable} ${switzer.variable}`}>
       <head>
         {/* Theme before paint: saved choice, else dark (brand default). */}
         <script

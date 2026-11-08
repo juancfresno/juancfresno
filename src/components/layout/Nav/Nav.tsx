@@ -184,6 +184,7 @@ function NavLinkItem({
     <a
       href={href}
       className={clsx(s.navLink, active && s.active)}
+      aria-current={active ? 'page' : undefined}
       onClick={(e) => {
         // Permitir Cmd/Ctrl+click para abrir en nueva pestaña
         if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
@@ -227,7 +228,7 @@ export default function Nav() {
     <a
       href="/"
       className={s.logo}
-      aria-label="Fresno — ir a inicio"
+      aria-label="Fresno — home"
       onClick={(e) => {
         if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
         e.preventDefault()
@@ -242,7 +243,7 @@ export default function Nav() {
     <a
       href="/"
       className={s.face}
-      aria-label="Ir a inicio"
+      aria-label="Home"
       onClick={(e) => {
         if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
         e.preventDefault()
@@ -261,7 +262,7 @@ export default function Nav() {
           <div className={s.left}>
             {faceLink}
 
-            <nav className={s.navMenu} aria-label="Navegación principal">
+            <nav className={s.navMenu} aria-label="Main">
               {NAV_LINKS.map(({ label, href }) => (
                 <NavLinkItem
                   key={href}
@@ -281,7 +282,7 @@ export default function Nav() {
             <button
               type="button"
               className={s.help}
-              aria-label="Atajos de teclado"
+              aria-label="Keyboard shortcuts"
               aria-keyshortcuts="?"
               onClick={() => window.dispatchEvent(new Event('fresno:shortcuts'))}
             >
@@ -296,7 +297,7 @@ export default function Nav() {
       </header>
 
       {/* ── Mobile bottom tab bar ── */}
-      <nav className={s.bottomBar} aria-label="Navegación móvil">
+      <nav className={s.bottomBar} aria-label="Main (mobile)">
           {MOBILE_LINKS.map(({ label, href }) => {
             const isActive = pathname === href || pathname.startsWith(href + '/')
             return (
@@ -304,6 +305,7 @@ export default function Nav() {
                 key={href}
                 href={href}
                 className={clsx(s.bottomTab, isActive && s.bottomTabActive)}
+                aria-current={isActive ? 'page' : undefined}
                 onClick={(e) => {
                   if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
                   e.preventDefault()

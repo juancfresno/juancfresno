@@ -7,10 +7,10 @@ import s from './Shortcuts.module.scss'
 // "?" opens it, Esc closes it. G (grid) and D (theme) are handled by their own
 // components; M (modes) is announced as coming soon. Ignored while typing.
 const KEYS: { k: string; label: string; soon?: boolean }[] = [
-  { k: 'G', label: 'Retícula' },
-  { k: 'D', label: 'Tema claro / oscuro' },
-  { k: 'M', label: 'Modos', soon: true },
-  { k: '?', label: 'Ayuda' },
+  { k: 'G', label: 'Layout grid' },
+  { k: 'D', label: 'Light / dark theme' },
+  { k: 'M', label: 'Modes', soon: true },
+  { k: '?', label: 'Help' },
 ]
 
 const isTyping = (t: EventTarget | null) => {
@@ -70,8 +70,8 @@ export default function Shortcuts() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className={s.head}>
-              <p id="shortcuts-title" className={s.title}>{'{ atajos ↘'}</p>
-              <button type="button" className={s.close} onClick={() => setOpen(false)} aria-label="Cerrar atajos">
+              <p id="shortcuts-title" className={s.title}>{'{ shortcuts ↘'}</p>
+              <button type="button" className={s.close} onClick={() => setOpen(false)} aria-label="Close shortcuts">
                 Esc
               </button>
             </div>
@@ -80,7 +80,7 @@ export default function Shortcuts() {
                 <li key={k} className={s.row}>
                   <kbd className={s.key}>{k}</kbd>
                   <span className={s.label}>{label}</span>
-                  {soon && <span className={s.soon}>próximamente</span>}
+                  {soon && <span className={s.soon}>coming soon</span>}
                 </li>
               ))}
             </ul>
@@ -88,7 +88,7 @@ export default function Shortcuts() {
         </div>
       )}
       <div className={s.toast} data-on={toast || undefined} role="status" aria-live="polite">
-        {toast ? 'Modos · próximamente' : ''}
+        {toast ? 'Modes · coming soon' : ''}
       </div>
     </>
   )

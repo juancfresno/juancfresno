@@ -21,7 +21,7 @@ export default function Footer() {
       <div className={s.inner}>
 
         {/* Social wordmarks */}
-        <nav className={s.social} aria-label="Redes sociales">
+        <nav className={s.social} aria-label="Social profiles">
             {SOCIALS.map(({ id, label, href, Icon }) => (
               <GlitchSocialIcon
                 key={id}

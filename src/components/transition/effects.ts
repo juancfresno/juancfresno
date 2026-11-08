@@ -267,7 +267,7 @@ function gridProbe() {
     probe.className = grid.overlay
     probe.setAttribute('aria-hidden', 'true')
     probe.style.visibility = 'hidden'
-    probe.style.fontFamily = 'var(--font-geist-mono), ui-monospace, monospace'
+    probe.style.fontFamily = 'var(--font-fragment-mono), ui-monospace, monospace'
     const inner = document.createElement('div')
     inner.className = grid.inner
     for (let i = 0; i < 12; i++) {

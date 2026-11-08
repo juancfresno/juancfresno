@@ -46,7 +46,7 @@ export default function ThemeToggle({ className }: { className?: string }) {
   }, [])
 
   return (
-    <div className={clsx(s.toggle, className)} role="group" aria-label="Modo de color">
+    <div className={clsx(s.toggle, className)} role="group" aria-label="Colour theme">
       {THEMES.map((t, i) => (
         <span key={t} className={s.item}>
           {i > 0 && <span className={s.sep} aria-hidden="true">/</span>}
