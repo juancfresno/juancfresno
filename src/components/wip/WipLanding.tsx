@@ -1,5 +1,5 @@
 import { getSite } from '@/content/site'
-import { FEED } from '@/content/feed'
+import { FEED, FEED_SELECTED } from '@/content/feed'
 import { PERSON_BASE } from '@/content/person'
 import type { Locale } from '@/i18n/config'
 import HelloCycle from '@/components/home/HelloCycle'
@@ -27,7 +27,7 @@ export default function WipLanding({ locale }: { locale: Locale }) {
 
   return (
     <div className={s.page}>
-      <CursorTrail items={items} />
+      <CursorTrail items={items} canvasItems={FEED_SELECTED} />
       <Grain />
       <header className={s.hero}>
         <h1 className={s.head}>

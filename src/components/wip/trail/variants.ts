@@ -8,14 +8,17 @@ import type { Deck, TrailItem } from './deck'
 // 1 Classic and 4 Grid animate with the Web Animations API (compositor), the
 // rest integrate springs per frame.
 
-export type TrailId = 1 | 2 | 3 | 4 | 5
-export const TRAIL_IDS: TrailId[] = [1, 2, 3, 4, 5]
+// 6 · Canvas is not a trail: the feed's infinite plane as the background
+// (../CanvasBackdrop.tsx), handled by CursorTrail.
+export type TrailId = 1 | 2 | 3 | 4 | 5 | 6
+export const TRAIL_IDS: TrailId[] = [1, 2, 3, 4, 5, 6]
 export const TRAIL_NAMES: Record<TrailId, string> = {
   1: 'Classic',
   2: 'Delay',
   3: 'Stack',
   4: 'Grid',
   5: 'Tail',
+  6: 'Canvas',
 }
 
 export type Env = {
@@ -480,7 +483,7 @@ function tail(env: Env): Behaviour {
   }
 }
 
-export const BEHAVIOURS: Record<TrailId, (env: Env) => Behaviour> = {
+export const BEHAVIOURS: Record<Exclude<TrailId, 6>, (env: Env) => Behaviour> = {
   1: classic,
   2: delay,
   3: stack,

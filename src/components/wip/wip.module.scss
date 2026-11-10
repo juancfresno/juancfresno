@@ -253,3 +253,64 @@
     color: $color-bg;
   }
 }
+
+// ─── 6 · Canvas (CanvasBackdrop.tsx) ─────────────────────────────────────────
+// The feed plane, fixed under everything (portalled to <body>, z 1: below
+// main 10, footer 20, header 100, grain 150). The veil keeps the copy legible
+// in both themes: a light overall dim, a strong wash behind the hero (left)
+// and bands under the header and the footer.
+.canvasStage {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+  background: $color-bg;
+}
+
+.canvasGl, .canvasDom {
+  position: absolute;
+  inset: 0;
+  display: block;
+  &[hidden] { display: none; }
+}
+
+.canvasTile {
+  position: absolute;
+  left: 0;
+  top: 0;
+  overflow: hidden;
+  border-radius: 2px;
+  background: $color-bg-2;
+  will-change: transform;
+  img { display: block; width: 100%; height: 100%; object-fit: cover; }
+}
+
+.canvasVeil {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--c-bg) 80%, transparent) 0, transparent 140px),
+    linear-gradient(0deg, color-mix(in srgb, var(--c-bg) 92%, transparent) 0, color-mix(in srgb, var(--c-bg) 60%, transparent) 130px, transparent 260px),
+    linear-gradient(90deg, color-mix(in srgb, var(--c-bg) 90%, transparent) 0, color-mix(in srgb, var(--c-bg) 84%, transparent) 50%, color-mix(in srgb, var(--c-bg) 62%, transparent) 70%, color-mix(in srgb, var(--c-bg) 22%, transparent) 88%, color-mix(in srgb, var(--c-bg) 15%, transparent) 100%);
+
+  @include respond-to(md) {
+    background:
+      linear-gradient(180deg, color-mix(in srgb, var(--c-bg) 88%, transparent) 0, color-mix(in srgb, var(--c-bg) 72%, transparent) 70%, color-mix(in srgb, var(--c-bg) 92%, transparent) 100%);
+  }
+}
+
+// While variant 6 is on: the page lets the plane through and takes drags.
+:global(html[data-trail='6']) {
+  :global(footer) { background: transparent; }
+  .page { touch-action: none; }
+  .hint { display: none; }
+  .hero { user-select: text; }
+  @media (pointer: fine) { :global(body) { cursor: grab; } }
+}
+
+:global(html).canvasDragging,
+:global(html).canvasDragging * {
+  cursor: grabbing !important;
+  user-select: none !important;
+}
