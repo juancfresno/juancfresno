@@ -3,18 +3,20 @@
 import s from './Footer.module.scss'
 import ElasticLine from '@/components/ui/ElasticLine/ElasticLine'
 import LiveClock from '@/components/ui/LiveClock/LiveClock'
-import { BehanceLogo, InstagramLogo, DribbbleLogo, LinkedInLogo } from '@/components/ui/SocialLogos/SocialLogos'
+import { BehanceLogo, InstagramLogo, DribbbleLogo, LinkedInLogo, XLogo } from '@/components/ui/SocialLogos/SocialLogos'
 import GlitchSocialIcon from '@/components/ui/GlitchSocialIcon/GlitchSocialIcon'
 import { useHref, useUi } from '@/i18n/client'
 import CopyEmail from '@/components/close/CopyEmail'
 import { WIP } from '@/lib/wip'
 
 // ─── Social links data ─────────────────────────────────────────────────────────
+// Order as in Figma web/footer: Behance · Dribbble · LinkedIn · Instagram · X.
 const SOCIALS = [
   { id: 'behance',   label: 'Behance',   href: 'https://www.behance.net/juancfresno',    Icon: BehanceLogo  },
-  { id: 'instagram', label: 'Instagram', href: 'https://instagram.com/juanc.fresno',     Icon: InstagramLogo },
   { id: 'dribbble',  label: 'Dribbble',  href: 'https://dribbble.com/JuanCFresno',       Icon: DribbbleLogo  },
   { id: 'linkedin',  label: 'LinkedIn',  href: 'https://www.linkedin.com/in/juancfresno', Icon: LinkedInLogo },
+  { id: 'instagram', label: 'Instagram', href: 'https://instagram.com/juanc.fresno',     Icon: InstagramLogo },
+  { id: 'x',         label: 'X',         href: 'https://x.com/JuanCFresno',              Icon: XLogo        },
 ]
 
 // ─── Component ────────────────────────────────────────────────────────────────
