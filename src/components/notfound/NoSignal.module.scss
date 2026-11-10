@@ -13,12 +13,12 @@ $tear-b: rgba(52, 128, 255, 0.85); // same blue
 .stage {
   position: relative;
   flex: 1;
-  min-height: calc(100svh - 122px); // footer ≈ 122 px
+  min-height: calc(100svh - #{fluid(122px)}); // footer ≈ 122 px
   color: $raw-pearl;
   isolation: isolate;
 
   @include respond-to(md) {
-    min-height: calc(100svh - 160px - var(--tabbar-h, 0px));
+    min-height: calc(100svh - #{fluid(160px)} - var(--tabbar-h, 0px));
   }
 }
 
@@ -60,11 +60,11 @@ $tear-b: rgba(52, 128, 255, 0.85); // same blue
   --tear-x: 0px;
   position: absolute;
   right: 0;
-  top: calc(36px + 50%);
+  top: calc(#{fluid(36px)} + 50%);
   display: flex;
   align-items: center;
-  gap: 32px;
-  padding: 24px 40px;
+  gap: fluid(32px);
+  padding: fluid(24px) fluid(40px);
   background: $plate;
   transform: translate(var(--tear-x), -50%);
 }
@@ -73,8 +73,8 @@ $tear-b: rgba(52, 128, 255, 0.85); // same blue
   margin: 0;
   font-family: $font-body;
   font-weight: 400;
-  font-size: 24px;
-  line-height: 46px;
+  font-size: fluid(24px);
+  line-height: fluid(46px);
   letter-spacing: -0.02em; // -0.48 px
   color: $tint;
   white-space: nowrap;
@@ -83,7 +83,7 @@ $tear-b: rgba(52, 128, 255, 0.85); // same blue
 .line {
   margin: 0;
   font-family: $font-body;
-  font-size: 14px;
+  font-size: fluid(14px);
   line-height: 1.4;
   color: $raw-pearl;
   white-space: nowrap;
@@ -93,14 +93,14 @@ $tear-b: rgba(52, 128, 255, 0.85); // same blue
 .actions {
   display: flex;
   align-items: center;
-  gap: 32px;
+  gap: fluid(32px);
   margin: 0;
 }
 
 .slash {
   font-family: $font-body;
-  font-size: 24px;
-  line-height: 46px;
+  font-size: fluid(24px);
+  line-height: fluid(46px);
   letter-spacing: -0.02em;
   color: $tint;
 }
@@ -119,11 +119,11 @@ $tear-b: rgba(52, 128, 255, 0.85); // same blue
 // right-aligned like the Figma text. ──────────────────────────────────────────
 @include respond-to(md) {
   .card {
-    left: 16px;
+    left: fluid(16px);
     flex-direction: column;
     align-items: flex-end;
-    gap: 12px;
-    padding: 20px 24px;
+    gap: fluid(12px);
+    padding: fluid(20px) fluid(24px);
   }
   .code { line-height: 1.2; }
   .line { white-space: normal; text-align: right; text-wrap: pretty; }

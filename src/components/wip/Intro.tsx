@@ -174,7 +174,7 @@ export default function Intro() {
       }
 
       // Boxes: in with re-typing labels, out in reading order at GO.
-      g.font = `10px ${probe.font || 'monospace'}`
+      g.font = `${10 * Math.max(1, window.innerWidth / 1680)}px ${probe.font || 'monospace'}`
       boxes.forEach((b, j) => {
         const pin = EASE_ENTER(prog(t, T.boxesAt + j * T.boxStagger, T.boxIn))
         const pout = EASE_SOFT(prog(t, T.go + j * T.boxOutStagger, T.boxOut))

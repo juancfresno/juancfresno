@@ -10,13 +10,13 @@ $in-ease: cubic-bezier(0.22, 1, 0.36, 1); // one family for everything that ente
 .page {
   position: relative;
   box-sizing: border-box;
-  min-height: calc(100svh - 122px); // footer ≈ 122 px (Figma web/footer)
-  padding-top: calc(72px + 83px);
+  min-height: calc(100svh - #{fluid(122px)}); // footer ≈ 122 px (Figma web/footer)
+  padding-top: calc(#{fluid(72px)} + #{fluid(83px)});
   padding-bottom: 6rem;
 
   @include respond-to(md) {
-    min-height: calc(100svh - 160px);
-    padding-top: calc(72px + 40px);
+    min-height: calc(100svh - #{fluid(160px)});
+    padding-top: calc(#{fluid(72px)} + #{fluid(40px)});
     padding-bottom: 9rem;
   }
 }
@@ -28,7 +28,7 @@ $in-ease: cubic-bezier(0.22, 1, 0.36, 1); // one family for everything that ente
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 24px;
+  gap: fluid(24px);
 }
 
 // Geist 40/46 −0.8 in Figma → Switzer (body font).
@@ -60,7 +60,7 @@ $in-ease: cubic-bezier(0.22, 1, 0.36, 1); // one family for everything that ente
 .disciplines {
   margin: 0;
   font-family: $font-mono;
-  font-size: 11px;
+  font-size: fluid(11px);
   line-height: normal;
   text-transform: uppercase;
   color: $color-text;
@@ -102,13 +102,13 @@ $in-ease: cubic-bezier(0.22, 1, 0.36, 1); // one family for everything that ente
 // "Copied ✓" chip: same chip as the nav hover (blue, ink text), same spring.
 .copied {
   display: inline-block;
-  margin-left: 10px;
-  padding: 0 6px;
+  margin-left: fluid(10px);
+  padding: 0 fluid(6px);
   border-radius: 3px;
   background: $raw-chip;
   color: $raw-ink;
   font-family: $font-mono;
-  font-size: 11px;
+  font-size: fluid(11px);
   line-height: 1.5;
   text-transform: uppercase;
   vertical-align: 0.08em;
@@ -144,10 +144,10 @@ $in-ease: cubic-bezier(0.22, 1, 0.36, 1); // one family for everything that ente
 .hint {
   position: absolute;
   left: 84.8%;
-  top: calc(72px + (100% - 72px) * 0.55);
+  top: calc(#{fluid(72px)} + (100% - #{fluid(72px)}) * 0.55);
   z-index: 3;
-  width: 10px;
-  height: 10px;
+  width: fluid(10px);
+  height: fluid(10px);
   pointer-events: none;
   mix-blend-mode: difference;
   color: #fff;
@@ -174,10 +174,10 @@ $in-ease: cubic-bezier(0.22, 1, 0.36, 1); // one family for everything that ente
 
 .hintLabel {
   position: absolute;
-  right: calc(100% + 10px);
-  top: 14px;
+  right: calc(100% + #{fluid(10px)});
+  top: fluid(14px);
   font-family: $font-mono;
-  font-size: 11px;
+  font-size: fluid(11px);
   letter-spacing: 0.08em;
   white-space: nowrap;
 }
@@ -270,27 +270,27 @@ $in-ease: cubic-bezier(0.22, 1, 0.36, 1); // one family for everything that ente
 .switcher {
   position: fixed;
   left: max(#{$m}, env(safe-area-inset-left, 0px));
-  top: calc(72px + 12px); // under the header line, clear of the hero copy and the footer
+  top: calc(#{fluid(72px)} + #{fluid(12px)}); // under the header line, clear of the hero copy and the footer
   @include respond-to(md) { top: auto; bottom: calc(10px + env(safe-area-inset-bottom, 0px)); }
   z-index: 160;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 4px;
+  gap: fluid(4px);
   max-width: calc(100vw - 2 * #{$m});
-  padding: 4px;
+  padding: fluid(4px);
   border: 1px solid $color-line;
   border-radius: 2px;
   background: $color-bg;
   font-family: $font-mono;
-  font-size: 10px;
+  font-size: fluid(10px);
   line-height: 1.2;
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
 
 .switcherLabel {
-  padding: 4px 6px;
+  padding: fluid(4px) fluid(6px);
   color: $color-text-mid;
 }
 
@@ -298,7 +298,7 @@ $in-ease: cubic-bezier(0.22, 1, 0.36, 1); // one family for everything that ente
   font: inherit;
   letter-spacing: inherit;
   text-transform: inherit;
-  padding: 4px 6px;
+  padding: fluid(4px) fluid(6px);
   border: 0;
   border-radius: 2px;
   background: none;

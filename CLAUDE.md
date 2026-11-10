@@ -33,6 +33,15 @@ No i18n library: a small typed setup (Next 16 App Router pattern: one root layou
 
 **Note for later:** the canvas background exercise (plane / sphere / tunnel / lens over the feed mosaic, RGB split on drag) will become a **Lab piece**. Not built yet.
 
+## Type scale (fluid above 1680)
+
+Every type size is EXACTLY the designed value up to 1680 px wide and scales linearly above it: `size = max(px, px × 100vw / 1680)` (2560 → ×1.524). Central mechanisms (`_variables.scss`, `_reset.scss`, `globals.scss`):
+
+- `html { font-size: max(100%, 0.95238vw) }` → every **rem** value (all `$fs-*` tokens, existing `clamp(rem, vw, rem)` sizes, paddings, gaps, `$nav-height`) scales with it; ≤ 1680 it is the normal 16 px, so nothing changes.
+- `--u: max(1px, calc(100vw / 1680))` (one design px) and the Sass function `fluid($px)` → `calc(N * var(--u))` for values written in px: mono labels (nav 11/10, theme toggle, grid overlay, social preview), px line-heights, the header face (25×32) and vertical wordmark (12×32 box, 101 px), sticky offsets `--fg-top` / `--arco-top` (72 px).
+- Canvas text (transition labels in `effects.ts`) multiplies by `max(1, innerWidth/1680)`.
+- **Rule:** never write a bare px for font-size, letter-spacing, line-height or type-tied sizes: use rem (or an `$fs-*` token) or `fluid(Npx)`. Layout grids stay liquid (`--m`, `--gutter`) and images are untouched. Check: computed font sizes at 1680 and 390 must match the previous build; at 2560 they are ×1.524.
+
 ## Routing (App Router, `app/[lang]/(site)`) — v1.0 copy on branch `web-v2`
 
 All real pages live under `src/app/[lang]/(site)/` (URLs below are the English ones; Spanish = the same under `/es`). Pages only lay content out; copy lives in `src/content/` (per locale in `src/content/i18n/`, see above):
