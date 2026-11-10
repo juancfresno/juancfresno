@@ -31,14 +31,16 @@
   padding: 0;
   cursor: pointer;
   @include touch-target(16px, 4px);
+  @include chip-hover(-3px -5px);
   transition: color $duration-fast $ease-out-quart;
 
-  &:hover { color: $color-text; }
+  &:hover, &:focus-visible { color: $raw-ink; }
   @include focus-ring;
 }
 
 .on {
   color: $color-text;
+  &:hover, &:focus-visible { color: $raw-ink; }
 }
 
 // `pair` (WIP header, Figma 6944:8987): no slash, 8 px apart, the option not
@@ -47,6 +49,6 @@
   gap: 8px;
   .sep { display: none; }
   .btn { color: $color-text; opacity: 0.3; transition: opacity $duration-fast $ease-out-quart; }
-  .btn:hover { color: $color-text; opacity: 0.7; }
+  .btn:hover, .btn:focus-visible { color: $raw-ink; opacity: 1; }
   .on, .on:hover { opacity: 1; }
 }

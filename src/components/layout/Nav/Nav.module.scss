@@ -35,6 +35,7 @@
   @include container;
                // same margins as the page grid (see GridOverlay)
   padding-block: 1.25rem;
+  &.wip { @include container-chrome; }
 }
 
 // ─── Left cluster: face + nav menu ───────────────────────────────────────────
@@ -130,128 +131,7 @@
   }
 }
 
-// ─── Nav link ─────────────────────────────────────────────────────────────────
-.navLink {
-  position: relative;
-  isolation: isolate;               // stacking context para el ::before chip
-
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;                         // gap entre texto y flecha SVG
-
-  font-family: $font-mono;
-  font-size: 11px;
-  font-weight: $fw-regular;
-  line-height: 13px;
-  letter-spacing: 0;
-  text-transform: uppercase;
-
-  color: $color-text-mid;           // 60% por defecto
-  transition: color $duration-fast $ease-out-quart;
-
-  // ── Chip de fondo — pastilla azul claro ──────────────────────────────────
-  &::before {
-    content: '';
-    position: absolute;
-    inset: -3px -6px;
-    border-radius: 3px;
-    background: $raw-chip;
-    opacity: 0;
-    transform: scale(0.88);
-    // Exit: rápido y sin spring
-    transition:
-      opacity   0.14s ease-in,
-      transform 0.18s ease-in;
-    pointer-events: none;
-    z-index: -1;
-  }
-
-  // Entry: chip aparece primero con spring, luego viene la flecha
-  &:hover::before,
-  &.active::before {
-    opacity: 1;
-    transform: scale(1);
-    transition:
-      opacity   0.18s ease-out,
-      transform 0.26s $ease-spring;
-  }
-
-  // Texto oscuro sobre el chip claro
-  &:hover,
-  &.active {
-    color: $raw-ink;               // dark text on the light chip, both themes
-  }
-
-  @include focus-ring;
-}
-
-// Span de texto — necesario para aislar el overflow del navArrow
-.navLinkText {
-  display: inline-block;
-}
-
-// ─── Arrow SVG container ──────────────────────────────────────────────────────
-.navArrow {
-  display: inline-block;
-  flex-shrink: 0;
-  // Alineación óptica: el SVG 9×9 necesita descender un pelo para alinearse
-  // con la baseline de Geist Mono 11/13
-  margin-top: 0.5px;
-  overflow: visible;                // los strokes con round linecap pueden salir del box
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// FLECHA — animación stroke-dashoffset
-//
-// Técnica: dos paths (shaft + head) con stroke-dasharray = longitud exacta del path
-//          • En reposo: dashoffset = dasharray → path invisible (gap ocupa todo)
-//          • En hover : dashoffset → 0 → path se dibuja de inicio a fin
-//
-// Longitudes:
-//   Shaft "M 1.5 1.5 L 7.5 7.5": √((6²+6²)) = √72 ≈ 8.485 → 8.5
-//   Head  "M 7.5 3.5 L 7.5 7.5 L 3.5 7.5":  4 + 4 = 8
-//
-// Timing (chip → shaft → head):
-//   • Chip crece  0 – ~0.26s  (ease-spring, sin delay)
-//   • Shaft dibuja  0.15s – 0.51s  (expo, delay 0.15s)
-//   • Head forma    0.31s – 0.63s  (expo, delay 0.31s = 0.15 + 0.16)
-//
-// Entrada/salida independientes:
-//   • Entrada (hover):   .navLink:hover sobreescribe transition → expo + delay
-//   • Salida (unhover):  transition del estado base → ease-in rápido, sin delay
-// ─────────────────────────────────────────────────────────────────────────────
-
-// ── Shaft ─────────────────────────────────────────────────────────────────────
-.navArrowShaft {
-  stroke-dasharray: 8.5;
-  stroke-dashoffset: 8.5;
-
-  // Exit: desaparece rápido y sincronizado
-  transition: stroke-dashoffset 0.2s ease-in;
-
-  // Entry: espera a que el chip aparezca, luego se dibuja (delay 0.15s)
-  .navLink:hover &,
-  .navLink.active & {
-    stroke-dashoffset: 0;
-    transition: stroke-dashoffset 0.36s $ease-out-expo 0.15s;
-  }
-}
-
-// ── Head (bracket L ↘) ────────────────────────────────────────────────────────
-.navArrowHead {
-  stroke-dasharray: 8;
-  stroke-dashoffset: 8;
-
-  // Exit: desaparece antes que el shaft (sin delay)
-  transition: stroke-dashoffset 0.18s ease-in;
-
-  // Entry: arranca cuando el shaft lleva 0.16s corriendo → delay total 0.31s
-  .navLink:hover &,
-  .navLink.active & {
-    stroke-dashoffset: 0;
-    transition: stroke-dashoffset 0.32s $ease-out-expo 0.31s;
-  }
-}
+// Nav link (chip + scramble + arrow): components/ui/NavLink
 
 // ─── Right cluster: local time + "?" + wordmark ──────────────────────────────
 .right {
@@ -383,6 +263,7 @@
 // ─── Separator line ───────────────────────────────────────────────────────────
 .lineWrap {
   @include container;
+  &.wip { @include container-chrome; }
 }
 
 .line {

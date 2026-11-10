@@ -1,6 +1,6 @@
 'use client'
 
-import type { CSSProperties } from 'react'
+import { useState, type CSSProperties } from 'react'
 
 import s from './Footer.module.scss'
 import ElasticLine from '@/components/ui/ElasticLine/ElasticLine'
@@ -10,6 +10,8 @@ import GlitchSocialIcon from '@/components/ui/GlitchSocialIcon/GlitchSocialIcon'
 import { useHref, useUi } from '@/i18n/client'
 import LocaleSwitch from '@/components/ui/LocaleSwitch/LocaleSwitch'
 import { WIP } from '@/lib/wip'
+import { useScramble } from '@/lib/useScramble'
+import clsx from 'clsx'
 
 // ─── Social links data ─────────────────────────────────────────────────────────
 // Order as in Figma web/footer: Behance · Dribbble · LinkedIn · Instagram · X.
@@ -21,13 +23,34 @@ const SOCIALS = [
   { id: 'x',         label: 'X',         href: 'https://x.com/JuanCFresno',              Icon: XLogo        },
 ]
 
+// "?" — same chip + decode as the nav links, on hover and keyboard focus.
+function HelpButton({ label }: { label: string }) {
+  const [hot, setHot] = useState(false)
+  const text = useScramble('?', hot)
+  return (
+    <button
+      type="button"
+      className={s.help}
+      aria-label={label}
+      aria-keyshortcuts="?"
+      onClick={() => window.dispatchEvent(new Event('fresno:shortcuts'))}
+      onMouseEnter={() => setHot(true)}
+      onMouseLeave={() => setHot(false)}
+      onFocus={() => setHot(true)}
+      onBlur={() => setHot(false)}
+    >
+      {text}
+    </button>
+  )
+}
+
 // ─── Component ────────────────────────────────────────────────────────────────
 export default function Footer() {
   const ui = useUi()
   const href = useHref()
   return (
     <footer className={s.footer} {...(WIP ? { 'data-in': 'rise', 'data-wire': 'FOOTER', style: { '--in-d': '480ms' } as CSSProperties } : {})}>
-      <div className={s.inner}>
+      <div className={clsx(s.inner, WIP && s.wip)}>
 
         {/* Social wordmarks */}
         <nav className={s.social} aria-label={ui.footer.socials}>
@@ -53,15 +76,7 @@ export default function Footer() {
           <div className={s.metaLeft}>
             <span className={s.copyright}>© 2012 — 2026{!WIP && <> · <a href={href('/legal')} style={{ color: 'inherit' }}>{ui.footer.legal}</a></>}</span>
             <LocaleSwitch className={s.lang} {...(WIP ? { pair: true } : {})} />
-            <button
-              type="button"
-              className={s.help}
-              aria-label={ui.nav.shortcuts}
-              aria-keyshortcuts="?"
-              onClick={() => window.dispatchEvent(new Event('fresno:shortcuts'))}
-            >
-              ?
-            </button>
+            <HelpButton label={ui.nav.shortcuts} />
           </div>
           <div className={s.metaRight}>
             <LiveClock />

@@ -15,6 +15,9 @@
   padding-bottom: 1.5rem;
 }
 
+// WIP landing + 404 (Figma web/footer: 20 px side margins at 1680, liquid).
+.wip { @include container-chrome; }
+
 // ─── Social row ───────────────────────────────────────────────────────────────
 .social {
   display: flex;
@@ -108,8 +111,9 @@
   line-height: 1;
   color: $color-text-mid;
   cursor: pointer;
+  @include chip-hover(-1px);
   transition: color $duration-fast, border-color $duration-fast;
-  &:hover { color: $color-text; border-color: $color-text-mid; }
+  &:hover, &:focus-visible { color: $raw-ink; border-color: transparent; }
   @include focus-ring;
 }
 

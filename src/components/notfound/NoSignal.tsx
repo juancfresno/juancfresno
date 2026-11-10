@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 import Link from 'next/link'
+import NavLinkItem from '@/components/ui/NavLink/NavLink'
 import { useHref, useUi } from '@/i18n/client'
 import { WIP } from '@/lib/wip'
 import { startNoSignal } from './noSignal'
@@ -56,7 +57,7 @@ export default function NoSignal() {
         <p className={s.line}>{t.line}</p>
         <p className={s.actions}>
           <span className={s.slash} aria-hidden="true">/</span>
-          <Link href={href('/')} className={s.link}>{t.home}</Link>
+          <NavLinkItem href={href('/')} label={t.home.replace(/\s*↘\s*$/, '')} className={s.link} />
           {!WIP && <Link href={href('/work')} className={s.link}>{t.work}</Link>}
         </p>
       </section>

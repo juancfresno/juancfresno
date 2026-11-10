@@ -1,10 +1,12 @@
 'use client'
 
+import { useState } from 'react'
 import { usePathname } from 'next/navigation'
 import clsx from 'clsx'
 import { HTML_LANG, LOCALES, LOCALE_COOKIE, LOCALE_STORAGE, switchLocalePath, type Locale } from '@/i18n/config'
 import { useLocale, useUi } from '@/i18n/client'
 import { usePageTransition } from '@/providers/PageTransition'
+import { useScramble } from '@/lib/useScramble'
 import s from '../ThemeToggle/ThemeToggle.module.scss'
 
 // ─── Language selector · "ES / EN" ────────────────────────────────────────────
@@ -18,6 +20,30 @@ const ORDER: Locale[] = ['es', 'en']
 export function rememberLocale(l: Locale) {
   document.cookie = `${LOCALE_COOKIE}=${l}; path=/; max-age=31536000; samesite=lax`
   try { localStorage.setItem(LOCALE_STORAGE, l) } catch {}
+}
+
+// One option: chip + decode on hover / focus (the nav link effect).
+function LocaleOption({ l, on, href, label, onGo }: { l: Locale; on: boolean; href: string; label: string; onGo: (e: React.MouseEvent) => void }) {
+  const [hot, setHot] = useState(false)
+  const text = useScramble(l, hot)
+  return (
+    <a
+      href={href}
+      hrefLang={HTML_LANG[l]}
+      lang={HTML_LANG[l]}
+      className={clsx(s.btn, on && s.on)}
+      aria-current={on ? 'true' : undefined}
+      aria-label={label}
+      data-no-transition
+      onClick={onGo}
+      onMouseEnter={() => setHot(true)}
+      onMouseLeave={() => setHot(false)}
+      onFocus={() => setHot(true)}
+      onBlur={() => setHot(false)}
+    >
+      {text}
+    </a>
+  )
 }
 
 export default function LocaleSwitch({ className, pair }: { className?: string; pair?: boolean }) {
@@ -34,24 +60,19 @@ export default function LocaleSwitch({ className, pair }: { className?: string; 
         return (
           <span key={l} className={s.item}>
             {i > 0 && <span className={s.sep} aria-hidden="true">/</span>}
-            <a
+            <LocaleOption
+              l={l}
+              on={on}
               href={href}
-              hrefLang={HTML_LANG[l]}
-              lang={HTML_LANG[l]}
-              className={clsx(s.btn, on && s.on)}
-              aria-current={on ? 'true' : undefined}
-              aria-label={ui.lang.to[l]}
-              data-no-transition
-              onClick={(e) => {
+              label={ui.lang.to[l]}
+              onGo={(e) => {
                 if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
                 e.preventDefault()
                 rememberLocale(l)
                 if (on) return
                 navigate(switchLocalePath(window.location.pathname, l) + window.location.search + window.location.hash)
               }}
-            >
-              {l}
-            </a>
+            />
           </span>
         )
       })}

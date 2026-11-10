@@ -87,6 +87,7 @@ $tear-b: rgba(52, 128, 255, 0.85); // same blue
   line-height: 1.4;
   color: $raw-pearl;
   white-space: nowrap;
+  &:hover, &:focus-visible { color: $raw-ink; }
 }
 
 .actions {
@@ -104,24 +105,12 @@ $tear-b: rgba(52, 128, 255, 0.85); // same blue
   color: $tint;
 }
 
-// web/nav-link: mono 11/13, chip on hover/focus (brand blue, ink text).
-.link {
+// web/nav-link: the real nav link (components/ui/NavLink: chip, decode, arrow);
+// here only the resting colour (pearl on the ink plate) and the layout.
+.actions .link {
   @include touch-target;
-  display: inline-flex;
-  align-items: center;
-  padding: 2px 4px;
-  border-radius: 3px;
-  font-family: $font-mono;
-  font-size: 11px;
-  line-height: 13px;
-  text-transform: uppercase;
   color: $raw-pearl;
-  text-decoration: none;
   white-space: nowrap;
-  transition: background-color 160ms ease, color 160ms ease;
-
-  &:hover, &:focus-visible { background: $raw-chip; color: $raw-ink; }
-  &:focus-visible { outline: 1px solid $raw-chip; outline-offset: 2px; }
 }
 
 .srOnly { @include visually-hidden; }
