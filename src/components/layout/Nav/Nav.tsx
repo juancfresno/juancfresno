@@ -10,7 +10,6 @@ import ElasticLine from '@/components/ui/ElasticLine/ElasticLine'
 import ThemeToggle from '@/components/ui/ThemeToggle/ThemeToggle'
 import NavClock from '@/components/ui/NavClock/NavClock'
 import { usePageTransition } from '@/providers/PageTransition'
-import LocaleSwitch from '@/components/ui/LocaleSwitch/LocaleSwitch'
 import { useHref, useUi } from '@/i18n/client'
 import { parsePath } from '@/i18n/config'
 import { WIP } from '@/lib/wip'
@@ -237,7 +236,7 @@ export default function Nav() {
     <a
       href={home}
       className={s.logo}
-      {...(WIP ? { 'data-in': 'fade', style: { '--in-d': '260ms' } as CSSProperties } : {})}
+      {...(WIP ? { 'data-in': 'fade', 'data-wire': 'LOGO · FRESNO©', style: { '--in-d': '120ms' } as CSSProperties } : {})}
       aria-label={ui.nav.logo}
       onClick={(e) => {
         if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
@@ -253,7 +252,7 @@ export default function Nav() {
     <a
       href={home}
       className={s.face}
-      {...(WIP ? { 'data-in': 'fade', style: { '--in-d': '60ms' } as CSSProperties } : {})}
+      {...(WIP ? { 'data-in': 'fade', 'data-wire': 'NAV', style: { '--in-d': '0ms' } as CSSProperties } : {})}
       aria-label={ui.nav.home}
       onClick={(e) => {
         if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
@@ -286,31 +285,15 @@ export default function Nav() {
             </nav>}
 
             {!WIP && <ThemeToggle className={s.theme} />}
-            {!WIP && <LocaleSwitch className={s.lang} />}
           </div>
 
-          {/* ── Right: local time + shortcuts, then the wordmark ── */}
+          {/* ── Right: local time, then the wordmark (ES / EN and "?" live in the footer) ── */}
           <div className={s.right}>
-            {/* WIP landing: "ES EN" before the wordmark; no theme toggle (the landing stays dark), no clock or "?". */}
-            {WIP && (
-              <div className={s.wipPrefs} data-in="fade" style={{ '--in-d': '180ms' } as CSSProperties}>
-                <LocaleSwitch pair />
-              </div>
-            )}
             {!WIP && <NavClock className={s.clock} />}
-            {!WIP && <button
-              type="button"
-              className={s.help}
-              aria-label={ui.nav.shortcuts}
-              aria-keyshortcuts="?"
-              onClick={() => window.dispatchEvent(new Event('fresno:shortcuts'))}
-            >
-              ?
-            </button>}
             {logoLink}
           </div>
         </div>
-        <div className={s.lineWrap} {...(WIP ? { 'data-in': 'line', style: { '--in-d': '120ms' } as CSSProperties } : {})}>
+        <div className={s.lineWrap} {...(WIP ? { 'data-in': 'line', style: { '--in-d': '0ms' } as CSSProperties } : {})}>
           <ElasticLine className={s.line} />
         </div>
       </header>

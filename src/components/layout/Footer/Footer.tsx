@@ -8,6 +8,7 @@ import LiveClock from '@/components/ui/LiveClock/LiveClock'
 import { BehanceLogo, InstagramLogo, DribbbleLogo, LinkedInLogo, XLogo } from '@/components/ui/SocialLogos/SocialLogos'
 import GlitchSocialIcon from '@/components/ui/GlitchSocialIcon/GlitchSocialIcon'
 import { useHref, useUi } from '@/i18n/client'
+import LocaleSwitch from '@/components/ui/LocaleSwitch/LocaleSwitch'
 import { WIP } from '@/lib/wip'
 
 // ─── Social links data ─────────────────────────────────────────────────────────
@@ -25,7 +26,7 @@ export default function Footer() {
   const ui = useUi()
   const href = useHref()
   return (
-    <footer className={s.footer} {...(WIP ? { 'data-in': 'rise', style: { '--in-d': '1000ms' } as CSSProperties } : {})}>
+    <footer className={s.footer} {...(WIP ? { 'data-in': 'rise', 'data-wire': 'FOOTER', style: { '--in-d': '480ms' } as CSSProperties } : {})}>
       <div className={s.inner}>
 
         {/* Social wordmarks */}
@@ -48,7 +49,20 @@ export default function Footer() {
 
         {/* Meta row */}
         <div className={s.meta}>
-          <span className={s.copyright}>© 2012 — 2026{!WIP && <> · <a href={href('/legal')} style={{ color: 'inherit' }}>{ui.footer.legal}</a></>}</span>
+          {/* © + language + the shortcuts legend ("?"), one mono line. */}
+          <div className={s.metaLeft}>
+            <span className={s.copyright}>© 2012 — 2026{!WIP && <> · <a href={href('/legal')} style={{ color: 'inherit' }}>{ui.footer.legal}</a></>}</span>
+            <LocaleSwitch className={s.lang} {...(WIP ? { pair: true } : {})} />
+            <button
+              type="button"
+              className={s.help}
+              aria-label={ui.nav.shortcuts}
+              aria-keyshortcuts="?"
+              onClick={() => window.dispatchEvent(new Event('fresno:shortcuts'))}
+            >
+              ?
+            </button>
+          </div>
           <div className={s.metaRight}>
             <LiveClock />
             <span className={s.location}>
