@@ -1,5 +1,7 @@
 'use client'
 
+import type { CSSProperties } from 'react'
+
 import { useState, useEffect, useRef } from 'react'
 import { usePathname } from 'next/navigation'
 import clsx from 'clsx'
@@ -235,6 +237,7 @@ export default function Nav() {
     <a
       href={home}
       className={s.logo}
+      {...(WIP ? { 'data-in': 'fade', style: { '--in-d': '260ms' } as CSSProperties } : {})}
       aria-label={ui.nav.logo}
       onClick={(e) => {
         if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
@@ -250,6 +253,7 @@ export default function Nav() {
     <a
       href={home}
       className={s.face}
+      {...(WIP ? { 'data-in': 'fade', style: { '--in-d': '60ms' } as CSSProperties } : {})}
       aria-label={ui.nav.home}
       onClick={(e) => {
         if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
@@ -289,7 +293,7 @@ export default function Nav() {
           <div className={s.right}>
             {/* WIP landing (Figma 6944:8876): "ES EN" · "DARK LIGHT" before the wordmark, no clock or "?". */}
             {WIP && (
-              <div className={s.wipPrefs}>
+              <div className={s.wipPrefs} data-in="fade" style={{ '--in-d': '180ms' } as CSSProperties}>
                 <LocaleSwitch pair />
                 <ThemeToggle pair />
               </div>
@@ -307,7 +311,7 @@ export default function Nav() {
             {logoLink}
           </div>
         </div>
-        <div className={s.lineWrap}>
+        <div className={s.lineWrap} {...(WIP ? { 'data-in': 'line', style: { '--in-d': '120ms' } as CSSProperties } : {})}>
           <ElasticLine className={s.line} />
         </div>
       </header>

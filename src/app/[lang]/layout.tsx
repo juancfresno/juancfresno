@@ -17,6 +17,7 @@ import { LocaleProvider } from '@/i18n/client'
 import { getSite, getUi } from '@/content/site'
 import { LANG_SWITCH_SCRIPT } from '@/providers/langSwitch'
 import { WIP } from '@/lib/wip'
+import { WIP_INTRO_SCRIPT } from '@/components/wip/introScript'
 
 // UI mono: Fragment Mono (one weight, 400 + italic). Body: Switzer.
 const fragmentMono = Fragment_Mono({
@@ -89,6 +90,8 @@ export default async function RootLayout({ children, params }: Props) {
         />
         {/* Language switch: keep the new page hidden until the transition reveals it. */}
         <script dangerouslySetInnerHTML={{ __html: LANG_SWITCH_SCRIPT }} />
+        {/* WIP landing intro: full / fast / reduced, before paint. */}
+        {WIP && <script dangerouslySetInnerHTML={{ __html: WIP_INTRO_SCRIPT }} />}
       </head>
       <body>
         <script

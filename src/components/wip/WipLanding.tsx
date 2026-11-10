@@ -1,50 +1,60 @@
+import type { CSSProperties } from 'react'
 import { getSite } from '@/content/site'
 import { FEED, FEED_SELECTED } from '@/content/feed'
 import { PERSON_BASE } from '@/content/person'
+import { headlineCycle } from '@/content/headline'
 import type { Locale } from '@/i18n/config'
 import HeadlineCycle from '@/components/home/HeadlineCycle'
-import { headlineCycle } from '@/content/headline'
-import CursorTrail, { type TrailItem } from './trail/CursorTrail'
+import Backdrop from './Backdrop'
+import type { TrailItem } from './trail/deck'
 import Grain from './Grain'
-import TrailHint from './TrailHint'
+import Intro from './Intro'
 import s from './wip.module.scss'
 
 // Temporary landing while v1.0 is finished (lib/wip.ts). Figma "Home · v0"
-// (6944:8590): two-line greeting + role, disciplines in mono, two-line intro,
-// the contact line with the email, the cursor image trail with its resting
-// hint, and an animated grain over everything. Copy: WIP in site.*.ts.
-// The feed manifest already leaves out duplicates and Biako (build-media);
-// ids are de-duplicated again here, and the trail uses the 600 px thumbnails.
+// (6944:8590): greeting line (cycles languages with a decode on hover) +
+// fixed role, mono disciplines, two-line intro, contact line with the email.
+// Behind it the feed plane (Backdrop: ?bg= / ?trail= compare in previews),
+// grain over everything, and the entrance (Intro + [data-in] delays).
+// Copy: WIP in site.*.ts; the greeting in other languages in content/headline.
+const d = (ms: number) => ({ '--in-d': `${ms}ms` }) as CSSProperties
+
 export default function WipLanding({ locale }: { locale: Locale }) {
   const { WIP } = getSite(locale)
   const email = PERSON_BASE.email
   const seen = new Set<string>()
-  const items: TrailItem[] = []
+  const trail: TrailItem[] = []
   for (const it of FEED) {
     if (seen.has(it.id)) continue
     seen.add(it.id)
-    items.push({ src: `/feed/t/${it.id}.webp`, r: +(it.w / it.h).toFixed(3) })
+    trail.push({ src: `/feed/t/${it.id}.webp`, r: +(it.w / it.h).toFixed(3) })
   }
 
   return (
     <div className={s.page}>
-      <CursorTrail items={items} canvasItems={FEED_SELECTED} />
+      <Intro />
+      <Backdrop feed={FEED_SELECTED} trail={trail} hint={WIP.hint} />
       <Grain />
       <header className={s.hero}>
         <h1 className={s.head}>
-          <HeadlineCycle lines={headlineCycle({ lang: locale, a: WIP.line1, b: WIP.title })} aClass={s.name} bClass={s.title} />
+          <HeadlineCycle lines={headlineCycle({ lang: locale, a: WIP.line1 })} className={s.name} />
+          <span className={`${s.mask} ${s.titleMask}`}>
+            <span className={s.title} data-in="mask" style={d(420)}>{WIP.title}</span>
+          </span>
         </h1>
-        <p className={s.disciplines}>{WIP.disciplines}</p>
-        <p className={s.intro}>
-          {WIP.intro[0]}
-          <br />
-          {WIP.intro[1]}
+        <p className={`${s.disciplines} ${s.mask}`}>
+          <span data-in="mask" style={d(540)}>{WIP.disciplines}</span>
         </p>
-        <p className={s.contact}>
-          {WIP.contact} <a className={s.email} href={`mailto:${email}`}>{email}</a>
+        <p className={s.intro}>
+          <span className={s.mask}><span data-in="mask" style={d(620)}>{WIP.intro[0]}</span></span>
+          <span className={s.mask}><span data-in="mask" style={d(700)}>{WIP.intro[1]}</span></span>
+        </p>
+        <p className={`${s.contact} ${s.mask}`}>
+          <span data-in="mask" style={d(800)}>
+            {WIP.contact} <a className={s.email} href={`mailto:${email}`}>{email}</a>
+          </span>
         </p>
       </header>
-      <TrailHint mouse={WIP.hint.mouse} touch={WIP.hint.touch} />
     </div>
   )
 }

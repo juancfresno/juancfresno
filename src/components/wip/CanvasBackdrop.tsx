@@ -1,6 +1,6 @@
 'use client'
 
-// ─── WIP trail variant 6 · "Canvas" ───────────────────────────────────────────
+// ─── WIP background · "plane" (default) ───────────────────────────────────────
 // The /feed infinite plane as the landing's background: same tile
 // (feed-canvas.json), same curated selection, same WebGL2 renderer
 // (feed/canvas/gl.ts: lazy textures, ≤ 6 loads in flight, LRU) with the RGB
@@ -19,6 +19,7 @@ import { createPortal } from 'react-dom'
 import type { FeedItem } from '@/content/feed'
 import { TILE, makeLayout, visible, gridMetrics, type Layout } from '@/components/feed/canvas/layout'
 import { createRenderer, type DrawPiece, type Renderer, type Theme } from '@/components/feed/canvas/gl'
+import { pageBg, pageFill, INTERACTIVE } from './bg/theme'
 import s from './wip.module.scss'
 
 const MAXV = 1.8 // px/ms cap for the release inertia
@@ -28,28 +29,14 @@ const DRIFT: [number, number] = [0.28, 0.12] // px per 60 Hz frame (≈ 17 / 7 p
 const PARALLAX = 22 // px of camera offset at the screen edge
 const IDLE_MS = 33 // ≤ 30 fps while only drifting
 
-function parseColor(v: string, fallback: [number, number, number]): [number, number, number] {
-  const ctx = document.createElement('canvas').getContext('2d')
-  if (!ctx || !v) return fallback
-  ctx.fillStyle = '#000'
-  ctx.fillStyle = v.trim()
-  const c = ctx.fillStyle as string
-  if (c.startsWith('#') && c.length === 7) return [1, 3, 5].map((i) => parseInt(c.slice(i, i + 2), 16) / 255) as [number, number, number]
-  const m = c.match(/[\d.]+/g)
-  return m ? [Number(m[0]) / 255, Number(m[1]) / 255, Number(m[2]) / 255] : fallback
-}
-
 function readTheme(): Theme {
-  const cs = getComputedStyle(document.documentElement)
   return {
-    bg: parseColor(cs.getPropertyValue('--c-bg'), [0.063, 0.063, 0.055]),
-    fill: parseColor(cs.getPropertyValue('--c-bg-2'), [0.1, 0.1, 0.094]),
+    bg: pageBg(),
+    fill: pageFill(),
     grain: 0,
     light: document.documentElement.dataset.theme === 'light',
   }
 }
-
-const INTERACTIVE = 'a, button, input, textarea, select, label, [role="group"], [tabindex]:not([tabindex="-1"])'
 
 export default function CanvasBackdrop({ items }: { items: FeedItem[] }) {
   const [host, setHost] = useState<HTMLElement | null>(null)
@@ -60,8 +47,8 @@ export default function CanvasBackdrop({ items }: { items: FeedItem[] }) {
   useEffect(() => {
     setHost(document.body)
     const html = document.documentElement
-    html.dataset.trail = '6'
-    return () => { delete html.dataset.trail }
+    html.dataset.bg = 'plane'
+    return () => { delete html.dataset.bg }
   }, [])
 
   useEffect(() => {

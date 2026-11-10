@@ -1,6 +1,8 @@
 @use '../../styles/variables' as *;
 @use '../../styles/mixins' as *;
 
+$in-ease: cubic-bezier(0.16, 1, 0.3, 1); // expo-out: fast start, long soft landing
+
 // WIP landing (lib/wip.ts) · Figma "Home · v0" (6944:8590, 1680 × 1024):
 // header 72 · hero (copy 83 px under the header line) · footer. The page
 // fills the screen so the footer sits at the bottom, as in the frame.
@@ -41,7 +43,18 @@
 }
 
 .name { color: $color-text; }
-.title { margin-top: 8px; color: var(--c-text-hi); } // Figma: the two lines 8 px apart
+.title { display: block; color: var(--c-text-hi); }
+.titleMask { margin-top: 8px; } // Figma: the two lines 8 px apart
+
+// Line mask for the entrance: the inner [data-in='mask'] rises into view.
+// The padding keeps descenders out of the clip.
+.mask {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.16em;
+  margin-bottom: -0.16em;
+  > [data-in] { display: block; }
+}
 
 // Geist Mono 11 uppercase → Fragment Mono.
 .disciplines {
@@ -210,6 +223,7 @@
   position: fixed;
   left: max(#{$gutter}, env(safe-area-inset-left, 0px));
   top: calc(72px + 12px); // under the header line, clear of the hero copy and the footer
+  @include respond-to(md) { top: auto; bottom: calc(10px + env(safe-area-inset-bottom, 0px)); }
   z-index: 160;
   display: flex;
   flex-wrap: wrap;
@@ -252,7 +266,7 @@
   }
 }
 
-// ─── 6 · Canvas (CanvasBackdrop.tsx) ─────────────────────────────────────────
+// ─── Backgrounds (CanvasBackdrop.tsx = plane, bg/OrbBackdrop.tsx) ───────────
 // The feed plane, fixed under everything (portalled to <body>, z 1: below
 // main 10, footer 20, header 100, grain 150). The veil keeps the copy legible
 // in both themes: a light overall dim, a strong wash behind the hero (left)
@@ -264,7 +278,18 @@
   overflow: hidden;
   pointer-events: none;
   background: $color-bg;
+  animation: bgIn 500ms $in-ease both;
+
+  > canvas, > div:not(.canvasVeil) { animation: bgZoom 900ms $in-ease both; }
+
+  :global(html[data-intro='full']) & { animation-duration: 1300ms; > canvas, > div:not(.canvasVeil) { animation-duration: 1700ms; } }
+  :global(html[data-intro='fast']) & { animation-duration: 600ms; > canvas, > div:not(.canvasVeil) { animation-duration: 800ms; } }
+  :global(html[data-intro='reduced']) &, :global(html[data-intro-skip]) & { animation-duration: 300ms; > canvas, > div:not(.canvasVeil) { animation: none; } }
+  @media (prefers-reduced-motion: reduce) { > canvas, > div:not(.canvasVeil) { animation: none; } }
 }
+
+@keyframes bgIn { from { opacity: 0; } }
+@keyframes bgZoom { from { transform: scale(1.08); } }
 
 .canvasGl, .canvasDom {
   position: absolute;
@@ -298,8 +323,8 @@
   }
 }
 
-// While variant 6 is on: the page lets the plane through and takes drags.
-:global(html[data-trail='6']) {
+// While a WebGL background is on: the page lets it through and takes drags.
+:global(html[data-bg]) {
   :global(footer) { background: transparent; }
   .page { touch-action: none; }
   .hint { display: none; }
@@ -312,3 +337,32 @@
   cursor: grabbing !important;
   user-select: none !important;
 }
+
+// ─── Entrance (Intro.tsx) ────────────────────────────────────────────────────
+// html[data-intro] is set in <head> (introScript.ts): full / fast / reduced.
+// Elements carry data-in="fade | mask | line | rise" and --in-d (their delay
+// in the full run); "fast" scales delays and durations by 0.45. Base styles
+// are the final state, so a skip (data-intro-skip) just drops the animation.
+:global(html[data-intro]) { --in-k: 1; }
+:global(html[data-intro='fast']) { --in-k: 0.45; }
+
+:global(html[data-intro='full']),
+:global(html[data-intro='fast']) {
+  [data-in] {
+    animation-delay: calc(var(--in-d, 0ms) * var(--in-k));
+    animation-fill-mode: both;
+    animation-timing-function: $in-ease;
+  }
+  [data-in='fade'] { animation-name: inFade; animation-duration: calc(800ms * var(--in-k)); animation-timing-function: cubic-bezier(0.33, 1, 0.68, 1); }
+  [data-in='mask'] { animation-name: inMask; animation-duration: calc(950ms * var(--in-k)); }
+  [data-in='line'] { animation-name: inLine; animation-duration: calc(1000ms * var(--in-k)); transform-origin: 0 50%; }
+  [data-in='rise'] { animation-name: inRise; animation-duration: calc(800ms * var(--in-k)); }
+}
+
+:global(html[data-intro='reduced']) [data-in] { animation: inFade 400ms ease both; }
+:global(html[data-intro-skip]) [data-in] { animation: none !important; }
+
+@keyframes inFade { from { opacity: 0; } }
+@keyframes inMask { from { transform: translate3d(0, 110%, 0); } }
+@keyframes inLine { from { transform: scaleX(0); } }
+@keyframes inRise { from { opacity: 0; transform: translate3d(0, 18px, 0); } }

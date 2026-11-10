@@ -1,5 +1,7 @@
 'use client'
 
+import type { CSSProperties } from 'react'
+
 import s from './Footer.module.scss'
 import ElasticLine from '@/components/ui/ElasticLine/ElasticLine'
 import LiveClock from '@/components/ui/LiveClock/LiveClock'
@@ -23,7 +25,7 @@ export default function Footer() {
   const ui = useUi()
   const href = useHref()
   return (
-    <footer className={s.footer}>
+    <footer className={s.footer} {...(WIP ? { 'data-in': 'rise', style: { '--in-d': '1000ms' } as CSSProperties } : {})}>
       <div className={s.inner}>
 
         {/* Social wordmarks */}

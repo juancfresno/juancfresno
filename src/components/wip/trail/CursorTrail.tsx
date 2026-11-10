@@ -1,55 +1,32 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
-import { createPortal } from 'react-dom'
-import dynamic from 'next/dynamic'
-import type { FeedItem } from '@/content/feed'
+import { useEffect, useRef } from 'react'
 import { createDeck, type TrailItem } from './deck'
-import { BEHAVIOURS, TRAIL_IDS, TRAIL_NAMES, type TrailId } from './variants'
+import { BEHAVIOURS, type TrailId } from './variants'
 import s from '../wip.module.scss'
 
 export type { TrailItem }
 
-// 6 · Canvas: loaded only when picked, so the default bundle has no WebGL code.
-const CanvasBackdrop = dynamic(() => import('../CanvasBackdrop'), { ssr: false })
-
-// Cursor image trail of the WIP landing (the social feed, 600 px thumbs).
-// Five variants live in ./variants.ts; production shows DEFAULT_TRAIL. A
-// preview can compare them with `?trail=1…6` (6 = the feed canvas as background), which also shows a small mono
-// switcher (never rendered without the parameter).
+// Cursor image trail (the social feed, 600 px thumbs). Since the canvas
+// background became the default, the trails are a comparison mode only:
+// `?trail=1…5` (wip/Backdrop.tsx picks it and shows the switcher).
 // Shared rules: no repeats until every piece has shown (./deck.ts), ≤ ~7 on
 // screen, transform/opacity only, one rAF loop that sleeps at rest, nothing
 // loads before the first pointer event or idle time, touch = a tap drops one
 // piece, prefers-reduced-motion = nothing is mounted.
 
-// 5 · Tail: Juan's Figma drawing (240 → 150 px, 100 → 25 %) with the delay.
-export const DEFAULT_TRAIL: TrailId = 5
-
-function readParam(): TrailId | null {
-  const v = Number(new URLSearchParams(window.location.search).get('trail'))
-  return (TRAIL_IDS as number[]).includes(v) ? (v as TrailId) : null
-}
-
-export default function CursorTrail({ items, canvasItems }: { items: TrailItem[]; canvasItems: FeedItem[] }) {
+export default function CursorTrail({ items, variant }: { items: TrailItem[]; variant: TrailId }) {
   const layer = useRef<HTMLDivElement>(null)
-  const [variant, setVariant] = useState<TrailId>(DEFAULT_TRAIL)
-  const [compare, setCompare] = useState(false)
-
-  // ?trail=N → that variant + the switcher.
-  useEffect(() => {
-    const v = readParam()
-    if (v) { setVariant(v); setCompare(true) }
-  }, [])
 
   useEffect(() => {
     const root = layer.current
-    if (!root || !items.length || variant === 6) return
+    if (!root || !items.length) return
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
     const deck = createDeck(items)
     let teardown: (() => void) | null = null
 
     const start = () => {
-      const b = BEHAVIOURS[variant as Exclude<TrailId, 6>]({
+      const b = BEHAVIOURS[variant]({
         root,
         deck,
         cls: { piece: s.piece, grid: s.gridPiece, strip: s.strip, tint: s.tint },
@@ -121,35 +98,5 @@ export default function CursorTrail({ items, canvasItems }: { items: TrailItem[]
     }
   }, [items, variant])
 
-  const pick = (v: TrailId) => {
-    setVariant(v)
-    const url = new URL(window.location.href)
-    url.searchParams.set('trail', String(v))
-    window.history.replaceState(window.history.state, '', url)
-  }
-
-  return (
-    <>
-      <div ref={layer} className={s.trail} aria-hidden="true" />
-      {variant === 6 && <CanvasBackdrop items={canvasItems} />}
-      {compare && createPortal(
-        <div className={s.switcher} role="group" aria-label="Cursor trail">
-          <span className={s.switcherLabel}>Trail</span>
-          {TRAIL_IDS.map((v) => (
-            <button
-              key={v}
-              type="button"
-              className={s.switcherBtn}
-              aria-pressed={v === variant}
-              onClick={() => pick(v)}
-              data-no-transition
-            >
-              {v} · {TRAIL_NAMES[v]}{v === DEFAULT_TRAIL ? ' ★' : ''}
-            </button>
-          ))}
-        </div>,
-        document.body,
-      )}
-    </>
-  )
+  return <div ref={layer} className={s.trail} aria-hidden="true" />
 }

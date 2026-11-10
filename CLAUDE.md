@@ -25,6 +25,12 @@ No i18n library: a small typed setup (Next 16 App Router pattern: one root layou
 - **SEO.** `pageMeta({ locale, path, … })` (`lib/seo.ts`): canonical per locale, hreflang `en` / `es` / `x-default` (→ EN) on every page, `og:locale` + `og:locale:alternate`. Sitemap lists both URLs of every page with `xhtml:link` alternates. JSON-LD `Person` per locale (same `@id`, `knowsLanguage`), `CreativeWork` with `inLanguage`. OG cards per locale (`lib/og.tsx`, `defaultOg(l)`, `caseOg({ locale })`). `llms.txt` stays English with a line pointing to `/es`.
 - **Mobile.** Spanish nav labels are longer: at ≤ 480 px the header clock hides (time stays on Contact and the close), the left cluster gap tightens, and Spanish tabs (and English below 360 px) use tighter pills so the six fit at 320 px. «Proyectos» on /es/work uses a smaller giant size so it never breaks.
 
+## WIP landing (branch `wip-landing`, temporary)
+
+`src/lib/wip.ts` (`WIP = true`) swaps `/` and `/es` for the temporary landing (`src/components/wip/`): Figma "Home · v0" (6944:8590) copy, the greeting line cycling languages with a decode (`components/home/HeadlineCycle`, `lib/scramble.ts`, `content/headline.ts`), the entrance (`wip/Intro.tsx` + `introScript.ts`, `html[data-intro]`), grain, and the background (`wip/Backdrop.tsx`): default = the feed plane (`wip/CanvasBackdrop.tsx`, reuses `feed/canvas/gl.ts`); previews compare `?bg=plane|sphere|tunnel|lens` (`wip/bg/`) and `?trail=1…5` (the earlier cursor trails).
+
+**Note for later:** the canvas background exercise (plane / sphere / tunnel / lens over the feed mosaic, RGB split on drag) will become a **Lab piece**. Not built yet.
+
 ## Routing (App Router, `app/[lang]/(site)`) — v1.0 copy on branch `web-v2`
 
 All real pages live under `src/app/[lang]/(site)/` (URLs below are the English ones; Spanish = the same under `/es`). Pages only lay content out; copy lives in `src/content/` (per locale in `src/content/i18n/`, see above):
