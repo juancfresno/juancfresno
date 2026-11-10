@@ -40,3 +40,13 @@
 .on {
   color: $color-text;
 }
+
+// `pair` (WIP header, Figma 6944:8987): no slash, 8 px apart, the option not
+// in use at 30 % of the text colour.
+.pair {
+  gap: 8px;
+  .sep { display: none; }
+  .btn { color: $color-text; opacity: 0.3; transition: opacity $duration-fast $ease-out-quart; }
+  .btn:hover { color: $color-text; opacity: 0.7; }
+  .on, .on:hover { opacity: 1; }
+}

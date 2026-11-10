@@ -1,20 +1,22 @@
-import { getSite, getUi } from '@/content/site'
+import { getSite } from '@/content/site'
 import { FEED } from '@/content/feed'
+import { PERSON_BASE } from '@/content/person'
 import type { Locale } from '@/i18n/config'
 import HelloCycle from '@/components/home/HelloCycle'
-import CursorTrail, { type TrailItem } from './CursorTrail'
-import h from '@/components/home/home.module.scss'
+import CursorTrail, { type TrailItem } from './trail/CursorTrail'
+import Grain from './Grain'
+import TrailHint from './TrailHint'
 import s from './wip.module.scss'
 
-// Temporary landing while v1.0 is finished (lib/wip.ts). The v1 home hero
-// (Hello cycle, role, disciplines, meta + intro ending in the signature), a
-// dashed "work in progress" tag, and a cursor trail of the social feed.
+// Temporary landing while v1.0 is finished (lib/wip.ts). Figma "Home · v0"
+// (6944:8590): two-line greeting + role, disciplines in mono, two-line intro,
+// the contact line with the email, the cursor image trail with its resting
+// hint, and an animated grain over everything. Copy: WIP in site.*.ts.
 // The feed manifest already leaves out duplicates and Biako (build-media);
 // ids are de-duplicated again here, and the trail uses the 600 px thumbnails.
 export default function WipLanding({ locale }: { locale: Locale }) {
-  const { HOME } = getSite(locale)
-  const ui = getUi(locale)
-  const intro = HOME.intro.replace(HOME.signature, '').trim()
+  const { WIP } = getSite(locale)
+  const email = PERSON_BASE.email
   const seen = new Set<string>()
   const items: TrailItem[] = []
   for (const it of FEED) {
@@ -26,28 +28,25 @@ export default function WipLanding({ locale }: { locale: Locale }) {
   return (
     <div className={s.page}>
       <CursorTrail items={items} />
-      <header className={`${h.hero} ${s.hero}`}>
-        <p className={s.tag}>
-          <span className={s.dot} aria-hidden="true" />
-          {ui.wip.tag}
-        </p>
-        <h1 className={h.heroHead}>
-          <span className={h.name}>
-            <HelloCycle words={HOME.greetings} /> {HOME.nameLine}
+      <Grain />
+      <header className={s.hero}>
+        <h1 className={s.head}>
+          <span className={s.name}>
+            <HelloCycle words={WIP.greetings} suffix="" /> {WIP.nameLine}
           </span>
-          <span className={h.srOnly}> — </span>
-          <span className={h.title}>{HOME.title}</span>
+          <span className={s.title}>{WIP.title}</span>
         </h1>
-        <p className={h.disciplines}>
-          {HOME.disciplines.map((d, i) => (
-            <span key={d}><span className={h.disc}>{d}{i < HOME.disciplines.length - 1 && <span className={h.dash}> —</span>}</span>{' '}</span>
-          ))}
+        <p className={s.disciplines}>{WIP.disciplines}</p>
+        <p className={s.intro}>
+          {WIP.intro[0]}
+          <br />
+          {WIP.intro[1]}
         </p>
-        <div className={`${h.introRow} ${s.introRow}`}>
-          <div className={h.meta}>{HOME.meta.map((x) => <p key={x}>{x}</p>)}</div>
-          <p className={h.intro}>{intro} <span className={h.signature}>{HOME.signature}</span></p>
-        </div>
+        <p className={s.contact}>
+          {WIP.contact} <a className={s.email} href={`mailto:${email}`}>{email}</a>
+        </p>
       </header>
+      <TrailHint mouse={WIP.hint.mouse} touch={WIP.hint.touch} />
     </div>
   )
 }

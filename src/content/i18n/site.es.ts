@@ -74,6 +74,17 @@ export const SITE_ES: SiteDict = {
     },
   },
 
+  // ─── Landing provisional (lib/wip.ts) · traducción de Figma 6944:8590 ──────
+  WIP: {
+    greetings: ['¡Hola!', 'Hello!', 'Bon dia!', 'Kaixo!', 'Olá!', 'Bonjour!', 'Ciao!', 'Hallo!', 'Hej!'],
+    nameLine: 'soy Juan C. Fresno,',
+    title: 'Director de arte y\u00a0diseñador interactivo independiente',
+    disciplines: 'Dirección de arte — Productos digitales — Interacción — Identidad de marca',
+    intro: ['Trabajo con estudios y marcas desde 2012.', 'Dirección de arte y diseño de productos digitales, identidades y experiencias interactivas — con claridad, detalle e intención.'],
+    contact: 'Para consultas, colaboraciones o proyectos nuevos —',
+    hint: { mouse: '[ MUEVE EL CURSOR ]', touch: '[ TOCA ]' },
+  },
+
   // ─── Intros de página ──────────────────────────────────────────────────────
   INTROS: {
     work: 'Una selección de los últimos años: marcas, webs y producto digital. Unos con estudios y agencias, otros mano a mano con la marca.',

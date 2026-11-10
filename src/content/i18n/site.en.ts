@@ -75,6 +75,17 @@ export const SITE_EN = {
     },
   },
 
+  // ─── WIP landing (lib/wip.ts) · Figma "Home · v0" 6944:8590, copy verbatim ──
+  WIP: {
+    greetings: ['Hello!', '¡Hola!', 'Bon dia!', 'Kaixo!', 'Olá!', 'Bonjour!', 'Ciao!', 'Hallo!', 'Hej!'],
+    nameLine: 'I’m Juan C. Fresno,',
+    title: 'Independent Art Director & Interactive Designer',
+    disciplines: 'Art direction — digital Products — Interaction — Brand identity',
+    intro: ['Working with studios and brands since 2012.', 'Art direction and design for digital products, identities and interactive experiences — built with clarity, detail and intent.'],
+    contact: 'For enquiries, collaborations or new projects —',
+    hint: { mouse: '[ MOVE THE CURSOR ]', touch: '[ TAP ]' },
+  },
+
   // ─── Page intros ──────────────────────────────────────────────────────────────
   INTROS: {
     work: 'Selected projects from recent years: brands, websites and digital products. Some with studios and agencies, some directly with the brand.',

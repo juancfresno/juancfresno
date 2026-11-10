@@ -261,6 +261,14 @@
   align-self: stretch;
 }
 
+// WIP header: language + theme pairs, 16 px apart, 40 px before the wordmark.
+.wipPrefs {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-right: 1rem; // + the cluster gap (1.5rem) = 40 px, as in Figma
+}
+
 .clock {
   font-family: $font-mono;
   font-size: 0.6875rem;

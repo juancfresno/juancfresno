@@ -6,7 +6,6 @@ import LiveClock from '@/components/ui/LiveClock/LiveClock'
 import { BehanceLogo, InstagramLogo, DribbbleLogo, LinkedInLogo, XLogo } from '@/components/ui/SocialLogos/SocialLogos'
 import GlitchSocialIcon from '@/components/ui/GlitchSocialIcon/GlitchSocialIcon'
 import { useHref, useUi } from '@/i18n/client'
-import CopyEmail from '@/components/close/CopyEmail'
 import { WIP } from '@/lib/wip'
 
 // ─── Social links data ─────────────────────────────────────────────────────────
@@ -26,9 +25,6 @@ export default function Footer() {
   return (
     <footer className={s.footer}>
       <div className={s.inner}>
-
-        {/* WIP landing (lib/wip.ts): the email lives here, there is no close block. */}
-        {WIP && <CopyEmail size="md" className={s.email} />}
 
         {/* Social wordmarks */}
         <nav className={s.social} aria-label={ui.footer.socials}>

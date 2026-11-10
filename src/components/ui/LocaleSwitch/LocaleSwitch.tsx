@@ -20,14 +20,14 @@ export function rememberLocale(l: Locale) {
   try { localStorage.setItem(LOCALE_STORAGE, l) } catch {}
 }
 
-export default function LocaleSwitch({ className }: { className?: string }) {
+export default function LocaleSwitch({ className, pair }: { className?: string; pair?: boolean }) {
   const locale = useLocale()
   const ui = useUi()
   const pathname = usePathname() || '/'
   const { navigate } = usePageTransition()
 
   return (
-    <div className={clsx(s.toggle, className)} role="group" aria-label={ui.lang.group}>
+    <div className={clsx(s.toggle, pair && s.pair, className)} role="group" aria-label={ui.lang.group}>
       {ORDER.filter((l) => LOCALES.includes(l)).map((l, i) => {
         const on = l === locale
         const href = switchLocalePath(pathname, l)

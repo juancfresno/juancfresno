@@ -13,7 +13,8 @@ import s from './home.module.scss'
 const STEP = 350
 const useIsoLayout = typeof window === 'undefined' ? useEffect : useLayoutEffect
 
-export default function HelloCycle({ words: WORDS }: { words: string[] }) {
+// `suffix` follows every word ("," on the home; the WIP landing's words carry "!").
+export default function HelloCycle({ words: WORDS, suffix = ',' }: { words: string[]; suffix?: string }) {
   const [i, setI] = useState(0)
   const [active, setActive] = useState(false)
   const [widths, setWidths] = useState<number[] | null>(null)
@@ -58,12 +59,12 @@ export default function HelloCycle({ words: WORDS }: { words: string[] }) {
       onBlur={stop}
       data-active={active || undefined}
     >
-      <span className={s.srOnly}>{WORDS[0]},</span>
+      <span className={s.srOnly}>{WORDS[0]}{suffix}</span>
       <span className={s.helloSlot} aria-hidden="true" style={widths ? { width: widths[i] } : undefined}>
-        <span key={i} className={s.helloWord}>{WORDS[i]},</span>
+        <span key={i} className={s.helloWord}>{WORDS[i]}{suffix}</span>
       </span>
       <span ref={measure} className={s.helloMeasure} aria-hidden="true">
-        {WORDS.map((w) => <span key={w}>{w},</span>)}
+        {WORDS.map((w) => <span key={w}>{w}{suffix}</span>)}
       </span>
     </span>
   )

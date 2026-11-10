@@ -21,7 +21,7 @@ function apply(theme: Theme) {
   window.setTimeout(() => root.classList.remove('theme-anim'), 400)
 }
 
-export default function ThemeToggle({ className }: { className?: string }) {
+export default function ThemeToggle({ className, pair }: { className?: string; pair?: boolean }) {
   const ui = useUi()
   const [theme, setTheme] = useState<Theme>('dark')
 
@@ -48,7 +48,7 @@ export default function ThemeToggle({ className }: { className?: string }) {
   }, [])
 
   return (
-    <div className={clsx(s.toggle, className)} role="group" aria-label={ui.theme.group}>
+    <div className={clsx(s.toggle, pair && s.pair, className)} role="group" aria-label={ui.theme.group}>
       {THEMES.map((t, i) => (
         <span key={t} className={s.item}>
           {i > 0 && <span className={s.sep} aria-hidden="true">/</span>}

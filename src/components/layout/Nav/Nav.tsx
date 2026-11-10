@@ -281,14 +281,21 @@ export default function Nav() {
               ))}
             </nav>}
 
-            <ThemeToggle className={s.theme} />
-            <LocaleSwitch className={s.lang} />
+            {!WIP && <ThemeToggle className={s.theme} />}
+            {!WIP && <LocaleSwitch className={s.lang} />}
           </div>
 
           {/* ── Right: local time + shortcuts, then the wordmark ── */}
           <div className={s.right}>
-            <NavClock className={s.clock} />
-            <button
+            {/* WIP landing (Figma 6944:8876): "ES EN" · "DARK LIGHT" before the wordmark, no clock or "?". */}
+            {WIP && (
+              <div className={s.wipPrefs}>
+                <LocaleSwitch pair />
+                <ThemeToggle pair />
+              </div>
+            )}
+            {!WIP && <NavClock className={s.clock} />}
+            {!WIP && <button
               type="button"
               className={s.help}
               aria-label={ui.nav.shortcuts}
@@ -296,7 +303,7 @@ export default function Nav() {
               onClick={() => window.dispatchEvent(new Event('fresno:shortcuts'))}
             >
               ?
-            </button>
+            </button>}
             {logoLink}
           </div>
         </div>
