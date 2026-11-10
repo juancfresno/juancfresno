@@ -287,12 +287,4 @@ export const SITE_ES: SiteDict = {
       { ...SITE_EN.ABOUT.photos[2], alt: 'Juan C. Fresno' },
     ],
   },
-
-  // ─── 404 ───────────────────────────────────────────────────────────────────
-  NOT_FOUND: {
-    title: '404',
-    line: 'Aquí no hay nada. Seguramente lo recorté yo.',
-    home: 'Volver al inicio ↘',
-    work: 'Ver proyectos ↘',
-  },
 }

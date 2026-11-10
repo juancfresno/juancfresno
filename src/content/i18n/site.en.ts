@@ -297,14 +297,6 @@ export const SITE_EN = {
       { src: '/images/about/juan.webp', w: 400, h: 400, alt: 'Juan C. Fresno' },
     ],
   },
-
-  // ─── 404 ──────────────────────────────────────────────────────────────────────
-  NOT_FOUND: {
-    title: '404',
-    line: 'Nothing here. Probably something I cut.',
-    home: 'Back home ↘',
-    work: 'See work ↘',
-  },
 }
 
 export type SiteDict = Widen<typeof SITE_EN>

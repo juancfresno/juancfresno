@@ -203,5 +203,15 @@ export const UI_ES: UiDict = {
     domain: 'juancfresno.com/es',
     alt: 'Juan C. Fresno — Director de arte y diseñador interactivo independiente',
   },
-  notFound: { title: 'No encontrado', cut: 'fuera' },
+  notFound: {
+    title: 'No encontrado',
+    code: 'Error 404',
+    heading: 'Sin señal',
+    line: 'Esta página no emite. Seguramente algo que corté.',
+    home: 'Volver al inicio ↘',
+    work: 'Ver proyectos ↘',
+    channel: 'CH 404',
+    input: 'Sin entrada',
+    signal: 'Señal 0 %',
+  },
 }

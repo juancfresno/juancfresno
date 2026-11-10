@@ -1,0 +1,179 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+// 404 · "No signal". A TV is dark in any theme, so the stage uses the brand
+// constants ($raw-ink / $raw-pearl), not the themed --c-* tokens; the only
+// themed colour is the G orange of the live dot (--c-g).
+
+$plate: rgba($raw-ink, 0.88);
+$hud-bg: rgba($raw-ink, 0.78);
+$text-mid: rgba($raw-pearl, 0.72);
+$text-low: rgba($raw-pearl, 0.56);
+$rule: rgba($raw-pearl, 0.16);
+$tear-r: rgba(255, 46, 84, 0.85);  // same red as the canvas tear lines
+$tear-b: rgba(52, 128, 255, 0.85); // same blue
+
+.stage {
+  --tear-x: 0px;
+  position: relative;
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
+  min-height: calc(100svh - 122px); // footer ≈ 122 px, as the WIP landing
+  padding: calc(72px + 56px) $gutter 72px; // header 72 + HUD row
+  color: $raw-pearl;
+  isolation: isolate;
+
+  @include respond-to(md) {
+    min-height: calc(100svh - 160px - var(--tabbar-h, 0px));
+    padding: calc(72px + 48px) 16px 64px;
+  }
+}
+
+// ─── Snow: fixed, full viewport, low-res buffer scaled up ───────────────────
+.snow {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -2;
+  display: block;
+  background: $raw-ink; // before the first frame / no 2D context
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  pointer-events: none;
+}
+
+// Scanlines (1 px dark every 3 px) + vignette, on top of the snow.
+.screen {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 75% 70% at 50% 50%, transparent 40%, rgba(0, 0, 0, 0.7) 100%),
+    repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0.32) 0 1px, transparent 1px 3px);
+}
+
+// ─── HUD: mono chips. Top-left: channel + time, timecode under it (the
+// top-right corner belongs to the vertical FRESNO wordmark). Bottom corners:
+// "no input" / "signal 0%". ──────────────────────────────────────────────────
+.hud {
+  position: absolute;
+  inset: calc(72px + 16px) $gutter 16px;
+  pointer-events: none;
+
+  > span {
+    position: absolute;
+    padding: 4px 6px;
+    background: $hud-bg;
+    font-family: $font-mono;
+    font-size: 11px;
+    line-height: 1;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: $text-mid;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+
+  @include respond-to(md) {
+    inset: calc(72px + 12px) 16px 12px;
+    > span { font-size: 10px; }
+  }
+}
+.tl { top: 0; left: 0; }
+.tc { top: 26px; left: 0; }
+.bl { bottom: 0; left: 0; }
+.br { bottom: 0; right: 0; }
+
+// ─── Error card ─────────────────────────────────────────────────────────────
+.card {
+  position: relative;
+  box-sizing: border-box;
+  width: min(100%, 760px);
+  padding: 40px 48px 44px;
+  background: $plate;
+  border: 1px solid $rule;
+  font-family: $font-mono;
+  transform: translateX(var(--tear-x));
+
+  @include respond-to(md) { padding: 24px 20px 28px; }
+}
+
+.code {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 24px;
+  font-size: 12px;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: $text-mid;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--c-g);
+  animation: blink 1s steps(1, end) infinite;
+  @media (prefers-reduced-motion: reduce) { animation: none; }
+}
+@keyframes blink { 50% { opacity: 0.15; } }
+
+.title {
+  margin: 0 0 0 -0.04em;
+  font-family: $font-mono;
+  font-weight: 400;
+  font-size: clamp(3rem, 1.6rem + 6vw, 8rem); // 48 → 128 px
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+  color: $raw-pearl;
+  white-space: nowrap;
+}
+
+.line {
+  margin: 28px 0 0;
+  max-width: 40ch;
+  font-size: clamp(0.875rem, 0.8rem + 0.3vw, 1.0625rem); // 14 → 17 px
+  line-height: 1.5;
+  color: $text-mid;
+  text-wrap: pretty;
+}
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 32px 0 0;
+}
+
+.link {
+  @include touch-target;
+  display: inline-block;
+  padding: 10px 14px;
+  border: 1px solid rgba($raw-pearl, 0.32);
+  font-size: 12px;
+  line-height: 1;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: $raw-pearl;
+  text-decoration: none;
+  transition: background-color 160ms ease, color 160ms ease;
+
+  &:hover, &:focus-visible { background: $raw-pearl; color: $raw-ink; }
+  &:focus-visible { outline: 1px solid $raw-pearl; outline-offset: 3px; }
+}
+
+// ─── During a tear: the card slips sideways, the heading splits R / B ───────
+.stage[data-tear] {
+  .title { text-shadow: -3px 0 $tear-r, 3px 0 $tear-b; }
+  .line, .code { text-shadow: -1px 0 $tear-r, 1px 0 $tear-b; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card { transform: none; }
+}

@@ -69,14 +69,17 @@ function locale(request: NextRequest) {
 
   const first = pathname.split('/')[1]
 
-  // WIP landing (lib/wip.ts): only the locale roots (and their og image)
-  // exist; any other page → / or /es. Temporary (307) so v1.0 URLs keep their
-  // standing for when they go live.
+  // WIP landing (lib/wip.ts): only the locale roots (and their og image) are
+  // live. The v1.0 sections (every first segment in SEGMENTS: work, about,
+  // contact, feed, lab, journal, legal, and their subpaths) → / or /es,
+  // temporary (307) so those URLs keep their standing for launch. Anything
+  // else is truly unknown and falls through to the 404 (real 404 status).
   if (WIP) {
     const prefixed = isLocale(first)
     const rest = prefixed ? pathname.slice(first.length + 1) : pathname
-    const ok = rest === '' || rest === '/' || METADATA_ROUTE.test(rest)
-    if (!ok) {
+    const section = parsePath(pathname).path.split('/')[1]
+    const held = !!section && Object.hasOwn(SEGMENTS, section) && !METADATA_ROUTE.test(rest)
+    if (held) {
       const to = url.clone()
       to.pathname = prefixed && first !== DEFAULT_LOCALE ? `/${first}` : '/'
       to.search = ''

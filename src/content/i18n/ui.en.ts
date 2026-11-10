@@ -204,7 +204,18 @@ export const UI_EN = {
     domain: 'juancfresno.com',
     alt: 'Juan C. Fresno — Independent Art Director & Interactive Designer',
   },
-  notFound: { title: 'Not found', cut: 'cut' },
+  // 404 · "No signal" (components/notfound/NoSignal): a TV with no input.
+  notFound: {
+    title: 'Not found',
+    code: 'Error 404',
+    heading: 'No signal',
+    line: 'This page isn’t broadcasting. Probably something I cut.',
+    home: 'Back home ↘',
+    work: 'See work ↘',
+    channel: 'CH 404',
+    input: 'No input',
+    signal: 'Signal 0%',
+  },
 }
 
 type Widen<T> = T extends string
