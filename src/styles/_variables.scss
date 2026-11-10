@@ -74,11 +74,10 @@ $space-40:  10rem;
 // ─── Layout ───────────────────────────────────────────────────────────────────
 $max-width:         1440px;   // reference only; the layout is liquid (no cap)
 // One page margin for header, footer and content (tokens live in globals.scss :root):
-//   --m      clamp(20px, 3.8vw, 64px)  (64 at 1680, ~55 at 1440, 20 at 390)
-//   --gutter column gap, 16 desktop / 12 ≤ 768
+//   --m      max(20px, 3.8vw)  (64 at 1680, ~97 at 2560, 20 at 390; no max width)
+//   --gutter max(12px, 0.952vw) (16 at 1680) desktop / 12 ≤ 768
 $m:                 var(--m);
 $gutter:            var(--gutter);
-$page-max:          1680px;   // above this, content is centred
 $nav-height:        5rem;
 
 $cols-12:           repeat(12, 1fr);
