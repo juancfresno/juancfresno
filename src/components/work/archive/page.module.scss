@@ -1,0 +1,121 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+// ─── /work page shell — Figma "work" (6951:13221) ────────────────────────────
+// Margins and gaps are the site tokens (web-v2 d1de50b): $m = --m page
+// margin clamp(20px, 3.8vw, 64px), $gutter = --gutter column gap (16 / 12
+// ≤ 768), liquid (no max width). The open views read the same vars.
+
+.page {
+  display: flex;
+  flex-direction: column;
+  padding-top: 72px; // header height (Figma v1/nav)
+  // Drawer open: the page steps back a little (transform only).
+  transition: transform 0.6s $ease-out-expo;
+  :global(html[data-work-open='drawer']) & { transform: translate3d(-2.5vw, 0, 0); }
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+    :global(html[data-work-open='drawer']) & { transform: none; }
+  }
+}
+
+@mixin margins {
+  width: 100%;
+  box-sizing: border-box;
+  padding-inline: max(#{$m}, env(safe-area-inset-left, 0px)) max(#{$m}, env(safe-area-inset-right, 0px));
+}
+
+// ─── 02 · Hero: "/Work" on the right, intro under it (py 83, gap 24) ─────────
+.hero {
+  @include margins;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding-block: clamp(2.5rem, 4.94vw, 83px);
+}
+
+.name {
+  margin: 0;
+  font-family: $font-body;
+  font-weight: $fw-regular;
+  font-size: 24px;
+  line-height: normal;
+  letter-spacing: -0.02em;
+  text-align: right;
+  color: $color-text-hi;
+  // Phones: clear the vertical FRESNO wordmark hanging from the header.
+  @include respond-to(md) { padding-right: 24px; }
+}
+
+.intro {
+  margin: 0;
+  font-family: $font-body;
+  font-size: clamp(1rem, 0.4vw + 0.85rem, 18px);
+  line-height: 1.4;
+  color: $color-text-mid;
+  max-width: 64rem;
+}
+
+// ─── Reserved band for the future gallery (537 px at 1680, liquid) ───────────
+.gallery {
+  position: relative;
+  height: clamp(280px, 31.964vw, 537px);
+  width: calc(100% - 2 * #{$m});
+  margin-inline: auto;
+
+  // Four crop marks, nothing else.
+  span {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border: 0 solid $color-line;
+  }
+  span:nth-child(1) { top: 0; left: 0; border-top-width: 1px; border-left-width: 1px; }
+  span:nth-child(2) { top: 0; right: 0; border-top-width: 1px; border-right-width: 1px; }
+  span:nth-child(3) { bottom: 0; left: 0; border-bottom-width: 1px; border-left-width: 1px; }
+  span:nth-child(4) { bottom: 0; right: 0; border-bottom-width: 1px; border-right-width: 1px; }
+}
+
+// ─── 03 · Archive (pt 96, pb 120) ────────────────────────────────────────────
+.archive {
+  @include margins;
+  display: grid;
+  grid-template-columns: $cols-12;
+  column-gap: $gutter;
+  padding-top: clamp(3rem, 5.714vw, 96px);
+  padding-bottom: clamp(4rem, 7.143vw, 120px);
+
+  @include respond-to(md) { grid-template-columns: repeat(4, 1fr); }
+}
+
+.rule {
+  grid-column: 1 / -1;
+  display: block;
+  width: 100%;
+  color: $color-line;
+}
+
+.label {
+  grid-column: 1 / -1;
+  margin: 24px 0 0;
+  font-family: $font-mono;
+  font-size: 11px;
+  line-height: 15px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: $color-text-hi;
+}
+
+// Intro on columns 7–11 (Figma: 768 px spacer, 637 px text), 40 px under the head.
+.archiveIntro {
+  grid-column: 7 / span 5;
+  margin: 40px 0 56px;
+  font-family: $font-body;
+  font-size: clamp(1rem, 0.4vw + 0.85rem, 18px);
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+  color: $color-text-mid;
+
+  @include respond-to(lg) { grid-column: 5 / -1; }
+  @include respond-to(md) { grid-column: 1 / -1; margin: 32px 0 40px; }
+}

@@ -10,7 +10,7 @@
   display: grid;
   // v1/index-row: 1 · 5 · 3 · 2 · 1 on the 12-col grid, 64 px high
   grid-template-columns: 1fr 5fr 3fr 2fr 1fr;
-  gap: 0 $space-4;
+  gap: 0 $gutter;
   align-items: center;
   min-height: 4rem;
   padding-block: 0.6rem;
@@ -190,7 +190,7 @@
 .covers {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: clamp(2rem, 3vw, 3rem) $space-4;
+  gap: clamp(2rem, 3vw, 3rem) $gutter;
   list-style: none;
 
   @include respond-to(md) { grid-template-columns: 1fr; }
@@ -260,7 +260,7 @@
   @include container;
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: $space-4;
+  gap: $gutter;
   align-items: end;
   padding-top: clamp(4rem, 7vw, 7.5rem);
   padding-bottom: clamp(2.5rem, 4vw, 4rem);
@@ -303,7 +303,7 @@
 .archiveHead {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: $space-4;
+  gap: $gutter;
   margin-bottom: clamp(2rem, 3.3vw, 3.5rem);
 
   @include respond-to(md) { grid-template-columns: 1fr; }
@@ -395,7 +395,7 @@
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
     grid-template-areas: 'p y' 'v v' 'r r';
-    column-gap: $space-4;
+    column-gap: $gutter;
     row-gap: 4px;
     padding-block: 0.85rem;
     border-bottom: 1px solid $color-line;

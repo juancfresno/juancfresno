@@ -77,6 +77,8 @@ export const SITE_ES: SiteDict = {
   // ─── Intros de página ──────────────────────────────────────────────────────
   INTROS: {
     work: 'Una selección de los últimos años: marcas, webs y producto digital. Unos con estudios y agencias, otros mano a mano con la marca.',
+    // Hero de /es/work (Figma 6951:13221). Traducción pendiente de revisar por Copywriter.
+    workHero: 'Trabajo con estudios y marcas desde 2012.\nDirección de arte y diseño de producto digital, identidades y experiencias interactivas, hechos con claridad, detalle e intención.',
     feed: 'Una selección de lo que publico: piezas sueltas, procesos y cosas que nunca llegaron a caso. Lo más reciente, primero.',
     lab: 'Lo que hago cuando nadie me lo pide. Construyo cosas yo mismo, sin brief: juego, rompo y aprendo con interacciones, layouts, pequeñas herramientas y mis propias apps. Me mantiene inquieto, y de vez en cuando algo acaba en un proyecto de cliente.',
     archive: 'La lista larga, desde que voy por mi cuenta, en 2016. Casi todo llegó a través de estudios y agencias, así que la columna «Vía» dice quién me llamó. Lo que está bajo NDA va sin nombre.',

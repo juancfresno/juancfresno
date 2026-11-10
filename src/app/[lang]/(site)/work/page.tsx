@@ -1,14 +1,13 @@
 import type { Metadata } from 'next'
 import { pageMeta } from '@/lib/seo'
 import { getSite, getUi } from '@/content/site'
-import { getProjects, getArchive, toRow } from '@/content/cases'
+import { getProjects, getCases, caseMedia, projectNumber, isPersonal, openKind } from '@/content/cases'
 import { localeOf, type LangParams } from '@/i18n/server'
-import WorkViews from '@/components/work/WorkViews'
-import ArchiveTable from '@/components/work/ArchiveTable'
-import V0Section from '@/components/blocks/V0Section'
+import type { WorkItem } from '@/components/work/archive/types'
+import WorkArchive from '@/components/work/archive/WorkArchive'
+import ElasticLine from '@/components/ui/ElasticLine/ElasticLine'
 import ContactBlock from '@/components/blocks/ContactBlock'
-import v from '@/components/blocks/v0.module.scss'
-import w from '@/components/work/work.module.scss'
+import s from '@/components/work/archive/page.module.scss'
 
 type Props = { params: Promise<LangParams> }
 
@@ -18,32 +17,71 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return pageMeta({ locale: l, path: '/work', title: META.work.title, description: META.work.description })
 }
 
-// Work v1.0 — Figma "Work · v1.0 · 1680" (6884:611): giant "Work" + intro,
-// View: List / Covers, the index renumbered 01–13 (NDA rows hidden,
-// SHOW_NDA in cases.ts), then the archive from the invoices.
+// Work — Figma "work" (AXxkCCuckrXGKDUCk8lNyQ · 6951:13221, 10 Nov 2026):
+// hero with the page name on the right + intro, an empty reserved band for the
+// future featured gallery (537 px at 1680), then the list of the 30 cases
+// (03 · Archive, 6951:13618) in ALL_PROJECTS order. Rows don't navigate to
+// /work/[slug]: they open the project in place (?open=drawer|expand|stage).
 export default async function WorkPage({ params }: Props) {
   const l = await localeOf(params)
   const { INTROS } = getSite(l)
   const ui = getUi(l)
-  const rows = getProjects(l).map((p) => toRow(l, p))
+  const cases = getCases(l)
+
+  const projects = getProjects(l).filter((p) => cases[p.slug] && caseMedia(p.slug))
+  const dupes = new Set(projects.map((p) => p.name).filter((n, i, a) => a.indexOf(n) !== i))
+  const items: WorkItem[] = projects.map((p) => {
+    const c = cases[p.slug]
+    const m = caseMedia(p.slug)
+    const kind = c.meta.split(' · ').slice(1).join(' · ')
+    return {
+      slug: p.slug,
+      n: projectNumber(p.slug),
+      name: dupes.has(p.name) ? `${p.name} · ${kind}` : p.name,
+      title: c.title,
+      kind,
+      via: c.ficha.via ?? (isPersonal(p.slug) ? c.ficha.client : ui.work.direct),
+      category: p.discipline,
+      role: c.ficha.role ?? '—',
+      year: c.ficha.year,
+      client: c.ficha.client,
+      studio: c.ficha.via,
+      chips: c.chips,
+      lead: c.lead,
+      cover: m.cover,
+      images: m.images,
+      open: openKind(p, m.images.length),
+    }
+  })
+
+  const [first, ...rest] = INTROS.workHero.split('\n')
 
   return (
-    <div className={v.page}>
-      <header className={w.header}>
-        <h1 className={w.h1}>{ui.work.h1}</h1>
-        <p className={w.intro}>{INTROS.work}</p>
+    <div className={s.page} data-work-page>
+      <header className={s.hero}>
+        <h1 className={s.name}>/{ui.work.h1}</h1>
+        <p className={s.intro}>
+          {first}
+          {rest.length > 0 && <><br />{rest.join(' ')}</>}
+        </p>
       </header>
 
-      <section className={w.indexMod} aria-label={ui.work.selected}>
-        <WorkViews rows={rows} />
+      {/* Reserved for the featured gallery (Juan designs it later): exact
+          Figma height, nothing inside but four crop marks. */}
+      <div className={s.gallery} aria-hidden="true">
+        <span /><span /><span /><span />
+      </div>
+
+      <section id="archive" className={s.archive} aria-labelledby="archive-label">
+        <ElasticLine className={s.rule} />
+        <p id="archive-label" className={s.label}>{ui.archive.label}</p>
+        <p className={s.archiveIntro}>{INTROS.archive}</p>
+        <WorkArchive items={items} />
       </section>
 
-      <V0Section id="archive" label={ui.archive.label}>
-        <div className={w.archiveHead}><p className={w.archiveIntro}>{INTROS.archive}</p></div>
-        <ArchiveTable rows={getArchive(l)} />
-      </V0Section>
-
-      <ContactBlock locale={l} />
+      <div data-flip-after>
+        <ContactBlock locale={l} />
+      </div>
     </div>
   )
 }

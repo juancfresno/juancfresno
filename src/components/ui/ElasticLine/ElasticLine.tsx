@@ -20,6 +20,7 @@ export default function ElasticLine({ className }: Props) {
     let cpx    = 0
     let target = 0
     let w      = 0
+    let straight = true
 
     // Física de muelle correcta:
     // DAMPING = retención de velocidad por frame (0.93 = 7% pérdida → oscila)
@@ -33,11 +34,20 @@ export default function ElasticLine({ className }: Props) {
     let lastMouseY = 0, lastTime = 0, mouseVY = 0
     let wasNear = false
 
-    const measure = () => {
-      w = svg.getBoundingClientRect().width
-      path.setAttribute('d', `M 0 0.5 L ${w} 0.5`)
+    // Layout width, not getBoundingClientRect(): a parent may be mid-transform
+    // at mount (the WIP intro scales the header line in from scaleX(0)) and the
+    // transformed width would freeze the path short. ResizeObserver reports
+    // the untransformed content box and fires again on every layout change.
+    const measure = (next?: number) => {
+      const nw = next ?? svg.clientWidth
+      if (!nw || nw === w) return
+      w = nw
+      if (straight) path.setAttribute('d', `M 0 0.5 L ${w} 0.5`)
     }
-    measure()
+    const ro = typeof ResizeObserver !== 'undefined'
+      ? new ResizeObserver((entries) => measure(entries[0]?.contentRect.width))
+      : null
+    ro?.observe(svg)
 
     const onMove = (e: MouseEvent) => {
       // Calcula velocidad Y del ratón (px/ms)
@@ -68,10 +78,10 @@ export default function ElasticLine({ className }: Props) {
     }
 
     window.addEventListener('mousemove', onMove)
-    window.addEventListener('resize', measure)
+    const onResize = () => measure()
+    window.addEventListener('resize', onResize)
 
     let rafId: number
-    let straight = true
 
     const tick = () => {
       vy += (target - y) * SPRING_K
@@ -92,12 +102,14 @@ export default function ElasticLine({ className }: Props) {
       rafId = requestAnimationFrame(tick)
     }
 
+    measure()
     rafId = requestAnimationFrame(tick)
 
     return () => {
       cancelAnimationFrame(rafId)
       window.removeEventListener('mousemove', onMove)
-      window.removeEventListener('resize', measure)
+      window.removeEventListener('resize', onResize)
+      ro?.disconnect()
     }
   }, [])
 

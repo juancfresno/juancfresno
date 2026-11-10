@@ -1,0 +1,282 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+// ─── /work list (Figma v1/archive-row 6878:98) ───────────────────────────────
+// 12-col grid, 4 · 3 · 2 · 2 · 1, rows 44 px with a 1 px rule. Project in
+// Switzer 15, the rest Fragment Mono 10 uppercase. Hover voice = the nav chip.
+
+.wrap {
+  grid-column: 1 / -1;
+}
+
+@mixin cols {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: $gutter;
+  > :nth-child(1) { grid-column: span 4; }
+  > :nth-child(2) { grid-column: span 3; }
+  > :nth-child(3) { grid-column: span 2; }
+  > :nth-child(4) { grid-column: span 2; }
+  > :nth-child(5) { grid-column: span 1; }
+}
+
+.head {
+  @include cols;
+  padding-bottom: 12px;
+  border-bottom: 1px solid $color-line;
+  font-family: $font-mono;
+  font-size: 10px;
+  line-height: 12px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: $color-text-mid;
+  .year { text-align: right; }
+
+  @include respond-to(md) { display: none; }
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow-anchor: none;
+}
+
+// Every row has the page background: during an expand FLIP the rows below
+// slide over the panel and work as its curtain.
+.item {
+  position: relative;
+  background: $color-bg;
+  border-bottom: 1px solid $color-line;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: $gutter;
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  min-height: 44px;
+  align-items: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: $color-text;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  --wk-chip: #{$raw-chip}; // read by usePixelFill
+  transition: opacity 0.28s $ease-out-quart, color 0.06s linear;
+  -webkit-tap-highlight-color: transparent;
+
+  // Grid children skip the sweep (absolute), so re-point the spans.
+  > .project { grid-column: 1 / span 4; }
+  > .via { grid-column: 5 / span 3; }
+  > .cat { grid-column: 8 / span 2; }
+  > .role { grid-column: 10 / span 2; }
+  > .year { grid-column: 12 / span 1; }
+
+  &:focus-visible { outline: none; }
+}
+
+// ── Pixel fill: square chip-blue cells in Bayer order (usePixelFill) ─────────
+// The canvas has no size until the row is active. Text flips with [data-ink].
+.fill {
+  position: absolute;
+  left: -10px;
+  top: 4px;
+  width: calc(100% + 20px);
+  height: calc(100% - 8px);
+  z-index: -1;
+  pointer-events: none;
+  image-rendering: pixelated;
+}
+
+.project {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  font-family: $font-body;
+  font-size: 15px;
+  line-height: 18px;
+  letter-spacing: -0.005em;
+}
+.nameText { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.via, .cat, .role, .year {
+  font-family: $font-mono;
+  font-size: 10px;
+  line-height: 12px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 0.06s linear;
+}
+.cat, .role { color: $color-text-mid; }
+.year { text-align: right; }
+
+// Arrow draws itself after the chip (same dash numbers as ui/NavLink).
+.arrow { flex: none; overflow: visible; margin-top: 1px; }
+.arrowShaft { stroke-dasharray: 8.5; stroke-dashoffset: 8.5; transition: stroke-dashoffset 0.2s ease-in; }
+.arrowHead { stroke-dasharray: 8; stroke-dashoffset: 8; transition: stroke-dashoffset 0.18s ease-in; }
+
+.thumb {
+  display: none;
+  flex: none;
+  width: 48px;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: 2px;
+  background: var(--c-stage);
+  img { width: 100%; height: 100%; object-fit: cover; display: block; }
+}
+
+// ── Active row (pointer hover or keyboard focus) ─────────────────────────────
+// Text goes ink when the pixel fill covers >= 50 % (data-ink, set by the hook).
+.row[data-ink] {
+  color: $raw-ink;
+  .via, .cat, .role, .year { color: $raw-ink; }
+}
+
+@mixin on {
+  .arrowShaft { stroke-dashoffset: 0; transition: stroke-dashoffset 0.36s $ease-out-expo 0.12s; }
+  .arrowHead { stroke-dashoffset: 0; transition: stroke-dashoffset 0.32s $ease-out-expo 0.26s; }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .item[data-on] .row { @include on; }
+}
+.item[data-on] .row:focus-visible { @include on; }
+
+// Others dim while one is active; an expanded row keeps the rest at 45 %.
+.list:has(.item[data-on]) .item:not([data-on]) .row { opacity: 0.35; }
+.hasOpen .item:not([data-open]):not([data-on]) .row { opacity: 0.45; }
+.item[data-open] .row .year { color: $color-text-hi; }
+
+@media (prefers-reduced-motion: reduce) {
+  .row, .arrowShaft, .arrowHead { transition: none !important; }
+}
+
+// ── Touch: no hover; a small fixed thumbnail per row ─────────────────────────
+@media (hover: none) {
+  .thumb { display: block; }
+}
+
+// ── Phones: two lines (name + year / via · category), role hidden ────────────
+@include respond-to(md) {
+  .row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: 'p y' 'm m';
+    row-gap: 4px;
+    padding-block: 12px;
+    > .project { grid-column: auto; grid-area: p; }
+    > .year { grid-column: auto; grid-area: y; }
+    > .via { grid-column: auto; grid-area: m; padding-left: 56px; }
+    > .cat, > .role { display: none; }
+  }
+  .via::after { content: none; }
+}
+
+// ─── Floating preview ─────────────────────────────────────────────────────────
+.svgDefs { position: absolute; width: 0; height: 0; overflow: hidden; }
+
+.preview {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 60; // above main (10) and the transition canvas, under the nav (100)
+  pointer-events: none;
+  will-change: transform;
+}
+
+.pvFrame {
+  position: relative;
+  width: clamp(240px, 22vw, 400px);
+  aspect-ratio: 4 / 3;
+  opacity: 0;
+  transform: scale(0.88);
+  transform-origin: 30% 50%;
+  transition: opacity 0.14s ease-in, transform 0.18s ease-in;
+  [data-on] > & {
+    opacity: 1;
+    transform: scale(1);
+    transition: opacity 0.18s ease-out, transform 0.42s $ease-spring;
+  }
+  [data-instant] > & { transition: none; }
+}
+
+.pvSlot {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  isolation: isolate;
+  background: #000;
+  opacity: 0;
+  transition: opacity 0.22s ease;
+  &[data-cur] { opacity: 1; }
+
+  img {
+    position: absolute;
+    inset: -16px; // room for the split
+    width: calc(100% + 32px);
+    height: calc(100% + 32px);
+    object-fit: cover;
+    max-width: none;
+    mix-blend-mode: screen;
+    will-change: transform;
+  }
+}
+// At rest: ONE plain image. The three-channel split only exists while moving.
+.pvR, .pvB { display: none; }
+[data-moving] {
+  .pvR { display: block; filter: url(#wk-ch-r); }
+  .pvG { filter: url(#wk-ch-g); }
+  .pvB { display: block; filter: url(#wk-ch-b); }
+}
+
+// G-orange crop ticks on the corners (the wireframe voice).
+.pvTick {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border: 0 solid var(--c-g);
+  &[data-c='tl'] { top: -5px; left: -5px; border-top-width: 1px; border-left-width: 1px; }
+  &[data-c='tr'] { top: -5px; right: -5px; border-top-width: 1px; border-right-width: 1px; }
+  &[data-c='bl'] { bottom: -5px; left: -5px; border-bottom-width: 1px; border-left-width: 1px; }
+  &[data-c='br'] { bottom: -5px; right: -5px; border-bottom-width: 1px; border-right-width: 1px; }
+}
+
+.pvLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 4px 6px;
+  border-radius: 3px;
+  background: $raw-chip;
+  color: $raw-ink;
+  font-family: $font-mono;
+  font-size: 10px;
+  line-height: 12px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translate3d(0, -4px, 0);
+  transition: opacity 0.12s ease-in, transform 0.12s ease-in;
+  [data-on] > & {
+    opacity: 1;
+    transform: none;
+    transition: opacity 0.2s ease-out 0.08s, transform 0.3s $ease-out-expo 0.08s;
+  }
+}
+.pvDot { width: 5px; height: 5px; border-radius: 50%; background: var(--c-g); }
+.pvName { min-width: 1ch; }
+
+@media (prefers-reduced-motion: reduce) {
+  .pvFrame, .pvLabel, .pvSlot { transition-duration: 0.01s !important; transition-delay: 0s !important; }
+}
