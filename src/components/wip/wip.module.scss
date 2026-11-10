@@ -1,0 +1,284 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+$in-ease: cubic-bezier(0.22, 1, 0.36, 1); // one family for everything that enters (grid stays in-out)
+
+// Home v1 · Figma "home" (6949:12453, 1680 × 1386): header 72 · hero (copy
+// 83 px under the header line, the lens behind it) · contact module · footer.
+// The hero fills the first screen; the lens lives inside it (absolute, not
+// fixed) so the page scrolls on to the contact module.
+
+.hero {
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  min-height: 100svh;
+  padding-top: calc(72px + 83px);
+  padding-bottom: 6rem;
+  overflow: hidden;
+  isolation: isolate;
+  // Horizontal drags pan the lens; vertical gestures keep scrolling the page.
+  touch-action: pan-y;
+  @media (pointer: fine) { cursor: grab; }
+
+  @include respond-to(md) {
+    padding-top: calc(72px + 40px);
+    padding-bottom: 9rem;
+  }
+}
+
+// ─── Hero copy (Figma 6949:12476: gap 24, the two heading lines gap 8) ────────
+.copy {
+  @include container;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 24px;
+  user-select: text;
+}
+
+// Geist 40/46 −0.8 in Figma → Switzer (body font).
+.head {
+  display: block;
+  margin: 0;
+  font-family: $font-body;
+  font-weight: 400;
+  font-size: clamp(1.75rem, 1.2rem + 1.6vw, 2.5rem);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.name { color: $color-text; }
+.title { display: block; color: var(--c-text-hi); }
+.titleMask { margin-top: 8px; } // Figma: the two lines 8 px apart
+
+// Line mask for the entrance: the inner [data-in='mask'] rises into view.
+// The padding keeps descenders out of the clip.
+.mask {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.16em;
+  margin-bottom: -0.16em;
+  > [data-in] { display: block; }
+}
+
+// Geist Mono 12 uppercase → Fragment Mono.
+.disciplines {
+  margin: 0;
+  font-family: $font-mono;
+  font-size: 12px;
+  line-height: normal;
+  text-transform: uppercase;
+  color: $color-text;
+}
+
+// Geist 18/1.4 #9c9ea0 → Switzer, text-mid.
+.intro {
+  margin: 0;
+  max-width: 62rem;
+  font-family: $font-body;
+  font-size: clamp(1rem, 0.9rem + 0.3vw, 1.125rem);
+  line-height: 1.4;
+  color: $color-text-mid;
+}
+
+.email {
+  position: relative;
+  display: inline-block;
+  color: inherit;
+  text-decoration: none;
+  background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat;
+  transition: color $duration-fast $ease-out-quart, background-size 420ms cubic-bezier(0.22, 1, 0.36, 1);
+  @include focus-ring;
+
+  &:hover,
+  &:focus-visible {
+    color: $color-text;
+    background-size: 100% 1px;
+  }
+
+  @media (prefers-reduced-motion: reduce) { transition: none; }
+}
+
+// The ghost keeps the real width; the live text (scrambled) sits on top.
+.emailGhost { visibility: hidden; }
+.emailLive { position: absolute; left: 0; top: 0; white-space: nowrap; }
+
+// "Copied ✓" chip: same chip as the nav hover (blue, ink text), same spring.
+.copied {
+  display: inline-block;
+  margin-left: 10px;
+  padding: 0 6px;
+  border-radius: 3px;
+  background: $raw-chip;
+  color: $raw-ink;
+  font-family: $font-mono;
+  font-size: 11px;
+  line-height: 1.5;
+  text-transform: uppercase;
+  vertical-align: 0.08em;
+  opacity: 0;
+  transform: scale(0.88);
+  visibility: hidden;
+  transition: opacity 0.14s ease-in, transform 0.18s ease-in, visibility 0s 0.18s;
+  pointer-events: none;
+
+  @media (prefers-reduced-motion: reduce) { transition: none; }
+}
+
+.copiedOn {
+  opacity: 1;
+  transform: scale(1);
+  visibility: visible;
+  transition: opacity 0.18s ease-out, transform 0.26s $ease-spring;
+
+  @media (prefers-reduced-motion: reduce) { transition: none; }
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+// ─── Grain (Grain.tsx) ───────────────────────────────────────────────────────
+// Over everything (header and footer included, so there is no seam), never
+// catches the pointer. Subtler than the feed canvas (× 1 / × 0.7): 0.5 / 0.35.
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0.5;
+
+  :global(html[data-theme='light']) & { opacity: 0.35; }
+}
+
+.grainTex {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: calc(100% + 256px);
+  height: calc(100% + 256px);
+  background: url('/feed/grain.webp') repeat;
+  background-size: 256px 256px;
+  will-change: transform;
+}
+
+// ─── Backgrounds (CanvasBackdrop.tsx = plane, bg/OrbBackdrop.tsx) ───────────
+// The lens fills the hero (absolute, behind the copy; the contact module and
+// the footer below are opaque). The veil keeps the copy legible
+// in both themes: a light overall dim, a strong wash behind the hero (left)
+// and bands under the header and the footer.
+.canvasStage {
+  position: absolute;
+  inset: 0;
+  z-index: -1; // inside .hero's stacking context: under the copy
+
+  overflow: hidden;
+  pointer-events: none;
+  background: $color-bg;
+  animation: bgIn 500ms $in-ease both;
+
+  > canvas, > div:not(.canvasVeil) { animation: bgZoom 900ms $in-ease both; }
+
+  // Enters after the grid and boxes are gone (delay), over clean black.
+  :global(html[data-intro='full']) & { animation-duration: 900ms; animation-delay: 200ms; > canvas, > div:not(.canvasVeil) { animation-duration: 900ms; animation-delay: 200ms; } }
+  :global(html[data-intro='fast']) & { animation-duration: 450ms; animation-delay: 100ms; > canvas, > div:not(.canvasVeil) { animation-duration: 450ms; animation-delay: 100ms; } }
+  // Underneath the wireframe: waits for the hand-over like the copy.
+  :global(html[data-intro='full']:not([data-intro-go])) &, :global(html[data-intro='fast']:not([data-intro-go])) & { &, > canvas, > div:not(.canvasVeil) { animation-play-state: paused; } }
+  :global(html[data-intro='reduced']) &, :global(html[data-intro-skip]) & { animation-duration: 300ms; animation-delay: 0ms; > canvas, > div:not(.canvasVeil) { animation: none; } }
+  @media (prefers-reduced-motion: reduce) { > canvas, > div:not(.canvasVeil) { animation: none; } }
+}
+
+@keyframes bgIn { from { opacity: 0; } }
+@keyframes bgZoom { from { transform: scale(1.08); } }
+
+.canvasGl, .canvasDom {
+  position: absolute;
+  inset: 0;
+  display: block;
+  &[hidden] { display: none; }
+}
+
+.canvasTile {
+  position: absolute;
+  left: 0;
+  top: 0;
+  overflow: hidden;
+  border-radius: 2px;
+  background: $color-bg-2;
+  will-change: transform;
+  img { display: block; width: 100%; height: 100%; object-fit: cover; }
+}
+
+.canvasVeil {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--c-bg) 80%, transparent) 0, transparent 140px),
+    linear-gradient(0deg, color-mix(in srgb, var(--c-bg) 92%, transparent) 0, color-mix(in srgb, var(--c-bg) 60%, transparent) 130px, transparent 260px),
+    linear-gradient(90deg, color-mix(in srgb, var(--c-bg) 90%, transparent) 0, color-mix(in srgb, var(--c-bg) 84%, transparent) 50%, color-mix(in srgb, var(--c-bg) 62%, transparent) 70%, color-mix(in srgb, var(--c-bg) 22%, transparent) 88%, color-mix(in srgb, var(--c-bg) 15%, transparent) 100%);
+
+  @include respond-to(md) {
+    background:
+      linear-gradient(180deg, color-mix(in srgb, var(--c-bg) 88%, transparent) 0, color-mix(in srgb, var(--c-bg) 82%, transparent) 60%, color-mix(in srgb, var(--c-bg) 70%, transparent) 75%, color-mix(in srgb, var(--c-bg) 92%, transparent) 100%);
+  }
+}
+
+:global(html).canvasDragging,
+:global(html).canvasDragging * {
+  cursor: grabbing !important;
+  user-select: none !important;
+}
+
+// ─── Entrance (Intro.tsx) ────────────────────────────────────────────────────
+// html[data-intro] is set in <head> (introScript.ts): full / fast / reduced.
+// The wireframe (Intro.tsx) runs first; the page's own entrance waits paused
+// until it hands over (html[data-intro-go]). Elements carry
+// data-in="fade | mask | line | rise" and --in-d (delay after GO, full run);
+// "fast" scales delays and durations by 0.5. Base styles are the final
+// state, so a skip just drops the animations.
+:global(html[data-intro]) { --in-k: 1; }
+:global(html[data-intro='fast']) { --in-k: 0.5; }
+
+:global(html[data-intro='full']),
+:global(html[data-intro='fast']) {
+  [data-in] {
+    animation-delay: calc(var(--in-d, 0ms) * var(--in-k));
+    animation-fill-mode: both;
+    animation-timing-function: $in-ease;
+    animation-play-state: paused;
+  }
+  [data-in='fade'] { animation-name: inFade; animation-duration: calc(700ms * var(--in-k)); }
+  [data-in='mask'] { animation-name: inMask; animation-duration: calc(700ms * var(--in-k)); }
+  [data-in='line'] { animation-name: inLine; animation-duration: calc(900ms * var(--in-k)); transform-origin: 0 50%; }
+  [data-in='rise'] { animation-name: inRise; animation-duration: calc(700ms * var(--in-k)); }
+}
+:global(html[data-intro-go]) [data-in] { animation-play-state: running; }
+
+:global(html[data-intro='reduced']) [data-in] { animation: inFade 400ms ease both; }
+:global(html[data-intro-skip]) [data-in] { animation: none !important; }
+
+@keyframes inFade { from { opacity: 0; } }
+@keyframes inMask { from { transform: translate3d(0, 110%, 0); } }
+@keyframes inLine { from { transform: scaleX(0); } }
+@keyframes inRise { from { opacity: 0; transform: translate3d(0, 18px, 0); } }
+
+// The wireframe canvas: over header, copy and footer, under the grain (150).
+.wire {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 140;
+  pointer-events: none;
+  :global(html:not([data-intro])) & { display: none; }
+}

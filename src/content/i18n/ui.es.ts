@@ -131,6 +131,7 @@ export const UI_ES: UiDict = {
     ogAlt: 'Caso de estudio de Juan C. Fresno',
   },
   home: { featuredStar: ' · ★ Destacado' },
+  wip: { copiedPill: 'Copiado ✓' },
   arco: {
     open: 'abrir el proyecto',
     aria: (label) => `${label}: arrastra, haz scroll o usa ← →. Intro abre el proyecto del centro.`,

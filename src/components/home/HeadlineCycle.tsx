@@ -51,19 +51,27 @@ export default function HeadlineCycle({ lines, className }: { lines: HeadlineLin
     const start = () => { window.clearTimeout(timer); loop() }
     const stop = () => { window.clearTimeout(timer); if (cur !== 0) go(0) }
 
-    // Entrance: the WIP intro builds the line from noise.
+    // Entrance: the WIP intro builds the line from noise once the wireframe
+    // hands over (html[data-intro-go] / 'wip:intro-go').
     const intro = document.documentElement.dataset.intro
+    let offGo: (() => void) | null = null
     if ((intro === 'full' || intro === 'fast') && !reduce) {
       const fast = intro === 'fast'
       const len = Array.from(lines[0].a).length
       el.textContent = ''
-      const t = window.setTimeout(() => {
-        el.dataset.run = ''
-        go(0, fast ? 320 : 620, ' '.repeat(len))
-      }, fast ? 90 : 260)
-      const skip = () => { window.clearTimeout(t); cancel?.(); el.dataset.run = ''; el.textContent = lines[0].a }
+      const build = () => {
+        timer = window.setTimeout(() => {
+          el.dataset.run = ''
+          go(0, fast ? 200 : 360, ' '.repeat(len))
+        }, fast ? 20 : 40)
+      }
+      if ('introGo' in document.documentElement.dataset) build()
+      else {
+        window.addEventListener('wip:intro-go', build, { once: true })
+        offGo = () => window.removeEventListener('wip:intro-go', build)
+      }
+      const skip = () => { offGo?.(); window.clearTimeout(timer); cancel?.(); el.dataset.run = ''; el.textContent = lines[0].a }
       window.addEventListener('wip:intro-skip', skip, { once: true })
-      timer = t
     } else {
       el.dataset.run = ''
     }
@@ -82,6 +90,7 @@ export default function HeadlineCycle({ lines, className }: { lines: HeadlineLin
     wrap.addEventListener('focus', onFocus)
     wrap.addEventListener('blur', onBlur)
     return () => {
+      offGo?.()
       cancel?.()
       window.clearTimeout(timer)
       host.removeEventListener('pointerenter', onEnter)
@@ -96,8 +105,9 @@ export default function HeadlineCycle({ lines, className }: { lines: HeadlineLin
     <span className={`${s.hc} ${className}`} tabIndex={0}>
       <span className={s.srOnly}>{lines[0].a}</span>
       <span className={s.hcStage} aria-hidden="true">
-        {lines.map((l) => (
-          <span key={l.lang} lang={l.lang} className={s.hcSizer} data-script={l.script}>{l.a}</span>
+        {lines.map((l, k) => (
+          <span key={l.lang} lang={l.lang} className={s.hcSizer} data-script={l.script}
+            {...(k === 0 ? { 'data-wire': '', 'data-wire-text': '' } : {})}>{l.a}</span>
         ))}
         <span ref={live} lang={lines[0].lang} className={s.hcLive}>{lines[0].a}</span>
       </span>

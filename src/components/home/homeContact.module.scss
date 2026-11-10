@@ -1,0 +1,50 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+// Figma "04 · Archivo" (6856:14014), 1680 × 275: bg ink, padding 40 (margin
+// token) / 64 bottom, gap 16, rule + label row (16 above the label), then two
+// Geist 24/46 −0.48 lines (Switzer), the second right-aligned.
+.contact {
+  @include container;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 40px;
+  padding-bottom: 64px;
+  background: $color-bg;
+  color: $color-text-hi;
+}
+
+.rule { display: block; width: 100%; color: $color-line; }
+
+// Geist Mono 11 uppercase → Fragment Mono.
+.label {
+  margin: 0;
+  padding-top: 16px;
+  font-family: $font-mono;
+  font-size: 11px;
+  line-height: normal;
+  text-transform: uppercase;
+  color: $color-text-hi;
+}
+
+.line {
+  margin: 0;
+  font-family: $font-body;
+  font-weight: 400;
+  font-size: clamp(1.25rem, 1.1rem + 0.5vw, 1.5rem); // 24 at 1680, never larger
+  line-height: 1.917; // 46 / 24 in Figma
+  letter-spacing: -0.02em;
+  color: $color-text-hi;
+}
+
+// Right-aligned: the "Copied ✓" pill sits to the left of the email so the
+// address itself stays flush with the margin.
+.email {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: flex-start;
+  align-items: baseline;
+  @include respond-to(md) { flex-direction: row; }
+}
+.email .pill { margin-left: 0; margin-right: 10px; @include respond-to(md) { margin-left: 10px; margin-right: 0; } }

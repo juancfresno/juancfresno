@@ -75,6 +75,16 @@ export const SITE_ES: SiteDict = {
   },
 
   // ─── Intros de página ──────────────────────────────────────────────────────
+  // ─── Home v1 · Figma "home" 6949:12453, traducción ────────────────────────
+  LANDING: {
+    line1: '¡Hola! Soy Juan C. Fresno,',
+    title: 'Director de arte y\u00a0diseñador interactivo independiente',
+    disciplines: 'Dirección de arte — Productos digitales — Interacción — Identidad de marca',
+    intro: ['Trabajo con estudios y marcas desde 2012.', 'Dirección de arte y diseño de productos digitales, identidades y experiencias interactivas — con claridad, detalle e intención.'],
+    contactLabel: 'Colaboremos↘',
+    contactLine: 'Para consultas, colaboraciones o proyectos nuevos',
+  },
+
   INTROS: {
     work: 'Una selección de los últimos años: marcas, webs y producto digital. Unos con estudios y agencias, otros mano a mano con la marca.',
     // Hero de /es/work (Figma 6951:13221). Traducción pendiente de revisar por Copywriter.
@@ -193,7 +203,7 @@ export const SITE_ES: SiteDict = {
       built: 'Web Animations API · sin librerías',
       note: '★ 11a y 11d',
       card: '22 transiciones de página, una al lado de otra, para elegir antes de comprometerse.',
-      how: 'JavaScript sin librerías, sobre la Web Animations API: una capa por encima de la página, y la página cambia mientras está tapada. Las de retícula miden la página real (márgenes, medianil, columnas y la caja de cada elemento; la retícula es la de esta web, margen 64 y medianil 16 a 1680, líquida) y trabajan con clones recortados por celdas o columnas. Con «reducir movimiento» todo es instantáneo. Esta web usa la 11a, «cae la retícula», entre páginas.',
+      how: 'JavaScript sin librerías, sobre la Web Animations API: una capa por encima de la página, y la página cambia mientras está tapada. Las de retícula miden la página real (márgenes, medianil, columnas y la caja de cada elemento; la retícula es la de esta web, margen 40 y medianil 16 a 1680, líquida) y trabajan con clones recortados por celdas o columnas. Con «reducir movimiento» todo es instantáneo. Esta web usa la 11a, «cae la retícula», entre páginas.',
     },
     {
       slug: 'galerias',

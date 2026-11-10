@@ -11,11 +11,11 @@ export type Tile = { cols: number; rows: number; slots: Slot[] }
 
 export const TILE = tileData as unknown as Tile & { source: string }
 
-// Site grid, liquid, same as the --m / --gutter tokens: margin max(20, 3.8vw),
-// gutter max(12, 0.952vw) (64/16 at 1680), 12 at ≤ 768; 4 columns at ≤ 768.
+// Site grid, liquid, same as the --m / --gutter tokens: margin max(20, 2.381vw),
+// gutter max(12, 0.952vw) (40/16 at 1680), 12 at ≤ 768; 4 columns at ≤ 768.
 // One unit = column + gutter.
 export function gridMetrics(W: number) {
-  const margin = Math.max(20, W * 0.038)
+  const margin = Math.max(20, W * 0.02381)
   const gutter = W <= 768 ? 12 : Math.max(12, W * 0.00952)
   const cols = W <= 768 ? 4 : 12
   const unit = (W - 2 * margin + gutter) / cols

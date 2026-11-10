@@ -3,7 +3,7 @@
 
 // ─── /work page shell — Figma "work" (6951:13221) ────────────────────────────
 // Margins and gaps are the site tokens (web-v2 d1de50b): $m = --m page
-// margin clamp(20px, 3.8vw, 64px), $gutter = --gutter column gap (16 / 12
+// margin max(20px, 2.381vw), $gutter = --gutter column gap (16 / 12
 // ≤ 768), liquid (no max width). The open views read the same vars.
 
 .page {

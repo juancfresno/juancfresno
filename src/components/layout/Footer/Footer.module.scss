@@ -19,6 +19,7 @@
 .social {
   display: flex;
   align-items: center;
+  justify-content: flex-end; // row sits on the right margin (Figma web/footer, Juan 10 Nov 2026)
   gap: 1.5625rem; // 25px — del Figma
   flex-wrap: wrap;
   padding-bottom: 1.5625rem;
@@ -33,6 +34,35 @@
 
   &:hover {
     opacity: 1;
+  }
+}
+
+// ─── Mobile: one row, 16 px tall (Juan, 10 Nov 2026) ─────────────────────────
+// Every wordmark scales by the same factor (2/3: the tallest, Instagram, 24 →
+// 16 px), so the row keeps its optical sizes and fits 320 px in one line:
+// widths 52.7 + 51.3 + 51.3 + 55.3 + 13.3 = 224 px. Gap 20 px; 14 px at
+// ≤ 360; at 320 the gap is whatever is left (12 px) so it never wraps.
+@include respond-to(md) {
+  .social {
+    flex-wrap: nowrap;
+    gap: 20px;
+    @media (max-width: 360px) { gap: min(14px, calc((100vw - 2 * #{$m} - 224px) / 4)); }
+  }
+  .socialLink {
+    // Every link box is 16 px tall (the row height), so the hit area is
+    // 16 + 2 × 14 = 44 px for each wordmark, short ones included.
+    display: flex;
+    align-items: center;
+    height: 16px;
+    @include touch-target(14px, 6px);
+    svg { width: auto; }
+    &[data-social='behance'] svg { width: 52.5px; height: 10px; }
+    &[data-social='dribbble'] svg { width: 51.33px; height: 14.67px; }
+    &[data-social='linkedin'] svg { width: 51.33px; height: 14px; }
+    &[data-social='instagram'] svg { width: 55.33px; height: 16px; }
+    &[data-social='x'] svg { width: 13.33px; height: 13.33px; }
+    // X is 13 px wide: its hit area grows into the right margin to reach 44.
+    @media (pointer: coarse) { &[data-social='x']::after { inset: -14px -24px -14px -7px; } }
   }
 }
 

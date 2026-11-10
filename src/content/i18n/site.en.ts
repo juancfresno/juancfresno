@@ -75,6 +75,16 @@ export const SITE_EN = {
     },
   },
 
+  // ─── Home v1 · Figma "home" 6949:12453, copy verbatim ────────────────────────
+  LANDING: {
+    line1: 'Hello! I’m Juan C. Fresno,',
+    title: 'Independent Art Director & Interactive Designer',
+    disciplines: 'Art direction — Digital products — Interaction — Brand identity',
+    intro: ['Working with studios and brands since 2012.', 'Art direction and design for digital products, identities and interactive experiences — built with clarity, detail and intent.'],
+    contactLabel: 'Let’s collaborate↘',
+    contactLine: 'For enquiries, collaborations or new projects',
+  },
+
   // ─── Page intros ──────────────────────────────────────────────────────────────
   INTROS: {
     work: 'Selected projects from recent years: brands, websites and digital products. Some with studios and agencies, some directly with the brand.',
@@ -200,7 +210,7 @@ export const SITE_EN = {
       built: 'Web Animations API · no libraries',
       note: '★ 11a and 11d',
       card: '22 page transitions, side by side, to choose before committing.',
-      how: 'JavaScript with no libraries, on the Web Animations API: an overlay above the page, and the page swaps while it is covered. The grid-based ones measure the real page (margins, gutter, columns and every element’s box; the grid is this site’s, margin 64 and gutter 16 at 1680, liquid) and work with clones clipped by cells or columns. With reduced motion everything is instant. This site uses 11a, “the grid falls”, between pages.',
+      how: 'JavaScript with no libraries, on the Web Animations API: an overlay above the page, and the page swaps while it is covered. The grid-based ones measure the real page (margins, gutter, columns and every element’s box; the grid is this site’s, margin 40 and gutter 16 at 1680, liquid) and work with clones clipped by cells or columns. With reduced motion everything is instant. This site uses 11a, “the grid falls”, between pages.',
     },
     {
       slug: 'galerias',

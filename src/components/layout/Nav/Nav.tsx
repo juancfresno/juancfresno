@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, type CSSProperties } from 'react'
 import { usePathname } from 'next/navigation'
 import clsx from 'clsx'
 import s from './Nav.module.scss'
@@ -117,6 +117,9 @@ export default function Nav() {
     <a
       href={home}
       className={s.logo}
+      data-in="fade"
+      data-wire="LOGO · FRESNO©"
+      style={{ '--in-d': '120ms' } as CSSProperties}
       aria-label={ui.nav.logo}
       onClick={(e) => {
         if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
@@ -132,6 +135,9 @@ export default function Nav() {
     <a
       href={home}
       className={s.face}
+      data-in="fade"
+      data-wire="FACE"
+      style={{ '--in-d': '0ms' } as CSSProperties}
       aria-label={ui.nav.home}
       onClick={(e) => {
         if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
@@ -151,7 +157,7 @@ export default function Nav() {
           <div className={s.left}>
             {faceLink}
 
-            <nav className={s.navMenu} aria-label={ui.nav.main}>
+            <nav className={s.navMenu} aria-label={ui.nav.main} data-in="fade" data-wire="NAV" style={{ '--in-d': '60ms' } as CSSProperties}>
               {links.map(({ label, href, url }) => (
                 <NavLinkItem
                   key={href}
@@ -171,7 +177,7 @@ export default function Nav() {
             {logoLink}
           </div>
         </div>
-        <div className={s.lineWrap}>
+        <div className={s.lineWrap} data-in="line" style={{ '--in-d': '0ms' } as CSSProperties}>
           <ElasticLine className={s.line} />
         </div>
       </header>

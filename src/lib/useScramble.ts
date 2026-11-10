@@ -6,10 +6,12 @@ import { useState, useEffect, useRef } from 'react'
 // ─── Scramble character pool ───────────────────────────────────────────────────
 const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%?'
 
+const LETTERS = 'abcdefghijklmnopqrstuvwxyz'
+
 // ─── useScramble ───────────────────────────────────────────────────────────────
 // Cicla aleatoriamente sobre los caracteres y los resuelve de izquierda a derecha.
 // active=true → arranca la animación; active=false → resetea al texto original.
-export function useScramble(text: string, active: boolean): string {
+export function useScramble(text: string, active: boolean, lettersOnly = false): string {
   const [display, setDisplay] = useState(text)
   const rafRef = useRef<number>(undefined)
   const t0Ref  = useRef<number | null>(null)
@@ -35,6 +37,11 @@ export function useScramble(text: string, active: boolean): string {
         text.split('').map((ch, i) => {
           if (ch === ' ') return ' '
           if (i < resolved) return ch
+          if (lettersOnly) {
+            if (!/[a-z]/i.test(ch)) return ch
+            const L = LETTERS[Math.floor(Math.random() * LETTERS.length)]
+            return ch === ch.toUpperCase() ? L.toUpperCase() : L
+          }
           return CHARS[Math.floor(Math.random() * CHARS.length)]
         }).join('')
       )
@@ -51,7 +58,7 @@ export function useScramble(text: string, active: boolean): string {
     rafRef.current = requestAnimationFrame(frame)
 
     return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current) }
-  }, [active, text])
+  }, [active, text, lettersOnly])
 
   return display
 }

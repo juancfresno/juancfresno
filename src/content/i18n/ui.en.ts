@@ -132,6 +132,7 @@ export const UI_EN = {
     ogAlt: 'Case study by Juan C. Fresno',
   },
   home: { featuredStar: ' · ★ Featured' },
+  wip: { copiedPill: 'Copied ✓' }, // email link on the home (components/wip/EmailLink)
   arco: {
     open: 'open the case',
     aria: (label: string) => `${label}: drag, scroll or use ← →. Enter opens the case in the centre.`,
