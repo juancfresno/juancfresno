@@ -326,6 +326,18 @@ $in-ease: cubic-bezier(0.22, 1, 0.36, 1); // one family for everything that ente
   }
 }
 
+// ?start=dense: same veil, the side gradient's last two stops darker
+// (22 % → 40 %, 15 % → 32 %) so no pale sheet out-shines the copy. Desktop only;
+// the mobile veil above is unchanged.
+@media (min-width: #{$bp-md + 1px}) {
+  .canvasVeilDense {
+    background:
+      linear-gradient(180deg, color-mix(in srgb, var(--c-bg) 80%, transparent) 0, transparent 140px),
+      linear-gradient(0deg, color-mix(in srgb, var(--c-bg) 92%, transparent) 0, color-mix(in srgb, var(--c-bg) 60%, transparent) 130px, transparent 260px),
+      linear-gradient(90deg, color-mix(in srgb, var(--c-bg) 90%, transparent) 0, color-mix(in srgb, var(--c-bg) 84%, transparent) 50%, color-mix(in srgb, var(--c-bg) 62%, transparent) 70%, color-mix(in srgb, var(--c-bg) 40%, transparent) 88%, color-mix(in srgb, var(--c-bg) 32%, transparent) 100%);
+  }
+}
+
 // While a WebGL background is on: the page lets it through and takes drags.
 :global(html[data-bg]) {
   :global(footer) { background: transparent; }

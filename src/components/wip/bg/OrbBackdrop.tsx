@@ -15,7 +15,7 @@ import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import dynamic from 'next/dynamic'
 import type { FeedItem } from '@/content/feed'
-import { createOrb, type Orb, type OrbMode } from './orb'
+import { createOrb, isLens, lensTileCss, DENSE_START, type Orb, type OrbMode } from './orb'
 import { pageBg, splitMag, INTERACTIVE } from './theme'
 import s from '../wip.module.scss'
 
@@ -40,6 +40,9 @@ export default function OrbBackdrop({ items, mode }: { items: FeedItem[]; mode: 
   const [host, setHost] = useState<HTMLElement | null>(null)
   const [fallback, setFallback] = useState(false)
   const glRef = useRef<HTMLCanvasElement>(null)
+  // ?start=dense: the lens starts over a dark, dense cluster and the side veil
+  // is darker (preview only; the default start and veil stay as they are).
+  const [dense] = useState(() => isLens(mode) && new URLSearchParams(window.location.search).get('start') === 'dense')
 
   useEffect(() => {
     setHost(document.body)
@@ -71,6 +74,7 @@ export default function OrbBackdrop({ items, mode }: { items: FeedItem[]; mode: 
     let bg = pageBg()
     // a, b = the mode's two axes; va, vb = their velocities per 60 Hz frame.
     let a = mode === 'sphere' ? 0.6 : 0, b = mode === 'sphere' ? 0.18 : 0
+    if (dense) { const [tw, th] = lensTileCss(mode, W); a = DENSE_START.a * tw; b = DENSE_START.b * th }
     let va = 0, vb = 0
     let dragging = false
     let last = performance.now(), lastDraw = 0
@@ -200,14 +204,14 @@ export default function OrbBackdrop({ items, mode }: { items: FeedItem[]; mode: 
       o.destroy()
       document.documentElement.classList.remove(s.canvasDragging)
     }
-  }, [host, items, mode, fallback])
+  }, [host, items, mode, fallback, dense])
 
   if (fallback) return <CanvasBackdrop items={items} />
   if (!host) return null
   return createPortal(
     <div className={s.canvasStage} aria-hidden="true">
       <canvas ref={glRef} className={s.canvasGl} />
-      <div className={s.canvasVeil} />
+      <div className={`${s.canvasVeil} ${dense ? s.canvasVeilDense : ''}`} />
     </div>,
     host,
   )
