@@ -20,12 +20,10 @@
 }
 
 // ─── Layout ───────────────────────────────────────────────────────────────────
-// ONE proportional page margin (--m) for header, footer and content. Above
-// $page-max (1680) the content is centred at that max width.
+// ONE proportional page margin (--m) for header, footer and content. No max
+// width: the layout is liquid and spans the full viewport at every width.
 @mixin container {
   width: 100%;
-  max-width: $page-max;
-  margin-inline: auto;
   box-sizing: border-box;
   padding-inline: max(#{$m}, env(safe-area-inset-left, 0px)) max(#{$m}, env(safe-area-inset-right, 0px));
 }
