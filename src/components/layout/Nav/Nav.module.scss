@@ -91,7 +91,7 @@
 .faceGl {
   display: block;
   line-height: 0;
-  svg { display: block; width: fluid(25px); height: fluid(32px); }
+  svg { display: block; }
 }
 
 .faceGlMain {
@@ -143,7 +143,7 @@
 .clock {
   font-family: $font-mono;
   font-size: 0.6875rem;
-  line-height: fluid(13px);
+  line-height: 13px;
   color: $color-text-mid;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
@@ -200,14 +200,14 @@
   // hangs over the line instead of pushing the content down.
   & {
     align-self: flex-start;
-    width: fluid(12px);
-    height: fluid(32px);
+    width: 12px;
+    height: 32px;
     overflow: visible;
     position: relative;
     z-index: 2;
 
     .glitchWrap {
-      width: fluid(101px);                 // keep natural size inside the 12px box
+      width: 101px;                 // keep natural size inside the 12px box
       svg { max-width: none; }
       transform-origin: top left;
       transform: rotate(90deg) translateY(-100%);
@@ -220,7 +220,6 @@
   position: relative;
   display: inline-block;
   line-height: 0;
-  svg { width: fluid(101px); height: fluid(12px); }
 }
 
 .gl {
@@ -293,7 +292,7 @@
 
 .bottomTab {
   font-family: $font-mono;
-  font-size: fluid(10px);
+  font-size: 10px;
   font-weight: $fw-regular;
   letter-spacing: 0.02em;
   text-transform: uppercase;

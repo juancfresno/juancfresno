@@ -55,7 +55,7 @@
     --fg-overlay: var(--c-overlay);
     --fg-mono: #{$font-mono};
     --fg-gutter: #{$space-4};
-    --fg-top: #{fluid(72px)};
+    --fg-top: 72px;
 
     @include respond-to(md) { --fg-bottom: 64px; }
   }
