@@ -1,5 +1,11 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { FDS_COOKIE, FDS_HOST, fdsToken, safeEqual } from '@/lib/fds-auth'
+import {
+  BETA_COOKIE,
+  betaToken,
+  isBetaHost,
+  safeEqual as betaSafeEqual,
+} from '@/lib/beta-auth'
 import { DEFAULT_LOCALE, LOCALE_COOKIE, SEGMENTS, isLocale, parsePath } from '@/i18n/config'
 
 // Two jobs:
@@ -54,6 +60,50 @@ async function fds(request: NextRequest, host: string) {
     return withHeaders(NextResponse.rewrite(new URL('/FDS/fds-tokens.css', request.url)))
   }
   return NextResponse.redirect(new URL('/', request.url), 307)
+}
+
+// Private v1 preview at beta.juancfresno.com (docs: CLAUDE.md "Beta"). Without a
+// valid beta_auth cookie every page is the cover; with it, the normal site.
+const BETA_HEADERS = { 'X-Robots-Tag': 'noindex, nofollow' }
+
+function betaHeaders<T extends NextResponse>(res: T, noStore = false): T {
+  for (const [k, v] of Object.entries(BETA_HEADERS)) res.headers.set(k, v)
+  if (noStore) res.headers.set('Cache-Control', 'private, no-store')
+  return res
+}
+
+async function beta(request: NextRequest) {
+  const { pathname } = request.nextUrl
+
+  if (pathname === '/api/beta-login' || pathname.startsWith('/_next/') || pathname.startsWith('/_vercel/')) {
+    return betaHeaders(NextResponse.next())
+  }
+
+  if (pathname === '/logout') {
+    const res = NextResponse.redirect(new URL('/', request.url), 303)
+    res.cookies.delete(BETA_COOKIE)
+    return betaHeaders(res, true)
+  }
+
+  if (pathname === '/robots.txt') {
+    return betaHeaders(
+      new NextResponse('User-agent: *\nDisallow: /\n', { headers: { 'Content-Type': 'text/plain; charset=utf-8' } }),
+    )
+  }
+  if (pathname === '/sitemap.xml') return betaHeaders(new NextResponse('Not found', { status: 404 }))
+
+  const password = process.env.BETA_PASSWORD
+  const cookie = request.cookies.get(BETA_COOKIE)?.value
+  const authed = !!password && !!cookie && betaSafeEqual(cookie, await betaToken(password))
+
+  if (!authed) {
+    return betaHeaders(NextResponse.rewrite(new URL('/beta/login.html', request.url)), true)
+  }
+
+  // Files with an extension (images, fonts, og routes…) are served as they are.
+  if (/\.[^/]+$/.test(pathname) && !METADATA_ROUTE.test(pathname)) return betaHeaders(NextResponse.next())
+  if (pathname.startsWith('/api/')) return betaHeaders(NextResponse.next())
+  return betaHeaders(locale(request), true)
 }
 
 // Static HTML in public/ served through next.config rewrites: not localized.
@@ -112,6 +162,7 @@ export async function proxy(request: NextRequest) {
   const host = (request.headers.get('host') || '').split(':')[0].toLowerCase()
   const { pathname } = request.nextUrl
   if (host === FDS_HOST || pathname === '/FDS' || pathname.startsWith('/FDS/')) return fds(request, host)
+  if (isBetaHost(host)) return beta(request)
   return locale(request)
 }
 
@@ -121,6 +172,9 @@ export const config = {
     '/FDS/:path*',
     // Must be a literal (statically parsed); keep in sync with FDS_HOST.
     { source: '/:path*', has: [{ type: 'host', value: 'fds.juancfresno.com' }] },
+    // beta.juancfresno.com / beta.localhost: every path (files and API included).
+    { source: '/:path*', has: [{ type: 'host', value: 'beta.juancfresno.com' }] },
+    { source: '/:path*', has: [{ type: 'host', value: 'beta.localhost' }] },
     // Pages: everything except API, Next internals, Vercel and files with an extension.
     '/((?!api|_next|_vercel|.*\\..*).*)',
   ],

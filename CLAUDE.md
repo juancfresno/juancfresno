@@ -103,6 +103,16 @@ v1 (historic): the `/` homepage (and its home-specific Nav/Footer chrome) was re
 
 Design tokens pulled from that file (colors, spacing, type scale) are documented inline as comments in `ComingSoon.module.scss` and `Footer.module.scss`. Assets (reel photo, decorative pixel glyph) were downloaded from Figma's export URLs and committed locally under `public/images/` and `public/icons/` — Figma's asset URLs are short-lived, so nothing in the app references them directly.
 
+## Beta (beta.juancfresno.com)
+
+The v1 site (branch `web-v2`) is served privately at **https://beta.juancfresno.com** behind a password cover, to test on a phone and share a link + password with a few people.
+
+- `src/proxy.ts` — `beta()` runs for hosts in `BETA_HOSTS` (`beta.juancfresno.com`, plus `beta.localhost` for local testing), after the FDS logic (untouched). No valid `beta_auth` cookie → every path rewrites to `public/beta/login.html` (the cover: dark, Fragment Mono, "BETA · v1.0 PREVIEW", one password field, EN, 16px input, no autofocus on touch). Valid cookie → the normal site (`locale()`). Exempt: `/api/beta-login`, `/_next`, `/_vercel`. `/logout` clears the cookie. Every response on that host carries `X-Robots-Tag: noindex, nofollow`; `/robots.txt` returns `Disallow: /`; `/sitemap.xml` is a 404. The proxy matcher has one literal entry per beta host (keep in sync with `BETA_HOSTS`).
+- `src/lib/beta-auth.ts` — cookie `beta_auth` = HMAC-SHA256 of the fixed label `beta-site-v1` keyed with env `BETA_PASSWORD` (separate from FDS: own env var, label and cookie). No env set → nobody gets in. Changing the password signs everyone out. `safeNext()` only accepts relative paths.
+- `src/app/api/beta-login/route.ts` — POST from the cover (`password`, hidden `next` = the path asked for). Constant-time compare of the two HMACs. OK → cookie (HttpOnly, Secure, SameSite=Lax, 30 days) + 303 back to `next`; wrong → 303 to `next?__beta_e=1` (the cover shows "Wrong password" and strips the param). 404 on any other host. No rate limit.
+- Vercel: domain `beta.juancfresno.com` on this project bound to git branch `web-v2` (Preview). `BETA_PASSWORD` must exist in the **Preview** environment (branch `web-v2`). DNS at cdmon: `beta` CNAME → `987eb5c3be8f14af.vercel-dns-017.com` (same target as `fds`/`www`).
+- Local test: `BETA_PASSWORD=test-local npx next start`, then `curl -H 'Host: beta.localhost' http://127.0.0.1:3000/`. Production (`main`) is untouched.
+
 ## Fresno Design System (FDS)
 
 `public/FDS/index.html` is a **static, self-contained styleguide artifact** (owned by Diseño / FDS). It is not an npm package and no component in `src/` imports from it — this app does not consume FDS as a dependency, it just hosts the styleguide.

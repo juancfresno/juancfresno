@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#10100e">
+<title>Beta · Juan C. Fresno</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fragment+Mono:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#10100e;             /* brand ink */
+  --text:#fcfcf7;           /* pearl */
+  --muted:rgba(252,252,247,.6);
+  --line:#3c3c3a;
+  --line-hi:#fcfcf7;
+  --chip:#c6dbf9;           /* brand blue */
+  --g:#ff5c1f;              /* G orange */
+  --font:'Fragment Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --pad:clamp(16px,4vw,64px);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--text);font-family:var(--font);-webkit-font-smoothing:antialiased}
+.cover{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;justify-content:space-between;
+  padding:var(--pad);padding-top:max(var(--pad),env(safe-area-inset-top));padding-bottom:max(var(--pad),env(safe-area-inset-bottom))}
+.tag{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:10px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--g)}
+h1{font-weight:400;font-size:clamp(44px,9vw,160px);line-height:1;letter-spacing:-.02em;margin-top:clamp(24px,5vh,64px)}
+.sub{font-size:clamp(14px,1.4vw,18px);line-height:1.5;color:var(--muted);margin-top:16px;max-width:42ch}
+form{margin-top:clamp(32px,6vh,72px);display:flex;flex-direction:column;gap:12px;width:min(100%,440px)}
+label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.row{display:flex;gap:8px}
+input{flex:1;min-width:0;height:48px;padding:0 16px;border-radius:0;background:transparent;
+  border:1px solid var(--line);color:var(--text);font:inherit;font-size:16px;letter-spacing:.04em;outline:none;
+  transition:border-color .15s ease;-webkit-appearance:none;appearance:none}
+input:hover{border-color:var(--muted)}
+input:focus-visible{border-color:var(--chip);box-shadow:0 0 0 1px var(--chip)}
+button{height:48px;padding:0 20px;border:1px solid var(--line-hi);border-radius:0;background:transparent;color:var(--text);
+  font:inherit;font-size:13px;letter-spacing:.06em;cursor:pointer;white-space:nowrap;transition:background .15s ease,color .15s ease,border-color .15s ease}
+button:hover{background:var(--chip);border-color:var(--chip);color:var(--bg)}
+button:focus-visible{outline:2px solid var(--chip);outline-offset:2px}
+.err{font-size:12px;letter-spacing:.06em;color:var(--g);min-height:16px}
+.foot{display:flex;justify-content:space-between;gap:16px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:48px}
+@media (max-width:480px){.row{flex-direction:column}button{width:100%}}
+</style>
+</head>
+<body>
+<main class="cover">
+  <div>
+    <p class="tag"><span class="dot" aria-hidden="true"></span>BETA · v1.0 PREVIEW</p>
+    <h1>Juan C. Fresno</h1>
+    <p class="sub">Private preview of the new site. Enter the password you were given.</p>
+    <form method="post" action="/api/beta-login" autocomplete="on">
+      <input type="hidden" name="next" id="next" value="/">
+      <label for="password">Password</label>
+      <div class="row">
+        <input id="password" name="password" type="password" autocomplete="current-password" required aria-describedby="err">
+        <button type="submit">Enter ↘</button>
+      </div>
+      <p class="err" id="err" role="alert"></p>
+    </form>
+  </div>
+  <div class="foot"><span>Not indexed</span><span>Fresno©</span></div>
+</main>
+<script>
+(function () {
+  var u = new URL(location.href);
+  var failed = u.searchParams.get('__beta_e') === '1';
+  u.searchParams.delete('__beta_e');
+  var path = u.pathname + u.search;
+  document.getElementById('next').value = path;
+  if (failed) {
+    document.getElementById('err').textContent = 'Wrong password';
+    history.replaceState(null, '', path + u.hash);
+  }
+  // No autofocus on touch devices: it pops the keyboard and zooms the page.
+  if (!window.matchMedia('(pointer: coarse)').matches) document.getElementById('password').focus();
+})();
+</script>
+</body>
+</html>
