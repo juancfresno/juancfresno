@@ -79,7 +79,7 @@ export const SITE_EN = {
   WIP: {
     line1: 'Hello! I’m Juan C. Fresno,',
     title: 'Independent Art Director & Interactive Designer',
-    disciplines: 'Art direction — digital products — Interaction — Brand identity',
+    disciplines: 'Art direction — Digital products — Interaction — Brand identity',
     intro: ['Working with studios and brands since 2012.', 'Art direction and design for digital products, identities and interactive experiences — built with clarity, detail and intent.'],
     contact: 'For enquiries, collaborations or new projects —',
     hint: { mouse: '[ MOVE THE CURSOR ]', touch: '[ TAP ]' },
