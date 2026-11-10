@@ -157,7 +157,7 @@ $in-ease: cubic-bezier(0.22, 1, 0.36, 1); // one family for everything that ente
 
   @include respond-to(md) {
     left: auto;
-    right: max(#{$gutter}, env(safe-area-inset-right, 0px));
+    right: max(#{$m}, env(safe-area-inset-right, 0px));
     top: auto;
     bottom: 4rem;
   }
@@ -269,7 +269,7 @@ $in-ease: cubic-bezier(0.22, 1, 0.36, 1); // one family for everything that ente
 // ─── ?trail switcher (previews only) ─────────────────────────────────────────
 .switcher {
   position: fixed;
-  left: max(#{$gutter}, env(safe-area-inset-left, 0px));
+  left: max(#{$m}, env(safe-area-inset-left, 0px));
   top: calc(72px + 12px); // under the header line, clear of the hero copy and the footer
   @include respond-to(md) { top: auto; bottom: calc(10px + env(safe-area-inset-bottom, 0px)); }
   z-index: 160;
@@ -277,7 +277,7 @@ $in-ease: cubic-bezier(0.22, 1, 0.36, 1); // one family for everything that ente
   flex-wrap: wrap;
   align-items: center;
   gap: 4px;
-  max-width: calc(100vw - 2 * #{$gutter});
+  max-width: calc(100vw - 2 * #{$m});
   padding: 4px;
   border: 1px solid $color-line;
   border-radius: 2px;

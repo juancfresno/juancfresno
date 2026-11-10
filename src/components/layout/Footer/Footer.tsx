@@ -11,7 +11,6 @@ import { useHref, useUi } from '@/i18n/client'
 import LocaleSwitch from '@/components/ui/LocaleSwitch/LocaleSwitch'
 import { WIP } from '@/lib/wip'
 import { useScramble } from '@/lib/useScramble'
-import clsx from 'clsx'
 
 // ─── Social links data ─────────────────────────────────────────────────────────
 // Order as in Figma web/footer: Behance · Dribbble · LinkedIn · Instagram · X.
@@ -50,7 +49,7 @@ export default function Footer() {
   const href = useHref()
   return (
     <footer className={s.footer} {...(WIP ? { 'data-in': 'rise', 'data-wire': 'FOOTER', style: { '--in-d': '480ms' } as CSSProperties } : {})}>
-      <div className={clsx(s.inner, WIP && s.wip)}>
+      <div className={s.inner}>
 
         <div className={s.top}>
           {WIP && (

@@ -62,8 +62,14 @@ html.theme-anim, html.theme-anim * {
   --color-bg:         #{$color-bg};
   --color-accent:     #{$color-accent};
   --nav-height:       #{$nav-height};
-  --gutter:           #{$gutter};
+  --m:                clamp(20px, 3.8vw, 64px);   // page margin (chrome + content)
+  --gutter:           16px;                       // column gap
+  --page-max:         #{$page-max};
   --ease-out-expo:    #{$ease-out-expo};
+}
+
+@include respond-to(md) {
+  :root { --gutter: 12px; }
 }
 
 // ─── Selection ────────────────────────────────────────────────────────────────

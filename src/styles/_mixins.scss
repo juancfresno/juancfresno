@@ -20,21 +20,14 @@
 }
 
 // ─── Layout ───────────────────────────────────────────────────────────────────
-// Liquid layout: full width at every size, only the fluid gutter as margin.
+// ONE proportional page margin (--m) for header, footer and content. Above
+// $page-max (1680) the content is centred at that max width.
 @mixin container {
   width: 100%;
+  max-width: $page-max;
   margin-inline: auto;
-  padding-inline: max(#{$gutter}, env(safe-area-inset-left, 0px)) max(#{$gutter}, env(safe-area-inset-right, 0px));
-}
-
-// Header / footer chrome of the WIP landing and the 404 (Figma v1/nav and
-// web/footer: 20 px side margins in the 1680 frame). Liquid: 20/1680 of the
-// width, never under 12 px; phones keep the grid gutter.
-@mixin container-chrome {
-  padding-inline: max(12px, 1.1905vw, env(safe-area-inset-left, 0px)) max(12px, 1.1905vw, env(safe-area-inset-right, 0px));
-  @include respond-to(md) {
-    padding-inline: max(#{$gutter}, env(safe-area-inset-left, 0px)) max(#{$gutter}, env(safe-area-inset-right, 0px));
-  }
+  box-sizing: border-box;
+  padding-inline: max(#{$m}, env(safe-area-inset-left, 0px)) max(#{$m}, env(safe-area-inset-right, 0px));
 }
 
 @mixin grid($cols: $cols-12, $gap: $space-4) {

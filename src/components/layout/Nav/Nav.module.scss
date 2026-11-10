@@ -35,7 +35,7 @@
   @include container;
                // same margins as the page grid (see GridOverlay)
   padding-block: 1.25rem;
-  &.wip { @include container-chrome; }
+
 }
 
 // ─── Left cluster: face + nav menu ───────────────────────────────────────────
@@ -263,7 +263,7 @@
 // ─── Separator line ───────────────────────────────────────────────────────────
 .lineWrap {
   @include container;
-  &.wip { @include container-chrome; }
+
 }
 
 .line {

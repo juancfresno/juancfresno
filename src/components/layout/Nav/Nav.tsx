@@ -151,7 +151,7 @@ export default function Nav() {
   return (
     <>
       <header data-site-header className={clsx(s.nav, hidden && s.hidden, scrolled && s.scrolled)}>
-        <div className={clsx(s.inner, WIP && s.wip)}>
+        <div className={s.inner}>
           {/* ── Left cluster: face + nav menu ── */}
           <div className={s.left}>
             {faceLink}
@@ -177,7 +177,7 @@ export default function Nav() {
             {logoLink}
           </div>
         </div>
-        <div className={clsx(s.lineWrap, WIP && s.wip)} {...(WIP ? { 'data-in': 'line', style: { '--in-d': '0ms' } as CSSProperties } : {})}>
+        <div className={s.lineWrap} {...(WIP ? { 'data-in': 'line', style: { '--in-d': '0ms' } as CSSProperties } : {})}>
           <ElasticLine className={s.line} />
         </div>
       </header>

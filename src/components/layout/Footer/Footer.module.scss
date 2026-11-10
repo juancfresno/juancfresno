@@ -15,9 +15,6 @@
   padding-bottom: 1.5rem;
 }
 
-// WIP landing + 404 (Figma web/footer: 20 px side margins at 1680, liquid).
-.wip { @include container-chrome; }
-
 // ─── Top row: availability tag (left, WIP) + social row (right) ───────────────
 // Narrow screens: the tag wraps to its own line above the socials, left-aligned.
 .top {
@@ -98,7 +95,7 @@
   .social {
     flex-wrap: nowrap;
     gap: 20px;
-    @media (max-width: 360px) { gap: min(14px, calc((100vw - 2 * #{$gutter} - 224px) / 4)); }
+    @media (max-width: 360px) { gap: min(14px, calc((100vw - 2 * #{$m} - 224px) / 4)); }
   }
   .socialLink {
     // Every link box is 16 px tall (the row height), so the hit area is

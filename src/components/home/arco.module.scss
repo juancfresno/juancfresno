@@ -73,7 +73,7 @@
 
 .dial {
   display: block;
-  width: calc(100% - 2 * #{$gutter});
+  width: calc(100% - 2 * #{$m});
   margin-inline: auto;
   height: auto;
   color: $color-text-mid;
