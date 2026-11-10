@@ -10,21 +10,22 @@ import type { OrbMode } from './bg/orb'
 import TrailHint from './TrailHint'
 import s from './wip.module.scss'
 
-// What sits behind the WIP copy. Default (production): the feed plane
-// (CanvasBackdrop). Previews compare with
-//   ?bg=plane | sphere | tunnel | lens   (WebGL backgrounds)
+// What sits behind the WIP copy. Default (production): the feed mosaic
+// through the fisheye, lens 1 (bg/OrbBackdrop). Previews compare with
+//   ?bg=plane | sphere | tunnel | lens | lens2 | lens3 | lens4   (WebGL backgrounds)
 //   ?trail=1…5                          (the earlier cursor trails, no bg)
 // and get a mono switcher; nothing of it renders without a parameter. Each
-// option is code-split, so the default bundle only carries the plane.
+// option is code-split, so the default bundle only carries what it shows.
 const CanvasBackdrop = dynamic(() => import('./CanvasBackdrop'), { ssr: false })
 const OrbBackdrop = dynamic(() => import('./bg/OrbBackdrop'), { ssr: false })
 const CursorTrail = dynamic(() => import('./trail/CursorTrail'), { ssr: false })
 
-const BGS = ['plane', 'sphere', 'tunnel', 'lens'] as const
+const BGS = ['plane', 'sphere', 'tunnel', 'lens', 'lens2', 'lens3', 'lens4'] as const
 type Bg = (typeof BGS)[number]
 type Mode = { kind: 'bg'; bg: Bg } | { kind: 'trail'; n: TrailId }
-const BG_NAMES: Record<Bg, string> = { plane: 'Plane', sphere: 'Sphere', tunnel: 'Tunnel', lens: 'Lens' }
-export const DEFAULT_BG: Bg = 'plane'
+const BG_NAMES: Record<Bg, string> = { plane: 'Plane', sphere: 'Sphere', tunnel: 'Tunnel', lens: 'Lens 1', lens2: 'Lens 2', lens3: 'Lens 3', lens4: 'Lens 4' }
+// Juan's pick (10 Nov 2026): the fisheye, mildest strength.
+export const DEFAULT_BG: Bg = 'lens'
 
 function readMode(): { mode: Mode; compare: boolean } {
   const q = new URLSearchParams(window.location.search)

@@ -291,11 +291,10 @@ export default function Nav() {
 
           {/* ── Right: local time + shortcuts, then the wordmark ── */}
           <div className={s.right}>
-            {/* WIP landing (Figma 6944:8876): "ES EN" · "DARK LIGHT" before the wordmark, no clock or "?". */}
+            {/* WIP landing: "ES EN" before the wordmark; no theme toggle (the landing stays dark), no clock or "?". */}
             {WIP && (
               <div className={s.wipPrefs} data-in="fade" style={{ '--in-d': '180ms' } as CSSProperties}>
                 <LocaleSwitch pair />
-                <ThemeToggle pair />
               </div>
             )}
             {!WIP && <NavClock className={s.clock} />}

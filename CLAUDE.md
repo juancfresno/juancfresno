@@ -27,7 +27,7 @@ No i18n library: a small typed setup (Next 16 App Router pattern: one root layou
 
 ## WIP landing (branch `wip-landing`, temporary)
 
-`src/lib/wip.ts` (`WIP = true`) swaps `/` and `/es` for the temporary landing (`src/components/wip/`): Figma "Home · v0" (6944:8590) copy, the greeting line cycling languages with a decode (`components/home/HeadlineCycle`, `lib/scramble.ts`, `content/headline.ts`), the entrance (`wip/Intro.tsx` + `introScript.ts`, `html[data-intro]`), grain, and the background (`wip/Backdrop.tsx`): default = the feed plane (`wip/CanvasBackdrop.tsx`, reuses `feed/canvas/gl.ts`); previews compare `?bg=plane|sphere|tunnel|lens` (`wip/bg/`) and `?trail=1…5` (the earlier cursor trails).
+`src/lib/wip.ts` (`WIP = true`) swaps `/` and `/es` for the temporary landing (`src/components/wip/`): Figma "Home · v0" (6944:8590) copy, the greeting line cycling languages with a decode (`components/home/HeadlineCycle`, `lib/scramble.ts`, `content/headline.ts`), the entrance (`wip/Intro.tsx` + `introScript.ts`, `html[data-intro]`), grain, no theme toggle (always dark), and the background (`wip/Backdrop.tsx`): default = the feed mosaic through a fisheye (`wip/bg/OrbBackdrop.tsx`, lens 1); the plane is `wip/CanvasBackdrop.tsx` (reuses `feed/canvas/gl.ts`); previews compare `?bg=plane|sphere|tunnel|lens|lens2|lens3|lens4` (`wip/bg/`; default = `lens`, the mildest fisheye) and `?trail=1…5` (the earlier cursor trails).
 
 **Note for later:** the canvas background exercise (plane / sphere / tunnel / lens over the feed mosaic, RGB split on drag) will become a **Lab piece**. Not built yet.
 

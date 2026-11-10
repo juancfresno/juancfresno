@@ -319,7 +319,7 @@ $in-ease: cubic-bezier(0.16, 1, 0.3, 1); // expo-out: fast start, long soft land
 
   @include respond-to(md) {
     background:
-      linear-gradient(180deg, color-mix(in srgb, var(--c-bg) 88%, transparent) 0, color-mix(in srgb, var(--c-bg) 72%, transparent) 70%, color-mix(in srgb, var(--c-bg) 92%, transparent) 100%);
+      linear-gradient(180deg, color-mix(in srgb, var(--c-bg) 88%, transparent) 0, color-mix(in srgb, var(--c-bg) 82%, transparent) 60%, color-mix(in srgb, var(--c-bg) 70%, transparent) 75%, color-mix(in srgb, var(--c-bg) 92%, transparent) 100%);
   }
 }
 

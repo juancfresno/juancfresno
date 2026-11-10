@@ -112,6 +112,7 @@ export default function OrbBackdrop({ items, mode }: { items: FeedItem[]; mode: 
       const mag = splitMag(sp) * fx
       const split: [number, number] = sp > 0.001 ? [(sx / sp) * mag, (sy / sp) * mag] : [0, 0]
       o.draw({ mode, a, b, cx: g.cx, cy: g.cy, r: g.r, split, bg })
+      ;(window as unknown as { __orb?: object }).__orb = { mode, speed: sp, split: mag } // QA probe, like window.__feedCanvas
       lastDraw = now
       if (force) return false
       return dragging || Math.abs(va) > 1e-4 || Math.abs(vb) > 1e-4 || sp > 0.8 || o.pending()

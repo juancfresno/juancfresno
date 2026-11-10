@@ -16,9 +16,22 @@ import { makeLayout, coverUv, type Tile } from '@/components/feed/canvas/layout'
 
 const TILE = tileData as unknown as Tile
 
-export type OrbMode = 'sphere' | 'tunnel' | 'lens'
-export const ORB_MODES: OrbMode[] = ['sphere', 'tunnel', 'lens']
-const MODE_ID: Record<OrbMode, number> = { sphere: 0, tunnel: 1, lens: 2 }
+export type OrbMode = 'sphere' | 'tunnel' | 'lens' | 'lens2' | 'lens3' | 'lens4'
+export const ORB_MODES: OrbMode[] = ['sphere', 'tunnel', 'lens', 'lens2', 'lens3', 'lens4']
+const MODE_ID: Record<OrbMode, number> = { sphere: 0, tunnel: 1, lens: 2, lens2: 2, lens3: 2, lens4: 2 }
+export const isLens = (m: OrbMode) => m.startsWith('lens')
+
+// Fisheye strengths: world offset = q · (c0 + k2·rr² + k4·rr⁴), rr = |q| / R.
+// c0 < 1 magnifies the centre; the tile shrinks by c0 / 0.72 so the centre
+// keeps lens 1's texel density (no blown-up texels), and the edges pack more
+// of the mosaic. vig = edge fade into the page colour; ca = radial chromatic
+// fringe at the rim (device px at rr = 1.3). lens = the original, mildest.
+const LENS: Record<string, { c0: number; k2: number; k4: number; vig: number; ca: number }> = {
+  lens: { c0: 0.72, k2: 0.55, k4: 0, vig: 0.45, ca: 0 },
+  lens2: { c0: 0.6, k2: 0.95, k4: 0.15, vig: 0.5, ca: 0 },
+  lens3: { c0: 0.5, k2: 1.35, k4: 0.55, vig: 0.55, ca: 1.5 },
+  lens4: { c0: 0.4, k2: 1.6, k4: 1.6, vig: 0.62, ca: 3 },
+}
 
 export type OrbFrame = {
   mode: OrbMode
@@ -42,6 +55,8 @@ uniform vec3 uGeo;     // cx, cy, r (device px, y down)
 uniform vec2 uSplit;
 uniform vec2 uTile;    // lens: tile size in device px
 uniform vec3 uBg;
+uniform vec4 uLens;    // c0, k2, k4, vignette
+uniform float uCA;     // lens rim chromatic fringe, device px
 out vec4 o;
 const float PI = 3.14159265;
 
@@ -70,9 +85,10 @@ void mapAt(vec2 p, out vec2 uv, out float fade){
   } else {
     vec2 q = p - uGeo.xy;
     float rr = length(q) / uGeo.z;
-    vec2 q2 = q * (0.72 + 0.55 * rr * rr);
+    float r2 = rr * rr;
+    vec2 q2 = q * (uLens.x + uLens.y * r2 + uLens.z * r2 * r2);
     uv = (vec2(uAB.x, uAB.y) + uGeo.xy + q2) / uTile;
-    fade = 1.0 - 0.45 * smoothstep(0.4, 1.3, rr);
+    fade = 1.0 - uLens.w * smoothstep(0.4, 1.3, rr);
   }
 }
 
@@ -88,15 +104,22 @@ void main(){
   vec2 gx = abs(g1x.x) <= abs(g2x.x) ? g1x : g2x;
   vec2 gy = abs(g1y.x) <= abs(g2y.x) ? g1y : g2y;
   // Very far rings / poles: clamp the footprint (keeps the tunnel centre calm).
-  gx = clamp(gx, -0.05, 0.05); gy = clamp(gy, -0.05, 0.05);
+  if (uMode == 1) { gx = clamp(gx, -0.05, 0.05); gy = clamp(gy, -0.05, 0.05); }
 
   vec4 c = tap(uv, gx, gy);
   vec3 col;
   float a = c.a * f;
-  if (dot(uSplit, uSplit) > 0.0001) {
+  // Drag split (+ the lens rim fringe, radial, strongest lenses only).
+  vec2 sv = uSplit;
+  if (uMode == 2 && uCA > 0.0) {
+    vec2 q = p - uGeo.xy;
+    float rr = length(q) / uGeo.z;
+    sv += normalize(q + 1e-4) * uCA * smoothstep(0.55, 1.3, rr);
+  }
+  if (dot(sv, sv) > 0.0001) {
     vec2 uvR, uvB; float fR, fB;
-    mapAt(p - uSplit, uvR, fR);
-    mapAt(p + uSplit, uvB, fB);
+    mapAt(p - sv, uvR, fR);
+    mapAt(p + sv, uvB, fB);
     vec4 cR = tap(uvR, gx, gy), cB = tap(uvB, gx, gy);
     col = vec3(mix(uBg.r, cR.r, cR.a * fR), mix(uBg.g, c.g, a), mix(uBg.b, cB.b, cB.a * fB));
   } else {
@@ -117,7 +140,7 @@ function compile(gl: WebGL2RenderingContext) {
   gl.linkProgram(p)
   if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p) || 'link')
   const u = (n: string) => gl.getUniformLocation(p, n)
-  return { p, u: { tex: u('uTex'), res: u('uRes'), mode: u('uMode'), ab: u('uAB'), geo: u('uGeo'), split: u('uSplit'), tile: u('uTile'), bg: u('uBg') } }
+  return { p, u: { tex: u('uTex'), res: u('uRes'), mode: u('uMode'), ab: u('uAB'), geo: u('uGeo'), split: u('uSplit'), tile: u('uTile'), bg: u('uBg'), lens: u('uLens'), ca: u('uCA') } }
 }
 
 export function createOrb(canvas: HTMLCanvasElement, items: FeedItem[], small: boolean, onChange: () => void) {
@@ -201,13 +224,16 @@ export function createOrb(canvas: HTMLCanvasElement, items: FeedItem[], small: b
       gl.uniform1i(prog.u.tex, 0)
       gl.uniform2f(prog.u.res, canvas.width, canvas.height)
       gl.uniform1i(prog.u.mode, MODE_ID[f.mode])
-      const k = f.mode === 'lens' ? dpr : 1 // lens camera comes in CSS px
+      const k = isLens(f.mode) ? dpr : 1 // lens camera comes in CSS px
       gl.uniform2f(prog.u.ab, f.a * k, f.b * k)
       gl.uniform3f(prog.u.geo, f.cx * dpr, f.cy * dpr, f.r * dpr)
       gl.uniform2f(prog.u.split, f.split[0] * dpr, f.split[1] * dpr)
       // Lens: one tile ≈ 1.6 screens wide at 1680, in device px.
-      const tw = Math.max(W, 900) * 1.6 * dpr
+      const ln = LENS[f.mode] ?? LENS.lens
+      const tw = Math.max(W, 900) * 1.6 * dpr * (ln.c0 / 0.72)
       gl.uniform2f(prog.u.tile, tw, tw * (AH / AW))
+      gl.uniform4f(prog.u.lens, ln.c0, ln.k2, ln.k4, ln.vig)
+      gl.uniform1f(prog.u.ca, ln.ca * dpr)
       gl.uniform3fv(prog.u.bg, f.bg)
       gl.bindVertexArray(vao)
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)

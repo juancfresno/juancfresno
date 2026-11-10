@@ -82,10 +82,12 @@ export default async function RootLayout({ children, params }: Props) {
   return (
     <html lang={HTML_LANG[l]} data-wip={WIP ? '' : undefined} suppressHydrationWarning className={`${fragmentMono.variable} ${switzer.variable}`}>
       <head>
-        {/* Theme before paint: saved choice, else dark (brand default). */}
+        {/* Theme before paint: saved choice, else dark (brand default). WIP: dark. */}
         <script
           dangerouslySetInnerHTML={{
-            __html: "try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}",
+            __html: WIP
+              ? "document.documentElement.dataset.theme='dark'" // WIP landing: always dark, no toggle
+              : "try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}",
           }}
         />
         {/* Language switch: keep the new page hidden until the transition reveals it. */}
