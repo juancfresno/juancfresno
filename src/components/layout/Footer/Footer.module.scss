@@ -52,6 +52,37 @@
   flex-wrap: wrap;
 }
 
+.metaLeft {
+  display: flex;
+  align-items: center;
+  gap: $space-4;
+  flex-wrap: wrap;
+}
+
+// ES / EN (components/ui/LocaleSwitch) in the footer voice.
+.lang { color: $color-text; }
+
+// "?" opens the shortcuts legend (components/ui/Shortcuts), as it did in the header.
+.help {
+  @include touch-target(14px, 14px);
+  display: inline-grid;
+  place-items: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  padding: 0;
+  border: 1px solid $color-line;
+  border-radius: 999px;
+  background: none;
+  font-family: $font-mono;
+  font-size: 0.6875rem;
+  line-height: 1;
+  color: $color-text-mid;
+  cursor: pointer;
+  transition: color $duration-fast, border-color $duration-fast;
+  &:hover { color: $color-text; border-color: $color-text-mid; }
+  @include focus-ring;
+}
+
 .metaRight {
   display: flex;
   align-items: center;

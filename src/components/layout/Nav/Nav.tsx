@@ -8,7 +8,6 @@ import ElasticLine from '@/components/ui/ElasticLine/ElasticLine'
 import ThemeToggle from '@/components/ui/ThemeToggle/ThemeToggle'
 import NavClock from '@/components/ui/NavClock/NavClock'
 import { usePageTransition } from '@/providers/PageTransition'
-import LocaleSwitch from '@/components/ui/LocaleSwitch/LocaleSwitch'
 import { useHref, useUi } from '@/i18n/client'
 import { parsePath } from '@/i18n/config'
 
@@ -280,21 +279,11 @@ export default function Nav() {
             </nav>
 
             <ThemeToggle className={s.theme} />
-            <LocaleSwitch className={s.lang} />
           </div>
 
-          {/* ── Right: local time + shortcuts, then the wordmark ── */}
+          {/* ── Right: local time, then the wordmark (ES / EN and "?" live in the footer) ── */}
           <div className={s.right}>
             <NavClock className={s.clock} />
-            <button
-              type="button"
-              className={s.help}
-              aria-label={ui.nav.shortcuts}
-              aria-keyshortcuts="?"
-              onClick={() => window.dispatchEvent(new Event('fresno:shortcuts'))}
-            >
-              ?
-            </button>
             {logoLink}
           </div>
         </div>

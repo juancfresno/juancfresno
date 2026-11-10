@@ -6,6 +6,7 @@ import LiveClock from '@/components/ui/LiveClock/LiveClock'
 import { BehanceLogo, InstagramLogo, DribbbleLogo, LinkedInLogo, XLogo } from '@/components/ui/SocialLogos/SocialLogos'
 import GlitchSocialIcon from '@/components/ui/GlitchSocialIcon/GlitchSocialIcon'
 import { useHref, useUi } from '@/i18n/client'
+import LocaleSwitch from '@/components/ui/LocaleSwitch/LocaleSwitch'
 
 // ─── Social links data ─────────────────────────────────────────────────────────
 // Order as in Figma web/footer: Behance · Dribbble · LinkedIn · Instagram · X.
@@ -45,7 +46,20 @@ export default function Footer() {
 
         {/* Meta row */}
         <div className={s.meta}>
-          <span className={s.copyright}>© 2012 — 2026 · <a href={href('/legal')} style={{ color: 'inherit' }}>{ui.footer.legal}</a></span>
+          {/* © + language + the shortcuts legend ("?"), one mono line. */}
+          <div className={s.metaLeft}>
+            <span className={s.copyright}>© 2012 — 2026 · <a href={href('/legal')} style={{ color: 'inherit' }}>{ui.footer.legal}</a></span>
+            <LocaleSwitch className={s.lang} />
+            <button
+              type="button"
+              className={s.help}
+              aria-label={ui.nav.shortcuts}
+              aria-keyshortcuts="?"
+              onClick={() => window.dispatchEvent(new Event('fresno:shortcuts'))}
+            >
+              ?
+            </button>
+          </div>
           <div className={s.metaRight}>
             <LiveClock />
             <span className={s.location}>
