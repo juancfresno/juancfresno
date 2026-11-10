@@ -31,9 +31,7 @@
 
 // Geist 40/46 −0.8 in Figma → Switzer (body font).
 .head {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  display: block;
   margin: 0;
   font-family: $font-body;
   font-weight: 400;
@@ -43,7 +41,7 @@
 }
 
 .name { color: $color-text; }
-.title { color: var(--c-text-hi); }
+.title { margin-top: 8px; color: var(--c-text-hi); } // Figma: the two lines 8 px apart
 
 // Geist Mono 11 uppercase → Fragment Mono.
 .disciplines {

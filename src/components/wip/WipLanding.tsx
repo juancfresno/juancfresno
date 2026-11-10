@@ -2,7 +2,8 @@ import { getSite } from '@/content/site'
 import { FEED, FEED_SELECTED } from '@/content/feed'
 import { PERSON_BASE } from '@/content/person'
 import type { Locale } from '@/i18n/config'
-import HelloCycle from '@/components/home/HelloCycle'
+import HeadlineCycle from '@/components/home/HeadlineCycle'
+import { headlineCycle } from '@/content/headline'
 import CursorTrail, { type TrailItem } from './trail/CursorTrail'
 import Grain from './Grain'
 import TrailHint from './TrailHint'
@@ -31,10 +32,7 @@ export default function WipLanding({ locale }: { locale: Locale }) {
       <Grain />
       <header className={s.hero}>
         <h1 className={s.head}>
-          <span className={s.name}>
-            <HelloCycle words={WIP.greetings} suffix="" /> {WIP.nameLine}
-          </span>
-          <span className={s.title}>{WIP.title}</span>
+          <HeadlineCycle lines={headlineCycle({ lang: locale, a: WIP.line1, b: WIP.title })} aClass={s.name} bClass={s.title} />
         </h1>
         <p className={s.disciplines}>{WIP.disciplines}</p>
         <p className={s.intro}>

@@ -84,7 +84,8 @@ export default function CursorTrail({ items, canvasItems }: { items: TrailItem[]
         if (e.pointerType === 'mouse' || !down) return
         const tap = Math.hypot(e.clientX - down.x, e.clientY - down.y) < 10 && performance.now() - down.t < 500
         down = null
-        if (!tap) return
+        // A tap on a link, button or the headline (it cycles languages) is theirs.
+        if (!tap || (e.target as Element | null)?.closest?.('a, button, [tabindex]')) return
         b.tap(e.clientX, e.clientY, performance.now())
         kick()
       }

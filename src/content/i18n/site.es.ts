@@ -76,8 +76,7 @@ export const SITE_ES: SiteDict = {
 
   // ─── Landing provisional (lib/wip.ts) · traducción de Figma 6944:8590 ──────
   WIP: {
-    greetings: ['¡Hola!', 'Hello!', 'Bon dia!', 'Kaixo!', 'Olá!', 'Bonjour!', 'Ciao!', 'Hallo!', 'Hej!'],
-    nameLine: 'soy Juan C. Fresno,',
+    line1: '¡Hola! Soy Juan C. Fresno,',
     title: 'Director de arte y\u00a0diseñador interactivo independiente',
     disciplines: 'Dirección de arte — Productos digitales — Interacción — Identidad de marca',
     intro: ['Trabajo con estudios y marcas desde 2012.', 'Dirección de arte y diseño de productos digitales, identidades y experiencias interactivas — con claridad, detalle e intención.'],
