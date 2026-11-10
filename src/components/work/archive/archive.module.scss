@@ -66,7 +66,8 @@
   text-align: left;
   cursor: pointer;
   font: inherit;
-  transition: opacity 0.28s $ease-out-quart, color 0.12s ease 0.1s;
+  --wk-chip: #{$raw-chip}; // read by usePixelFill
+  transition: opacity 0.28s $ease-out-quart, color 0.06s linear;
   -webkit-tap-highlight-color: transparent;
 
   // Grid children skip the sweep (absolute), so re-point the spans.
@@ -79,17 +80,17 @@
   &:focus-visible { outline: none; }
 }
 
-// ── Chip sweep: in from the left (nav spring feel), out to the right ─────────
-.sweep {
+// ── Pixel fill: square chip-blue cells in Bayer order (usePixelFill) ─────────
+// The canvas has no size until the row is active. Text flips with [data-ink].
+.fill {
   position: absolute;
-  inset: 4px -10px;
-  border-radius: 3px;
-  background: $raw-chip;
-  transform: scaleX(0);
-  transform-origin: right center;
-  transition: transform 0.18s cubic-bezier(0.55, 0, 1, 0.45);
+  left: -10px;
+  top: 4px;
+  width: calc(100% + 20px);
+  height: calc(100% - 8px);
   z-index: -1;
   pointer-events: none;
+  image-rendering: pixelated;
 }
 
 .project {
@@ -113,7 +114,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  transition: color 0.12s ease 0.1s;
+  transition: color 0.06s linear;
 }
 .cat, .role { color: $color-text-mid; }
 .year { text-align: right; }
@@ -135,14 +136,13 @@
 }
 
 // ── Active row (pointer hover or keyboard focus) ─────────────────────────────
-@mixin on {
+// Text goes ink when the pixel fill covers >= 50 % (data-ink, set by the hook).
+.row[data-ink] {
   color: $raw-ink;
-  .via, .cat, .role, .year { color: $raw-ink; transition-delay: 0.05s; }
-  .sweep {
-    transform: scaleX(1);
-    transform-origin: left center;
-    transition: transform 0.46s $ease-out-expo;
-  }
+  .via, .cat, .role, .year { color: $raw-ink; }
+}
+
+@mixin on {
   .arrowShaft { stroke-dashoffset: 0; transition: stroke-dashoffset 0.36s $ease-out-expo 0.12s; }
   .arrowHead { stroke-dashoffset: 0; transition: stroke-dashoffset 0.32s $ease-out-expo 0.26s; }
 }
@@ -150,7 +150,7 @@
 @media (hover: hover) and (pointer: fine) {
   .item[data-on] .row { @include on; }
 }
-.row:focus-visible { @include on; }
+.item[data-on] .row:focus-visible { @include on; }
 
 // Others dim while one is active; an expanded row keeps the rest at 45 %.
 .list:has(.item[data-on]) .item:not([data-on]) .row { opacity: 0.35; }
@@ -158,7 +158,7 @@
 .item[data-open] .row .year { color: $color-text-hi; }
 
 @media (prefers-reduced-motion: reduce) {
-  .sweep, .row, .arrowShaft, .arrowHead { transition: none !important; }
+  .row, .arrowShaft, .arrowHead { transition: none !important; }
 }
 
 // ── Touch: no hover; a small fixed thumbnail per row ─────────────────────────

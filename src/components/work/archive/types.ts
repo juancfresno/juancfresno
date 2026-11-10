@@ -18,8 +18,10 @@ export type WorkItem = {
   lead: string
   cover: Img
   images: Img[]
+  open: 'drawer' | 'expand' // per case, see `open` in content/cases.ts
 }
 
-// ?open=drawer|expand|stage — three ways to open a project, chosen by query.
+// Per-case mode is `WorkItem.open`. ?open=drawer|expand|stage is a dev override
+// that forces one mode for every row (not linked anywhere).
 export type OpenMode = 'drawer' | 'expand' | 'stage'
 export const OPEN_MODES: OpenMode[] = ['drawer', 'expand', 'stage']

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { pageMeta } from '@/lib/seo'
 import { getSite, getUi } from '@/content/site'
-import { getProjects, getCases, caseMedia, projectNumber, isPersonal } from '@/content/cases'
+import { getProjects, getCases, caseMedia, projectNumber, isPersonal, openKind } from '@/content/cases'
 import { localeOf, type LangParams } from '@/i18n/server'
 import type { WorkItem } from '@/components/work/archive/types'
 import WorkArchive from '@/components/work/archive/WorkArchive'
@@ -50,6 +50,7 @@ export default async function WorkPage({ params }: Props) {
       lead: c.lead,
       cover: m.cover,
       images: m.images,
+      open: openKind(p, m.images.length),
     }
   })
 

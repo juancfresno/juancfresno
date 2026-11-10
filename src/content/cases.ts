@@ -52,7 +52,17 @@ type ProjectBase = {
   caseStudy?: boolean
   featured?: boolean
   personal?: boolean // personal project: credits say so instead of Client
+  // How /work opens this case (neutral, same in every language):
+  //   'drawer' — side drawer (long cases); 'expand' — in place under its row.
+  // Unset = by length: 'expand' when the case has <= EXPAND_MAX_IMAGES images
+  // in caseMedia, else 'drawer'. To force one, add `open: 'expand'` (or
+  // 'drawer') to its row in ALL_PROJECTS below, e.g. after cutting images.
+  open?: 'drawer' | 'expand'
 }
+export type OpenKind = 'drawer' | 'expand'
+export const EXPAND_MAX_IMAGES = 6
+export const openKind = (p: { open?: OpenKind }, imageCount: number): OpenKind =>
+  p.open ?? (imageCount <= EXPAND_MAX_IMAGES ? 'expand' : 'drawer')
 export type ProjectCopy = { name: string; discipline: string; client: string /* client / studio column */ }
 export type Project = ProjectBase & ProjectCopy
 

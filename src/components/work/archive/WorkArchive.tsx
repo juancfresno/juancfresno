@@ -9,19 +9,24 @@ import OpenDrawer from './OpenDrawer'
 import ExpandPanel from './ExpandPanel'
 import OpenStage from './OpenStage'
 import { prefersReduced } from './useOverlay'
+import { usePixelFill } from './usePixelFill'
 import { OPEN_MODES, type OpenMode, type WorkItem } from './types'
 import s from './archive.module.scss'
 
 // ─── /work list: Project · Via · Category · Role · Year (4 · 3 · 2 · 2 · 1) ───
 // Figma 03 · Archive (6951:13618). Rows are buttons, not links: they never go
-// to /work/[slug]; they open the project in place, three ways (?open=):
-//   drawer (default) — side drawer from the right   → OpenDrawer
-//   expand           — the row opens in place (FLIP) → ExpandPanel
-//   stage            — the preview flies into a full stage → OpenStage
+// to /work/[slug]; each case opens in its own mode (WorkItem.open, from
+// `open` in ALL_PROJECTS or, unset, <= 6 images → expand, else drawer):
+//   drawer — side drawer from the right    → OpenDrawer
+//   expand — the row opens in place (FLIP) → ExpandPanel
+// Both coexist: opening a drawer case closes an open panel first; ← / → in the
+// drawer walks the list and keeps showing every case in the drawer, whatever
+// its mode (no jump between two UIs). Dev override: ?open=drawer|expand|stage
+// forces one mode for all rows (stage = OpenStage); not linked anywhere.
 // URL hash #slug while a project is open (shareable; opens on load).
 //
-// Row hover (fine pointers): the blue nav chip sweeps through the row from the
-// left (exit sweeps out to the right), text turns ink, the project name
+// Row hover (fine pointers): the row fills with blue chip PIXELS in Bayer order
+// sweeping left → right (usePixelFill; text turns ink at 50 % cover), the project name
 // decodes (useScramble, 420 ms), an arrow draws itself, the other rows dim to
 // 35 %, and ONE floating cover follows the cursor (HoverPreview: spring,
 // velocity skew, RGB split, `NN / 30 · NAME` chip). Keyboard focus = the same.
@@ -42,6 +47,9 @@ function Row({ it, i, active, expanded, mode, panelId, onEnter, onLeave, onFocus
   onOpen: (i: number, el: HTMLButtonElement) => void
 }) {
   const t = useUi().work
+  const rowRef = useRef<HTMLButtonElement>(null)
+  const fillRef = useRef<HTMLCanvasElement>(null)
+  usePixelFill(fillRef, rowRef, active)
   // Name decode on activation: case-preserving glyphs (lib/scramble), so the
   // Switzer line keeps its width while it resolves.
   const nameRef = useRef<HTMLSpanElement>(null)
@@ -53,6 +61,7 @@ function Row({ it, i, active, expanded, mode, panelId, onEnter, onLeave, onFocus
   }, [active, it.name])
   return (
     <button
+      ref={rowRef}
       type="button"
       className={s.row}
       data-row-btn={it.slug}
@@ -66,7 +75,7 @@ function Row({ it, i, active, expanded, mode, panelId, onEnter, onLeave, onFocus
       onBlur={onBlurRow}
       onClick={(e) => onOpen(i, e.currentTarget)}
     >
-      <span className={s.sweep} aria-hidden="true" />
+      <canvas ref={fillRef} className={s.fill} width={0} height={0} aria-hidden="true" />
       <span className={s.project} data-name aria-hidden="true">
         <span className={s.thumb}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -98,7 +107,8 @@ const preload = (src?: string) => {
 export default function WorkArchive({ items }: { items: WorkItem[] }) {
   const ui = useUi()
   const a = ui.archive
-  const [mode, setMode] = useState<OpenMode>('drawer')
+  const [force, setForce] = useState<OpenMode | null>(null) // ?open= dev override
+  const modeOf = useCallback((i: number): OpenMode => force ?? items[i].open, [force, items])
   const [hover, setHover] = useState<number | null>(null)
   const [openIdx, setOpenIdx] = useState<number | null>(null) // drawer / stage
   const [expanded, setExpanded] = useState<number | null>(null)
@@ -125,13 +135,13 @@ export default function WorkArchive({ items }: { items: WorkItem[] }) {
   useEffect(() => {
     fine.current = window.matchMedia('(hover: hover) and (pointer: fine)').matches
     const q = new URLSearchParams(window.location.search).get('open') as OpenMode | null
-    const m: OpenMode = q && OPEN_MODES.includes(q) ? q : 'drawer'
-    setMode(m)
+    const f: OpenMode | null = q && OPEN_MODES.includes(q) ? q : null
+    setForce(f)
     const fromHash = () => {
       const slug = decodeURIComponent(window.location.hash.slice(1))
       const i = items.findIndex((x) => x.slug === slug)
       if (i < 0) return
-      if (m === 'expand') {
+      if ((f ?? items[i].open) === 'expand') {
         setExpanded(i)
         requestAnimationFrame(() => {
           const li = listRef.current?.children[i] as HTMLElement | undefined
@@ -148,7 +158,7 @@ export default function WorkArchive({ items }: { items: WorkItem[] }) {
   }, [items])
 
   // Hash follows what is open.
-  const current = mode === 'expand' ? expanded : openIdx
+  const current = expanded ?? openIdx
   useEffect(() => {
     const url = window.location.pathname + window.location.search
     if (current === null) { if (window.location.hash) history.replaceState(history.state, '', url) }
@@ -241,11 +251,19 @@ export default function WorkArchive({ items }: { items: WorkItem[] }) {
   // ── Open ──
   const onOpen = useCallback((i: number, el: HTMLButtonElement) => {
     opener.current = el
+    const mode = modeOf(i)
     if (mode === 'expand') {
       preview.current?.hide()
       if (expanded === i) { collapse(() => el.focus({ preventScroll: true })); return }
+      // Only one panel at a time (a different one open collapses into this one).
       snapshot(el.parentElement, true)
       setExpanded(i)
+      return
+    }
+    // Drawer / stage: an open panel closes first.
+    if (expanded !== null) {
+      preview.current?.hide()
+      collapse(() => setOpenIdx(i))
       return
     }
     if (mode === 'stage') {
@@ -256,13 +274,13 @@ export default function WorkArchive({ items }: { items: WorkItem[] }) {
       preview.current?.hide()
     }
     setOpenIdx(i)
-  }, [mode, expanded, collapse])
+  }, [modeOf, expanded, collapse])
 
   const closeOverlay = useCallback(() => {
     setOpenIdx(null)
     // Return focus to the row (drawer now; the stage after its fly-back).
-    if (mode === 'drawer') requestAnimationFrame(() => opener.current?.focus({ preventScroll: true }))
-  }, [mode])
+    if (force !== 'stage') requestAnimationFrame(() => opener.current?.focus({ preventScroll: true }))
+  }, [force])
 
   const navDrawer = useCallback((dir: 1 | -1) => {
     setOpenIdx((v) => {
@@ -296,7 +314,7 @@ export default function WorkArchive({ items }: { items: WorkItem[] }) {
               i={i}
               active={hover === i}
               expanded={expanded === i}
-              mode={mode}
+              mode={modeOf(i)}
               panelId={`work-panel-${it.slug}`}
               onEnter={onEnter}
               onLeave={onLeave}
@@ -304,7 +322,7 @@ export default function WorkArchive({ items }: { items: WorkItem[] }) {
               onBlurRow={onBlurRow}
               onOpen={onOpen}
             />
-            {mode === 'expand' && expanded === i && (
+            {expanded === i && (
               <ExpandPanel
                 ref={panelRef}
                 it={it}
@@ -318,10 +336,10 @@ export default function WorkArchive({ items }: { items: WorkItem[] }) {
 
       <HoverPreview ref={preview} items={items} total={total} />
 
-      {mode === 'drawer' && (
+      {force !== 'stage' && (
         <OpenDrawer items={items} index={openIdx} onClose={closeOverlay} onNav={navDrawer} />
       )}
-      {mode === 'stage' && (
+      {force === 'stage' && (
         <OpenStage
           items={items}
           index={openIdx}
