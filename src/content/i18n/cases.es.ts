@@ -323,8 +323,8 @@ const CASES: Record<CaseSlug, Case> = {
     meta: '2025 · Rediseño',
     chips: ['Web', 'App', 'Venta de entradas'],
     lead: 'Rediseño de una plataforma de venta de entradas, del descubrimiento al pago. Responsive y con modo oscuro.',
-    ficha: { client: 'Entradium', year: '2025', role: 'UX · UI' },
-    credits: 'Diseño: Juan C. Fresno · Cliente: Entradium · 2025',
+    ficha: { client: 'Entradium', year: '2023—2024', role: 'UX · UI' },
+    credits: 'Diseño: Juan C. Fresno · Cliente: Entradium · 2023—2024',
   },
   wubalu: {
     ...EN['wubalu'],

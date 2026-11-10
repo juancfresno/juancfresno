@@ -387,9 +387,9 @@ export const WORK_EN = {
       title: 'Entradium',
       chips: ['Web', 'App', 'Ticketing'],
       lead: 'Redesign of an event ticketing platform, from discovery to checkout. Responsive, with dark mode.',
-      ficha: { client: 'Entradium', year: '2025', role: 'UX · UI' },
+      ficha: { client: 'Entradium', year: '2023—2024', role: 'UX · UI' },
       hindsight: null,
-      credits: 'Design: Juan C. Fresno · Client: Entradium · 2025',
+      credits: 'Design: Juan C. Fresno · Client: Entradium · 2023—2024',
       behance: 'https://www.behance.net/gallery/218960289/Entradiumcom-Redesign',
     },
     wubalu: {
