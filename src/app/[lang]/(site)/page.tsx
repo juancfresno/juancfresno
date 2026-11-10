@@ -9,7 +9,8 @@ import { FEED_SELECTED, monthYear } from '@/content/feed'
 import HoverIndex from '@/components/work/HoverIndex'
 import V0Section from '@/components/blocks/V0Section'
 import ContactBlock from '@/components/blocks/ContactBlock'
-import HelloCycle from '@/components/home/HelloCycle'
+import HeadlineCycle from '@/components/home/HeadlineCycle'
+import { headlineCycle } from '@/content/headline'
 import Arco, { type ArcoItem } from '@/components/home/Arco'
 import v from '@/components/blocks/v0.module.scss'
 import h from '@/components/home/home.module.scss'
@@ -48,11 +49,12 @@ export default async function HomePage({ params }: Props) {
     <div className={v.page}>
       <header className={h.hero}>
         <h1 className={h.heroHead}>
-          <span className={h.name}>
-            <HelloCycle words={HOME.greetings} /> {HOME.nameLine}
-          </span>
-          <span className={h.srOnly}> — </span>
-          <span className={h.title}>{HOME.title}</span>
+          <HeadlineCycle
+            lines={headlineCycle({ lang: l, a: `${HOME.greetings[0]}, ${HOME.nameLine}`, b: HOME.title })}
+            aClass={h.name}
+            bClass={h.title}
+            sep=" — "
+          />
         </h1>
         <p className={h.disciplines}>
           {HOME.disciplines.map((d, i) => (
