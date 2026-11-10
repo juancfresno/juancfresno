@@ -52,6 +52,13 @@ const HoverPreview = forwardRef<PreviewHandle, { items: WorkItem[]; total: strin
     reduce: false, cancelName: () => {}, cancelNum: 0,
   })
 
+  // The outgoing slot is dropped once its fade (0.22s) is over: no invisible layers painting.
+  useEffect(() => {
+    if (prev === null) return
+    const id = window.setTimeout(() => setPrev(null), 300)
+    return () => window.clearTimeout(id)
+  }, [prev, cur])
+
   useEffect(() => {
     setMounted(true)
     st.current.reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -91,6 +98,8 @@ const HoverPreview = forwardRef<PreviewHandle, { items: WorkItem[]; total: strin
     const L = layers.current.get(p.cur)
     if (L?.r) L.r.style.transform = `translate3d(${ox}px, ${oy}px, 0)`
     if (L?.b) L.b.style.transform = `translate3d(${-ox}px, ${-oy}px, 0)`
+    if (amt > 0) root.dataset.moving = ''
+    else delete root.dataset.moving
 
     const settled = Math.abs(p.tx - p.x) < 0.1 && Math.abs(p.ty - p.y) < 0.1 && Math.abs(p.vx) < 0.5 && Math.abs(p.vy) < 0.5
     if (settled && amt === 0) { p.raf = 0; p.last = 0; return }
@@ -123,14 +132,16 @@ const HoverPreview = forwardRef<PreviewHandle, { items: WorkItem[]; total: strin
     else p.cancelName = scrambleTo(nameEl, nameEl.textContent, it.name, 320)
     // Index number ticks from the previous to the new one.
     cancelAnimationFrame(p.cancelNum)
-    const from = parseInt(numEl.textContent || it.n, 10) || 1
-    const to = parseInt(it.n, 10)
+    const max = Math.max(1, parseInt(total, 10) || items.length)
+    const to = clamp(parseInt(it.n, 10) || 1, 1, max)
+    const shown = parseInt(numEl.textContent || '', 10)
+    const from = Number.isFinite(shown) ? clamp(shown, 1, max) : to
     if (p.reduce || from === to) { numEl.textContent = it.n; return }
     const t0 = performance.now()
     const run = (now: number) => {
       const k = Math.min(1, (now - t0) / 260)
       const e = 1 - Math.pow(1 - k, 3)
-      numEl.textContent = String(Math.round(from + (to - from) * e)).padStart(2, '0')
+      numEl.textContent = String(clamp(Math.round(from + (to - from) * e), 1, max)).padStart(2, '0')
       if (k < 1) p.cancelNum = requestAnimationFrame(run)
     }
     p.cancelNum = requestAnimationFrame(run)

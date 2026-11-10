@@ -217,6 +217,14 @@ $hdr: 72px;
 }
 
 .dStrip {
+  opacity: 0;
+  transform: translate3d(0, 24px, 0);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  :global([data-phase='open']) & {
+    opacity: 1;
+    transform: none;
+    transition: opacity 0.5s ease 0.36s, transform 0.8s $ease-out-expo 0.36s;
+  }
   img { display: block; width: 100%; height: auto; background: var(--c-stage); }
 }
 
@@ -348,7 +356,7 @@ $hdr: 72px;
   background: $color-bg;
   opacity: 0;
   transition: opacity 0.28s ease;
-  [data-phase='open'] > & { opacity: 0.97; }
+  [data-phase='open'] > & { opacity: 1; }
   [data-phase='closing'] > & { opacity: 0; transition: opacity 0.42s ease 0.1s; }
 }
 
@@ -364,7 +372,7 @@ $hdr: 72px;
   padding-inline: $m;
   pointer-events: none;
   transition: opacity 0.6s ease;
-  [data-phase='open'] > & { opacity: 0.26; transition: opacity 0.9s ease 0.75s; }
+  [data-phase='open'] > & { opacity: 0.08; transition: opacity 0.9s ease 0.75s; }
   [data-phase='closing'] > & { opacity: 0.6; transition: opacity 0.15s ease; }
 
   @include respond-to(md) {
@@ -389,12 +397,12 @@ $hdr: 72px;
       height: 100%;
       background: color-mix(in srgb, var(--c-g) 8%, transparent);
       opacity: 0;
-      transition: opacity 0.17s ease 0.19s;
     }
   }
   [data-phase='open'] & { transform: scaleY(1); }
   [data-phase='open'] & i { transform: scaleX(1); }
-  [data-phase='open'] & i::before { opacity: 1; }
+  // Fill flashes during the entrance only, then leaves lines (legibility).
+  [data-phase='open'] & i::before { animation: stFill 0.5s ease 0.19s both; }
   [data-phase='closing'] & {
     transform: scaleY(0);
     transform-origin: bottom;
@@ -530,7 +538,15 @@ $hdr: 72px;
   [data-phase='open'] & { opacity: 1; transition: opacity 0.3s ease 0.6s; }
 }
 
+@keyframes stFill { 0% { opacity: 0; } 35% { opacity: 1; } 100% { opacity: 0; } }
+
 @media (prefers-reduced-motion: reduce) {
+  .stGrid { display: none; }
+  .stCol i::before { animation: none !important; }
   .stCol, .stCol i, .stCol i::before { transition: none !important; }
   .stInfo, .stFoot, .stClose, .stTag { transition-delay: 0s !important; }
+}
+
+@media (hover: none) {
+  .ctl kbd { display: none; }
 }

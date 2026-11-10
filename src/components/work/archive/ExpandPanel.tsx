@@ -132,12 +132,14 @@ const ExpandPanel = forwardRef<HTMLDivElement, { it: WorkItem; id: string; onClo
   const onKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'ArrowRight') { e.preventDefault(); goTo(cur) }
     else if (e.key === 'ArrowLeft') { e.preventDefault(); goTo(cur - 2) }
-    else if (e.key === 'Escape') { e.preventDefault(); onClose() }
+  }
+  const onPanelKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); onClose() }
   }
 
   const n = it.images.length
   return (
-    <div ref={ref} id={id} className={s.xPanel} role="region" aria-label={t.dialog(it.title)} tabIndex={-1}>
+    <div ref={ref} id={id} className={s.xPanel} role="region" aria-label={t.dialog(it.title)} tabIndex={-1} onKeyDown={onPanelKeyDown}>
       <div className={s.xHead}>
         <div className={s.xIntro}>
           <p className={s.dKind}>{it.year} · {it.kind}</p>

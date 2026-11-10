@@ -66,7 +66,7 @@
   text-align: left;
   cursor: pointer;
   font: inherit;
-  transition: opacity 0.28s $ease-out-quart;
+  transition: opacity 0.28s $ease-out-quart, color 0.12s ease 0.1s;
   -webkit-tap-highlight-color: transparent;
 
   // Grid children skip the sweep (absolute), so re-point the spans.
@@ -87,7 +87,7 @@
   background: $raw-chip;
   transform: scaleX(0);
   transform-origin: right center;
-  transition: transform 0.26s cubic-bezier(0.55, 0, 1, 0.45);
+  transition: transform 0.18s cubic-bezier(0.55, 0, 1, 0.45);
   z-index: -1;
   pointer-events: none;
 }
@@ -113,7 +113,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  transition: color 0.12s ease;
+  transition: color 0.12s ease 0.1s;
 }
 .cat, .role { color: $color-text-mid; }
 .year { text-align: right; }
@@ -225,13 +225,18 @@
     width: calc(100% + 32px);
     height: calc(100% + 32px);
     object-fit: cover;
+    max-width: none;
     mix-blend-mode: screen;
     will-change: transform;
   }
 }
-.pvR { filter: url(#wk-ch-r); }
-.pvG { filter: url(#wk-ch-g); }
-.pvB { filter: url(#wk-ch-b); }
+// At rest: ONE plain image. The three-channel split only exists while moving.
+.pvR, .pvB { display: none; }
+[data-moving] {
+  .pvR { display: block; filter: url(#wk-ch-r); }
+  .pvG { filter: url(#wk-ch-g); }
+  .pvB { display: block; filter: url(#wk-ch-b); }
+}
 
 // G-orange crop ticks on the corners (the wireframe voice).
 .pvTick {
