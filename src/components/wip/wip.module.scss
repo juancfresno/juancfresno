@@ -282,8 +282,10 @@ $in-ease: cubic-bezier(0.16, 1, 0.3, 1); // expo-out: fast start, long soft land
 
   > canvas, > div:not(.canvasVeil) { animation: bgZoom 900ms $in-ease both; }
 
-  :global(html[data-intro='full']) & { animation-duration: 1300ms; > canvas, > div:not(.canvasVeil) { animation-duration: 1700ms; } }
-  :global(html[data-intro='fast']) & { animation-duration: 600ms; > canvas, > div:not(.canvasVeil) { animation-duration: 800ms; } }
+  :global(html[data-intro='full']) & { animation-duration: 1100ms; > canvas, > div:not(.canvasVeil) { animation-duration: 1500ms; } }
+  :global(html[data-intro='fast']) & { animation-duration: 550ms; > canvas, > div:not(.canvasVeil) { animation-duration: 750ms; } }
+  // Underneath the wireframe: waits for the hand-over like the copy.
+  :global(html[data-intro='full']:not([data-intro-go])) &, :global(html[data-intro='fast']:not([data-intro-go])) & { &, > canvas, > div:not(.canvasVeil) { animation-play-state: paused; } }
   :global(html[data-intro='reduced']) &, :global(html[data-intro-skip]) & { animation-duration: 300ms; > canvas, > div:not(.canvasVeil) { animation: none; } }
   @media (prefers-reduced-motion: reduce) { > canvas, > div:not(.canvasVeil) { animation: none; } }
 }
@@ -340,11 +342,13 @@ $in-ease: cubic-bezier(0.16, 1, 0.3, 1); // expo-out: fast start, long soft land
 
 // ─── Entrance (Intro.tsx) ────────────────────────────────────────────────────
 // html[data-intro] is set in <head> (introScript.ts): full / fast / reduced.
-// Elements carry data-in="fade | mask | line | rise" and --in-d (their delay
-// in the full run); "fast" scales delays and durations by 0.45. Base styles
-// are the final state, so a skip (data-intro-skip) just drops the animation.
+// The wireframe (Intro.tsx) runs first; the page's own entrance waits paused
+// until it hands over (html[data-intro-go]). Elements carry
+// data-in="fade | mask | line | rise" and --in-d (delay after GO, full run);
+// "fast" scales delays and durations by 0.5. Base styles are the final
+// state, so a skip just drops the animations.
 :global(html[data-intro]) { --in-k: 1; }
-:global(html[data-intro='fast']) { --in-k: 0.45; }
+:global(html[data-intro='fast']) { --in-k: 0.5; }
 
 :global(html[data-intro='full']),
 :global(html[data-intro='fast']) {
@@ -352,12 +356,14 @@ $in-ease: cubic-bezier(0.16, 1, 0.3, 1); // expo-out: fast start, long soft land
     animation-delay: calc(var(--in-d, 0ms) * var(--in-k));
     animation-fill-mode: both;
     animation-timing-function: $in-ease;
+    animation-play-state: paused;
   }
-  [data-in='fade'] { animation-name: inFade; animation-duration: calc(800ms * var(--in-k)); animation-timing-function: cubic-bezier(0.33, 1, 0.68, 1); }
-  [data-in='mask'] { animation-name: inMask; animation-duration: calc(950ms * var(--in-k)); }
-  [data-in='line'] { animation-name: inLine; animation-duration: calc(1000ms * var(--in-k)); transform-origin: 0 50%; }
-  [data-in='rise'] { animation-name: inRise; animation-duration: calc(800ms * var(--in-k)); }
+  [data-in='fade'] { animation-name: inFade; animation-duration: calc(700ms * var(--in-k)); animation-timing-function: cubic-bezier(0.33, 1, 0.68, 1); }
+  [data-in='mask'] { animation-name: inMask; animation-duration: calc(900ms * var(--in-k)); }
+  [data-in='line'] { animation-name: inLine; animation-duration: calc(900ms * var(--in-k)); transform-origin: 0 50%; }
+  [data-in='rise'] { animation-name: inRise; animation-duration: calc(700ms * var(--in-k)); }
 }
+:global(html[data-intro-go]) [data-in] { animation-play-state: running; }
 
 :global(html[data-intro='reduced']) [data-in] { animation: inFade 400ms ease both; }
 :global(html[data-intro-skip]) [data-in] { animation: none !important; }
@@ -366,3 +372,13 @@ $in-ease: cubic-bezier(0.16, 1, 0.3, 1); // expo-out: fast start, long soft land
 @keyframes inMask { from { transform: translate3d(0, 110%, 0); } }
 @keyframes inLine { from { transform: scaleX(0); } }
 @keyframes inRise { from { opacity: 0; transform: translate3d(0, 18px, 0); } }
+
+// The wireframe canvas: over header, copy and footer, under the grain (150).
+.wire {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 140;
+  pointer-events: none;
+  :global(html:not([data-intro])) & { display: none; }
+}

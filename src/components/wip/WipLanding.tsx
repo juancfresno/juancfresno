@@ -38,19 +38,19 @@ export default function WipLanding({ locale }: { locale: Locale }) {
       <header className={s.hero}>
         <h1 className={s.head}>
           <HeadlineCycle lines={headlineCycle({ lang: locale, a: WIP.line1 })} className={s.name} />
-          <span className={`${s.mask} ${s.titleMask}`}>
-            <span className={s.title} data-in="mask" style={d(420)}>{WIP.title}</span>
+          <span className={`${s.mask} ${s.titleMask}`} data-wire="" data-wire-text="">
+            <span className={s.title} data-in="mask" style={d(140)}>{WIP.title}</span>
           </span>
         </h1>
-        <p className={`${s.disciplines} ${s.mask}`}>
-          <span data-in="mask" style={d(540)}>{WIP.disciplines}</span>
+        <p className={`${s.disciplines} ${s.mask}`} data-wire="" data-wire-text="">
+          <span data-in="mask" style={d(220)}>{WIP.disciplines}</span>
         </p>
         <p className={s.intro}>
-          <span className={s.mask}><span data-in="mask" style={d(620)}>{WIP.intro[0]}</span></span>
-          <span className={s.mask}><span data-in="mask" style={d(700)}>{WIP.intro[1]}</span></span>
+          <span className={s.mask} data-wire="" data-wire-text=""><span data-in="mask" style={d(280)}>{WIP.intro[0]}</span></span>
+          <span className={s.mask} data-wire="" data-wire-text=""><span data-in="mask" style={d(340)}>{WIP.intro[1]}</span></span>
         </p>
-        <p className={`${s.contact} ${s.mask}`}>
-          <span data-in="mask" style={d(800)}>
+        <p className={`${s.contact} ${s.mask}`} data-wire="P · 18 · MAILTO" data-wire-text="">
+          <span data-in="mask" style={d(400)}>
             {WIP.contact} <a className={s.email} href={`mailto:${email}`}>{email}</a>
           </span>
         </p>

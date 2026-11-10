@@ -155,8 +155,8 @@ const WF = {
   move: 230, moveStagger: 4, staggerCap: 28, relabel: 0.7,
   out: 110, maxBoxes: 40,
 }
-const ACCENT = '255, 92, 30' // GridOverlay orange
-const GLYPHS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#%&*+=/'
+export const ACCENT = '255, 92, 30' // GridOverlay orange
+export const GLYPHS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#%&*+=/'
 
 const bezier = (x1: number, y1: number, x2: number, y2: number) => {
   const cx = 3 * x1, bx = 3 * (x2 - x1) - cx, ax = 1 - cx - bx
@@ -176,10 +176,11 @@ const bezier = (x1: number, y1: number, x2: number, y2: number) => {
     return sy(t)
   }
 }
-const EASE = bezier(0.19, 1, 0.22, 1)     // Lab EASE (expo out)
-const EASE_IO = bezier(0.76, 0, 0.24, 1)  // Lab EASE_IO
-const EASE_OUT = bezier(0, 0, 0.58, 1)
-const prog = (t: number, at: number, dur: number) => Math.max(0, Math.min(1, (t - at) / dur))
+// Shared with the WIP intro (wip/IntroWire.tsx): same eases, grid and glyphs.
+export const EASE = bezier(0.19, 1, 0.22, 1)     // Lab EASE (expo out)
+export const EASE_IO = bezier(0.76, 0, 0.24, 1)  // Lab EASE_IO
+export const EASE_OUT = bezier(0, 0, 0.58, 1)
+export const prog = (t: number, at: number, dur: number) => Math.max(0, Math.min(1, (t - at) / dur))
 const lerp = (a: number, b: number, p: number) => a + (b - a) * p
 
 type Block = { x: number; y: number; w: number; h: number; label: string }
@@ -261,7 +262,7 @@ function collectBlocks(top: number, height: number): Block[] {
 
 // A hidden copy of the G overlay: its columns ARE the site grid.
 let probe: HTMLDivElement | null = null
-function gridProbe() {
+export function gridProbe() {
   if (!probe || !probe.isConnected) {
     probe = document.createElement('div')
     probe.className = grid.overlay
@@ -285,7 +286,7 @@ function gridProbe() {
   return { cols, font: getComputedStyle(probe).fontFamily }
 }
 
-const scramble = (from: string, to: string, p: number) => {
+export const scramble = (from: string, to: string, p: number) => {
   if (p <= 0) return from
   if (p >= 1) return to
   const n = Math.floor(p * to.length)

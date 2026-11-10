@@ -32,7 +32,8 @@ function geometry(mode: OrbMode, W: number, H: number) {
   if (mode === 'tunnel') {
     return phone ? { cx: W * 0.5, cy: H * 0.66, r: Math.max(W, H) * 0.5 } : { cx: W * 0.68, cy: H * 0.5, r: Math.max(W, H) * 0.5 }
   }
-  return { cx: W * (phone ? 0.5 : 0.62), cy: H * 0.5, r: Math.hypot(W, H) * 0.5 }
+  // Lens: the exact centre of the viewport (W, H = the fixed stage, no scrollbar).
+  return { cx: W / 2, cy: H / 2, r: Math.hypot(W, H) * 0.5 }
 }
 
 export default function OrbBackdrop({ items, mode }: { items: FeedItem[]; mode: OrbMode }) {
@@ -52,7 +53,10 @@ export default function OrbBackdrop({ items, mode }: { items: FeedItem[]; mode: 
     const cv = glRef.current!
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const fx = reduce ? 0 : 1
-    let W = window.innerWidth, H = window.innerHeight
+    // The stage is position: fixed; inset: 0 → the viewport without scrollbars.
+    const vw = () => document.documentElement.clientWidth || window.innerWidth
+    const vh = () => document.documentElement.clientHeight || window.innerHeight
+    let W = vw(), H = vh()
     let orb: Orb | null = null
     try { orb = createOrb(cv, items, W <= 800, () => wake()) } catch { orb = null }
     if (!orb) { setFallback(true); return }
@@ -79,7 +83,7 @@ export default function OrbBackdrop({ items, mode }: { items: FeedItem[]; mode: 
     const auto = mode === 'sphere' ? [0.0016, 0] : mode === 'tunnel' ? [0.00025, 0.0032] : [0.28, 0.12]
 
     function resize() {
-      W = window.innerWidth; H = window.innerHeight
+      W = vw(); H = vh()
       g = geometry(mode, W, H)
       cv.style.width = `${W}px`; cv.style.height = `${H}px`
       o.resize(W, H, Math.min(1.5, window.devicePixelRatio || 1))
@@ -112,7 +116,7 @@ export default function OrbBackdrop({ items, mode }: { items: FeedItem[]; mode: 
       const mag = splitMag(sp) * fx
       const split: [number, number] = sp > 0.001 ? [(sx / sp) * mag, (sy / sp) * mag] : [0, 0]
       o.draw({ mode, a, b, cx: g.cx, cy: g.cy, r: g.r, split, bg })
-      ;(window as unknown as { __orb?: object }).__orb = { mode, speed: sp, split: mag } // QA probe, like window.__feedCanvas
+      ;(window as unknown as { __orb?: object }).__orb = { mode, speed: sp, split: mag, cx: g.cx, cy: g.cy } // QA probe, like window.__feedCanvas
       lastDraw = now
       if (force) return false
       return dragging || Math.abs(va) > 1e-4 || Math.abs(vb) > 1e-4 || sp > 0.8 || o.pending()
