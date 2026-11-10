@@ -49,12 +49,9 @@ export default async function HomePage({ params }: Props) {
     <div className={v.page}>
       <header className={h.hero}>
         <h1 className={h.heroHead}>
-          <HeadlineCycle
-            lines={headlineCycle({ lang: l, a: `${HOME.greetings[0]}, ${HOME.nameLine}`, b: HOME.title })}
-            aClass={h.name}
-            bClass={h.title}
-            sep=" — "
-          />
+          <HeadlineCycle lines={headlineCycle({ lang: l, a: `${HOME.greetings[0]}, ${HOME.nameLine}` })} className={h.name} />
+          <span className={h.srOnly}> — </span>
+          <span className={h.title}>{HOME.title}</span>
         </h1>
         <p className={h.disciplines}>
           {HOME.disciplines.map((d, i) => (
