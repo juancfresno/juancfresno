@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { ACCENT, EASE, EASE_IO, EASE_OUT, GLYPHS, gridProbe, prog, scramble } from '@/components/transition/effects'
+import { ACCENT, EASE, EASE_DROP, EASE_ENTER, EASE_OUT, EASE_SOFT, gridProbe, prog, scramble } from '@/components/transition/effects'
 import s from './wip.module.scss'
 
 // ─── WIP entrance: from structure to design ───────────────────────────────────
@@ -17,19 +17,25 @@ import s from './wip.module.scss'
 //      pieces, the greeting decodes (HeadlineCycle), role and lines rise
 //      through masks, footer last; the lens background fades in underneath;
 //      the grid fades away.
-// full ≈ 1.9 s (first visit in the session), fast ≈ 0.95 s (×0.5), reduced
-// motion = a plain fade (no wireframe). Any input skips to the end. The
-// head script (introScript.ts) decides the mode before paint and releases
-// the page after 3.5 s if this never runs.
+// Motion (full run; "fast" = ×0.5): every phase overlaps the next, nothing
+// pops. Lines fall from the top (ease-out, 28 ms stagger left → right,
+// a bright head that dims as each line lands), the gutters open while the
+// lines are still falling, the columns fill downward behind them, the boxes
+// grow in, and at GO (≈1.1 s) the page takes over while the grid dissolves.
+// Readable ≈1.5 s, canvas gone ≈1.7 s. Reduced motion = a plain fade (no
+// wireframe). Any input skips to the end. The head script (introScript.ts)
+// decides the mode before paint and releases the page after 3.5 s if this
+// never runs.
 const T = {
-  drop: 260, dropStagger: 12,
-  splitAt: 170, split: 200,
-  fillAt: 250, fill: 260, fillStagger: 10,
-  boxesAt: 380, boxIn: 220, boxStagger: 22, type: 260,
-  go: 760,
-  boxOut: 260, boxOutStagger: 28,
-  gridOutAt: 860, gridOut: 420,
+  drop: 520, dropStagger: 28,             // per line: top → bottom (ease-out: visible at once)
+  splitAt: 300, split: 520,               // gutters open (per line, same stagger)
+  fillAt: 420, fill: 620, fillStagger: 0,  // all columns fill down together (no staircase)
+  boxesAt: 680, boxIn: 380, boxStagger: 30, type: 380,
+  go: 1100,
+  boxOut: 320, boxOutStagger: 20,        // boxes out before the background is up
+  gridOutAt: 880, gridOut: 420,           // grid gone before the background enters
 }
+const HEAD = 72 // px of brighter "falling head" on each line
 const TAIL = { full: 1180, fast: 1180 } // ms after GO until the CSS run is over (×k)
 
 type Box = { x: number; y: number; w: number; h: number; label: string }
@@ -125,36 +131,53 @@ export default function Intro() {
       g.setTransform(dpr, 0, 0, dpr, 0, 0)
       g.clearRect(0, 0, W, H)
 
-      // Grid: lines drop, gutters open, columns fill; then it fades away.
-      const gridA = 1 - EASE_OUT(prog(t, T.gridOutAt, T.gridOut))
+      // Grid: lines fall from the top, gutters open, columns fill downward;
+      // then it dissolves. Everything eased, no step changes in alpha.
+      const gridA = 1 - EASE_SOFT(prog(t, T.gridOutAt, T.gridOut))
       const n = cols.length
       const step = n > 1 ? 11 / (n - 1) : 0 // 4 phone columns keep the 12-column rhythm
       if (gridA > 0) {
         for (let i = 0; i < n; i++) {
           const c = cols[i], o = i * step
-          const pf = EASE(prog(t, T.fillAt + o * T.fillStagger, T.fill))
+          const pf = EASE_SOFT(prog(t, T.fillAt + o * T.fillStagger, T.fill))
           if (pf > 0) {
-            g.globalAlpha = gridA
-            g.fillStyle = `rgba(${ACCENT}, 0.07)`
+            g.globalAlpha = gridA * Math.min(1, pf * 2)
+            g.fillStyle = `rgba(${ACCENT}, 0.04)`
             g.fillRect(c.x, 0, c.w, H * pf)
           }
-          const pd = EASE(prog(t, o * T.dropStagger, T.drop))
-          if (pd <= 0) continue
-          const ps = EASE_IO(prog(t, T.splitAt + o * T.dropStagger, T.split))
-          g.globalAlpha = gridA
-          g.fillStyle = `rgba(${ACCENT}, 0.6)`
+          const rd = prog(t, o * T.dropStagger, T.drop)
+          if (rd <= 0) continue
+          const pd = EASE_DROP(rd)
+          const ps = EASE_SOFT(prog(t, T.splitAt + o * T.dropStagger, T.split))
           const left = c.x + (i > 0 ? -gap / 2 : 0) * (1 - ps)
           const right = c.x + c.w - 1 + (i < n - 1 ? gap / 2 : 0) * (1 - ps)
-          g.fillRect(Math.round(left * dpr) / dpr, 0, 1, H * pd)
-          g.fillRect(Math.round(right * dpr) / dpr, 0, 1, H * pd)
+          const yEnd = H * pd
+          const head = 1 - EASE_OUT(prog(t, o * T.dropStagger + T.drop * 0.85, 260)) // dims as it lands
+          for (const lx of [left, right]) {
+            const x = Math.round(lx * dpr) / dpr
+            // body (fades in over the first few frames, no pop)
+            g.globalAlpha = gridA * Math.min(1, rd * 6)
+            g.fillStyle = `rgba(${ACCENT}, 0.55)`
+            g.fillRect(x, 0, 1, yEnd)
+            // falling head: brighter gradient at the leading edge
+            if (head > 0 && yEnd > 2) {
+              const h0 = Math.max(0, yEnd - HEAD)
+              const grd = g.createLinearGradient(0, h0, 0, yEnd)
+              grd.addColorStop(0, `rgba(${ACCENT}, 0)`)
+              grd.addColorStop(1, `rgba(${ACCENT}, 1)`)
+              g.globalAlpha = gridA * head
+              g.fillStyle = grd
+              g.fillRect(x, h0, 1, yEnd - h0)
+            }
+          }
         }
       }
 
       // Boxes: in with re-typing labels, out in reading order at GO.
       g.font = `10px ${probe.font || 'monospace'}`
       boxes.forEach((b, j) => {
-        const pin = EASE_OUT(prog(t, T.boxesAt + j * T.boxStagger, T.boxIn))
-        const pout = EASE_OUT(prog(t, T.go + j * T.boxOutStagger, T.boxOut))
+        const pin = EASE_ENTER(prog(t, T.boxesAt + j * T.boxStagger, T.boxIn))
+        const pout = EASE_SOFT(prog(t, T.go + j * T.boxOutStagger, T.boxOut))
         const a = pin * (1 - pout)
         if (a <= 0.003) return
         const grow = 0.96 + 0.04 * EASE(pin)

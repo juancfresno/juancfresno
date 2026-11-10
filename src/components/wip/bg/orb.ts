@@ -33,6 +33,29 @@ const LENS: Record<string, { c0: number; k2: number; k4: number; vig: number; ca
   lens4: { c0: 0.4, k2: 1.6, k4: 1.6, vig: 0.62, ca: 3 },
 }
 
+// Lens tile size in CSS px for a viewport width (same formula as draw()).
+export function lensTileCss(mode: OrbMode, W: number): [number, number] {
+  const ln = LENS[mode] ?? LENS.lens
+  const tw = Math.max(W, 900) * 1.6 * (ln.c0 / 0.72)
+  return [tw, tw * (TILE.rows / TILE.cols)]
+}
+
+// ?start=dense (preview variant, 10 Nov 2026): where the lens camera starts,
+// as a fraction of the tile. Picked by luminance, not by eye: the slot
+// thumbnails (public/feed/t, cover-cropped as in the atlas; slots that cross
+// the tile edge left out, since the atlas upload below never draws them) were
+// composited into one tile luminance map and every camera (a, b) on a 12 px
+// grid was scored at 1920 × 1080 through lens 1 and the dense veil: visible
+// coverage and number of pieces up; pale area (relative luminance > 0.35),
+// the 98th-percentile seen luminance and anything pale behind the copy or the
+// top-right wordmark down; a little saturation up. Winner a = 816, b = 852 px
+// of a 3072 × 2508 tile (default 0, 0): Awen naming (L 0.03) big under the
+// copy, Awen stickers, Creative assets and Music player UI (dark) around it,
+// Drip and PlayerUp on the right; 10 pieces in view vs 4, pale area 10 % vs
+// 30 %, p98 0.33 vs 0.51, nothing pale behind the copy (1 % vs 5 %). As
+// fractions it holds for any width ≥ 900 px.
+export const DENSE_START = { a: 816 / 3072, b: 852 / 2507.75 }
+
 export type OrbFrame = {
   mode: OrbMode
   a: number; b: number // sphere: yaw, pitch · tunnel: angle (turns), depth · lens: camera x, y (CSS px)

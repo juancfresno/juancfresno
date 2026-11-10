@@ -180,6 +180,9 @@ const bezier = (x1: number, y1: number, x2: number, y2: number) => {
 export const EASE = bezier(0.19, 1, 0.22, 1)     // Lab EASE (expo out)
 export const EASE_IO = bezier(0.76, 0, 0.24, 1)  // Lab EASE_IO
 export const EASE_OUT = bezier(0, 0, 0.58, 1)
+export const EASE_SOFT = bezier(0.65, 0, 0.35, 1) // soft in-out (WIP intro grid only)
+export const EASE_DROP = bezier(0.33, 1, 0.68, 1) // WIP intro line drop: visible from the first frames
+export const EASE_ENTER = bezier(0.22, 1, 0.36, 1) // WIP: everything that enters (masks, background, decode)
 export const prog = (t: number, at: number, dur: number) => Math.max(0, Math.min(1, (t - at) / dur))
 const lerp = (a: number, b: number, p: number) => a + (b - a) * p
 

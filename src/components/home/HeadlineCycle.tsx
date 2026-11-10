@@ -62,7 +62,7 @@ export default function HeadlineCycle({ lines, className }: { lines: HeadlineLin
       const build = () => {
         timer = window.setTimeout(() => {
           el.dataset.run = ''
-          go(0, fast ? 300 : 560, ' '.repeat(len))
+          go(0, fast ? 200 : 360, ' '.repeat(len))
         }, fast ? 20 : 40)
       }
       if ('introGo' in document.documentElement.dataset) build()
