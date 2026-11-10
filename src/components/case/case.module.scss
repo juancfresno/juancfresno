@@ -11,7 +11,7 @@
   @include container;
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
-  column-gap: $space-4;
+  column-gap: $gutter;
   padding-top: clamp(3.5rem, 5.2vw, 5.5rem);
   padding-bottom: clamp(4rem, 6.7vw, 7rem);
 
@@ -185,7 +185,7 @@
 .rowInner {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
-  column-gap: $space-4;
+  column-gap: $gutter;
   padding-top: 24px;
   border-top: 1px solid $color-line;
 
@@ -295,7 +295,7 @@
 .next {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
-  column-gap: $space-4;
+  column-gap: $gutter;
   align-items: end;
   color: $color-text;
   text-decoration: none;

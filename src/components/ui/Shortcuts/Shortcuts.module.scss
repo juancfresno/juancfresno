@@ -8,7 +8,7 @@
   display: flex;
   align-items: flex-start;
   justify-content: flex-end;
-  padding: calc(#{$nav-height} + #{$space-4}) $gutter $space-4;
+  padding: calc(#{$nav-height} + #{$space-4}) $m $space-4;
   background: transparent;
 }
 

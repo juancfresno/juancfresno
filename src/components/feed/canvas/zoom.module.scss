@@ -106,7 +106,7 @@
 
 .hint {
   position: absolute;
-  left: $gutter;
+  left: $m;
   bottom: $space-4;
   padding: 6px 9px;
   border-radius: 2px;
@@ -125,7 +125,7 @@
 // Prev / next / close: hidden until focused (keyboard), close always visible on touch.
 .ctl {
   position: absolute;
-  right: $gutter;
+  right: $m;
   bottom: calc(var(--tabbar-h, 0px) + #{$space-4}); // above the mobile tab bar
   display: flex;
   gap: 0.4rem;

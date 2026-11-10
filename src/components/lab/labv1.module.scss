@@ -27,7 +27,7 @@
 .headRow {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: $space-4;
+  gap: $gutter;
   align-items: end;
 
   @include respond-to(md) { grid-template-columns: 1fr; gap: $space-8; }
@@ -86,7 +86,7 @@
 .intro {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: $space-4;
+  gap: $gutter;
   margin-top: clamp(3rem, 4.3vw, 4.5rem);
 
   p {
@@ -130,7 +130,7 @@
 .specimen {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: $space-4;
+  gap: $gutter;
   align-items: start;
 
   @include respond-to(lg) { grid-template-columns: 1fr; gap: $space-8; }
