@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { ACCENT, EASE, EASE_OUT, EASE_SOFT, gridProbe, prog, scramble } from '@/components/transition/effects'
+import { ACCENT, EASE, EASE_DROP, EASE_ENTER, EASE_OUT, EASE_SOFT, gridProbe, prog, scramble } from '@/components/transition/effects'
 import s from './wip.module.scss'
 
 // ─── WIP entrance: from structure to design ───────────────────────────────────
@@ -18,7 +18,7 @@ import s from './wip.module.scss'
 //      through masks, footer last; the lens background fades in underneath;
 //      the grid fades away.
 // Motion (full run; "fast" = ×0.5): every phase overlaps the next, nothing
-// pops. Lines fall from the top (soft in-out, 34 ms stagger left → right,
+// pops. Lines fall from the top (ease-out, 28 ms stagger left → right,
 // a bright head that dims as each line lands), the gutters open while the
 // lines are still falling, the columns fill downward behind them, the boxes
 // grow in, and at GO (≈1.1 s) the page takes over while the grid dissolves.
@@ -27,13 +27,13 @@ import s from './wip.module.scss'
 // decides the mode before paint and releases the page after 3.5 s if this
 // never runs.
 const T = {
-  drop: 620, dropStagger: 34,             // per line: top → bottom
+  drop: 520, dropStagger: 28,             // per line: top → bottom (ease-out: visible at once)
   splitAt: 300, split: 520,               // gutters open (per line, same stagger)
-  fillAt: 420, fill: 620, fillStagger: 30, // columns fill downward
+  fillAt: 420, fill: 620, fillStagger: 0,  // all columns fill down together (no staircase)
   boxesAt: 680, boxIn: 380, boxStagger: 30, type: 380,
   go: 1100,
-  boxOut: 420, boxOutStagger: 30,
-  gridOutAt: 1060, gridOut: 620,
+  boxOut: 320, boxOutStagger: 20,        // boxes out before the background is up
+  gridOutAt: 880, gridOut: 420,           // grid gone before the background enters
 }
 const HEAD = 72 // px of brighter "falling head" on each line
 const TAIL = { full: 1180, fast: 1180 } // ms after GO until the CSS run is over (×k)
@@ -142,12 +142,12 @@ export default function Intro() {
           const pf = EASE_SOFT(prog(t, T.fillAt + o * T.fillStagger, T.fill))
           if (pf > 0) {
             g.globalAlpha = gridA * Math.min(1, pf * 2)
-            g.fillStyle = `rgba(${ACCENT}, 0.07)`
+            g.fillStyle = `rgba(${ACCENT}, 0.04)`
             g.fillRect(c.x, 0, c.w, H * pf)
           }
           const rd = prog(t, o * T.dropStagger, T.drop)
           if (rd <= 0) continue
-          const pd = EASE_SOFT(rd)
+          const pd = EASE_DROP(rd)
           const ps = EASE_SOFT(prog(t, T.splitAt + o * T.dropStagger, T.split))
           const left = c.x + (i > 0 ? -gap / 2 : 0) * (1 - ps)
           const right = c.x + c.w - 1 + (i < n - 1 ? gap / 2 : 0) * (1 - ps)
@@ -176,7 +176,7 @@ export default function Intro() {
       // Boxes: in with re-typing labels, out in reading order at GO.
       g.font = `10px ${probe.font || 'monospace'}`
       boxes.forEach((b, j) => {
-        const pin = EASE_SOFT(prog(t, T.boxesAt + j * T.boxStagger, T.boxIn))
+        const pin = EASE_ENTER(prog(t, T.boxesAt + j * T.boxStagger, T.boxIn))
         const pout = EASE_SOFT(prog(t, T.go + j * T.boxOutStagger, T.boxOut))
         const a = pin * (1 - pout)
         if (a <= 0.003) return

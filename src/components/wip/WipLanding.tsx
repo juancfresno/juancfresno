@@ -39,7 +39,7 @@ export default function WipLanding({ locale }: { locale: Locale }) {
         <h1 className={s.head}>
           <HeadlineCycle lines={headlineCycle({ lang: locale, a: WIP.line1 })} className={s.name} />
           <span className={`${s.mask} ${s.titleMask}`} data-wire="" data-wire-text="">
-            <span className={s.title} data-in="mask" style={d(140)}>{WIP.title}</span>
+            <span className={s.title} data-in="mask" style={d(280)}>{WIP.title}</span>
           </span>
         </h1>
         <p className={`${s.disciplines} ${s.mask}`} data-wire="" data-wire-text="">

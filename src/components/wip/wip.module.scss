@@ -1,7 +1,7 @@
 @use '../../styles/variables' as *;
 @use '../../styles/mixins' as *;
 
-$in-ease: cubic-bezier(0.16, 1, 0.3, 1); // expo-out: fast start, long soft landing
+$in-ease: cubic-bezier(0.22, 1, 0.36, 1); // one family for everything that enters (grid stays in-out)
 
 // WIP landing (lib/wip.ts) · Figma "Home · v0" (6944:8590, 1680 × 1024):
 // header 72 · hero (copy 83 px under the header line) · footer. The page
@@ -282,11 +282,12 @@ $in-ease: cubic-bezier(0.16, 1, 0.3, 1); // expo-out: fast start, long soft land
 
   > canvas, > div:not(.canvasVeil) { animation: bgZoom 900ms $in-ease both; }
 
-  :global(html[data-intro='full']) & { animation-duration: 1100ms; > canvas, > div:not(.canvasVeil) { animation-duration: 1500ms; } }
-  :global(html[data-intro='fast']) & { animation-duration: 550ms; > canvas, > div:not(.canvasVeil) { animation-duration: 750ms; } }
+  // Enters after the grid and boxes are gone (delay), over clean black.
+  :global(html[data-intro='full']) & { animation-duration: 900ms; animation-delay: 200ms; > canvas, > div:not(.canvasVeil) { animation-duration: 900ms; animation-delay: 200ms; } }
+  :global(html[data-intro='fast']) & { animation-duration: 450ms; animation-delay: 100ms; > canvas, > div:not(.canvasVeil) { animation-duration: 450ms; animation-delay: 100ms; } }
   // Underneath the wireframe: waits for the hand-over like the copy.
   :global(html[data-intro='full']:not([data-intro-go])) &, :global(html[data-intro='fast']:not([data-intro-go])) & { &, > canvas, > div:not(.canvasVeil) { animation-play-state: paused; } }
-  :global(html[data-intro='reduced']) &, :global(html[data-intro-skip]) & { animation-duration: 300ms; > canvas, > div:not(.canvasVeil) { animation: none; } }
+  :global(html[data-intro='reduced']) &, :global(html[data-intro-skip]) & { animation-duration: 300ms; animation-delay: 0ms; > canvas, > div:not(.canvasVeil) { animation: none; } }
   @media (prefers-reduced-motion: reduce) { > canvas, > div:not(.canvasVeil) { animation: none; } }
 }
 
@@ -358,8 +359,8 @@ $in-ease: cubic-bezier(0.16, 1, 0.3, 1); // expo-out: fast start, long soft land
     animation-timing-function: $in-ease;
     animation-play-state: paused;
   }
-  [data-in='fade'] { animation-name: inFade; animation-duration: calc(700ms * var(--in-k)); animation-timing-function: cubic-bezier(0.33, 1, 0.68, 1); }
-  [data-in='mask'] { animation-name: inMask; animation-duration: calc(900ms * var(--in-k)); }
+  [data-in='fade'] { animation-name: inFade; animation-duration: calc(700ms * var(--in-k)); }
+  [data-in='mask'] { animation-name: inMask; animation-duration: calc(700ms * var(--in-k)); }
   [data-in='line'] { animation-name: inLine; animation-duration: calc(900ms * var(--in-k)); transform-origin: 0 50%; }
   [data-in='rise'] { animation-name: inRise; animation-duration: calc(700ms * var(--in-k)); }
 }
