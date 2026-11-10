@@ -81,7 +81,7 @@ export const WORK_EN = {
     { project: "Garplast", via: "Aspid", category: "Brand Identity", role: "—", year: "2023—2024" },
     { project: "Gestión de Residencias", via: "Aspid", category: "Brand Identity", role: "—", year: "2023—2024" },
     { project: "Sureact", via: "Aspid", category: "Brand Identity", role: "—", year: "2023—2024" },
-    { project: "Entradium · redesign + covers", via: "Crocantickets", category: "Digital Product", role: "—", year: "2023—2024" },
+    { project: "Entradium · redesign + covers", via: "Direct", category: "Digital Product", role: "—", year: "2023—2024" },
     { project: "IVF Life · brandbook, posters, templates", via: "Hype Entertainment", category: "Brand Identity", role: "Visual proposals · brandbook", year: "2023—2024" },
     { project: "Kuzidesign · website + branding", via: "Direct", category: "Brand Identity · Web", role: "Branding · web", year: "2023" },
     { project: "Workout App", via: "Direct", category: "Digital Product", role: "UI Design", year: "2023" },
