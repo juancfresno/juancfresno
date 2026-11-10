@@ -314,12 +314,23 @@
 }
 
 .bottomTabActive {
-  color: $raw-ink;
-  background: $raw-chip;
+  color: var(--c-chip-ink);
+  background: var(--c-chip);
 }
 
 // Light theme: the face SVG has hardcoded light strokes, so darken it.
 :global(html[data-theme="light"]) .faceGlitchWrap { filter: brightness(0.08); }
+
+// Blue chrome (Contact): ink logos without the difference blend (web/nav Theme=Blue).
+:global(html[data-chrome="blue"]) {
+  .face, .logo { mix-blend-mode: normal; }
+  .faceGlitchWrap { filter: brightness(0.08); }
+}
+// While the chrome changes theme the header has a solid background, which the
+// difference blend would cancel out.
+:global(html.chrome-hold) {
+  .face, .logo { mix-blend-mode: normal; }
+}
 
 
 // ══════════════════════════════════════════════════════════════════════════════

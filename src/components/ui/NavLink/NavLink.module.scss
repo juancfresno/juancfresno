@@ -26,7 +26,7 @@
     position: absolute;
     inset: -3px -6px;
     border-radius: 3px;
-    background: $raw-chip;
+    background: var(--c-chip);
     opacity: 0;
     transform: scale(0.88);
     // Exit: rápido y sin spring
@@ -52,10 +52,13 @@
   &:hover,
   &:focus-visible,
   &.active {
-    color: $raw-ink;               // dark text on the light chip, both themes
+    color: var(--c-chip-ink);      // ink on the blue chip; blue on the ink chip (blue chrome)
   }
 
   @include focus-ring;
+
+  // Blue chrome (web/nav-link Theme=Blue): links at rest in text/primary.
+  :global(html[data-chrome="blue"]) &:not(:hover):not(:focus-visible):not(.active) { color: $color-text; }
 }
 
 // Span de texto — necesario para aislar el overflow del navArrow

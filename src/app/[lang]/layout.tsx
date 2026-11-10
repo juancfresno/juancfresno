@@ -16,6 +16,7 @@ import { HTML_LANG, LOCALES, OG_LOCALE, isLocale, DEFAULT_LOCALE, type Locale } 
 import { LocaleProvider } from '@/i18n/client'
 import { getSite, getUi } from '@/content/site'
 import { LANG_SWITCH_SCRIPT } from '@/providers/langSwitch'
+import { PAGE_THEME_SCRIPT } from '@/lib/pageTheme'
 import { WIP_INTRO_SCRIPT } from '@/components/wip/introScript'
 
 // UI mono: Fragment Mono (one weight, 400 + italic). Body: Switzer.
@@ -87,6 +88,8 @@ export default async function RootLayout({ children, params }: Props) {
             __html: "try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}",
           }}
         />
+        {/* Page theme before paint: /contact is born blue whatever the theme. */}
+        <script dangerouslySetInnerHTML={{ __html: PAGE_THEME_SCRIPT }} />
         {/* Language switch: keep the new page hidden until the transition reveals it. */}
         <script dangerouslySetInnerHTML={{ __html: LANG_SWITCH_SCRIPT }} />
         {/* Home entrance (wireframe → page): full / fast / reduced, decided before paint, only on / and /es. */}

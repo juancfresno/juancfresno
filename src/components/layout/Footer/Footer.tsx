@@ -23,7 +23,7 @@ export default function Footer() {
   const ui = useUi()
   const href = useHref()
   return (
-    <footer className={s.footer}>
+    <footer data-site-footer className={s.footer}>
       <div className={s.inner}>
 
         {/* Social wordmarks */}

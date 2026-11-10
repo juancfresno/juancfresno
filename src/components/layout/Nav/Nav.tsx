@@ -183,7 +183,7 @@ export default function Nav() {
       </header>
 
       {/* ── Mobile bottom tab bar ── */}
-      <nav className={s.bottomBar} aria-label={ui.nav.mainMobile}>
+      <nav data-site-tabbar className={s.bottomBar} aria-label={ui.nav.mainMobile}>
           {links.map(({ label, href, url }) => {
             const isActive = pathname === href || pathname.startsWith(href + '/')
             return (

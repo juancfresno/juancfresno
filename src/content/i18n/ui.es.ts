@@ -165,6 +165,7 @@ export const UI_ES: UiDict = {
     th: { n: 'Nº', company: 'Estudio o empresa', role: 'Rol', how: 'Cómo', years: 'Años' },
   },
   contact: {
+    h1: 'Contacto', // hero: "/Contacto"
     doors: 'Dos formas de empezar',
     modes: 'Cómo trabajo con estudios',
     yourTeam: 'Tu equipo',

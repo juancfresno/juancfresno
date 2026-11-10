@@ -1,11 +1,12 @@
 'use client'
 
-import { createContext, useCallback, useContext, useEffect, useRef, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useRef, type ReactNode } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import { EFFECTS, SITE_TRANSITION, type TransitionEffect } from '@/components/transition/effects'
 import s from '@/components/transition/SiteTransition.module.scss'
 import { parsePath } from '@/i18n/config'
 import { LANG_SWITCH_KEY } from './langSwitch'
+import { applyPageTheme, currentPageTheme, pageThemeOf, type PageTheme } from '@/lib/pageTheme'
 
 // ─── Context ──────────────────────────────────────────────────────────────────
 type TransitionCtx = { navigate: (href: string) => void }
@@ -14,6 +15,23 @@ export const usePageTransition = () => useContext(Ctx)
 
 const frame = () => new Promise<void>((r) => requestAnimationFrame(() => r()))
 const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+// ─── Page theme (blue Contact) ────────────────────────────────────────────────
+// Chrome (nav, tab bar, footer) changes theme at cover start with a 160 ms
+// colour fade ('chrome-anim'); the header keeps a solid background
+// ('chrome-hold') until the page itself has changed under the cover.
+const cssVar = (name: string) => getComputedStyle(document.documentElement).getPropertyValue(name).trim()
+let fadeTimer = 0
+function flipChrome(t: PageTheme) {
+  const cl = document.documentElement.classList
+  cl.add('chrome-anim', 'chrome-hold')
+  applyPageTheme(t, 'chrome')
+  clearTimeout(fadeTimer)
+  fadeTimer = window.setTimeout(() => cl.remove('chrome-anim'), 200)
+}
+const releaseChrome = () => document.documentElement.classList.remove('chrome-hold')
+// Fill of the transition columns: the brand blue going in, the site theme's own bg going out.
+const themeFill = (t: PageTheme) => cssVar(t ? '--c-brand-blue' : '--c-base-bg') || undefined
 
 // After a navigation, focus the new page's h1 (or <main>) without scrolling.
 function focusPage() {
@@ -86,6 +104,10 @@ export default function PageTransitionProvider({ children }: { children: ReactNo
     return () => { window.removeEventListener('pageshow', onShow); effect.current?.cancel() }
   }, [])
 
+  // The committed route decides the page theme (before paint): direct loads,
+  // reduced motion and anything the transition did not flip end up right here.
+  useLayoutEffect(() => { applyPageTheme(pageThemeOf(pathname)) }, [pathname])
+
   // Resolve anyone waiting for the route to change once the new page has committed.
   useEffect(() => {
     current.current = pathname
@@ -109,6 +131,7 @@ export default function PageTransitionProvider({ children }: { children: ReactNo
     await frame()
     await frame()
     if (animate) await effect.current?.reveal()
+    releaseChrome()
     focusPage()
     busy.current = false
   }, [routeChanged])
@@ -133,7 +156,16 @@ export default function PageTransitionProvider({ children }: { children: ReactNo
     }
     stack.current = stack.current.slice(0, at.current + 1).concat(url.pathname)
     at.current = stack.current.length - 1
-    if (animate) await effect.current!.cover({ back: false })
+    const theme = pageThemeOf(url.pathname)
+    if (animate && theme !== currentPageTheme()) {
+      // Into / out of the blue page: the columns fill with the destination
+      // background and it stays; leaving Contact runs mirrored.
+      flipChrome(theme)
+      await effect.current!.cover({ back: !theme, fill: themeFill(theme) })
+      applyPageTheme(theme, 'page')
+    } else if (animate) {
+      await effect.current!.cover({ back: false })
+    }
     router.push(to)
     await finish(from, animate)
   }, [router, finish])
@@ -161,7 +193,14 @@ export default function PageTransitionProvider({ children }: { children: ReactNo
       if (forward) at.current += 1
       else if (stack.current[at.current - 1] === location.pathname) at.current -= 1
       const animate = !reduced() && !!effect.current
-      if (animate) effect.current!.coverNow({ back: !forward })
+      const theme = pageThemeOf(location.pathname)
+      if (animate && theme !== currentPageTheme()) {
+        flipChrome(theme)
+        effect.current!.coverNow({ back: !forward !== !theme, fill: themeFill(theme) })
+        applyPageTheme(theme, 'page')
+      } else if (animate) {
+        effect.current!.coverNow({ back: !forward })
+      }
       finish(from, animate)
     }
     window.addEventListener('popstate', onPop)

@@ -16,7 +16,7 @@
   display: inline-block;
   margin-left: $space-2;
   padding: 3px 7px;
-  border: 1px dashed $color-text-mid;
+  border: 1px dashed var(--c-control);
   border-radius: 2px;
   font-family: $font-mono;
   font-size: 0.5625rem;
@@ -25,7 +25,7 @@
   line-height: 1.2;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: $color-text-mid;
+  color: var(--c-control-ink);
   vertical-align: middle;
   white-space: nowrap;
 }

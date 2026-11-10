@@ -15,6 +15,10 @@ export const SITE_TRANSITION: SiteTransitionId = 'wireframe-grid'
 export type CoverOptions = {
   /** Browser back (or a pop we can't place): the effect runs mirrored. */
   back?: boolean
+  /** Page-theme change (into / out of the blue Contact): the columns fill
+   *  solid with this colour and it stays as the new page's background (no
+   *  wireframe boxes). Only 'wireframe-grid' draws it; the others ignore it. */
+  fill?: string
 }
 
 export type TransitionEffect = {
@@ -148,6 +152,10 @@ const instant: Factory = () => ({
 // overlay's own CSS (GridOverlay.module.scss) measured live, so it is the real
 // grid at every width: 12 columns, margin 64 / gutter 16 at 1680, liquid;
 // 4 columns ≤ 768 px. Grid in the G orange; boxes and labels in --c-text/--c-bg.
+// Theme change (o.fill, Figma note 7013:6997): the columns fill solid with the
+// destination background (190–355), the margins and gutters follow (300–390),
+// no boxes; on reveal only the grid lines and that layer fade (110 ms) over a
+// page that already has the same background, so the colour stays.
 const WF = {
   drop: 120, dropStagger: 6, splitAt: 120, split: 100,
   fillAt: 190, fill: 110, fillStagger: 5,
@@ -312,6 +320,7 @@ const wireframeGrid: Factory = (canvas) => {
   let A: Block[] = []
   let pairs: Pair[] = []
   let back = false, pop = false
+  let fill: string | null = null
   let t0 = 0, t1 = -1
   let stagger = 0, outAt = 0
   let coverEnd = 0
@@ -377,7 +386,7 @@ const wireframeGrid: Factory = (canvas) => {
     const veil = pop ? 1 : EASE_OUT(prog(tc, WF.boxesAt, WF.boxes))
     if (veil > 0) {
       g.globalAlpha = master * veil
-      g.fillStyle = bg
+      g.fillStyle = fill ?? bg
       g.fillRect(0, 0, W, H)
     }
 
@@ -390,7 +399,7 @@ const wireframeGrid: Factory = (canvas) => {
       const pf = EASE(prog(tc, WF.fillAt + o * WF.fillStagger, WF.fill))
       if (pf > 0) {
         g.globalAlpha = master
-        g.fillStyle = `rgba(${ACCENT}, 0.07)`
+        g.fillStyle = fill ?? `rgba(${ACCENT}, 0.07)`
         g.fillRect(c.x, 0, c.w, H * pf)
       }
       const pd = EASE(prog(tc, o * WF.dropStagger, WF.drop))
@@ -404,7 +413,8 @@ const wireframeGrid: Factory = (canvas) => {
       g.fillRect(Math.round(right * dpr) / dpr, 0, 1, H * pd)
     }
 
-    // Boxes.
+    // Boxes (none on a theme change: the colour is the cover).
+    if (fill) return
     g.font = `10px ${font}`
     const boxIn = EASE_OUT(prog(tc, pop ? 0 : WF.boxesAt, WF.boxes))
     if (tr < 0) {
@@ -460,8 +470,9 @@ const wireframeGrid: Factory = (canvas) => {
     stop()
     back = !!o?.back
     pop = isPop
+    fill = o?.fill ?? null
     const top = layout()
-    A = collectBlocks(top, H)
+    A = fill ? [] : collectBlocks(top, H)
     pairs = []
     t1 = -1
     t0 = performance.now()
@@ -482,7 +493,7 @@ const wireframeGrid: Factory = (canvas) => {
       await covered
       if (canvas.style.visibility !== 'visible') return
       const top = Math.round(parseFloat(canvas.style.top) || 0)
-      const B = collectBlocks(top, H)
+      const B = fill ? [] : collectBlocks(top, H)
       const n = Math.max(A.length, B.length)
       pairs = []
       for (let i = 0; i < n; i++) {

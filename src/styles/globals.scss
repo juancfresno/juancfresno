@@ -6,7 +6,8 @@
 
 // ─── Theme: dark by default, light with html[data-theme="light"] ──────────────
 // Set before paint by the inline script in layout.tsx; toggled by ThemeToggle.
-:root {
+// Token sets are mixins so a scope can re-declare them (blue page, its chrome).
+@mixin theme-dark {
   --c-bg:         #{$raw-ink};
   --c-bg-2:       #1a1a18;
   --c-surface:    #242420;
@@ -23,10 +24,15 @@
   --c-stage:      #0c0c0b;   // media stages inside alt modules (Figma v1.0 #0E0E0E)
   --c-faint:      #5a5a56;   // faint labels (Figma v1.0)
   --c-g:          #ff5c1f;   // G orange: grid, annotations, live dots
+  --c-control:    rgba(252, 252, 247, 0.6);  // control outlines (Pending tags)
+  --c-control-ink: rgba(252, 252, 247, 0.6); // text inside those controls
+  --c-chip:       #{$raw-chip};  // active / hover nav chip
+  --c-chip-ink:   #{$raw-ink};
+  --c-fill:       #{$raw-pearl}; // Contact door 02 hover fill
   color-scheme: dark;
 }
 
-:root[data-theme="light"] {
+@mixin theme-light {
   --c-bg:         #{$raw-pearl};
   --c-bg-2:       #f3f2ec;
   --c-surface:    #e9e8e1;
@@ -43,8 +49,73 @@
   --c-stage:      #e9e8e1;
   --c-faint:      rgba(16, 16, 14, 0.4);
   --c-g:          #e5480e;
+  --c-control:    rgba(16, 16, 14, 0.6);
+  --c-control-ink: rgba(16, 16, 14, 0.6);
+  --c-chip:       #{$raw-chip};
+  --c-chip-ink:   #{$raw-ink};
+  --c-fill:       #{$raw-pearl};
   color-scheme: light;
 }
+
+// Brand blue page (Figma "Contact" 7014:18145, Diseño spec): bg/brand-blue with
+// the light-theme ink tokens. Same in dark and light; orange text → text/brand.
+@mixin theme-blue {
+  --c-bg:         #{$raw-chip};  // bg/brand-blue #C6DBF9
+  --c-bg-2:       #{$raw-chip};
+  --c-surface:    #f4f2ea;       // bg/surface
+  --c-border:     #a9aea9;       // border/strong (hairlines, ElasticLine)
+  --c-bar:        rgba(198, 219, 249, 0.85);
+  --c-text:       #141414;       // text/primary
+  --c-text-mid:   #373737;       // text/secondary
+  --c-text-muted: #4a4d4b;       // text/tertiary
+  --c-text-hi:    #141414;
+  --c-text-dim:   #4a4d4b;
+  --c-line:       #a9aea9;
+  --c-line-hi:    #141414;       // border/strongest
+  --c-overlay:    rgba(198, 219, 249, 0.92);
+  --c-stage:      #141414;       // dark stages keep their orange
+  --c-faint:      #4a4d4b;
+  --c-g:          #344e9b;       // text/brand: orange fails on blue
+  --c-control:    #636965;       // border/control
+  --c-control-ink: #4a4d4b;
+  --c-chip:       #141414;       // inverted chip: ink with blue text
+  --c-chip-ink:   #{$raw-chip};
+  --c-fill:       #f4f2ea;
+  color-scheme: light;
+}
+
+:root {
+  @include theme-dark;
+  --c-brand-blue: #{$raw-chip};  // bg/brand-blue, read by the site transition
+  --c-base-bg:    #{$raw-ink};   // the theme's own bg (never blue)
+}
+
+:root[data-theme="light"] {
+  @include theme-light;
+  --c-base-bg:    #{$raw-pearl};
+}
+
+// ─── Page theme: blue (Contact) ─────────────────────────────────────────────
+// html[data-page-theme="blue"] = the whole page; html[data-chrome="blue"] =
+// nav, tab bar and footer only. Both are set before paint on a direct load
+// (PAGE_THEME_SCRIPT) and kept in sync with the route by PageTransition, which
+// flips the chrome at cover start and the page once the grid has covered it.
+$chrome: '[data-site-header], [data-site-tabbar]';
+:root[data-page-theme="blue"] { @include theme-blue; }
+:root[data-chrome="blue"] :is(#{$chrome}) { @include theme-blue; }
+// Footer on the blue page = web/footer Theme=Dark (Figma 7014:18145).
+:root[data-chrome="blue"] [data-site-footer] { @include theme-dark; }
+// Leaving Contact: the chrome goes back to the site theme before the page does.
+:root[data-page-theme="blue"]:not([data-chrome="blue"]) :is(#{$chrome}, [data-site-footer]) { @include theme-dark; }
+:root[data-theme="light"][data-page-theme="blue"]:not([data-chrome="blue"]) :is(#{$chrome}, [data-site-footer]) { @include theme-light; }
+
+// 160 ms colour fade of the chrome while it changes theme; the header gets a
+// solid background meanwhile, since the page under it changes later.
+html.chrome-anim :is(#{$chrome}, [data-site-footer]),
+html.chrome-anim :is(#{$chrome}, [data-site-footer]) * {
+  transition: background-color 0.16s ease, color 0.16s ease, border-color 0.16s ease, fill 0.16s ease, stroke 0.16s ease !important;
+}
+html.chrome-hold [data-site-header] { background-color: var(--c-bg); }
 
 // Smooth swap between themes (colors only).
 html.theme-anim, html.theme-anim * {

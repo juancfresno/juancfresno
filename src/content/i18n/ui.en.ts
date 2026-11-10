@@ -166,6 +166,7 @@ export const UI_EN = {
     th: { n: 'Nº', company: 'Studio or company', role: 'Role', how: 'How', years: 'Years' },
   },
   contact: {
+    h1: 'Contact', // hero: "/Contact"
     doors: 'Two ways to start',
     modes: 'How I work with studios',
     yourTeam: 'Your team',
