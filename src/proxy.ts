@@ -92,7 +92,7 @@ async function beta(request: NextRequest) {
   }
   if (pathname === '/sitemap.xml') return betaHeaders(new NextResponse('Not found', { status: 404 }))
 
-  const password = process.env.BETA_PASSWORD
+  const password = process.env.BETA_PASSWORD || process.env.FDS_PASSWORD
   const cookie = request.cookies.get(BETA_COOKIE)?.value
   const authed = !!password && !!cookie && betaSafeEqual(cookie, await betaToken(password))
 

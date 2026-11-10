@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
   const form = await request.formData().catch(() => null)
   const given = String(form?.get('password') ?? '')
   const next = safeNext(form?.get('next'))
-  const password = process.env.BETA_PASSWORD
+  const password = process.env.BETA_PASSWORD || process.env.FDS_PASSWORD
 
   const ok = !!password && safeEqual(await betaToken(given), await betaToken(password))
   const to = new URL(next, request.url)
