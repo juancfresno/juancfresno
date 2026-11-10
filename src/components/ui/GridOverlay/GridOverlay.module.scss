@@ -28,6 +28,31 @@
   border-inline: 1px solid rgba(255, 92, 30, 0.35);
 }
 
+// WIP landing: header/footer chrome margin (container-chrome), two dashed guides.
+// On phones chrome = content margin, so they are hidden there.
+.chrome {
+  @include container-chrome;
+  position: fixed;
+  inset: 0;
+  box-sizing: border-box;
+  @include respond-to(md) { display: none; }
+}
+
+.chromeIn {
+  position: relative;
+  height: 100%;
+
+  i {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 0;
+    border-left: 1px dashed rgba(255, 92, 30, 0.5);
+    &:first-child { left: 0; }
+    &:last-child { right: 0; }
+  }
+}
+
 .badge {
   position: fixed;
   top: calc(#{$nav-height} + #{$space-3});

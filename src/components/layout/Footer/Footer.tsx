@@ -52,6 +52,13 @@ export default function Footer() {
     <footer className={s.footer} {...(WIP ? { 'data-in': 'rise', 'data-wire': 'FOOTER', style: { '--in-d': '480ms' } as CSSProperties } : {})}>
       <div className={clsx(s.inner, WIP && s.wip)}>
 
+        <div className={s.top}>
+          {WIP && (
+            <span className={s.availability}>
+              <i className={s.dot} aria-hidden="true" />
+              {ui.wip.available}
+            </span>
+          )}
         {/* Social wordmarks */}
         <nav className={s.social} aria-label={ui.footer.socials}>
             {SOCIALS.map(({ id, label, href: url, Icon }) => (
@@ -65,6 +72,7 @@ export default function Footer() {
               />
             ))}
           </nav>
+        </div>
 
 
         {/* Divider */}

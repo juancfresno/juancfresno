@@ -8,7 +8,6 @@ import HeadlineCycle from '@/components/home/HeadlineCycle'
 import Backdrop from './Backdrop'
 import type { TrailItem } from './trail/deck'
 import EmailLink from './EmailLink'
-import Availability from './Availability'
 import Grain from './Grain'
 import Intro from './Intro'
 import s from './wip.module.scss'
@@ -56,7 +55,6 @@ export default function WipLanding({ locale }: { locale: Locale }) {
             {WIP.contact} <EmailLink email={email} />
           </span>
         </p>
-        <Availability locale={locale} />
       </header>
     </div>
   )

@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { WIP } from '@/lib/wip'
 import s from './GridOverlay.module.scss'
 
 // ─── Grid overlay ─────────────────────────────────────────────────────────────
@@ -12,6 +13,7 @@ export default function GridOverlay() {
   const [visible, setVisible] = useState(false)
   const [spec, setSpec] = useState('')
   const innerRef = useRef<HTMLDivElement>(null)
+  const chromeRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -34,7 +36,10 @@ export default function GridOverlay() {
       const cols = cs.gridTemplateColumns.split(' ').length
       const gap = Math.round(parseFloat(cs.columnGap))
       const margin = Math.round(parseFloat(cs.paddingLeft) + el.getBoundingClientRect().left)
-      setSpec(`${cols} col · ${gap} gutter · ${margin} margin`)
+      let chrome = ''
+      const ch = chromeRef.current
+      if (ch && getComputedStyle(ch).display !== 'none') chrome = ` · ${Math.round(parseFloat(getComputedStyle(ch).paddingLeft))} chrome`
+      setSpec(`${cols} col · ${gap} gutter · ${margin} margin${chrome}`)
     }
     measure()
     window.addEventListener('resize', measure)
@@ -50,6 +55,11 @@ export default function GridOverlay() {
           <span key={i} className={s.col} />
         ))}
       </div>
+      {WIP && (
+        <div ref={chromeRef} className={s.chrome}>
+          <div className={s.chromeIn}><i /><i /></div>
+        </div>
+      )}
       <div className={s.badge}>
         {spec} <span className={s.key}>G</span>
       </div>
