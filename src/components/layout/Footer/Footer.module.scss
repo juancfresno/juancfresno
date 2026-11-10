@@ -19,6 +19,7 @@
 .social {
   display: flex;
   align-items: center;
+  justify-content: flex-end; // row sits on the right margin (Juan, 10 Nov 2026)
   gap: 1.5625rem; // 25px — del Figma
   flex-wrap: wrap;
   padding-bottom: 1.5625rem;
