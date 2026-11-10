@@ -6,7 +6,7 @@
 // the content width; the readout sits under it.
 
 .arco {
-  --arco-top: #{fluid(72px)};
+  --arco-top: 72px;
   --arco-bottom: 0px;
   --arco-pin-h: calc(100svh - var(--arco-top) - var(--arco-bottom));
 

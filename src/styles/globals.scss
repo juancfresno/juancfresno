@@ -59,7 +59,6 @@ html.theme-anim, html.theme-anim * {
   --m:                max(20px, 3.8vw);           // page margin (chrome + content): 64 at 1680, ~97 at 2560, 20 on mobile
   --gutter:           max(12px, 0.952vw);         // column gap: 16 at 1680; 12 ≤ 768
   --ease-out-expo:    #{$ease-out-expo};
-  --u:                max(1px, calc(100vw / 1680)); // 1 design px: 1px up to 1680 wide, then scales with the viewport (fluid())
 }
 
 @include respond-to(md) {
