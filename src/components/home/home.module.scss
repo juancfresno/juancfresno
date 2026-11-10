@@ -33,46 +33,44 @@
   max-width: min(100%, 76.8vw);
 }
 
-// ─── "Hello" slot: width eases to the measured width of each greeting ──────
-.hello {
-  position: relative;
-  display: inline-block;
-  vertical-align: baseline;
+// ─── Headline cycle (HeadlineCycle.tsx) ──────────────────────────────────────
+// Every language's two lines sit in the same grid cell, so the block always
+// takes the size of the longest one: nothing below moves while it cycles.
+.hc {
+  display: block;
   outline: none;
-  cursor: default;
   border-radius: 2px;
-
-  &:focus-visible { box-shadow: 0 2px 0 0 $color-text; }
+  &:focus-visible .hcStage { box-shadow: 0 2px 0 0 $color-text; }
 }
 
-.helloSlot {
-  display: inline-block;
-  white-space: nowrap;
-  vertical-align: baseline;
-  transition: width 0.28s $ease-out-expo;
-
-  @media (prefers-reduced-motion: reduce) { transition: none; }
+.hcStage {
+  display: inline-grid;
+  max-width: 100%;
+  cursor: default;
+  vertical-align: top;
 }
 
-.helloMeasure {
-  position: absolute;
-  left: 0;
-  top: 0;
+.hcSet {
+  grid-area: 1 / 1;
+  display: flex;
+  flex-direction: column;
   visibility: hidden;
-  pointer-events: none;
-  white-space: nowrap;
 
-  span { position: absolute; left: 0; top: 0; }
-}
+  &[data-on] { visibility: visible; }
 
-.helloWord {
-  display: inline-block;
-
-  .hello[data-active] & {
+  .hc[data-active] &[data-on] {
     @media (prefers-reduced-motion: no-preference) {
       animation: helloIn 0.22s $ease-out-expo both;
     }
   }
+
+  // Switzer has no Cyrillic or CJK: Latin stays in Switzer (the name), the
+  // rest falls to the system fonts. No webfont is loaded for them.
+  $sys: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans', sans-serif;
+  &[data-script] > * { font-family: var(--font-switzer), $sys; }
+  &[lang='ja'] > * { font-family: var(--font-switzer), 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'Meiryo', 'Noto Sans JP', 'Noto Sans CJK JP', $sys; }
+  &[lang='zh-Hans'] > * { font-family: var(--font-switzer), 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans SC', 'Noto Sans CJK SC', $sys; }
+  &[data-script='cjk'] > * { letter-spacing: 0; }
 }
 
 @keyframes helloIn {
