@@ -19,8 +19,8 @@ $hdr: 72px;
   background: none;
   color: $color-text;
   font-family: $font-mono;
-  font-size: 10px;
-  line-height: 12px;
+  font-size: fluid(10px);
+  line-height: fluid(12px);
   letter-spacing: 0.02em;
   text-transform: uppercase;
   cursor: pointer;
@@ -37,14 +37,14 @@ $hdr: 72px;
   div { min-width: 0; }
   dt {
     font-family: $font-mono;
-    font-size: 10px;
-    line-height: 12px;
+    font-size: fluid(10px);
+    line-height: fluid(12px);
     letter-spacing: 0.02em;
     text-transform: uppercase;
     color: $color-text-mid;
     margin-bottom: 6px;
   }
-  dd { margin: 0; font-family: $font-body; font-size: 14px; line-height: 1.35; color: $color-text; }
+  dd { margin: 0; font-family: $font-body; font-size: fluid(14px); line-height: 1.35; color: $color-text; }
 }
 
 .chips {
@@ -59,8 +59,8 @@ $hdr: 72px;
     border: 1px solid $color-line;
     border-radius: 3px;
     font-family: $font-mono;
-    font-size: 10px;
-    line-height: 12px;
+    font-size: fluid(10px);
+    line-height: fluid(12px);
     letter-spacing: 0.02em;
     text-transform: uppercase;
     color: $color-text-mid;
@@ -70,8 +70,8 @@ $hdr: 72px;
 .dKind {
   margin: 0;
   font-family: $font-mono;
-  font-size: 10px;
-  line-height: 12px;
+  font-size: fluid(10px);
+  line-height: fluid(12px);
   letter-spacing: 0.03em;
   text-transform: uppercase;
   color: $color-text-hi;
@@ -143,7 +143,7 @@ $hdr: 72px;
 
 .dCount {
   font-family: $font-mono;
-  font-size: 10px;
+  font-size: fluid(10px);
   letter-spacing: 0.02em;
   color: $color-text-mid;
   b { font-weight: inherit; color: var(--c-g); }
@@ -154,7 +154,7 @@ $hdr: 72px;
   white-space: nowrap;
   text-overflow: ellipsis;
   font-family: $font-mono;
-  font-size: 10px;
+  font-size: fluid(10px);
   letter-spacing: 0.02em;
   text-transform: uppercase;
   color: $color-text;
@@ -211,7 +211,7 @@ $hdr: 72px;
 .dLead {
   margin: 0;
   font-family: $font-body;
-  font-size: 18px;
+  font-size: fluid(18px);
   line-height: 1.45;
   color: $color-text;
 }
@@ -246,7 +246,7 @@ $hdr: 72px;
 }
 .dNextLabel {
   font-family: $font-mono;
-  font-size: 10px;
+  font-size: fluid(10px);
   letter-spacing: 0.02em;
   text-transform: uppercase;
   color: $color-text-mid;
@@ -282,7 +282,7 @@ $hdr: 72px;
   gap: 14px;
   @include respond-to(md) { grid-column: 1 / -1; }
 }
-.xLead { margin: 0; font-family: $font-body; font-size: 18px; line-height: 1.45; color: $color-text; }
+.xLead { margin: 0; font-family: $font-body; font-size: fluid(18px); line-height: 1.45; color: $color-text; }
 .xFicha {
   grid-column: 7 / span 5;
   @include respond-to(md) { grid-column: 1 / -1; }
@@ -328,7 +328,7 @@ $hdr: 72px;
   gap: 16px;
   padding-top: 16px;
   font-family: $font-mono;
-  font-size: 10px;
+  font-size: fluid(10px);
   letter-spacing: 0.02em;
   text-transform: uppercase;
   color: $color-text-mid;
@@ -364,8 +364,6 @@ $hdr: 72px;
 .stGrid {
   position: absolute;
   inset: $hdr 0 0 0;
-  max-width: $page-max;
-  margin-inline: auto;
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
   column-gap: $gutter;
@@ -413,7 +411,6 @@ $hdr: 72px;
 .stLayout {
   position: absolute;
   inset: $hdr 0 0 0;
-  max-width: $page-max;
   margin-inline: auto;
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
@@ -443,8 +440,8 @@ $hdr: 72px;
 .stMono {
   margin: 0;
   font-family: $font-mono;
-  font-size: 10px;
-  line-height: 12px;
+  font-size: fluid(10px);
+  line-height: fluid(12px);
   letter-spacing: 0.03em;
   text-transform: uppercase;
   color: $color-text-mid;
@@ -462,14 +459,14 @@ $hdr: 72px;
 .stLead {
   margin: 0;
   font-family: $font-body;
-  font-size: 15px;
+  font-size: fluid(15px);
   line-height: 1.45;
   color: $color-text-mid;
   @include respond-to(md) { display: none; }
 }
 .stFicha {
   grid-template-columns: 1fr 1fr;
-  dd { font-family: $font-mono; font-size: 11px; text-transform: uppercase; letter-spacing: 0.02em; }
+  dd { font-family: $font-mono; font-size: fluid(11px); text-transform: uppercase; letter-spacing: 0.02em; }
   @include respond-to(md) { display: none; }
 }
 .stInfo > .chips { @include respond-to(md) { display: none; } }
@@ -529,8 +526,8 @@ $hdr: 72px;
   left: 0;
   top: -18px;
   font-family: $font-mono;
-  font-size: 9px;
-  line-height: 11px;
+  font-size: fluid(9px);
+  line-height: fluid(11px);
   letter-spacing: 0.04em;
   color: var(--c-g);
   opacity: 0;

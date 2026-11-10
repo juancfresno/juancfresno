@@ -401,7 +401,7 @@ const wireframeGrid: Factory = (canvas) => {
     }
 
     // Boxes.
-    g.font = `10px ${font}`
+    g.font = `${10 * Math.max(1, window.innerWidth / 1680)}px ${font}`
     const boxIn = EASE_OUT(prog(tc, pop ? 0 : WF.boxesAt, WF.boxes))
     if (tr < 0) {
       for (const b of A) box(b, b.label, boxIn, master)

@@ -1,3 +1,4 @@
+@use 'sass:math';
 // ─── Colors ───────────────────────────────────────────────────────────────────
 // Theme colors are CSS custom properties so the whole site can switch between
 // dark (default) and light at runtime via html[data-theme]. Values live in
@@ -74,12 +75,23 @@ $space-40:  10rem;
 // ─── Layout ───────────────────────────────────────────────────────────────────
 $max-width:         1440px;   // reference only; the layout is liquid (no cap)
 // One page margin for header, footer and content (tokens live in globals.scss :root):
-//   --m      clamp(20px, 3.8vw, 64px)  (64 at 1680, ~55 at 1440, 20 at 390)
-//   --gutter column gap, 16 desktop / 12 ≤ 768
+//   --m      max(20px, 3.8vw)  (64 at 1680, ~97 at 2560, 20 at 390; no max width)
+//   --gutter max(12px, 0.952vw) (16 at 1680) desktop / 12 ≤ 768
 $m:                 var(--m);
 $gutter:            var(--gutter);
-$page-max:          1680px;   // above this, content is centred
 $nav-height:        5rem;
+
+// ─── Fluid type scale ────────────────────────────────────────────────────────
+// Type is exactly as designed up to 1680 px and scales linearly above it
+// (size = max(px, px × 100vw / 1680)). Two mechanisms, same maths:
+//  1. rem values: `html` font-size is max(100%, 100vw/105) (see _reset.scss), so
+//     every rem (all $fs-* tokens, paddings, gaps, nav height) grows with it.
+//  2. px values (labels, icons, line-heights...): `fluid(11px)` → calc(11 * var(--u)),
+//     where --u = max(1px, 100vw / 1680) (globals.scss :root).
+// Never write a bare px for type or type-driven sizes: use rem or fluid().
+@function fluid($px) {
+  @return calc(#{math.div($px, 1px)} * var(--u));
+}
 
 $cols-12:           repeat(12, 1fr);
 $cols-6:            repeat(6, 1fr);
