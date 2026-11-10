@@ -1,69 +1,105 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import type { HeadlineLine } from '@/content/headline'
+import { scrambleTo } from '@/lib/scramble'
 import s from './home.module.scss'
 
-// The hero headline cycles through languages on hover (or keyboard focus):
-// BOTH lines change together, every STEP ms, and go back to the page's own
-// language on leave. On touch each tap moves to the next language. Reduced
-// motion = static. `lines[0]` is the page's own locale (its dictionary).
-// - Layout: all languages are rendered in one grid cell (only the current one
-//   visible), so the block keeps the size of the longest: no jumps below and
-//   no width changes while cycling.
-// - Screen readers and SEO get only the real heading (lines[0], visually
-//   hidden); the visual sets are aria-hidden, no live region.
-// - Each set carries its `lang`; Cyrillic and CJK fall back to system fonts
-//   (home.module.scss .hcSet), no extra webfont.
-// The caller owns the <h1>; aClass / bClass style the two lines.
-const STEP = 450
+// The hero's first line ("Hello! I'm Juan C. Fresno,") cycles through
+// languages on hover / keyboard focus, and one step per tap on touch. Each
+// change is a decode (lib/scramble.ts, the nav-hover family): glyphs of the
+// target script resolve left to right in DECODE ms, then the line holds.
+// Leaving goes back to the page's own language. The role line is NOT part
+// of this: it stays in the page locale (the caller renders it).
+// - Layout: every language's line is laid out invisibly in one grid cell, so
+//   the slot keeps the size of the longest greeting: nothing moves.
+// - Screen readers / SEO: only the real line (lines[0]) in a visually hidden
+//   span; the visual part is aria-hidden, no live region.
+// - Entrance (WIP intro, html[data-intro]): the line builds with the same
+//   decode on first load (FastIntro shorter).
+// - Reduced motion: plain swaps, no decode, no entrance build.
+const DECODE = 420
+const HOLD = 700
 
-export default function HeadlineCycle({
-  lines, aClass, bClass, sep = ' ',
-}: { lines: HeadlineLine[]; aClass: string; bClass: string; sep?: string }) {
-  const [i, setI] = useState(0)
-  const [active, setActive] = useState(false)
-  const reduce = useRef(false)
-  const timer = useRef(0)
-  const n = lines.length
+export default function HeadlineCycle({ lines, className }: { lines: HeadlineLine[]; className: string }) {
+  const live = useRef<HTMLSpanElement>(null)
 
   useEffect(() => {
-    reduce.current = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  }, [])
+    const el = live.current!
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const n = lines.length
+    let cur = 0
+    let cancel: (() => void) | null = null
+    let timer = 0
 
-  useEffect(() => {
-    if (!active || reduce.current) return
-    setI((k) => (k + 1) % n)
-    timer.current = window.setInterval(() => setI((k) => (k + 1) % n), STEP)
-    return () => window.clearInterval(timer.current)
-  }, [active, n])
+    const paint = (k: number) => {
+      el.lang = lines[k].lang
+      if (lines[k].script) el.dataset.script = lines[k].script
+      else delete el.dataset.script
+    }
+    const go = (k: number, ms = DECODE, from = el.textContent || '') => {
+      cancel?.()
+      cur = k
+      paint(k)
+      if (reduce) { el.textContent = lines[k].a; return }
+      cancel = scrambleTo(el, from, lines[k].a, ms)
+    }
+    const loop = () => {
+      go((cur + 1) % n)
+      timer = window.setTimeout(loop, DECODE + HOLD)
+    }
+    const start = () => { window.clearTimeout(timer); loop() }
+    const stop = () => { window.clearTimeout(timer); if (cur !== 0) go(0) }
 
-  const start = () => { if (!reduce.current) setActive(true) }
-  const stop = () => { setActive(false); setI(0) }
+    // Entrance: the WIP intro builds the line from noise.
+    const intro = document.documentElement.dataset.intro
+    if ((intro === 'full' || intro === 'fast') && !reduce) {
+      const fast = intro === 'fast'
+      const len = Array.from(lines[0].a).length
+      el.textContent = ''
+      const t = window.setTimeout(() => {
+        el.dataset.run = ''
+        go(0, fast ? 320 : 620, ' '.repeat(len))
+      }, fast ? 90 : 260)
+      const skip = () => { window.clearTimeout(t); cancel?.(); el.dataset.run = ''; el.textContent = lines[0].a }
+      window.addEventListener('wip:intro-skip', skip, { once: true })
+      timer = t
+    } else {
+      el.dataset.run = ''
+    }
+
+    const host = el.parentElement!
+    const wrap = host.parentElement!
+    const onEnter = (e: PointerEvent) => { if (e.pointerType === 'mouse') start() }
+    const onLeave = (e: PointerEvent) => { if (e.pointerType === 'mouse') stop() }
+    const onUp = (e: PointerEvent) => { if (e.pointerType !== 'mouse') go((cur + 1) % n) }
+    // Keyboard focus cycles; a tap also focuses, but touch = one step per tap.
+    const onFocus = () => { if (wrap.matches(':focus-visible')) start() }
+    const onBlur = () => stop()
+    host.addEventListener('pointerenter', onEnter)
+    host.addEventListener('pointerleave', onLeave)
+    host.addEventListener('pointerup', onUp)
+    wrap.addEventListener('focus', onFocus)
+    wrap.addEventListener('blur', onBlur)
+    return () => {
+      cancel?.()
+      window.clearTimeout(timer)
+      host.removeEventListener('pointerenter', onEnter)
+      host.removeEventListener('pointerleave', onLeave)
+      host.removeEventListener('pointerup', onUp)
+      wrap.removeEventListener('focus', onFocus)
+      wrap.removeEventListener('blur', onBlur)
+    }
+  }, [lines])
 
   return (
-    <span
-      className={s.hc}
-      tabIndex={0}
-      // Keyboard focus cycles; a tap also focuses, but touch = one step per tap.
-      onFocus={(e) => { if (e.currentTarget.matches(':focus-visible')) start() }}
-      onBlur={stop}
-      data-active={active || i > 0 || undefined}
-    >
-      <span className={s.srOnly}>{lines[0].a}{sep}{lines[0].b}</span>
-      <span
-        className={s.hcStage}
-        aria-hidden="true"
-        onPointerEnter={(e) => { if (e.pointerType === 'mouse') start() }}
-        onPointerLeave={(e) => { if (e.pointerType === 'mouse') stop() }}
-        onPointerUp={(e) => { if (e.pointerType !== 'mouse' && !reduce.current) setI((k) => (k + 1) % n) }}
-      >
-        {lines.map((l, k) => (
-          <span key={l.lang} lang={l.lang} className={s.hcSet} data-on={k === i || undefined} data-script={l.script}>
-            <span className={aClass}>{l.a}</span>
-            <span className={bClass}>{l.b}</span>
-          </span>
+    <span className={`${s.hc} ${className}`} tabIndex={0}>
+      <span className={s.srOnly}>{lines[0].a}</span>
+      <span className={s.hcStage} aria-hidden="true">
+        {lines.map((l) => (
+          <span key={l.lang} lang={l.lang} className={s.hcSizer} data-script={l.script}>{l.a}</span>
         ))}
+        <span ref={live} lang={lines[0].lang} className={s.hcLive}>{lines[0].a}</span>
       </span>
     </span>
   )

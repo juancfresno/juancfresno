@@ -34,13 +34,13 @@
 }
 
 // ─── Headline cycle (HeadlineCycle.tsx) ──────────────────────────────────────
-// Every language's two lines sit in the same grid cell, so the block always
-// takes the size of the longest one: nothing below moves while it cycles.
+// Every language's first line sits invisibly in the same grid cell as the
+// live one, so the slot keeps the size of the longest greeting: no jumps.
 .hc {
   display: block;
   outline: none;
   border-radius: 2px;
-  &:focus-visible .hcStage { box-shadow: 0 2px 0 0 $color-text; }
+  &:focus-visible .hcStage { box-shadow: 0 2px 0 0 currentColor; }
 }
 
 .hcStage {
@@ -50,32 +50,35 @@
   vertical-align: top;
 }
 
-.hcSet {
-  grid-area: 1 / 1;
-  display: flex;
-  flex-direction: column;
-  visibility: hidden;
+.hcSizer,
+.hcLive { grid-area: 1 / 1; }
 
-  &[data-on] { visibility: visible; }
+// When a longer language needs two lines (phones), the spare line goes ABOVE
+// the greeting, so it always sits tight on the role.
+.hcLive { align-self: end; }
 
-  .hc[data-active] &[data-on] {
-    @media (prefers-reduced-motion: no-preference) {
-      animation: helloIn 0.22s $ease-out-expo both;
-    }
-  }
+.hcSizer { visibility: hidden; }
 
-  // Switzer has no Cyrillic or CJK: Latin stays in Switzer (the name), the
-  // rest falls to the system fonts. No webfont is loaded for them.
-  $sys: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans', sans-serif;
-  &[data-script] > * { font-family: var(--font-switzer), $sys; }
-  &[lang='ja'] > * { font-family: var(--font-switzer), 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'Meiryo', 'Noto Sans JP', 'Noto Sans CJK JP', $sys; }
-  &[lang='zh-Hans'] > * { font-family: var(--font-switzer), 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans SC', 'Noto Sans CJK SC', $sys; }
-  &[data-script='cjk'] > * { letter-spacing: 0; }
+// Desktop: the live line never wraps (noise can be a little wider than the
+// text it becomes); it may overhang its slot for a frame, never push.
+@media (min-width: 769px) { .hcLive { white-space: nowrap; } }
+
+// WIP intro: the line stays hidden until the decode starts (JS sets
+// data-run); a CSS safety net shows it anyway after 1.4 s.
+:global(html[data-intro='full']) .hcLive:not([data-run]),
+:global(html[data-intro='fast']) .hcLive:not([data-run]) {
+  opacity: 0;
+  animation: hcSafety 0s linear 1.4s forwards;
 }
+@keyframes hcSafety { to { opacity: 1; } }
 
-@keyframes helloIn {
-  from { opacity: 0; transform: translateY(0.12em); filter: blur(2px); }
-}
+// Switzer has no Cyrillic or CJK: Latin stays in Switzer (the name), the rest
+// falls to the system fonts. No webfont is loaded for them.
+$sys: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans', sans-serif;
+.hcSizer[data-script], .hcLive[data-script] { font-family: var(--font-switzer), $sys; }
+.hcSizer[lang='ja'], .hcLive[lang='ja'] { font-family: var(--font-switzer), 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'Meiryo', 'Noto Sans JP', 'Noto Sans CJK JP', $sys; }
+.hcSizer[lang='zh-Hans'], .hcLive[lang='zh-Hans'] { font-family: var(--font-switzer), 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans SC', 'Noto Sans CJK SC', $sys; }
+.hcSizer[data-script='cjk'], .hcLive[data-script='cjk'] { letter-spacing: 0; }
 
 .disciplines {
   margin-top: 44px;
