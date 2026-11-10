@@ -64,24 +64,46 @@ export const caseMedia = (slug: string) => M[slug]
 export const SHOW_NDA = false
 
 // ─── Index (Work · v0, newest first) ──────────────────────────────────────────
+// Order rule (Juan, 10 Nov 2026; final list by Diseño in refs/casos-orden.md):
+// by the ficha year, newest first; ties by Behance publish date (or gallery
+// id); Biako Posters always last. NDA rows sit by year (hidden). Numbers, Next
+// links and projectTotal() follow this array.
 // Home selections (Arco, short index) are ARCO / FEATURED below.
 const ALL_PROJECTS = [
   { slug: 'signflow', year: '2026', caseStudy: true, featured: true },
+  { slug: 'drip', year: '2026', caseStudy: true },
+  { slug: 'likitech', year: '2025', caseStudy: true, featured: true },
   { slug: 'access', year: '2025', caseStudy: true },
   { slug: 'educa-projects', year: '2025', caseStudy: true },
-  { slug: 'likitech', year: '2025', caseStudy: true, featured: true },
+  { slug: 'entradium', year: '2025', caseStudy: true },
+  { slug: 'wubalu', year: '2025', caseStudy: true },
   { slug: 'nda-banca', year: '2024', nda: true },
-  { slug: 'dinamo', year: '2024', caseStudy: true, featured: true },
   { slug: 'bonamar', year: '2024', caseStudy: true },
   { slug: 'awen', year: '2024', caseStudy: true },
+  { slug: 'dinamo', year: '2024', caseStudy: true, featured: true },
   { slug: 'correos', year: '2024', caseStudy: true },
   { slug: 'selected-logos', year: '2024', caseStudy: true },
+  { slug: 'workout-app', year: '2023', caseStudy: true },
   { slug: 'casa-carbon', year: '2022', caseStudy: true, featured: true },
   { slug: 'nda-moda', year: '2022', nda: true },
   { slug: 'nda-energia', year: '2021', nda: true },
+  { slug: '15-bodegas-web', year: '2021', caseStudy: true },
+  { slug: '15-bodegas-branding', year: '2021', caseStudy: true },
+  { slug: 'dior-backstage', year: '2020', caseStudy: true },
+  { slug: 'hm', year: '2020', caseStudy: true },
+  { slug: 'roadis', year: '2020', caseStudy: true },
+  { slug: 'bunkr-app', year: '2020', caseStudy: true },
+  { slug: 'bunkr-branding', year: '2019', caseStudy: true },
+  { slug: 'murmur', year: '2019', caseStudy: true },
+  { slug: 'icommunity', year: '2018', caseStudy: true },
+  { slug: 'erare', year: '2018', caseStudy: true },
   { slug: 'shoeciety', year: '2018', caseStudy: true, featured: true, personal: true },
-  { slug: 'google', year: '2016', caseStudy: true, featured: true, personal: true },
+  { slug: 'push-for-burger', year: '2018', caseStudy: true },
   { slug: 'super-nintendo', year: '2016', caseStudy: true, personal: true },
+  { slug: 'madrid-buildings', year: '2016', caseStudy: true, personal: true },
+  { slug: 'google', year: '2016', caseStudy: true, featured: true, personal: true },
+  // Biako (Juan's art project) always closes the list, whatever its year.
+  { slug: 'biako-poster', year: '2024', caseStudy: true, personal: true },
 ] as const satisfies readonly ProjectBase[]
 
 export type ProjectSlug = (typeof ALL_PROJECTS)[number]['slug']
@@ -108,7 +130,9 @@ export const isPersonal = (slug: string) => !!VISIBLE.find((p) => p.slug === slu
 export const creditsLine = (l: Locale, slug: string, c: Case) => {
   const t = getUi(l).case
   const parts = [`${t.cDesign}: Juan C. Fresno`]
-  if (isPersonal(slug)) parts.push(t.cPersonal)
+  // Personal projects: "Personal project" (or the ficha client when it extends
+  // it, e.g. "Personal project · Biako").
+  if (isPersonal(slug)) parts.push(c.ficha.client.startsWith(t.cPersonal) ? c.ficha.client : t.cPersonal)
   else {
     if (c.ficha.via) parts.push(`${t.cStudio}: ${c.ficha.via}`)
     parts.push(`${t.cClient}: ${c.ficha.client}`)

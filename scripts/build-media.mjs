@@ -16,8 +16,12 @@
 //
 // The image order and count of each case follow its "Behance · bloque" in
 // Figma (file AXxkCCuckrXGKDUCk8lNyQ, page ↪ Casos). Dropped there, dropped
-// here: Dinamo without its 12th image, Google without its 17th. GIFs use the
-// first frame, as in Figma.
+// here: Dinamo without its 12th image, Google without its 17th, and the pure
+// "Thanks for watching" slides of the Behance imports (DROP below). GIFs use
+// the first frame, as in Figma.
+//
+//   ONLY=murmur,drip node scripts/build-media.mjs cases   rebuild some slugs,
+//   keeping every other entry of cases-media.json (and its files) as it is.
 
 import fs from 'node:fs'
 import path from 'node:path'
@@ -65,10 +69,24 @@ function caseFiles(slug) {
   imgs = [...imgs].sort((a, b) => a.order - b.order)
   if (slug === 'dinamo') imgs = imgs.slice(0, 11)
   if (slug === 'google') imgs = imgs.slice(0, 16)
+  if (DROP[slug]) imgs = imgs.filter((i) => !DROP[slug].includes(i.order))
   return imgs.map((i) => gif(dir, i.file))
 }
 
-const CASE_SLUGS = ['shoeciety', 'signflow', 'likitech', 'access', 'educa-projects', 'dinamo', 'bonamar', 'awen', 'correos', 'selected-logos', 'casa-carbon', 'google', 'super-nintendo']
+// Behance order numbers of pure "Thanks for watching" slides (dropped in Figma).
+const DROP = { '15-bodegas-web': [10], '15-bodegas-branding': [10], 'bunkr-branding': [12], 'push-for-burger': [11] }
+
+// Cover = image 01 unless a cleaner one is set here (1-based, after DROP).
+// Bunkr: 01 is a text slide over a photo; 07 is the wordmark on black.
+const COVER = { 'bunkr-branding': 7 }
+
+const CASE_SLUGS = [
+  'shoeciety', 'signflow', 'likitech', 'access', 'educa-projects', 'dinamo', 'bonamar', 'awen', 'correos', 'selected-logos', 'casa-carbon', 'google', 'super-nintendo',
+  // Behance imports, 10 Nov 2026 (refs/casos-nuevos-grupo1.md, grupo2.md)
+  'murmur', 'dior-backstage', 'hm', 'workout-app', 'drip', 'wubalu', 'entradium', '15-bodegas-web', '15-bodegas-branding',
+  'bunkr-app', 'bunkr-branding', 'roadis', 'push-for-burger', 'icommunity', 'erare', 'madrid-buildings', 'biako-poster',
+]
+const ONLY = process.env.ONLY ? process.env.ONLY.split(',').map((x) => x.trim()) : null
 
 async function buildCases() {
   const outJSON = path.join(ROOT, 'src/content/generated/cases-media.json')
@@ -76,6 +94,7 @@ async function buildCases() {
   const result = {}
   let total = 0
   for (const slug of CASE_SLUGS) {
+    if (ONLY && !ONLY.includes(slug)) { result[slug] = prev[slug]; continue }
     const files = caseFiles(slug)
     if (!files) { result[slug] = prev[slug]; console.log(`skip ${slug} (no source, kept previous)`); continue }
     const outDir = path.join(ROOT, 'public/work', slug)
@@ -87,7 +106,7 @@ async function buildCases() {
       total += r.bytes
       images.push({ src: `/work/${slug}/${name}`, w: r.w, h: r.h })
     }
-    const c = await toWebp(files[0], path.join(outDir, 'cover.webp'), 800, 76)
+    const c = await toWebp(files[(COVER[slug] ?? 1) - 1], path.join(outDir, 'cover.webp'), 800, 76)
     total += c.bytes
     result[slug] = { cover: { src: `/work/${slug}/cover.webp`, w: c.w, h: c.h }, images }
     console.log(`${slug}: ${images.length} images`)
