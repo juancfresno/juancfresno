@@ -33,29 +33,6 @@ const LENS: Record<string, { c0: number; k2: number; k4: number; vig: number; ca
   lens4: { c0: 0.4, k2: 1.6, k4: 1.6, vig: 0.62, ca: 3 },
 }
 
-// Lens tile size in CSS px for a viewport width (same formula as draw()).
-export function lensTileCss(mode: OrbMode, W: number): [number, number] {
-  const ln = LENS[mode] ?? LENS.lens
-  const tw = Math.max(W, 900) * 1.6 * (ln.c0 / 0.72)
-  return [tw, tw * (TILE.rows / TILE.cols)]
-}
-
-// ?start=dense (preview variant, 10 Nov 2026): where the lens camera starts,
-// as a fraction of the tile. Picked by luminance, not by eye: the slot
-// thumbnails (public/feed/t, cover-cropped as in the atlas; slots that cross
-// the tile edge left out, since the atlas upload below never draws them) were
-// composited into one tile luminance map and every camera (a, b) on a 12 px
-// grid was scored at 1920 × 1080 through lens 1 and the dense veil: visible
-// coverage and number of pieces up; pale area (relative luminance > 0.35),
-// the 98th-percentile seen luminance and anything pale behind the copy or the
-// top-right wordmark down; a little saturation up. Winner a = 816, b = 852 px
-// of a 3072 × 2508 tile (default 0, 0): Awen naming (L 0.03) big under the
-// copy, Awen stickers, Creative assets and Music player UI (dark) around it,
-// Drip and PlayerUp on the right; 10 pieces in view vs 4, pale area 10 % vs
-// 30 %, p98 0.33 vs 0.51, nothing pale behind the copy (1 % vs 5 %). As
-// fractions it holds for any width ≥ 900 px.
-export const DENSE_START = { a: 816 / 3072, b: 852 / 2507.75 }
-
 export type OrbFrame = {
   mode: OrbMode
   a: number; b: number // sphere: yaw, pitch · tunnel: angle (turns), depth · lens: camera x, y (CSS px)
@@ -199,8 +176,9 @@ export function createOrb(canvas: HTMLCanvasElement, items: FeedItem[], small: b
 
   const L = makeLayout(items, 1680)
   const jobs = TILE.slots.map((sl, s) => {
-    const x = Math.round(sl.x * unit), y = Math.round(sl.y * unit)
-    const w = Math.round(sl.w * unit) - gutter, h = Math.round(sl.h * unit) - gutter
+    // Origin wrapped into the tile (the atlas is one tile, sampled with REPEAT).
+    const x = ((Math.round(sl.x * unit) % AW) + AW) % AW, y = ((Math.round(sl.y * unit) % AH) + AH) % AH
+    const w = Math.min(AW, Math.round(sl.w * unit) - gutter), h = Math.min(AH, Math.round(sl.h * unit) - gutter)
     const it = items[L.piece(0, s)]
     return { x, y, w, h, it, src: Math.max(w, h) > 620 ? it.src : `/feed/t/${it.id}.webp` }
   })
@@ -208,6 +186,29 @@ export function createOrb(canvas: HTMLCanvasElement, items: FeedItem[], small: b
   jobs.sort((a, b) => b.w * b.h - a.w * a.h)
   const scratch = document.createElement('canvas')
   const sctx = scratch.getContext('2d')!
+  // The atlas is exactly one tile and the shader samples it with REPEAT, so a
+  // piece that crosses the tile's right / bottom edge (9 of the 30 slots) is
+  // split into the 2 or 4 parts that wrap to the opposite edges: each atlas
+  // texel is written once, no padding, no seam, no duplicated halves.
+  const part = document.createElement('canvas')
+  const pctx = part.getContext('2d')!
+  const upload = (x: number, y: number, w: number, h: number) => {
+    for (const ox of [0, AW]) for (const oy of [0, AH]) {
+      // Part of the piece that lands in [0, AW) × [0, AH) after shifting by −ox, −oy.
+      const dx0 = Math.max(0, x - ox), dy0 = Math.max(0, y - oy)
+      const dx1 = Math.min(AW, x + w - ox), dy1 = Math.min(AH, y + h - oy)
+      if (dx1 <= dx0 || dy1 <= dy0) continue
+      const pw = dx1 - dx0, ph = dy1 - dy0
+      const sx = dx0 + ox - x, sy = dy0 + oy - y
+      if (sx === 0 && sy === 0 && pw === w && ph === h) {
+        gl.texSubImage2D(gl.TEXTURE_2D, 0, dx0, dy0, gl.RGBA, gl.UNSIGNED_BYTE, scratch)
+      } else {
+        part.width = pw; part.height = ph
+        pctx.drawImage(scratch, sx, sy, pw, ph, 0, 0, pw, ph)
+        gl.texSubImage2D(gl.TEXTURE_2D, 0, dx0, dy0, gl.RGBA, gl.UNSIGNED_BYTE, part)
+      }
+    }
+  }
   let next = 0, inflight = 0, dead = false, mipDirty = false, lastMip = 0, loaded = 0
   const pump = () => {
     while (!dead && inflight < 4 && next < jobs.length) {
@@ -222,7 +223,7 @@ export function createOrb(canvas: HTMLCanvasElement, items: FeedItem[], small: b
         const [u0, v0, us, vs] = coverUv(im.naturalWidth, im.naturalHeight, j.w, j.h)
         sctx.drawImage(im, u0 * im.naturalWidth, v0 * im.naturalHeight, us * im.naturalWidth, vs * im.naturalHeight, 0, 0, j.w, j.h)
         gl.bindTexture(gl.TEXTURE_2D, tex)
-        gl.texSubImage2D(gl.TEXTURE_2D, 0, j.x, j.y, gl.RGBA, gl.UNSIGNED_BYTE, scratch)
+        upload(j.x, j.y, j.w, j.h)
         mipDirty = true
         loaded++
         onChange()
