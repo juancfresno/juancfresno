@@ -1,36 +1,28 @@
 @use '../../styles/variables' as *;
 @use '../../styles/mixins' as *;
 
-// 404 · "No signal". A TV is dark in any theme, so the stage uses the brand
-// constants ($raw-ink / $raw-pearl), not the themed --c-* tokens; the only
-// themed colour is the G orange of the live dot (--c-g).
+// 404 · "No signal" (Figma 6957:9370). A TV is dark in any theme, so the
+// stage uses the brand constants ($raw-ink / $raw-pearl); the chrome takes the
+// dark tokens through html[data-nosignal] (globals.scss).
 
 $plate: rgba($raw-ink, 0.88);
-$hud-bg: rgba($raw-ink, 0.78);
-$text-mid: rgba($raw-pearl, 0.72);
-$text-low: rgba($raw-pearl, 0.56);
-$rule: rgba($raw-pearl, 0.16);
-$tear-r: rgba(255, 46, 84, 0.85);  // same red as the canvas tear lines
+$tint: #ddedff; // "/404" and "/" (Figma; = the dark --c-text-hi)
+$tear-r: rgba(255, 46, 84, 0.85); // same red as the canvas tear lines
 $tear-b: rgba(52, 128, 255, 0.85); // same blue
 
 .stage {
-  --tear-x: 0px;
   position: relative;
-  box-sizing: border-box;
-  display: grid;
-  place-items: center;
-  min-height: calc(100svh - 122px); // footer ≈ 122 px, as the WIP landing
-  padding: calc(72px + 56px) $gutter 72px; // header 72 + HUD row
+  flex: 1;
+  min-height: calc(100svh - 122px); // footer ≈ 122 px
   color: $raw-pearl;
   isolation: isolate;
 
   @include respond-to(md) {
     min-height: calc(100svh - 160px - var(--tabbar-h, 0px));
-    padding: calc(72px + 48px) 16px 64px;
   }
 }
 
-// ─── Snow: fixed, full viewport, low-res buffer scaled up ───────────────────
+// ─── Snow: fixed, full viewport (under header and footer too) ────────────────
 .snow {
   position: fixed;
   inset: 0;
@@ -44,7 +36,7 @@ $tear-b: rgba(52, 128, 255, 0.85); // same blue
   pointer-events: none;
 }
 
-// Scanlines (1 px dark every 3 px) + vignette, on top of the snow.
+// Scanlines (1 px dark every 3 px) + vignette 75 % × 70 % (Figma), over the snow.
 .screen {
   position: fixed;
   inset: 0;
@@ -55,125 +47,119 @@ $tear-b: rgba(52, 128, 255, 0.85); // same blue
     repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0.32) 0 1px, transparent 1px 3px);
 }
 
-// ─── HUD: mono chips. Top-left: channel + time, timecode under it (the
-// top-right corner belongs to the vertical FRESNO wordmark). Bottom corners:
-// "no input" / "signal 0%". ──────────────────────────────────────────────────
-.hud {
-  position: absolute;
-  inset: calc(72px + 16px) $gutter 16px;
-  pointer-events: none;
-
-  > span {
-    position: absolute;
-    padding: 4px 6px;
-    background: $hud-bg;
-    font-family: $font-mono;
-    font-size: 11px;
-    line-height: 1;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: $text-mid;
-    white-space: nowrap;
-    font-variant-numeric: tabular-nums;
-  }
-
-  @include respond-to(md) {
-    inset: calc(72px + 12px) 16px 12px;
-    > span { font-size: 10px; }
-  }
+// The footer has no band of its own here: the snow runs under it. Its muted
+// meta (clock, coordinates) takes the Figma tertiary so it reads on the snow.
+:global(html[data-nosignal]) footer {
+  --c-text-muted: #a9aea9;
+  background: transparent;
 }
-.tl { top: 0; left: 0; }
-.tc { top: 26px; left: 0; }
-.bl { bottom: 0; left: 0; }
-.br { bottom: 0; right: 0; }
 
-// ─── Error card ─────────────────────────────────────────────────────────────
+// ─── Plate: flush right, centred in the area between header (72) and footer.
+// One row: /404 · line · / BACK HOME ↘ (Figma: padding 24 / 40, gap 32). ───
 .card {
-  position: relative;
-  box-sizing: border-box;
-  width: min(100%, 760px);
-  padding: 40px 48px 44px;
+  --tear-x: 0px;
+  position: absolute;
+  right: 0;
+  top: calc(36px + 50%);
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  padding: 24px 40px;
   background: $plate;
-  border: 1px solid $rule;
-  font-family: $font-mono;
-  transform: translateX(var(--tear-x));
-
-  @include respond-to(md) { padding: 24px 20px 28px; }
+  transform: translate(var(--tear-x), -50%);
 }
 
 .code {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin: 0 0 24px;
-  font-size: 12px;
-  line-height: 1;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: $text-mid;
-}
-
-.dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--c-g);
-  animation: blink 1s steps(1, end) infinite;
-  @media (prefers-reduced-motion: reduce) { animation: none; }
-}
-@keyframes blink { 50% { opacity: 0.15; } }
-
-.title {
-  margin: 0 0 0 -0.04em;
-  font-family: $font-mono;
+  margin: 0;
+  font-family: $font-body;
   font-weight: 400;
-  font-size: clamp(3rem, 1.6rem + 6vw, 8rem); // 48 → 128 px
-  line-height: 0.9;
-  letter-spacing: -0.04em;
-  text-transform: uppercase;
-  color: $raw-pearl;
+  font-size: 24px;
+  line-height: 46px;
+  letter-spacing: -0.02em; // -0.48 px
+  color: $tint;
   white-space: nowrap;
 }
 
 .line {
-  margin: 28px 0 0;
-  max-width: 40ch;
-  font-size: clamp(0.875rem, 0.8rem + 0.3vw, 1.0625rem); // 14 → 17 px
-  line-height: 1.5;
-  color: $text-mid;
-  text-wrap: pretty;
+  margin: 0;
+  font-family: $font-body;
+  font-size: 14px;
+  line-height: 1.4;
+  color: $raw-pearl;
+  white-space: nowrap;
 }
 
-.links {
+.actions {
   display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin: 32px 0 0;
+  align-items: center;
+  gap: 32px;
+  margin: 0;
 }
 
+.slash {
+  font-family: $font-body;
+  font-size: 24px;
+  line-height: 46px;
+  letter-spacing: -0.02em;
+  color: $tint;
+}
+
+// web/nav-link: mono 11/13, chip on hover/focus (brand blue, ink text).
 .link {
   @include touch-target;
-  display: inline-block;
-  padding: 10px 14px;
-  border: 1px solid rgba($raw-pearl, 0.32);
-  font-size: 12px;
-  line-height: 1;
-  letter-spacing: 0.06em;
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-family: $font-mono;
+  font-size: 11px;
+  line-height: 13px;
   text-transform: uppercase;
   color: $raw-pearl;
   text-decoration: none;
+  white-space: nowrap;
   transition: background-color 160ms ease, color 160ms ease;
 
-  &:hover, &:focus-visible { background: $raw-pearl; color: $raw-ink; }
-  &:focus-visible { outline: 1px solid $raw-pearl; outline-offset: 3px; }
+  &:hover, &:focus-visible { background: $raw-chip; color: $raw-ink; }
+  &:focus-visible { outline: 1px solid $raw-chip; outline-offset: 2px; }
 }
 
-// ─── During a tear: the card slips sideways, the heading splits R / B ───────
-.stage[data-tear] {
-  .title { text-shadow: -3px 0 $tear-r, 3px 0 $tear-b; }
-  .line, .code { text-shadow: -1px 0 $tear-r, 1px 0 $tear-b; }
+.srOnly { @include visually-hidden; }
+
+// ─── Mobile: the row does not fit; the plate keeps the right edge and stacks,
+// right-aligned like the Figma text. ──────────────────────────────────────────
+@include respond-to(md) {
+  .card {
+    left: 16px;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 12px;
+    padding: 20px 24px;
+  }
+  .code { line-height: 1.2; }
+  .line { white-space: normal; text-align: right; text-wrap: pretty; }
+  .actions { gap: 16px; }
+  .slash { line-height: 1; }
+}
+
+// ─── During an ambient tear: the plate slips sideways, the text splits R / B ─
+.card[data-tear] {
+  .code, .slash { text-shadow: -3px 0 $tear-r, 3px 0 $tear-b; }
+  .line, .link { text-shadow: -1px 0 $tear-r, 1px 0 $tear-b; }
+}
+
+// ─── Page-wide burst (pageGlitch.ts): red / blue copies of the chrome and
+// the plate, --ns-split px apart. ─────────────────────────────────────────────
+:global(html[data-ns-rgb]) {
+  :global([data-site-header]),
+  footer,
+  .card {
+    filter:
+      drop-shadow(calc(var(--ns-split, 12px) * -1) 0 0 rgba(255, 30, 70, 0.9))
+      drop-shadow(var(--ns-split, 12px) 0 0 rgba(40, 110, 255, 0.9));
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .card { transform: none; }
+  .card { transform: translateY(-50%); }
 }

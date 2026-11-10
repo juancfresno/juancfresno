@@ -207,14 +207,10 @@ export const UI_EN = {
   // 404 · "No signal" (components/notfound/NoSignal): a TV with no input.
   notFound: {
     title: 'Not found',
-    code: 'Error 404',
-    heading: 'No signal',
+    code: '/404',
     line: 'This page isn’t broadcasting. Probably something I cut.',
     home: 'Back home ↘',
     work: 'See work ↘',
-    channel: 'CH 404',
-    input: 'No input',
-    signal: 'Signal 0%',
   },
 }
 

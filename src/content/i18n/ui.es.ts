@@ -205,13 +205,9 @@ export const UI_ES: UiDict = {
   },
   notFound: {
     title: 'No encontrado',
-    code: 'Error 404',
-    heading: 'Sin señal',
+    code: '/404',
     line: 'Esta página no emite. Seguramente algo que corté.',
     home: 'Volver al inicio ↘',
     work: 'Ver proyectos ↘',
-    channel: 'CH 404',
-    input: 'Sin entrada',
-    signal: 'Señal 0 %',
   },
 }

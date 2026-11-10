@@ -14,6 +14,8 @@
 // Tears arrive at random 0.6–3 s apart and last 1–6 frames; each frame of a
 // tear re-jitters its bands. onTear(dx) lets the page nudge the text.
 // Reduced motion: one still frame, no tears. Hidden tab: the loop stops.
+// kick(frames, power) forces a heavy tear now (the page-wide glitch bursts in
+// pageGlitch.ts call it so the snow tears with the rest of the screen).
 
 export type NoSignalHooks = {
   /** Horizontal text offset in css px while a tear is on (0 = none). */
@@ -45,9 +47,11 @@ const COLOURS: [number, number, number][] = [
 const rand = (a: number, b: number) => a + Math.random() * (b - a)
 const randInt = (a: number, b: number) => Math.floor(rand(a, b + 1))
 
-export function startNoSignal(canvas: HTMLCanvasElement, hooks: NoSignalHooks = {}) {
+export type NoSignal = (() => void) & { kick: (frames: number, power: number) => void }
+
+export function startNoSignal(canvas: HTMLCanvasElement, hooks: NoSignalHooks = {}): NoSignal {
   const g = canvas.getContext('2d', { alpha: false })
-  if (!g) return () => {}
+  if (!g) return Object.assign(() => {}, { kick: () => {} })
 
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches
   let w = 0
@@ -81,15 +85,18 @@ export function startNoSignal(canvas: HTMLCanvasElement, hooks: NoSignalHooks = 
   let tearLeft = 0 // frames left in the current tear
   let nextTear = 0 // timestamp of the next one
 
+  // power 1 = the ambient tears; > 1 (page-wide bursts) = more, taller and
+  // wider bands.
+  let power = 1
   const planTear = () => {
     rowMode.fill(MODE_NONE)
-    const bands = randInt(1, 4)
+    const bands = randInt(1, 4) + Math.round((power - 1) * 2.5)
     for (let i = 0; i < bands; i++) {
       const r = Math.random()
       const mode = r < 0.45 ? MODE_SPLIT : r < 0.75 ? MODE_SHIFT : MODE_LINE
       const y = randInt(0, h - 1)
-      const bh = mode === MODE_LINE ? randInt(1, 2) : randInt(2, Math.max(3, Math.round(h * 0.045)))
-      const dx = randInt(2, Math.max(3, Math.round(w * 0.02))) * (Math.random() < 0.5 ? -1 : 1)
+      const bh = mode === MODE_LINE ? randInt(1, 2) : randInt(2, Math.max(3, Math.round(h * 0.045 * power)))
+      const dx = randInt(2, Math.max(3, Math.round(w * 0.02 * power))) * (Math.random() < 0.5 ? -1 : 1)
       const col = randInt(0, mode === MODE_SHIFT ? 2 : 3)
       for (let j = y; j < Math.min(h, y + bh); j++) {
         rowMode[j] = mode
@@ -181,6 +188,7 @@ export function startNoSignal(canvas: HTMLCanvasElement, hooks: NoSignalHooks = 
     if (tearLeft > 0) {
       tearLeft--
       if (tearLeft === 0) {
+        power = 1
         rowMode.fill(MODE_NONE)
         hooks.onTear?.(0)
         nextTear = t + rand(...TEAR_GAP)
@@ -218,10 +226,17 @@ export function startNoSignal(canvas: HTMLCanvasElement, hooks: NoSignalHooks = 
   addEventListener('resize', onResize)
   document.addEventListener('visibilitychange', onVisibility)
 
-  return () => {
+  const kick = (frames: number, p: number) => {
+    if (reduced || !raf) return
+    power = Math.max(power, p)
+    tearLeft = Math.max(tearLeft, frames + 1)
+    planTear()
+  }
+
+  return Object.assign(() => {
     stop()
     clearTimeout(resizeId)
     removeEventListener('resize', onResize)
     document.removeEventListener('visibilitychange', onVisibility)
-  }
+  }, { kick })
 }

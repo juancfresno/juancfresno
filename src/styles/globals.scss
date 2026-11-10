@@ -6,7 +6,7 @@
 
 // ─── Theme: dark by default, light with html[data-theme="light"] ──────────────
 // Set before paint by the inline script in layout.tsx; toggled by ThemeToggle.
-:root {
+@mixin theme-dark {
   --c-bg:         #{$raw-ink};
   --c-bg-2:       #1a1a18;
   --c-surface:    #242420;
@@ -25,6 +25,8 @@
   --c-g:          #ff5c1f;   // G orange: grid, annotations, live dots
   color-scheme: dark;
 }
+
+:root { @include theme-dark; }
 
 :root[data-theme="light"] {
   --c-bg:         #{$raw-pearl};
@@ -45,6 +47,10 @@
   --c-g:          #e5480e;
   color-scheme: light;
 }
+
+// 404 "No signal" (components/notfound): a TV is dark in any theme, so the
+// header and footer chrome take the dark tokens while that page is mounted.
+:root[data-nosignal] { @include theme-dark; background: $raw-ink; }
 
 // Smooth swap between themes (colors only).
 html.theme-anim, html.theme-anim * {
