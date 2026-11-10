@@ -10,58 +10,7 @@ import NavClock from '@/components/ui/NavClock/NavClock'
 import { usePageTransition } from '@/providers/PageTransition'
 import { useHref, useUi } from '@/i18n/client'
 import { parsePath } from '@/i18n/config'
-
-// ─── Scramble character pool ───────────────────────────────────────────────────
-const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%?'
-
-// ─── useScramble ───────────────────────────────────────────────────────────────
-// Cicla aleatoriamente sobre los caracteres y los resuelve de izquierda a derecha.
-// active=true → arranca la animación; active=false → resetea al texto original.
-function useScramble(text: string, active: boolean): string {
-  const [display, setDisplay] = useState(text)
-  const rafRef = useRef<number>(undefined)
-  const t0Ref  = useRef<number | null>(null)
-
-  useEffect(() => {
-    if (!active) {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current)
-      t0Ref.current = null
-      setDisplay(text)
-      return
-    }
-
-    const DURATION = 420 // ms — tiempo hasta que todos los chars se resuelven
-
-    const frame = (ts: number) => {
-      if (!t0Ref.current) t0Ref.current = ts
-      const elapsed  = ts - t0Ref.current
-      const progress = Math.min(elapsed / DURATION, 1)
-      const resolved = Math.floor(progress * text.length)
-
-      setDisplay(
-        text.split('').map((ch, i) => {
-          if (ch === ' ') return ' '
-          if (i < resolved) return ch
-          return CHARS[Math.floor(Math.random() * CHARS.length)]
-        }).join('')
-      )
-
-      if (progress < 1) {
-        rafRef.current = requestAnimationFrame(frame)
-      } else {
-        setDisplay(text)
-        t0Ref.current = null
-      }
-    }
-
-    t0Ref.current = null
-    rafRef.current = requestAnimationFrame(frame)
-
-    return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current) }
-  }, [active, text])
-
-  return display
-}
+import NavLinkItem from '@/components/ui/NavLink/NavLink'
 
 // ─── SVG: Biako face (25×32) ──────────────────────────────────────────────────
 const BiakoFace = () => (
@@ -124,37 +73,6 @@ const GlitchFace = () => (
   </span>
 )
 
-// ─── Arrow SVG ↘ — draws from shaft tip to arrowhead on hover ─────────────────
-// ViewBox 9×9 · shaft: M1.5,1.5 → L7.5,7.5 (len≈8.5) · head: M7.5,3.5 → L7.5,7.5 → L3.5,7.5 (len=8)
-const NavArrow = () => (
-  <svg
-    className={s.navArrow}
-    width="9"
-    height="9"
-    viewBox="0 0 9 9"
-    fill="none"
-    aria-hidden="true"
-  >
-    {/* Shaft — diagonal from origin to corner */}
-    <path
-      className={s.navArrowShaft}
-      d="M 1.5 1.5 L 7.5 7.5"
-      stroke="currentColor"
-      strokeWidth="1.15"
-      strokeLinecap="round"
-    />
-    {/* Head — L-bracket at the arrow tip: down then left */}
-    <path
-      className={s.navArrowHead}
-      d="M 7.5 3.5 L 7.5 7.5 L 3.5 7.5"
-      stroke="currentColor"
-      strokeWidth="1.15"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-)
-
 // ─── Nav links data ───────────────────────────────────────────────────────────
 // Internal paths; labels per locale (getUi(l).nav.links), hrefs via localePath.
 const NAV_LINKS = [
@@ -165,40 +83,6 @@ const NAV_LINKS = [
   { id: 'journal', href: '/journal' },
   { id: 'contact', href: '/contact' },
 ] as const
-
-// ─── NavLinkItem — scramble + chip + transition ───────────────────────────────
-function NavLinkItem({
-  label,
-  href,
-  active,
-}: {
-  label: string
-  href: string
-  active: boolean
-}) {
-  const { navigate } = usePageTransition()
-  const [hovered, setHovered] = useState(false)
-  const scrambled = useScramble(label, hovered)
-
-  return (
-    <a
-      href={href}
-      className={clsx(s.navLink, active && s.active)}
-      aria-current={active ? 'page' : undefined}
-      onClick={(e) => {
-        // Permitir Cmd/Ctrl+click para abrir en nueva pestaña
-        if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
-        e.preventDefault()
-        navigate(href)
-      }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-    >
-      <span className={s.navLinkText}>{scrambled}</span>
-      <NavArrow />
-    </a>
-  )
-}
 
 // ─── Component ────────────────────────────────────────────────────────────────
 export default function Nav() {

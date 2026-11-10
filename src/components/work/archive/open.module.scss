@@ -1,0 +1,536 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+// ─── Open views: drawer · expand · stage (?open=) ────────────────────────────
+// Margins = the site tokens ($m, $gutter from _variables.scss, --m / --gutter on :root).
+$hdr: 72px;
+
+// ─── Shared bits ──────────────────────────────────────────────────────────────
+.ctl {
+  @include chip-hover(-1px);
+  @include touch-target(10px, 2px);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  padding: 6px 9px;
+  border: 1px solid $color-line;
+  border-radius: 3px;
+  background: none;
+  color: $color-text;
+  font-family: $font-mono;
+  font-size: 10px;
+  line-height: 12px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease;
+  &:hover, &:focus-visible { color: $raw-ink; border-color: transparent; outline: none; }
+  kbd { font: inherit; opacity: 0.55; }
+}
+
+.ficha {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 16px;
+  margin: 0;
+  div { min-width: 0; }
+  dt {
+    font-family: $font-mono;
+    font-size: 10px;
+    line-height: 12px;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: $color-text-mid;
+    margin-bottom: 6px;
+  }
+  dd { margin: 0; font-family: $font-body; font-size: 14px; line-height: 1.35; color: $color-text; }
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  li {
+    padding: 3px 6px;
+    border: 1px solid $color-line;
+    border-radius: 3px;
+    font-family: $font-mono;
+    font-size: 10px;
+    line-height: 12px;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: $color-text-mid;
+  }
+}
+
+.dKind {
+  margin: 0;
+  font-family: $font-mono;
+  font-size: 10px;
+  line-height: 12px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: $color-text-hi;
+}
+
+// ═══ DRAWER ═══════════════════════════════════════════════════════════════════
+.drawerRoot {
+  position: fixed;
+  inset: 0;
+  z-index: $z-modal;
+  pointer-events: none;
+  &[data-phase='open'] { pointer-events: auto; }
+}
+
+.scrim {
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, var(--c-bg) 70%, transparent);
+  opacity: 0;
+  transition: opacity 0.42s ease;
+  [data-phase='open'] > & { opacity: 1; transition: opacity 0.5s ease; }
+}
+
+.drawer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: clamp(560px, 58vw, 1120px);
+  background: $color-bg;
+  border-left: 1px solid $color-line;
+  transform: translate3d(100%, 0, 0);
+  transition: transform 0.42s cubic-bezier(0.76, 0, 0.24, 1);
+  outline: none;
+  box-shadow: -40px 0 80px -40px rgba(0, 0, 0, 0.35);
+  [data-phase='open'] > & { transform: none; transition: transform 0.62s $ease-out-expo; }
+
+  @include respond-to(md) { width: 100%; border-left: 0; }
+  @media (prefers-reduced-motion: reduce) {
+    transform: none;
+    opacity: 0;
+    transition: opacity 0.16s ease;
+    [data-phase='open'] > & { opacity: 1; transition: opacity 0.16s ease; }
+  }
+}
+
+.drawerScroll {
+  height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.drawerBar {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 16px;
+  height: 56px;
+  padding: 0 32px;
+  background: color-mix(in srgb, var(--c-bg) 92%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid $color-line;
+  @include respond-to(md) { padding: 0 20px; gap: 10px; }
+}
+
+.dCount {
+  font-family: $font-mono;
+  font-size: 10px;
+  letter-spacing: 0.02em;
+  color: $color-text-mid;
+  b { font-weight: inherit; color: var(--c-g); }
+}
+.dTitle {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-family: $font-mono;
+  font-size: 10px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: $color-text;
+}
+.dActions { display: inline-flex; gap: 6px; }
+
+.drawerBody {
+  transition: opacity 0.16s ease, transform 0.3s $ease-out-expo;
+  &[data-swap] { opacity: 0; transform: translate3d(0, 8px, 0); transition: opacity 0.14s ease-in, transform 0.14s ease-in; }
+}
+
+.dHead {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 48px 32px 40px;
+  @include respond-to(md) { padding: 32px 20px 28px; }
+
+  // Staggered rise on open.
+  > * {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+  :global([data-phase='open']) & > * {
+    opacity: 1;
+    transform: none;
+    transition: opacity 0.5s ease, transform 0.7s $ease-out-expo;
+  }
+  :global([data-phase='open']) & > :nth-child(1) { transition-delay: 0.16s; }
+  :global([data-phase='open']) & > :nth-child(2) { transition-delay: 0.2s; }
+  :global([data-phase='open']) & > :nth-child(3) { transition-delay: 0.26s; }
+  :global([data-phase='open']) & > :nth-child(4) { transition-delay: 0.32s; }
+}
+
+.dH2 {
+  margin: 0;
+  font-family: $font-body;
+  font-weight: $fw-light;
+  font-size: clamp(40px, 4.6vw, 88px);
+  line-height: 0.95;
+  letter-spacing: -0.035em;
+  color: $color-text-hi;
+}
+
+.dCols {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: 32px;
+  padding-top: 12px;
+  @include respond-to(md) { grid-template-columns: 1fr; gap: 24px; }
+}
+
+.dLead {
+  margin: 0;
+  font-family: $font-body;
+  font-size: 18px;
+  line-height: 1.45;
+  color: $color-text;
+}
+
+.dStrip {
+  img { display: block; width: 100%; height: auto; background: var(--c-stage); }
+}
+
+.dNext {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  padding: 48px 32px 64px;
+  border: 0;
+  border-top: 1px solid $color-line;
+  background: none;
+  color: $color-text;
+  text-align: left;
+  cursor: pointer;
+  @include respond-to(md) { padding: 32px 20px 48px; }
+  &:hover .dNextTitle span, &:focus-visible .dNextTitle span { transform: translate3d(8px, 0, 0); }
+  &:focus-visible { outline: 1px solid var(--c-g); outline-offset: -4px; }
+}
+.dNextLabel {
+  font-family: $font-mono;
+  font-size: 10px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: $color-text-mid;
+}
+.dNextTitle {
+  font-family: $font-body;
+  font-weight: $fw-light;
+  font-size: clamp(32px, 3.2vw, 56px);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  span { display: inline-block; transition: transform 0.4s $ease-out-expo; }
+}
+
+// ═══ EXPAND ═══════════════════════════════════════════════════════════════════
+.xPanel {
+  padding: 24px 0 40px;
+  outline: none;
+}
+
+.xHead {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: $gutter;
+  row-gap: 24px;
+  align-items: start;
+  padding-bottom: 28px;
+  @include respond-to(md) { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+.xIntro {
+  grid-column: 1 / span 5;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  @include respond-to(md) { grid-column: 1 / -1; }
+}
+.xLead { margin: 0; font-family: $font-body; font-size: 18px; line-height: 1.45; color: $color-text; }
+.xFicha {
+  grid-column: 7 / span 5;
+  @include respond-to(md) { grid-column: 1 / -1; }
+}
+.xClose {
+  grid-column: 12 / span 1;
+  justify-self: end;
+  @include respond-to(md) { grid-column: 1 / -1; grid-row: 1; }
+}
+
+// Strip bleeds to the right edge of the viewport.
+.xView {
+  position: relative;
+  height: clamp(220px, 30vw, 520px);
+  margin-right: calc(-1 * #{$m});
+  overflow: hidden;
+  cursor: grab;
+  touch-action: pan-y;
+  user-select: none;
+  outline: none;
+  &[data-dragging] { cursor: grabbing; }
+  &:focus-visible { box-shadow: inset 0 0 0 1px var(--c-g); }
+}
+.xTrack {
+  display: flex;
+  gap: 12px;
+  height: 100%;
+  width: max-content;
+  will-change: transform;
+  img {
+    display: block;
+    height: 100%;
+    width: auto;
+    background: var(--c-stage);
+    pointer-events: none;
+  }
+}
+
+.xFoot {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 16px;
+  padding-top: 16px;
+  font-family: $font-mono;
+  font-size: 10px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: $color-text-mid;
+}
+.xCount { color: $color-text; font-variant-numeric: tabular-nums; }
+.xBar {
+  height: 1px;
+  background: $color-line;
+  span { display: block; height: 1px; background: var(--c-g); transform-origin: left; transform: scaleX(0.04); }
+}
+.xArrows { display: inline-flex; gap: 6px; }
+@media (hover: none) { .xHint { display: none; } }
+
+// ═══ STAGE ════════════════════════════════════════════════════════════════════
+.stage {
+  position: fixed;
+  inset: 0;
+  z-index: 90; // over the page and the transition canvas, under the nav (100)
+  outline: none;
+}
+
+.stBg {
+  position: absolute;
+  inset: 0;
+  background: $color-bg;
+  opacity: 0;
+  transition: opacity 0.28s ease;
+  [data-phase='open'] > & { opacity: 0.97; }
+  [data-phase='closing'] > & { opacity: 0; transition: opacity 0.42s ease 0.1s; }
+}
+
+// The site grid, Lab 002 · 11a: lines drop, gutters open, columns fill.
+.stGrid {
+  position: absolute;
+  inset: $hdr 0 0 0;
+  max-width: $page-max;
+  margin-inline: auto;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: $gutter;
+  padding-inline: $m;
+  pointer-events: none;
+  transition: opacity 0.6s ease;
+  [data-phase='open'] > & { opacity: 0.26; transition: opacity 0.9s ease 0.75s; }
+  [data-phase='closing'] > & { opacity: 0.6; transition: opacity 0.15s ease; }
+
+  @include respond-to(md) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    .stCol:nth-child(n + 5) { display: none; }
+  }
+}
+.stCol {
+  display: block;
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 0.19s cubic-bezier(0.65, 0, 0.35, 1) calc(var(--i) * 14ms);
+  i {
+    display: block;
+    height: 100%;
+    border-inline: 1px solid color-mix(in srgb, var(--c-g) 70%, transparent);
+    transform: scaleX(1.16);
+    transition: transform 0.17s cubic-bezier(0.65, 0, 0.35, 1) 0.12s;
+    &::before {
+      content: '';
+      display: block;
+      height: 100%;
+      background: color-mix(in srgb, var(--c-g) 8%, transparent);
+      opacity: 0;
+      transition: opacity 0.17s ease 0.19s;
+    }
+  }
+  [data-phase='open'] & { transform: scaleY(1); }
+  [data-phase='open'] & i { transform: scaleX(1); }
+  [data-phase='open'] & i::before { opacity: 1; }
+  [data-phase='closing'] & {
+    transform: scaleY(0);
+    transform-origin: bottom;
+    transition: transform 0.3s cubic-bezier(0.76, 0, 0.24, 1) calc((11 - var(--i)) * 10ms + 0.1s);
+  }
+}
+
+.stLayout {
+  position: absolute;
+  inset: $hdr 0 0 0;
+  max-width: $page-max;
+  margin-inline: auto;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-template-rows: minmax(0, 1fr) auto;
+  column-gap: $gutter;
+  row-gap: 20px;
+  padding: 56px $m 28px;
+
+  @include respond-to(md) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    padding: 64px $m calc(20px + var(--tabbar-h, 0px));
+  }
+}
+
+.stInfo {
+  grid-column: 1 / span 3;
+  grid-row: 1 / span 2;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 0;
+  align-self: end;
+  padding-bottom: 4px;
+  @include respond-to(md) { grid-column: 1 / -1; grid-row: 1; align-self: start; gap: 8px; }
+}
+.stMono {
+  margin: 0;
+  font-family: $font-mono;
+  font-size: 10px;
+  line-height: 12px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: $color-text-mid;
+  b { font-weight: inherit; color: var(--c-g); }
+}
+.stTitle {
+  margin: 0;
+  font-family: $font-body;
+  font-weight: $fw-light;
+  font-size: clamp(32px, 3.4vw, 64px);
+  line-height: 0.95;
+  letter-spacing: -0.035em;
+  color: $color-text-hi;
+}
+.stLead {
+  margin: 0;
+  font-family: $font-body;
+  font-size: 15px;
+  line-height: 1.45;
+  color: $color-text-mid;
+  @include respond-to(md) { display: none; }
+}
+.stFicha {
+  grid-template-columns: 1fr 1fr;
+  dd { font-family: $font-mono; font-size: 11px; text-transform: uppercase; letter-spacing: 0.02em; }
+  @include respond-to(md) { display: none; }
+}
+.stInfo > .chips { @include respond-to(md) { display: none; } }
+
+.stBox {
+  grid-column: 4 / -1;
+  grid-row: 1;
+  min-height: 0;
+  @include respond-to(md) { grid-column: 1 / -1; grid-row: 2; }
+}
+.stFoot {
+  grid-column: 4 / -1;
+  grid-row: 2;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  @include respond-to(md) { grid-column: 1 / -1; grid-row: 3; }
+}
+.stTicks {
+  display: flex;
+  gap: 4px;
+  min-width: 0;
+  overflow: hidden;
+  i {
+    flex: 0 1 18px;
+    height: 1px;
+    background: $color-line;
+    transition: background 0.2s ease;
+    &[data-on] { background: var(--c-g); }
+  }
+}
+.stArrows { display: inline-flex; gap: 6px; }
+.stClose {
+  position: absolute;
+  top: 16px;
+  right: $m;
+  @include respond-to(md) { right: auto; left: $m; } // the wordmark owns the top-right corner
+}
+
+// Info and controls arrive after the image lands; leave first on close.
+.stInfo, .stFoot, .stClose {
+  opacity: 0;
+  transition: opacity 0.18s ease;
+  [data-phase='open'] & { opacity: 1; transition: opacity 0.4s ease 0.38s; }
+}
+
+.stImg {
+  position: absolute;
+  z-index: 2;
+  transform-origin: 0 0;
+  will-change: transform, opacity;
+  img { display: block; width: 100%; height: 100%; object-fit: contain; }
+}
+.stTag {
+  position: absolute;
+  left: 0;
+  top: -18px;
+  font-family: $font-mono;
+  font-size: 9px;
+  line-height: 11px;
+  letter-spacing: 0.04em;
+  color: var(--c-g);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  [data-phase='open'] & { opacity: 1; transition: opacity 0.3s ease 0.6s; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stCol, .stCol i, .stCol i::before { transition: none !important; }
+  .stInfo, .stFoot, .stClose, .stTag { transition-delay: 0s !important; }
+}

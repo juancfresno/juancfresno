@@ -159,3 +159,37 @@
     }
   }
 }
+
+
+// ─── Chip hover (the nav link voice) ──────────────────────────────────────────
+// Blue chip grows in with the nav spring on hover / keyboard focus, text turns
+// ink; leaving is quick. Pair with useScramble (lib/useScramble) for the text.
+// Same numbers as ui/NavLink. Reduced motion = instant.
+@mixin chip-hover($inset: -3px -6px) {
+  position: relative;
+  isolation: isolate;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: $inset;
+    border-radius: 3px;
+    background: $raw-chip;
+    opacity: 0;
+    transform: scale(0.88);
+    transition: opacity 0.14s ease-in, transform 0.18s ease-in;
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  &:hover::before,
+  &:focus-visible::before {
+    opacity: 1;
+    transform: scale(1);
+    transition: opacity 0.18s ease-out, transform 0.26s $ease-spring;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &::before { transition: none; }
+  }
+}
