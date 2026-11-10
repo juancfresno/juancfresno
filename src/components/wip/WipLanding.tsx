@@ -7,6 +7,8 @@ import type { Locale } from '@/i18n/config'
 import HeadlineCycle from '@/components/home/HeadlineCycle'
 import Backdrop from './Backdrop'
 import type { TrailItem } from './trail/deck'
+import EmailLink from './EmailLink'
+import Availability from './Availability'
 import Grain from './Grain'
 import Intro from './Intro'
 import s from './wip.module.scss'
@@ -51,9 +53,10 @@ export default function WipLanding({ locale }: { locale: Locale }) {
         </p>
         <p className={`${s.contact} ${s.mask}`} data-wire="P · 18 · MAILTO" data-wire-text="">
           <span data-in="mask" style={d(400)}>
-            {WIP.contact} <a className={s.email} href={`mailto:${email}`}>{email}</a>
+            {WIP.contact} <EmailLink email={email} />
           </span>
         </p>
+        <Availability locale={locale} />
       </header>
     </div>
   )

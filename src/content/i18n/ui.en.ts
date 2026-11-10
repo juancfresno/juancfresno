@@ -110,7 +110,7 @@ export const UI_EN = {
     ogAlt: 'Case study by Juan C. Fresno',
   },
   home: { featuredStar: ' · ★ Featured' },
-  wip: { tag: 'WORK IN PROGRESS · v1.0 coming soon' },
+  wip: { tag: 'WORK IN PROGRESS · v1.0 coming soon', available: 'Available now', copiedPill: 'Copied ✓' },
   arco: {
     open: 'open the case',
     aria: (label: string) => `${label}: drag, scroll or use ← →. Enter opens the case in the centre.`,
