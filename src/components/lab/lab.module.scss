@@ -1,0 +1,353 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+// Demo stage: the piece runs on the page surface, themed with the site tokens.
+.stage {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: $space-8;
+  min-height: clamp(18rem, 40vw, 32rem);
+  padding: $space-16 $space-8;
+  background: $color-bg-2;
+  font-family: $font-body;
+
+  :global(.fb) {
+    --fb-fg: var(--c-text);
+    --fb-inv: var(--c-bg);
+  }
+
+  // 002 · Transiciones: full-width piece (picker + mock site), site tokens.
+  &:has(> :global(.ft)) {
+    display: block;
+    padding: $space-8;
+
+    @include respond-to(sm) { padding: $space-6 $space-4; }
+  }
+
+  :global(.ft) {
+    --ft-bg: var(--c-bg);
+    --ft-bg-2: var(--c-bg-2);
+    --ft-fg: var(--c-text);
+    --ft-mid: var(--c-text-mid);
+    --ft-muted: var(--c-text-muted);
+    --ft-line: var(--c-border);
+    --ft-mono: #{$font-mono};
+  }
+
+  // 003 · Galerías: full-width piece (picker + gallery), site tokens and grid.
+  // Pinned galleries stick under the 72px header (and above the mobile tab bar).
+  &:has(> :global(.fg)) {
+    display: block;
+    padding: $space-8;
+
+    @include respond-to(sm) { padding: $space-6 $space-4; }
+  }
+
+  :global(.fg) {
+    --fg-bg: var(--c-bg-2);
+    --fg-bg-2: var(--c-surface);
+    --fg-fg: var(--c-text);
+    --fg-mid: var(--c-text-mid);
+    --fg-muted: var(--c-text-muted);
+    --fg-line: var(--c-border);
+    --fg-overlay: var(--c-overlay);
+    --fg-mono: #{$font-mono};
+    --fg-gutter: #{$space-4};
+    --fg-top: 72px;
+
+    @include respond-to(md) { --fg-bottom: 64px; }
+  }
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-3;
+}
+
+.action {
+  display: inline-flex;
+  align-items: center;
+  padding: $space-3 $space-6;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  background: none;
+  font-family: $font-mono;
+  font-size: $fs-xs;
+  letter-spacing: $ls-wide;
+  text-transform: uppercase;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background $duration-fast, color $duration-fast;
+
+  &:hover, &:focus-visible {
+    background: $color-text;
+    color: $color-bg;
+  }
+}
+
+.code {
+  margin: 0;
+  padding: $space-6;
+  overflow-x: auto;
+  background: $color-bg-2;
+  border: 1px solid $color-border;
+  font-family: $font-mono;
+  font-size: $fs-xs;
+  line-height: 1.7;
+  color: $color-text-mid;
+  max-height: 28rem;
+}
+
+// Lab index card for an experiment.
+.piece {
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
+  color: inherit;
+  text-decoration: none;
+
+  &:hover .pieceMedia, &:focus-visible .pieceMedia { border-color: $color-text; }
+}
+
+.pieceMedia {
+  @include flex-center;
+  aspect-ratio: 16 / 9;
+  background: $color-bg-2;
+  border: 1px solid $color-border;
+  font-family: $font-mono;
+  font-size: $fs-xs;
+  letter-spacing: $ls-wide;
+  text-transform: uppercase;
+  transition: border-color $duration-fast;
+}
+
+.pieceMeta {
+  font-family: $font-mono;
+  font-size: $fs-xs;
+  letter-spacing: $ls-wide;
+  text-transform: uppercase;
+  color: $color-text-muted;
+}
+
+// ─── Lab index rows (Lab · Desktop, v0) ───────────────────────────────────────
+.rows { list-style: none; }
+
+.row {
+  display: grid;
+  grid-template-columns: 4.5rem minmax(0, 1fr) minmax(0, 40%) 10rem;
+  align-items: center;
+  min-height: 3.6rem;
+  padding-block: $space-4;
+  border-top: 1px solid $color-line;
+  color: $color-text;
+  text-decoration: none;
+
+  li:last-child > & { border-bottom: 1px solid $color-line; }
+  &:is(a):hover, &:is(a):focus-visible { border-top-color: $color-line-hi; }
+
+  @include respond-to(md) {
+    grid-template-columns: 2.25rem minmax(0, 1fr) auto;
+    row-gap: $space-1;
+    > :nth-child(3) { grid-column: 2 / -1; grid-row: 2; }
+    > :nth-child(4) { grid-column: 3; grid-row: 1; }
+  }
+}
+
+.whatCell {
+  font-family: $font-body;
+  font-size: 0.9375rem;
+  color: $color-text-mid;
+  padding-right: $space-4;
+}
+
+// Experiment rows: Nº · name + what · kind · how it's built · year
+.exp {
+  display: grid;
+  grid-template-columns: 4.5rem minmax(0, 1fr) 9rem minmax(0, 22%) 4rem;
+  align-items: baseline;
+  gap: 0 $space-4;
+  padding-block: $space-6;
+  border-top: 1px solid $color-line;
+  color: $color-text;
+  text-decoration: none;
+  transition: border-color $duration-fast;
+
+  li:last-child > & { border-bottom: 1px solid $color-line; }
+  &:hover, &:focus-visible { border-top-color: $color-line-hi; .arrow { opacity: 1; transform: none; } }
+  @include focus-ring($color-text);
+
+  @include respond-to(lg) {
+    grid-template-columns: 3rem minmax(0, 1fr) 4rem;
+    > :nth-child(3), > :nth-child(4) { display: none; }
+  }
+  @include respond-to(md) { grid-template-columns: 2.25rem minmax(0, 1fr) auto; }
+}
+
+.expMain { display: flex; flex-direction: column; gap: $space-2; min-width: 0; }
+
+.expWhat {
+  font-family: $font-body;
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  color: $color-text-mid;
+  max-width: 58ch;
+}
+
+.arrow {
+  display: inline-block;
+  opacity: 0;
+  transform: translate(-4px, 4px);
+  transition: opacity $duration-fast, transform $duration-base $ease-out-expo;
+}
+
+// ─── Featured: 002 Transitions ───────────────────────────────────────────────
+.featured {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: $space-8 $space-4;
+  align-items: start;
+
+  @include respond-to(md) { grid-template-columns: 1fr; }
+}
+
+.featuredVisual {
+  grid-column: 1 / span 7;
+  display: block;
+  @include respond-to(md) { grid-column: 1 / -1; }
+}
+
+.featuredText {
+  grid-column: 9 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+
+  @include respond-to(lg) { grid-column: 8 / -1; }
+  @include respond-to(md) { grid-column: 1 / -1; }
+}
+
+.featuredMeta { font-family: $font-mono; font-size: 0.6875rem; text-transform: uppercase; color: $color-text-mid; }
+
+.featuredTitle {
+  font-family: $font-body;
+  font-weight: $fw-light;
+  font-size: clamp(2rem, 3.2vw, 3.75rem);
+  line-height: 1;
+  letter-spacing: -0.035em;
+  color: $color-text-hi;
+}
+
+.featuredBody {
+  font-family: $font-body;
+  font-weight: $fw-light;
+  font-size: clamp(1rem, 0.4vw + 0.9rem, 1.1875rem);
+  line-height: 1.45;
+  color: $color-text-mid;
+  max-width: 44ch;
+}
+
+.featuredLinks { display: flex; flex-wrap: wrap; align-items: center; gap: $space-3 $space-8; padding-top: $space-2; }
+
+// A small loop of 11a "the grid falls": lines drop, columns fill, boxes outline.
+.wire {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 6px;
+  aspect-ratio: 16 / 10;
+  padding: 6%;
+  background: $color-bg-2;
+  overflow: hidden;
+  --g: #ff5c1e;
+}
+
+.wireCol {
+  position: relative;
+  border-inline: 1px solid color-mix(in srgb, var(--g) 55%, transparent);
+  transform-origin: top;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: color-mix(in srgb, var(--g) 12%, transparent);
+    transform-origin: bottom;
+    transform: scaleY(0);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    animation: wireDrop 4.8s $ease-out-expo infinite;
+    animation-delay: calc(var(--i) * 28ms);
+    &::after { animation: wireFill 4.8s $ease-out-expo infinite; animation-delay: calc(var(--i) * 28ms); }
+  }
+}
+
+.wireBox {
+  position: absolute;
+  border: 1px solid $color-text;
+  background: $color-bg-2;
+
+  em {
+    position: absolute;
+    left: 6px;
+    top: 4px;
+    font-family: $font-mono;
+    font-size: 0.5625rem;
+    font-style: normal;
+    color: $color-text;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    animation: wireBox 4.8s $ease-out-expo infinite;
+  }
+}
+
+.wireBoxA { left: 6%; top: 12%; width: 62%; height: 18%; }
+.wireBoxB { left: 6%; top: 36%; width: 38%; height: 12%; animation-delay: 60ms; }
+.wireBoxC { left: 50%; top: 36%; width: 44%; height: 50%; animation-delay: 120ms; }
+
+@keyframes wireDrop {
+  0% { transform: scaleY(0); opacity: 1; }
+  12%, 82% { transform: scaleY(1); opacity: 1; }
+  95%, 100% { transform: scaleY(1); opacity: 0; }
+}
+
+@keyframes wireFill {
+  0%, 14% { transform: scaleY(0); }
+  28%, 82% { transform: scaleY(1); }
+  95%, 100% { transform: scaleY(1); opacity: 0; }
+}
+
+@keyframes wireBox {
+  0%, 26% { opacity: 0; transform: translateY(6px); }
+  36%, 84% { opacity: 1; transform: none; }
+  96%, 100% { opacity: 0; }
+}
+
+.n {
+  font-family: $font-mono;
+  font-size: 0.75rem;
+  color: $color-text-mid;
+}
+
+.rowName {
+  font-family: $font-body;
+  font-size: clamp(1rem, 0.4vw + 0.9rem, 1.125rem);
+}
+
+.spec {
+  font-family: $font-mono;
+  font-size: 0.625rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: $color-text;
+  padding-right: $space-4;
+
+  @include respond-to(md) { color: $color-text-mid; }
+}
+
+.end { text-align: right; padding-right: 0; }

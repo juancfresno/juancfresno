@@ -1,0 +1,61 @@
+@use '../../../styles/variables' as *;
+
+// Shared travelling preview for social links. The clip is drawn on the canvas
+// (12-column wipe, Bayer dissolve); the DOM only gets transform and opacity.
+// Colours for the canvas are read from these custom properties, so it follows
+// the theme.
+.float {
+  --sp-surface: var(--c-surface);
+  --sp-ink: var(--c-text);
+  --sp-line: var(--c-line);
+
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: $z-overlay;
+  width: 256px;
+  pointer-events: none;
+  visibility: hidden;
+  transform-origin: 50% 100%;
+  will-change: transform;
+
+  @media (hover: none), (pointer: coarse) { display: none; }
+}
+
+.canvas {
+  display: block;
+  width: 256px;
+  height: 160px;
+}
+
+// Mono chip riding under the clip: "BEHANCE ↗ @juancfresno · 03/05".
+.label {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 3px 6px;
+  min-height: 18px;
+  background: var(--c-text);
+  color: var(--c-bg);
+  font-family: $font-mono;
+  font-size: 10px;
+  line-height: 12px;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  opacity: 0;
+  font-variant-numeric: tabular-nums;
+
+  &:empty { visibility: hidden; }
+}
+
+// Videos live here (decoded and drawn into the canvas, never shown).
+.pool {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+
+  video { width: 1px; height: 1px; }
+}

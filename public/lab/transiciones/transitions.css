@@ -1,0 +1,249 @@
+/* Fresno Lab · 002 · Transitions — https://juancfresno.com/lab/transiciones
+   No dependencies. Theme with the --ft-* variables on .ft. MIT. */
+.ft {
+  --ft-bg: #10100e;
+  --ft-bg-2: #1a1a18;
+  --ft-fg: #fcfcf7;
+  --ft-mid: rgba(252, 252, 247, 0.6);
+  --ft-muted: rgba(252, 252, 247, 0.35);
+  --ft-line: rgba(252, 252, 247, 0.12);
+  --ft-accent: #ff5c1e; /* grid overlay colour (same as the site's G grid) */
+  --ft-mono: 'Geist Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  --ft-ease: cubic-bezier(0.19, 1, 0.22, 1);
+  container: ft / inline-size;
+  width: 100%;
+  color: var(--ft-fg);
+  font-family: inherit;
+}
+.ft *, .ft *::before, .ft *::after { box-sizing: border-box; }
+.ft [hidden] { display: none !important; }
+
+/* Layout: picker beside the stage; stacked below it on narrow widths. */
+.ft__layout {
+  display: grid;
+  grid-template-columns: minmax(15rem, 3fr) minmax(0, 9fr);
+  gap: 1.5rem;
+  align-items: start;
+}
+.ft__main { display: flex; flex-direction: column; gap: 0.75rem; min-width: 0; }
+
+.ft__mono, .ft__bar, .ft__note, .ft__rec, .ft__picker {
+  font-family: var(--ft-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  line-height: 1.5;
+}
+
+/* Toolbar: replay + live status. */
+.ft__bar { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; min-height: 2.5rem; }
+.ft__btn {
+  display: inline-flex; align-items: center; gap: 0.5em;
+  min-height: 2.5rem; padding: 0 1.1rem;
+  border: 1px solid var(--ft-fg); border-radius: 999px;
+  background: none; color: var(--ft-fg);
+  font: inherit; text-transform: uppercase; letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.ft__btn:hover, .ft__btn:focus-visible { background: var(--ft-fg); color: var(--ft-bg); }
+.ft__btn:focus-visible { outline: 2px solid var(--ft-fg); outline-offset: 3px; }
+.ft__status { margin: 0; color: var(--ft-mid); }
+.ft__note { margin: 0; padding: 0.6rem 0.8rem; border: 1px dashed var(--ft-muted); color: var(--ft-mid); }
+.ft__rec { margin: 0; color: var(--ft-mid); }
+.ft__rec strong { color: var(--ft-fg); font-weight: 400; }
+
+/* Picker: native radios, so arrows/tab/space work out of the box. */
+.ft__picker { margin: 0; padding: 0; border: 0; min-width: 0; }
+.ft__picker legend { padding: 0 0 0.75rem; color: var(--ft-muted); text-transform: uppercase; letter-spacing: 0.08em; }
+.ft__opts { display: flex; flex-direction: column; border-top: 1px solid var(--ft-line); }
+.ft__opt {
+  position: relative;
+  display: grid;
+  grid-template-columns: 2.2em 1fr auto;
+  gap: 0.25rem 0.5rem;
+  align-items: baseline;
+  padding: 0.65rem 0.25rem;
+  border-bottom: 1px solid var(--ft-line);
+  color: var(--ft-mid);
+  cursor: pointer;
+  transition: color 0.2s, background 0.2s;
+}
+.ft__opt input { position: absolute; opacity: 0; pointer-events: none; }
+.ft__opt:hover { color: var(--ft-fg); }
+.ft__opt:has(input:checked) { color: var(--ft-bg); background: var(--ft-fg); }
+.ft__opt--out .ft__name { text-decoration: line-through; text-decoration-thickness: 1px; }
+.ft__opt--out:not(:has(input:checked)) { opacity: 0.55; }
+.ft__opt:has(input:focus-visible) { outline: 2px solid var(--ft-fg); outline-offset: 2px; }
+.ft__n { color: inherit; opacity: 0.6; }
+.ft__ms { white-space: nowrap; opacity: 0.7; }
+.ft__tag {
+  grid-column: 2 / -1;
+  justify-self: start;
+  padding: 0 0.45em;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 0.6875rem;
+  opacity: 0.8;
+}
+/* Option groups (11a–11f): an indented block with an accent rule, a name and a compare hint. */
+.ft__group { display: flex; flex-direction: column; margin-left: 0.6rem; padding-left: 0.6rem; border-left: 1px solid var(--ft-accent); border-bottom: 1px solid var(--ft-line); }
+.ft__group > .ft__opt:last-child { border-bottom: 0; }
+.ft__ghead { display: flex; flex-direction: column; gap: 0.2rem; margin: 0; padding: 0.65rem 0.25rem 0.55rem; border-bottom: 1px solid var(--ft-line); }
+.ft__gname { color: var(--ft-accent); text-transform: uppercase; letter-spacing: 0.08em; }
+.ft__ghint { color: var(--ft-muted); }
+.ft__sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ── Stage: a mini mock site, 16:10 ─────────────────────────────────────── */
+.ft__stage {
+  container: ftstage / inline-size;
+  position: relative;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border: 1px solid var(--ft-line);
+  background: var(--ft-bg);
+  color: var(--ft-fg);
+  font-size: clamp(10px, 1.6cqi, 14px);
+  /* The site's grid, scaled to the stage: margin 64 and gutter 16 at 1680, liquid. */
+  --ft-m: max(12px, calc(100cqi * 64 / 1680));
+  --ft-g: max(4px, calc(100cqi * 16 / 1680));
+}
+.ft__nav, .ft__foot {
+  position: relative; z-index: 6;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 var(--ft-m);
+  background: var(--ft-bg);
+  font-family: var(--ft-mono);
+  font-size: clamp(9px, 1.25cqi, 12px);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.ft__nav { height: max(2.6em, 6.5cqi); border-bottom: 1px solid var(--ft-line); }
+.ft__foot { height: max(2.4em, 5cqi); border-top: 1px solid var(--ft-line); color: var(--ft-muted); }
+.ft__mark { font-weight: 500; letter-spacing: 0.2em; }
+.ft__links { display: flex; gap: 2.4cqi; }
+.ft__links a, .ft a.ft__thumb { color: inherit; text-decoration: none; }
+.ft__links a { color: var(--ft-muted); padding: 0.4em 0; }
+.ft__links a:hover, .ft__links a[aria-current='page'] { color: var(--ft-fg); }
+.ft__stage a:focus-visible { outline: 1px solid var(--ft-fg); outline-offset: 2px; }
+
+.ft__view { position: relative; overflow: hidden; background: var(--ft-bg-2); }
+.ft__page {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; gap: 2cqi;
+  padding: var(--ft-m);
+  background: var(--ft-bg);
+}
+.ft__kicker { margin: 0; font-family: var(--ft-mono); font-size: clamp(9px, 1.2cqi, 12px); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ft-muted); }
+.ft__title {
+  margin: 0;
+  font-size: clamp(22px, 6.4cqi, 72px);
+  font-weight: 400;
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+}
+.ft__title:focus { outline: none; }
+.ft__grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 1.4cqi var(--ft-g); flex: 1; min-height: 0; }
+.ft__grid--home { margin-top: auto; flex: 0 0 34%; }
+.ft__grid--work { grid-template-rows: 1fr 1fr; }
+.ft__thumb { grid-column: span 4; display: flex; flex-direction: column; gap: 0.6cqi; min-height: 0; }
+.ft__media { flex: 1; min-height: 0; background: var(--g, var(--ft-bg-2)); }
+.ft__label { display: flex; justify-content: space-between; font-family: var(--ft-mono); font-size: clamp(8px, 1.1cqi, 11px); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ft-mid); }
+.ft__thumb:hover .ft__label, .ft__thumb:focus-visible .ft__label { color: var(--ft-fg); }
+.ft__page--case .ft__media { flex: 1; }
+
+/* Narrow: picker under the stage; square stage and 2-column work grid on phones. */
+@container ft (max-width: 760px) {
+  .ft__layout { grid-template-columns: 1fr; }
+  .ft__picker { order: 2; }
+  .ft__opts { display: grid; grid-template-columns: 1fr 1fr; column-gap: 0.75rem; }
+  .ft__opt { grid-template-columns: 2em 1fr; }
+  .ft__ms { grid-column: 2; }
+  .ft__group { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; column-gap: 0.75rem; margin-left: 0; }
+  .ft__ghead { grid-column: 1 / -1; }
+  .ft__group > .ft__opt:last-child { border-bottom: 1px solid var(--ft-line); }
+}
+@container ft (max-width: 480px) {
+  .ft__stage { aspect-ratio: 1 / 1; }
+}
+@container ft (max-width: 420px) {
+  .ft__opts { grid-template-columns: 1fr; }
+  .ft__opt { grid-template-columns: 2em 1fr auto; padding: 0.5rem 0.25rem; }
+  .ft__ms { grid-column: auto; }
+  .ft__group { grid-template-columns: 1fr; }
+}
+@container ftstage (max-width: 480px) {
+  .ft__thumb { grid-column: span 6; }
+  .ft__grid--work { grid-template-rows: 1fr 1fr 1fr; }
+  .ft__grid--home .ft__thumb:nth-child(3) { display: none; }
+  .ft__links { gap: 3.5cqi; }
+}
+
+/* ── FX layer (overlays live here, above the page, under the chrome) ───── */
+.ft__fx { position: absolute; inset: 0; z-index: 5; pointer-events: none; overflow: hidden; }
+.ft__col { position: absolute; top: 0; bottom: 0; background: var(--ft-fg); transform: scaleY(0); transform-origin: top; }
+.ft__px { position: absolute; background: var(--ft-fg); opacity: 0; }
+.ft__ghost { position: absolute; transform-origin: 0 0; }
+.ft__strip { position: absolute; inset: 0; filter: drop-shadow(3px 0 rgba(255, 40, 80, 0.55)) drop-shadow(-3px 0 rgba(40, 220, 255, 0.55)); }
+.ft__strip > .ft__page { position: absolute; }
+.ft__curtain {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--ft-fg); color: var(--ft-bg);
+  font-family: var(--ft-mono); font-size: clamp(10px, 1.6cqi, 14px); letter-spacing: 0.08em; text-transform: uppercase;
+}
+.ft__word { display: inline-block; white-space: pre; }
+
+/* Grid explorations (11–16) */
+.ft__gfx { position: absolute; inset: 0; }
+.ft__gcol {
+  position: absolute;
+  border-inline: 1px solid color-mix(in srgb, var(--ft-accent) 70%, transparent);
+  background: color-mix(in srgb, var(--ft-accent) 7%, transparent);
+  transform-origin: top;
+  padding-top: 0.6cqi;
+  font-family: var(--ft-mono); font-size: clamp(7px, 0.9cqi, 10px); letter-spacing: 0.06em;
+  color: var(--ft-accent); text-align: center;
+}
+.ft__wf, .ft__mod {
+  position: absolute;
+  outline: 1px solid var(--ft-accent);
+  outline-offset: -1px;
+}
+.ft__wf { background: color-mix(in srgb, var(--ft-bg) 80%, transparent); }
+.ft__wf--line { background: none; }
+.ft__wf--solid { background: var(--ft-bg); overflow: hidden; }
+.ft__gl { position: absolute; background: color-mix(in srgb, var(--ft-accent) 70%, transparent); transform-origin: top; }
+.ft__gfill { position: absolute; background: color-mix(in srgb, var(--ft-accent) 7%, transparent); transform-origin: top; }
+.ft__wfl {
+  position: absolute; left: 0; top: 0;
+  padding: 0.2em 0.45em;
+  background: var(--ft-accent); color: var(--ft-bg);
+  font-family: var(--ft-mono); font-size: clamp(7px, 0.9cqi, 10px); letter-spacing: 0.06em; line-height: 1.3;
+  white-space: nowrap;
+}
+.ft__mod { overflow: hidden; }
+.ft__mod > * { display: flex; }
+.ft__mod > .ft__thumb { flex-direction: column; }
+.ft__mod > .ft__kicker, .ft__mod > .ft__title { display: block; }
+.ft__slice, .ft__cell, .ft__face { position: absolute; overflow: hidden; }
+.ft__slice > .ft__page, .ft__face > .ft__page { position: absolute; }
+.ft__face { backface-visibility: hidden; }
+.ft__fill { position: absolute; inset: 0; background: var(--ft-bg); }
+.ft__gline { position: absolute; background: var(--ft-accent); }
+.ft__band { position: absolute; background: var(--ft-bg); }
+.ft__base { position: absolute; background: color-mix(in srgb, var(--ft-accent) 55%, transparent); transform-origin: left; }
+.ft__dim {
+  position: absolute;
+  background: var(--ft-accent);
+}
+.ft__dim::before, .ft__dim::after { content: ''; position: absolute; top: -0.5cqi; width: 1px; height: 1cqi; background: var(--ft-accent); }
+.ft__dim::before { left: 0; }
+.ft__dim::after { right: 0; }
+.ft__diml {
+  position: absolute; left: 50%; top: 0; transform: translate(-50%, -50%);
+  padding: 0 0.6em; background: var(--ft-bg); color: var(--ft-accent);
+  font-family: var(--ft-mono); font-size: clamp(7px, 0.9cqi, 10px); letter-spacing: 0.06em; white-space: nowrap;
+}
+.ft__track { position: absolute; inset: 0; }

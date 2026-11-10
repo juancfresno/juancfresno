@@ -1,0 +1,433 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+// Case template — Figma "Caso · Shoeciety · Rediseño" (6771:23052) for the
+// text modules and "Caso · Shoeciety · v0" (6728:6380) for the image block.
+// Grid: label column 1/3, content 2/3, gutter 16 (web/case-header: 12 col,
+// margin 64, gutter 16 at 1680).
+
+// ─── Case top (Figma v1/case-top, 6879:460) ─────────────────────────────────
+.top {
+  @include container;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: $space-4;
+  padding-top: clamp(3.5rem, 5.2vw, 5.5rem);
+  padding-bottom: clamp(4rem, 6.7vw, 7rem);
+
+  @include respond-to(lg) { grid-template-columns: 1fr; row-gap: $space-12; }
+}
+
+.fichaCol {
+  grid-column: 1 / span 3;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+
+  @include respond-to(lg) { grid-row: 2; }
+}
+
+.bigN {
+  font-family: $font-body;
+  font-weight: 200;
+  font-size: clamp(6rem, 14.8vw, 15.5rem);
+  line-height: 0.84;
+  letter-spacing: -0.06em;
+  color: $color-text-hi;
+  margin-left: -0.05em;
+
+  @include respond-to(lg) { display: none; }
+}
+
+.ficha {
+  margin-top: clamp(2rem, 3.3vw, 3.5rem);
+  border-bottom: 1px solid $color-line;
+
+  div {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    gap: $space-4;
+    padding-block: 14px;
+    border-top: 1px solid $color-line;
+  }
+
+  dt {
+    font-family: $font-mono;
+    font-size: 0.625rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: $color-text-mid;
+    padding-top: 3px;
+  }
+
+  dd {
+    font-family: $font-body;
+    font-size: 0.9375rem;
+    line-height: 1.4;
+    color: $color-text;
+  }
+}
+
+.live {
+  margin-top: 20px;
+  font-family: $font-mono;
+  font-size: 0.625rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: $color-text;
+}
+
+.divider {
+  grid-column: 4;
+  position: relative;
+  &::before { content: ''; position: absolute; left: 16px; top: 0; bottom: -5.5rem; width: 1px; background: $color-line; }
+
+  @include respond-to(lg) { display: none; }
+}
+
+.headCol {
+  grid-column: 5 / -1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+
+  @include respond-to(lg) { grid-column: 1 / -1; }
+}
+
+.crumb {
+  font-family: $font-mono;
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: $color-text-mid;
+
+  a { color: inherit; text-decoration: none; @include touch-target(15px, 8px); &:hover, &:focus-visible { color: $color-text; } }
+}
+
+.title {
+  margin-top: 28px;
+  font-family: $font-body;
+  font-weight: $fw-regular;
+  font-size: clamp(3.25rem, 10vw, 10.5rem);
+  line-height: 0.92;
+  letter-spacing: -0.05em;
+  color: $color-text-hi;
+  overflow-wrap: anywhere;
+}
+
+.chips {
+  margin-top: 32px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+
+  li {
+    padding: 5px 10px;
+    border: 1px solid $color-text-mid;
+    border-radius: 999px;
+    font-family: $font-mono;
+    font-size: 0.625rem;
+    line-height: 1.2;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: $color-text;
+  }
+}
+
+.lead {
+  margin-top: 48px;
+  font-family: $font-body;
+  font-weight: $fw-light;
+  font-size: clamp(1.375rem, 1.8vw, 1.875rem);
+  line-height: 1.3;
+  letter-spacing: -0.015em;
+  color: $color-text;
+  max-width: 38ch;
+}
+
+.qLabel {
+  display: flex;
+  flex-direction: column;
+  font-family: $font-body;
+  font-size: 1rem;
+  color: $color-text-mid;
+}
+
+.question {
+  margin-top: 56px;
+  padding-top: 24px;
+  border-top: 1px solid $color-line;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 3fr);
+  gap: $space-4;
+
+  @include respond-to(md) { grid-template-columns: 1fr; }
+}
+
+.questionText {
+  font-family: $font-body;
+  font-size: clamp(1.375rem, 1.8vw, 1.875rem);
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+  color: $color-text;
+  max-width: 32ch;
+}
+
+// ─── Text rows (label cols 5–6, content 7–12) ────────────────────────────────
+.row {
+  @include container;
+  padding-bottom: clamp(4rem, 7vw, 7.5rem);
+}
+
+.rowFirst { padding-top: 24px; }
+
+.rowInner {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: $space-4;
+  padding-top: 24px;
+  border-top: 1px solid $color-line;
+
+  @include respond-to(md) { grid-template-columns: 1fr; row-gap: $space-6; }
+}
+
+.rowLabel {
+  grid-column: 5 / span 2;
+  display: flex;
+  flex-direction: column;
+  font-family: $font-body;
+  font-size: 1rem;
+  letter-spacing: -0.005em;
+  color: $color-text-mid;
+
+  @include respond-to(lg) { grid-column: 1 / span 3; }
+  @include respond-to(md) { grid-column: 1; }
+}
+
+.rowN {
+  font-family: $font-mono;
+  font-size: 0.625rem;
+  letter-spacing: 0.02em;
+  color: var(--c-faint);
+}
+
+.rowContent {
+  grid-column: 7 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+
+  @include respond-to(lg) { grid-column: 4 / -1; }
+  @include respond-to(md) { grid-column: 1; }
+}
+
+.contextLead {
+  font-family: $font-body;
+  font-weight: $fw-light;
+  font-size: clamp(1.375rem, 1.8vw, 1.875rem);
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+  color: $color-text;
+}
+
+.faint { color: var(--c-faint); }
+
+.text {
+  font-family: $font-body;
+  font-size: 1.125rem;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+  color: $color-text-mid;
+  max-width: 40rem;
+}
+
+.decisions {
+  list-style: none;
+
+  li {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 5fr);
+    gap: $space-4;
+    padding-block: 20px;
+    border-top: 1px solid $color-line;
+
+    &:first-child { padding-top: 0; border-top: 0; }
+  }
+}
+
+.decN { font-family: $font-mono; font-size: 0.625rem; letter-spacing: 0.02em; color: $color-text-mid; padding-top: 6px; }
+.decTitle { display: block; font-family: $font-body; font-size: 1.375rem; letter-spacing: -0.01em; color: $color-text; }
+.decText { display: block; margin-top: 6px; font-family: $font-body; font-size: 1rem; line-height: 1.5; color: $color-text-mid; }
+
+.rowHindsight { padding-top: clamp(5rem, 7vw, 7.5rem); }
+.rowCredits { padding-bottom: clamp(4rem, 7vw, 7.5rem); }
+
+.credits {
+  font-family: $font-body;
+  font-size: 1.125rem;
+  line-height: 1.5;
+  letter-spacing: -0.005em;
+  color: $color-text;
+}
+
+// ─── Next case ──────────────────────────────────────────────────────────────
+.nextMod {
+  @include container;
+  padding-block: clamp(4rem, 6vw, 6rem);
+  background: $color-bg-2;
+}
+
+.head { display: flex; flex-direction: column; gap: $space-6; margin-bottom: 40px; }
+.headRule { display: block; width: 100%; color: $color-line; }
+.headRow {
+  display: flex;
+  justify-content: space-between;
+  font-family: $font-mono;
+  font-size: 0.6875rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  > :first-child { color: $color-text-hi; }
+  a { color: $color-text; text-decoration: none; @include touch-target(15px, 8px); &:hover, &:focus-visible { text-decoration: underline; text-underline-offset: 3px; } }
+}
+
+.next {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: $space-4;
+  align-items: end;
+  color: $color-text;
+  text-decoration: none;
+
+  @include respond-to(md) { grid-template-columns: 1fr; row-gap: $space-8; }
+  @include focus-ring($color-text);
+}
+
+.nextText { grid-column: 1 / span 8; display: flex; flex-direction: column; gap: 16px; min-width: 0; @include respond-to(md) { grid-column: 1; grid-row: 2; } }
+.nextLabel { font-family: $font-mono; font-size: 0.6875rem; letter-spacing: 0.04em; text-transform: uppercase; color: $color-text-mid; }
+
+.nextTitle {
+  font-family: $font-body;
+  font-weight: $fw-light;
+  font-size: clamp(3rem, 7.1vw, 7.5rem);
+  line-height: 0.95;
+  letter-spacing: -0.05em;
+  color: $color-text-hi;
+}
+
+.nextArrow { display: inline-block; transition: transform 0.45s $ease-out-expo; }
+.next:hover .nextArrow, .next:focus-visible .nextArrow { transform: translate(0.08em, -0.08em); }
+
+.nextLead { font-family: $font-body; font-size: 1.125rem; line-height: 1.5; letter-spacing: -0.01em; color: $color-text-mid; max-width: 48rem; }
+
+.nextCover {
+  grid-column: 9 / -1;
+  display: block;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: var(--c-stage);
+
+  img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.8s $ease-out-expo; }
+  .next:hover & img { transform: scale(1.03); }
+
+  @include respond-to(md) { grid-column: 1; }
+}
+
+// ─── Behance block ────────────────────────────────────────────────────────────
+.blockWrap {
+  @include container;
+  position: relative;
+}
+
+.notesBar {
+  position: sticky;
+  // Below the vertical FRESNO wordmark, which hangs ~120 px from the top.
+  top: calc(#{$nav-height} + 3.5rem);
+  z-index: 3;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+  height: 0;            // floats over the block without pushing it
+  overflow: visible;
+
+  > div {
+    margin-top: $space-3;
+    margin-right: $space-3;
+    padding: 4px 4px 4px 14px;
+    border-radius: 999px;
+    background: $color-overlay;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  }
+
+  @media (max-width: 900px) { display: none; }
+}
+
+.block {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  line-height: 0;
+}
+
+.blockImg {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 0;
+}
+
+.notes {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  line-height: normal;
+
+  @media (max-width: 900px) { display: none; }
+}
+
+.lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+
+  line { stroke: $raw-chip; stroke-width: 1.25; }
+}
+
+.dot {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  border-radius: 50%;
+  background: $raw-chip;
+  box-shadow: 0 0 0 3px rgba(198, 219, 249, 0.25);
+}
+
+.note {
+  position: absolute;
+  width: clamp(14rem, 21.1%, 20.5rem);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px;
+  border-radius: 4px;
+  background: $raw-chip;
+  color: $raw-ink;
+  font-family: $font-mono;
+  font-size: 0.75rem;
+  line-height: 1.35;
+  pointer-events: auto;
+
+  @media (prefers-reduced-motion: no-preference) {
+    animation: noteIn 0.25s $ease-out-quart both;
+  }
+}
+
+@keyframes noteIn { from { opacity: 0; transform: translateY(4px); } }
+
+.noteTitle { font-weight: $fw-medium; }
+

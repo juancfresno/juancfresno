@@ -1,0 +1,171 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+// Arco (Lab 003 · 01) on the site: pinned under the 72px header, above the
+// mobile tab bar (≤ 768: not pinned, swipe only; see Arco.tsx). The drum fills
+// the content width; the readout sits under it.
+
+.arco {
+  --arco-top: 72px;
+  --arco-bottom: 0px;
+  --arco-pin-h: calc(100svh - var(--arco-top) - var(--arco-bottom));
+
+  // Phones/tablets: the bar is var(--tabbar-h); the pinned stage only needs the
+  // portrait panel (66 % of the width, 4:5) + dial + readout, not a full screen.
+  @include respond-to(md) {
+    --arco-bottom: var(--tabbar-h);
+    --arco-pin-h: min(calc(100svh - var(--arco-top) - var(--arco-bottom)), calc(66vw * 1.25 + 8.5rem));
+  }
+  position: relative;
+}
+
+.pin { position: relative; }
+
+.inner {
+  position: sticky;
+  top: var(--arco-top);
+  height: var(--arco-pin-h);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.view {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  touch-action: pan-y;
+  cursor: grab;
+  outline: none;
+
+  &:focus-visible { box-shadow: inset 0 0 0 1px $color-text; }
+}
+
+.dragging { cursor: grabbing; }
+
+.ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform-style: preserve-3d;
+}
+
+.card {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-style: preserve-3d;
+  cursor: pointer;
+}
+
+.strip {
+  position: absolute;
+  background-color: $color-bg-2;
+  background-repeat: no-repeat;
+  backface-visibility: hidden;
+  border-radius: 2px;
+  filter: brightness(var(--b, 1));
+  transition: filter 0.4s ease;
+}
+
+.mono .strip { filter: brightness(var(--b, 1)) grayscale(1) contrast(1.2); }
+
+.dial {
+  display: block;
+  width: calc(100% - 2 * #{$gutter});
+  margin-inline: auto;
+  height: auto;
+  color: $color-text-mid;
+  overflow: visible;
+
+  circle { fill: $color-text-mid; r: 2.5; transition: r 0.3s $ease-out-expo, fill 0.3s; }
+  circle[data-on='true'] { fill: $color-text; r: 4.5; }
+}
+
+.hud {
+  @include container;
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: baseline;
+  gap: $space-4;
+  padding-top: clamp(1rem, 2vw, 2rem);
+  padding-bottom: clamp(1rem, 2vw, 1.75rem);
+  font-family: $font-mono;
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: $color-text-mid;
+
+  @include respond-to(md) { grid-template-columns: auto 1fr; }
+}
+
+.readN { font-variant-numeric: tabular-nums; }
+
+.read {
+  margin: 0;
+  text-align: center;
+  font-size: 0.75rem;
+  color: $color-text;
+  white-space: nowrap;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  @include respond-to(md) { text-align: right; white-space: normal; }
+}
+
+.readT {
+  color: $color-text;
+  text-decoration: none;
+
+  &:hover, &:focus-visible { text-decoration: underline; text-underline-offset: 3px; }
+  @include focus-ring($color-text);
+}
+
+.readD { color: $color-text; }
+
+.hint {
+  justify-self: end;
+  @include respond-to(md) { display: none; }
+}
+
+// ─── Still grid (reduced motion) ────────────────────────────────────────────
+.still {
+  display: none;
+  list-style: none;
+  @include container;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: $space-8 $space-4;
+
+  @include respond-to(md) { grid-template-columns: 1fr; }
+}
+
+.stillLink { display: flex; flex-direction: column; gap: $space-3; color: $color-text; text-decoration: none; }
+
+.stillMedia {
+  display: block;
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
+  background: $color-bg-2;
+
+  img { width: 100%; height: 100%; object-fit: cover; }
+}
+
+.stillMeta {
+  display: flex;
+  justify-content: space-between;
+  gap: $space-4;
+  font-family: $font-mono;
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  color: $color-text-mid;
+
+  span:first-child { color: $color-text; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pin { display: none; }
+  .still { display: grid; }
+}

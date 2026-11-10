@@ -1,12 +1,26 @@
 // ─── Colors ───────────────────────────────────────────────────────────────────
-$color-bg:          #10100e;   // brand/brand from Figma
-$color-bg-2:        #1a1a18;
-$color-surface:     #242420;
-$color-border:      rgba(252, 252, 247, 0.1);
+// Theme colors are CSS custom properties so the whole site can switch between
+// dark (default) and light at runtime via html[data-theme]. Values live in
+// globals.scss (:root + [data-theme="light"]). Raw brand values stay below
+// for the few places that must not change with the theme.
+$raw-ink:           #10100e;   // brand/brand from Figma
+$raw-pearl:         #fcfcf7;   // background/pearl from Figma
+$raw-chip:          #c6dbf9;   // brand blue — hover/active chip, same in both themes
 
-$color-text:        #fcfcf7;   // background/pearl from Figma
-$color-text-muted:  rgba(252, 252, 247, 0.35);
-$color-text-mid:    rgba(252, 252, 247, 0.6);
+$color-bg:          var(--c-bg);
+$color-bg-2:        var(--c-bg-2);
+$color-surface:     var(--c-surface);
+$color-border:      var(--c-border);
+$color-bar:         var(--c-bar);
+
+$color-text:        var(--c-text);
+$color-text-muted:  var(--c-text-muted);
+$color-text-mid:    var(--c-text-mid);
+$color-text-hi:     var(--c-text-hi);
+$color-text-dim:    var(--c-text-dim);
+$color-line:        var(--c-line);
+$color-line-hi:     var(--c-line-hi);
+$color-overlay:     var(--c-overlay);
 
 $color-accent:      #c8ff00;   // ← ajusta tu color de acento
 $color-accent-2:    #ff3d00;
@@ -14,7 +28,7 @@ $color-accent-2:    #ff3d00;
 // ─── Typography ───────────────────────────────────────────────────────────────
 $font-sans:         'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 $font-display:      'ClashDisplay', $font-sans;
-$font-mono:         var(--font-geist-mono), 'JetBrains Mono', monospace;
+$font-mono:         var(--font-fragment-mono), ui-monospace, 'SFMono-Regular', Menlo, monospace;
 $font-body:         var(--font-switzer), $font-sans;
 
 $fs-xs:    clamp(0.625rem,  0.5vw + 0.5rem, 0.75rem);
@@ -58,7 +72,7 @@ $space-32:  8rem;
 $space-40:  10rem;
 
 // ─── Layout ───────────────────────────────────────────────────────────────────
-$max-width:         1440px;
+$max-width:         1440px;   // reference only; the layout is liquid (no cap)
 $gutter:            clamp(1.5rem, 4vw, 4rem);
 $nav-height:        5rem;
 

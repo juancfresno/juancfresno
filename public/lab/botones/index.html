@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fresno Lab · 001 · Buttons</title>
+  <link rel="stylesheet" href="buttons.css">
+  <style>
+    body { margin: 0; min-height: 100vh; display: flex; flex-wrap: wrap; gap: 24px; align-items: center; justify-content: center; background: #10100e; font-family: system-ui, sans-serif; }
+    .fb { --fb-fg: #fcfcf7; --fb-inv: #10100e; }
+  </style>
+</head>
+<body>
+  <button class="fb fb--magnet"><span class="fb__label">Magnético</span></button>
+  <button class="fb fb--cols"><span class="fb__label">Columnas</span></button>
+  <button class="fb fb--roll"><span class="fb__label"><span data-text="Rodillo">Rodillo</span></span></button>
+  <button class="fb fb--scramble"><span class="fb__label">Scramble</span></button>
+  <script src="buttons.js"></script>
+</body>
+</html>

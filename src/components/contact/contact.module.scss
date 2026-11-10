@@ -1,0 +1,306 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+// Contact v1.0 — Figma "Contact · v1.0 · 1680" (6889:1345).
+
+.label {
+  font-family: $font-mono;
+  font-size: 0.6875rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: $color-text-hi;
+}
+
+// ─── 01 · Title ─────────────────────────────────────────────────────────────
+.hero {
+  @include container;
+  padding-top: clamp(4rem, 7vw, 7.5rem);
+  padding-bottom: clamp(3.5rem, 5.7vw, 6rem);
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: $space-3 $space-8;
+}
+
+// Block, not flex: the clock and the tail are inline text, so on a phone the
+// line wraps as one sentence instead of splitting into columns.
+.time {
+  display: block;
+  font-family: $font-mono;
+  font-size: 0.6875rem;
+  letter-spacing: 0.02em;
+  color: $color-text;
+  font-variant-numeric: tabular-nums;
+
+  i { display: inline-block; width: 7px; height: 7px; margin-right: 10px; vertical-align: 0.05em; border-radius: 50%; background: var(--c-g); }
+}
+
+.title {
+  margin-top: clamp(2.5rem, 3.3vw, 3.5rem);
+  font-family: $font-body;
+  font-weight: $fw-light;
+  font-size: clamp(3rem, 8.1vw, 8.5rem);
+  line-height: 0.92;
+  letter-spacing: -0.05em;
+  color: $color-text-hi;
+  max-width: 10ch;
+  text-wrap: balance;
+
+  @media (min-width: 1100px) { max-width: 16ch; }
+}
+
+// ─── 02 · Two doors ─────────────────────────────────────────────────────────
+.doorsWrap {
+  @include container;
+  padding-bottom: clamp(4.5rem, 7vw, 7.5rem);
+}
+
+.doors {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: $space-4;
+
+  @include respond-to(md) { grid-template-columns: 1fr; }
+}
+
+.door {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: $space-12;
+  min-height: clamp(20rem, 28.6vw, 30rem);
+  padding: 32px clamp(1.25rem, 2.4vw, 2.5rem) 36px;
+  border: 1px solid $color-line;
+  border-radius: 2px;
+  color: $color-text;
+  text-decoration: none;
+  transition: background 0.35s $ease-out-expo, color 0.35s $ease-out-expo, border-color 0.35s;
+}
+
+.doorTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  font-family: $font-mono;
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.doorN {
+  font-size: clamp(2.5rem, 3.8vw, 4rem);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--c-faint);
+  transition: color 0.35s;
+}
+
+.doorBody { display: flex; flex-direction: column; gap: 20px; }
+
+// min(…, 6.9vw): the address fits inside the door on a 360 px phone.
+.doorEmail :global(a) { font-size: min(clamp(1.75rem, 3.1vw, 3.25rem), 6.9vw) !important; letter-spacing: -0.03em !important; }
+
+.doorAction {
+  font-family: $font-body;
+  font-weight: $fw-light;
+  font-size: clamp(1.75rem, 3.1vw, 3.25rem);
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.arrow {
+  display: inline-block;
+  transition: transform 0.4s $ease-out-expo;
+}
+
+.doorLine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  :global([class*='pending']) { margin-left: 0; }
+}
+
+.doorText {
+  font-family: $font-body;
+  font-size: 1.125rem;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+  color: $color-text-mid;
+  max-width: 32rem;
+  transition: color 0.35s;
+}
+
+// Talk door: at rest like Write; on hover it fills in pearl and the arrow moves.
+.doorTalk {
+  &:hover, &:focus-visible {
+    background: $raw-pearl;
+    border-color: $raw-pearl;
+    color: $raw-ink;
+
+    .doorN { color: $raw-ink; }
+    .doorText { color: #3a3a37; }
+    .arrow { transform: translate(4px, -4px); }
+  }
+  @include focus-ring($color-text);
+}
+
+// ─── 03 · How I work with studios ───────────────────────────────────────────
+.modesWrap {
+  @include container;
+  padding-top: clamp(4rem, 6vw, 6rem);
+  padding-bottom: clamp(4.5rem, 7vw, 7rem);
+  background: $color-bg-2;
+}
+
+.head { display: flex; flex-direction: column; gap: $space-6; margin-bottom: clamp(2rem, 3vw, 3rem); }
+.headRule { display: block; width: 100%; color: $color-line; }
+
+.modes {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: $space-4;
+
+  @include respond-to(md) { grid-template-columns: 1fr; gap: $space-12; }
+}
+
+.modeTitle {
+  margin-top: 28px;
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  font-family: $font-mono;
+  font-size: 0.75rem;
+  color: $color-text-mid;
+}
+
+.modeName {
+  font-family: $font-body;
+  font-weight: $fw-light;
+  font-size: clamp(2rem, 2.4vw, 2.5rem);
+  letter-spacing: -0.025em;
+  color: $color-text;
+}
+
+.modeText {
+  margin-top: 14px;
+  font-family: $font-body;
+  font-size: 1.0625rem;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+  color: $color-text-mid;
+  max-width: 30rem;
+}
+
+// Diagrams
+.diagram {
+  position: relative;
+  aspect-ratio: 507 / 220;
+  background: var(--c-stage);
+  overflow: hidden;
+
+  em {
+    position: absolute;
+    font-family: $font-mono;
+    font-size: 0.5rem;
+    font-style: normal;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: $color-text-mid;
+    white-space: nowrap;
+  }
+}
+
+.dLabel {
+  position: absolute;
+  left: 8%;
+  top: 11%;
+  font-family: $font-mono;
+  font-size: 0.5rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: $color-text-mid;
+}
+
+.team {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  top: 18%;
+  bottom: 18%;
+  border: 1px solid var(--c-faint);
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 3%;
+  padding: 7% 4%;
+
+  i { border: 1px solid $color-line; }
+  i[data-me] { background: var(--c-g); border-color: var(--c-g); }
+}
+
+.yours, .mine {
+  position: absolute;
+  top: 18%;
+  bottom: 18%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: 34%;
+  gap: 8%;
+  padding: 12px;
+
+  em { top: -16px; left: 0; }
+}
+
+.yours {
+  left: 8%;
+  width: 42%;
+  border: 1px solid var(--c-faint);
+  i { background: color-mix(in srgb, var(--c-faint) 60%, transparent); }
+}
+
+.mine {
+  left: 54.7%;
+  width: 37.4%;
+  border: 1px dashed var(--c-g);
+  gap: 6px;
+  i { background: var(--c-g); }
+  em { color: var(--c-g); }
+}
+
+.track {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  top: 50%;
+  height: 1px;
+  background: var(--c-g);
+
+  &::before, &::after { content: ''; position: absolute; top: -5px; width: 10px; height: 10px; border-radius: 50%; }
+  &::before { left: -5px; background: var(--c-g); }
+  &::after { right: -5px; background: $color-text; }
+
+  i { position: absolute; top: -8px; width: 1px; height: 16px; background: var(--c-g); }
+}
+
+.tStart { left: 8%; top: calc(50% + 20px); }
+.tEnd { right: 8%; top: calc(50% + 20px); }
+
+.foot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: $space-4 $space-8;
+  margin-top: clamp(3rem, 4.3vw, 4.5rem);
+  padding-top: 20px;
+  border-top: 1px solid $color-line;
+}
+
+.small { font-family: $font-body; font-size: 1.125rem; letter-spacing: -0.005em; color: $color-text; }

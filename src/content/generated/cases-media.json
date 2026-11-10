@@ -1,0 +1,1009 @@
+{
+ "shoeciety": {
+  "cover": {
+   "src": "/work/shoeciety/cover.webp",
+   "w": 800,
+   "h": 732
+  },
+  "images": [
+   {
+    "src": "/work/shoeciety/01.webp",
+    "w": 1600,
+    "h": 1465
+   },
+   {
+    "src": "/work/shoeciety/02.webp",
+    "w": 1600,
+    "h": 1234
+   },
+   {
+    "src": "/work/shoeciety/03.webp",
+    "w": 1600,
+    "h": 1255
+   },
+   {
+    "src": "/work/shoeciety/04.webp",
+    "w": 1600,
+    "h": 1662
+   },
+   {
+    "src": "/work/shoeciety/05.webp",
+    "w": 1600,
+    "h": 1622
+   },
+   {
+    "src": "/work/shoeciety/06.webp",
+    "w": 1600,
+    "h": 1653
+   },
+   {
+    "src": "/work/shoeciety/07.webp",
+    "w": 1600,
+    "h": 1045
+   },
+   {
+    "src": "/work/shoeciety/08.webp",
+    "w": 1600,
+    "h": 2488
+   },
+   {
+    "src": "/work/shoeciety/09.webp",
+    "w": 1600,
+    "h": 1010
+   },
+   {
+    "src": "/work/shoeciety/10.webp",
+    "w": 1600,
+    "h": 1219
+   },
+   {
+    "src": "/work/shoeciety/11.webp",
+    "w": 1600,
+    "h": 1972
+   },
+   {
+    "src": "/work/shoeciety/12.webp",
+    "w": 1600,
+    "h": 1471
+   },
+   {
+    "src": "/work/shoeciety/13.webp",
+    "w": 1600,
+    "h": 883
+   }
+  ]
+ },
+ "signflow": {
+  "cover": {
+   "src": "/work/signflow/cover.webp",
+   "w": 800,
+   "h": 354
+  },
+  "images": [
+   {
+    "src": "/work/signflow/01.webp",
+    "w": 1600,
+    "h": 707
+   },
+   {
+    "src": "/work/signflow/02.webp",
+    "w": 1600,
+    "h": 982
+   },
+   {
+    "src": "/work/signflow/03.webp",
+    "w": 1600,
+    "h": 982
+   },
+   {
+    "src": "/work/signflow/04.webp",
+    "w": 1600,
+    "h": 949
+   },
+   {
+    "src": "/work/signflow/05.webp",
+    "w": 1600,
+    "h": 949
+   },
+   {
+    "src": "/work/signflow/06.webp",
+    "w": 1600,
+    "h": 949
+   },
+   {
+    "src": "/work/signflow/07.webp",
+    "w": 1600,
+    "h": 949
+   },
+   {
+    "src": "/work/signflow/08.webp",
+    "w": 1600,
+    "h": 949
+   },
+   {
+    "src": "/work/signflow/09.webp",
+    "w": 1600,
+    "h": 949
+   },
+   {
+    "src": "/work/signflow/10.webp",
+    "w": 1600,
+    "h": 949
+   },
+   {
+    "src": "/work/signflow/11.webp",
+    "w": 1600,
+    "h": 949
+   },
+   {
+    "src": "/work/signflow/12.webp",
+    "w": 1600,
+    "h": 2635
+   },
+   {
+    "src": "/work/signflow/13.webp",
+    "w": 1600,
+    "h": 949
+   },
+   {
+    "src": "/work/signflow/14.webp",
+    "w": 1600,
+    "h": 949
+   },
+   {
+    "src": "/work/signflow/15.webp",
+    "w": 1600,
+    "h": 949
+   },
+   {
+    "src": "/work/signflow/16.webp",
+    "w": 1600,
+    "h": 982
+   }
+  ]
+ },
+ "likitech": {
+  "cover": {
+   "src": "/work/likitech/cover.webp",
+   "w": 800,
+   "h": 548
+  },
+  "images": [
+   {
+    "src": "/work/likitech/01.webp",
+    "w": 1600,
+    "h": 1095
+   },
+   {
+    "src": "/work/likitech/02.webp",
+    "w": 1600,
+    "h": 885
+   },
+   {
+    "src": "/work/likitech/03.webp",
+    "w": 1600,
+    "h": 1029
+   },
+   {
+    "src": "/work/likitech/04.webp",
+    "w": 1600,
+    "h": 944
+   },
+   {
+    "src": "/work/likitech/05.webp",
+    "w": 1600,
+    "h": 939
+   },
+   {
+    "src": "/work/likitech/06.webp",
+    "w": 1600,
+    "h": 939
+   },
+   {
+    "src": "/work/likitech/07.webp",
+    "w": 1600,
+    "h": 939
+   },
+   {
+    "src": "/work/likitech/08.webp",
+    "w": 1600,
+    "h": 939
+   },
+   {
+    "src": "/work/likitech/09.webp",
+    "w": 1600,
+    "h": 503
+   },
+   {
+    "src": "/work/likitech/10.webp",
+    "w": 1600,
+    "h": 1251
+   },
+   {
+    "src": "/work/likitech/11.webp",
+    "w": 1600,
+    "h": 939
+   },
+   {
+    "src": "/work/likitech/12.webp",
+    "w": 1600,
+    "h": 939
+   },
+   {
+    "src": "/work/likitech/13.webp",
+    "w": 1600,
+    "h": 939
+   },
+   {
+    "src": "/work/likitech/14.webp",
+    "w": 1600,
+    "h": 939
+   },
+   {
+    "src": "/work/likitech/15.webp",
+    "w": 1600,
+    "h": 939
+   }
+  ]
+ },
+ "access": {
+  "cover": {
+   "src": "/work/access/cover.webp",
+   "w": 800,
+   "h": 354
+  },
+  "images": [
+   {
+    "src": "/work/access/01.webp",
+    "w": 1600,
+    "h": 707
+   },
+   {
+    "src": "/work/access/02.webp",
+    "w": 1600,
+    "h": 373
+   },
+   {
+    "src": "/work/access/03.webp",
+    "w": 1600,
+    "h": 457
+   },
+   {
+    "src": "/work/access/04.webp",
+    "w": 1600,
+    "h": 1752
+   },
+   {
+    "src": "/work/access/05.webp",
+    "w": 1600,
+    "h": 1909
+   },
+   {
+    "src": "/work/access/06.webp",
+    "w": 1600,
+    "h": 914
+   },
+   {
+    "src": "/work/access/07.webp",
+    "w": 1600,
+    "h": 1153
+   },
+   {
+    "src": "/work/access/08.webp",
+    "w": 1600,
+    "h": 997
+   },
+   {
+    "src": "/work/access/09.webp",
+    "w": 1600,
+    "h": 1075
+   },
+   {
+    "src": "/work/access/10.webp",
+    "w": 1600,
+    "h": 1386
+   }
+  ]
+ },
+ "educa-projects": {
+  "cover": {
+   "src": "/work/educa-projects/cover.webp",
+   "w": 800,
+   "h": 436
+  },
+  "images": [
+   {
+    "src": "/work/educa-projects/01.webp",
+    "w": 1600,
+    "h": 872
+   },
+   {
+    "src": "/work/educa-projects/02.webp",
+    "w": 1600,
+    "h": 987
+   },
+   {
+    "src": "/work/educa-projects/03.webp",
+    "w": 1600,
+    "h": 535
+   },
+   {
+    "src": "/work/educa-projects/04.webp",
+    "w": 1600,
+    "h": 1439
+   },
+   {
+    "src": "/work/educa-projects/05.webp",
+    "w": 1600,
+    "h": 1877
+   },
+   {
+    "src": "/work/educa-projects/06.webp",
+    "w": 1600,
+    "h": 1383
+   },
+   {
+    "src": "/work/educa-projects/07.webp",
+    "w": 1600,
+    "h": 1305
+   },
+   {
+    "src": "/work/educa-projects/08.webp",
+    "w": 1600,
+    "h": 889
+   },
+   {
+    "src": "/work/educa-projects/09.webp",
+    "w": 1600,
+    "h": 905
+   },
+   {
+    "src": "/work/educa-projects/10.webp",
+    "w": 1600,
+    "h": 942
+   },
+   {
+    "src": "/work/educa-projects/11.webp",
+    "w": 1600,
+    "h": 1493
+   }
+  ]
+ },
+ "dinamo": {
+  "cover": {
+   "src": "/work/dinamo/cover.webp",
+   "w": 800,
+   "h": 457
+  },
+  "images": [
+   {
+    "src": "/work/dinamo/01.webp",
+    "w": 1600,
+    "h": 914
+   },
+   {
+    "src": "/work/dinamo/02.webp",
+    "w": 1600,
+    "h": 656
+   },
+   {
+    "src": "/work/dinamo/03.webp",
+    "w": 1600,
+    "h": 981
+   },
+   {
+    "src": "/work/dinamo/04.webp",
+    "w": 1600,
+    "h": 914
+   },
+   {
+    "src": "/work/dinamo/05.webp",
+    "w": 1600,
+    "h": 664
+   },
+   {
+    "src": "/work/dinamo/06.webp",
+    "w": 1600,
+    "h": 898
+   },
+   {
+    "src": "/work/dinamo/07.webp",
+    "w": 1600,
+    "h": 454
+   },
+   {
+    "src": "/work/dinamo/08.webp",
+    "w": 1600,
+    "h": 2295
+   },
+   {
+    "src": "/work/dinamo/09.webp",
+    "w": 1600,
+    "h": 1067
+   },
+   {
+    "src": "/work/dinamo/10.webp",
+    "w": 1600,
+    "h": 1166
+   },
+   {
+    "src": "/work/dinamo/11.webp",
+    "w": 1600,
+    "h": 981
+   }
+  ]
+ },
+ "bonamar": {
+  "cover": {
+   "src": "/work/bonamar/cover.webp",
+   "w": 800,
+   "h": 457
+  },
+  "images": [
+   {
+    "src": "/work/bonamar/01.webp",
+    "w": 1600,
+    "h": 914
+   },
+   {
+    "src": "/work/bonamar/02.webp",
+    "w": 1600,
+    "h": 1152
+   },
+   {
+    "src": "/work/bonamar/03.webp",
+    "w": 1600,
+    "h": 466
+   },
+   {
+    "src": "/work/bonamar/04.webp",
+    "w": 1600,
+    "h": 631
+   },
+   {
+    "src": "/work/bonamar/05.webp",
+    "w": 1600,
+    "h": 1314
+   },
+   {
+    "src": "/work/bonamar/06.webp",
+    "w": 1600,
+    "h": 1061
+   },
+   {
+    "src": "/work/bonamar/07.webp",
+    "w": 1600,
+    "h": 1977
+   },
+   {
+    "src": "/work/bonamar/08.webp",
+    "w": 1600,
+    "h": 1106
+   },
+   {
+    "src": "/work/bonamar/09.webp",
+    "w": 1600,
+    "h": 1413
+   }
+  ]
+ },
+ "awen": {
+  "cover": {
+   "src": "/work/awen/cover.webp",
+   "w": 800,
+   "h": 457
+  },
+  "images": [
+   {
+    "src": "/work/awen/01.webp",
+    "w": 1600,
+    "h": 914
+   },
+   {
+    "src": "/work/awen/02.webp",
+    "w": 1600,
+    "h": 686
+   },
+   {
+    "src": "/work/awen/03.webp",
+    "w": 1600,
+    "h": 3063
+   },
+   {
+    "src": "/work/awen/04.webp",
+    "w": 1600,
+    "h": 1097
+   },
+   {
+    "src": "/work/awen/05.webp",
+    "w": 1600,
+    "h": 2523
+   },
+   {
+    "src": "/work/awen/06.webp",
+    "w": 1600,
+    "h": 787
+   },
+   {
+    "src": "/work/awen/07.webp",
+    "w": 1600,
+    "h": 546
+   },
+   {
+    "src": "/work/awen/08.webp",
+    "w": 1600,
+    "h": 743
+   }
+  ]
+ },
+ "correos": {
+  "cover": {
+   "src": "/work/correos/cover.webp",
+   "w": 800,
+   "h": 457
+  },
+  "images": [
+   {
+    "src": "/work/correos/01.webp",
+    "w": 1600,
+    "h": 914
+   },
+   {
+    "src": "/work/correos/02.webp",
+    "w": 1600,
+    "h": 914
+   },
+   {
+    "src": "/work/correos/03.webp",
+    "w": 1600,
+    "h": 2350
+   },
+   {
+    "src": "/work/correos/04.webp",
+    "w": 1600,
+    "h": 978
+   },
+   {
+    "src": "/work/correos/05.webp",
+    "w": 1600,
+    "h": 731
+   },
+   {
+    "src": "/work/correos/06.webp",
+    "w": 1600,
+    "h": 923
+   },
+   {
+    "src": "/work/correos/07.webp",
+    "w": 1600,
+    "h": 1576
+   },
+   {
+    "src": "/work/correos/08.webp",
+    "w": 1600,
+    "h": 4662
+   },
+   {
+    "src": "/work/correos/09.webp",
+    "w": 1600,
+    "h": 1909
+   }
+  ]
+ },
+ "selected-logos": {
+  "cover": {
+   "src": "/work/selected-logos/cover.webp",
+   "w": 800,
+   "h": 457
+  },
+  "images": [
+   {
+    "src": "/work/selected-logos/01.webp",
+    "w": 1600,
+    "h": 914
+   },
+   {
+    "src": "/work/selected-logos/02.webp",
+    "w": 1600,
+    "h": 914
+   },
+   {
+    "src": "/work/selected-logos/03.webp",
+    "w": 1600,
+    "h": 914
+   },
+   {
+    "src": "/work/selected-logos/04.webp",
+    "w": 1600,
+    "h": 914
+   },
+   {
+    "src": "/work/selected-logos/05.webp",
+    "w": 1600,
+    "h": 914
+   },
+   {
+    "src": "/work/selected-logos/06.webp",
+    "w": 1600,
+    "h": 914
+   },
+   {
+    "src": "/work/selected-logos/07.webp",
+    "w": 1600,
+    "h": 914
+   },
+   {
+    "src": "/work/selected-logos/08.webp",
+    "w": 1600,
+    "h": 914
+   },
+   {
+    "src": "/work/selected-logos/09.webp",
+    "w": 1600,
+    "h": 914
+   },
+   {
+    "src": "/work/selected-logos/10.webp",
+    "w": 1600,
+    "h": 914
+   },
+   {
+    "src": "/work/selected-logos/11.webp",
+    "w": 1600,
+    "h": 914
+   },
+   {
+    "src": "/work/selected-logos/12.webp",
+    "w": 1600,
+    "h": 914
+   },
+   {
+    "src": "/work/selected-logos/13.webp",
+    "w": 1600,
+    "h": 914
+   },
+   {
+    "src": "/work/selected-logos/14.webp",
+    "w": 1600,
+    "h": 914
+   },
+   {
+    "src": "/work/selected-logos/15.webp",
+    "w": 1600,
+    "h": 914
+   },
+   {
+    "src": "/work/selected-logos/16.webp",
+    "w": 1600,
+    "h": 914
+   }
+  ]
+ },
+ "casa-carbon": {
+  "cover": {
+   "src": "/work/casa-carbon/cover.webp",
+   "w": 800,
+   "h": 457
+  },
+  "images": [
+   {
+    "src": "/work/casa-carbon/01.webp",
+    "w": 1600,
+    "h": 914
+   },
+   {
+    "src": "/work/casa-carbon/02.webp",
+    "w": 1600,
+    "h": 667
+   },
+   {
+    "src": "/work/casa-carbon/03.webp",
+    "w": 1600,
+    "h": 1515
+   },
+   {
+    "src": "/work/casa-carbon/04.webp",
+    "w": 1600,
+    "h": 1065
+   },
+   {
+    "src": "/work/casa-carbon/05.webp",
+    "w": 1600,
+    "h": 773
+   },
+   {
+    "src": "/work/casa-carbon/06.webp",
+    "w": 1600,
+    "h": 1499
+   },
+   {
+    "src": "/work/casa-carbon/07.webp",
+    "w": 1600,
+    "h": 645
+   },
+   {
+    "src": "/work/casa-carbon/08.webp",
+    "w": 1600,
+    "h": 1438
+   },
+   {
+    "src": "/work/casa-carbon/09.webp",
+    "w": 1600,
+    "h": 718
+   },
+   {
+    "src": "/work/casa-carbon/10.webp",
+    "w": 1600,
+    "h": 594
+   },
+   {
+    "src": "/work/casa-carbon/11.webp",
+    "w": 1600,
+    "h": 818
+   },
+   {
+    "src": "/work/casa-carbon/12.webp",
+    "w": 1600,
+    "h": 634
+   },
+   {
+    "src": "/work/casa-carbon/13.webp",
+    "w": 1600,
+    "h": 870
+   },
+   {
+    "src": "/work/casa-carbon/14.webp",
+    "w": 1600,
+    "h": 549
+   },
+   {
+    "src": "/work/casa-carbon/15.webp",
+    "w": 1600,
+    "h": 865
+   },
+   {
+    "src": "/work/casa-carbon/16.webp",
+    "w": 1600,
+    "h": 865
+   },
+   {
+    "src": "/work/casa-carbon/17.webp",
+    "w": 1600,
+    "h": 835
+   },
+   {
+    "src": "/work/casa-carbon/18.webp",
+    "w": 1600,
+    "h": 818
+   },
+   {
+    "src": "/work/casa-carbon/19.webp",
+    "w": 1600,
+    "h": 805
+   },
+   {
+    "src": "/work/casa-carbon/20.webp",
+    "w": 1600,
+    "h": 823
+   },
+   {
+    "src": "/work/casa-carbon/21.webp",
+    "w": 1600,
+    "h": 823
+   },
+   {
+    "src": "/work/casa-carbon/22.webp",
+    "w": 1600,
+    "h": 823
+   },
+   {
+    "src": "/work/casa-carbon/23.webp",
+    "w": 1600,
+    "h": 823
+   },
+   {
+    "src": "/work/casa-carbon/24.webp",
+    "w": 1600,
+    "h": 823
+   },
+   {
+    "src": "/work/casa-carbon/25.webp",
+    "w": 1600,
+    "h": 823
+   },
+   {
+    "src": "/work/casa-carbon/26.webp",
+    "w": 1600,
+    "h": 864
+   },
+   {
+    "src": "/work/casa-carbon/27.webp",
+    "w": 1600,
+    "h": 1006
+   },
+   {
+    "src": "/work/casa-carbon/28.webp",
+    "w": 1600,
+    "h": 549
+   },
+   {
+    "src": "/work/casa-carbon/29.webp",
+    "w": 1600,
+    "h": 869
+   },
+   {
+    "src": "/work/casa-carbon/30.webp",
+    "w": 1600,
+    "h": 960
+   },
+   {
+    "src": "/work/casa-carbon/31.webp",
+    "w": 1600,
+    "h": 663
+   },
+   {
+    "src": "/work/casa-carbon/32.webp",
+    "w": 1600,
+    "h": 1718
+   }
+  ]
+ },
+ "google": {
+  "cover": {
+   "src": "/work/google/cover.webp",
+   "w": 800,
+   "h": 532
+  },
+  "images": [
+   {
+    "src": "/work/google/01.webp",
+    "w": 1540,
+    "h": 1025
+   },
+   {
+    "src": "/work/google/02.webp",
+    "w": 1540,
+    "h": 1046
+   },
+   {
+    "src": "/work/google/03.webp",
+    "w": 1540,
+    "h": 697
+   },
+   {
+    "src": "/work/google/04.webp",
+    "w": 800,
+    "h": 571
+   },
+   {
+    "src": "/work/google/05.webp",
+    "w": 1540,
+    "h": 1067
+   },
+   {
+    "src": "/work/google/06.webp",
+    "w": 800,
+    "h": 571
+   },
+   {
+    "src": "/work/google/07.webp",
+    "w": 1540,
+    "h": 1064
+   },
+   {
+    "src": "/work/google/08.webp",
+    "w": 1540,
+    "h": 1089
+   },
+   {
+    "src": "/work/google/09.webp",
+    "w": 1540,
+    "h": 1256
+   },
+   {
+    "src": "/work/google/10.webp",
+    "w": 1540,
+    "h": 1086
+   },
+   {
+    "src": "/work/google/11.webp",
+    "w": 1540,
+    "h": 1359
+   },
+   {
+    "src": "/work/google/12.webp",
+    "w": 1540,
+    "h": 1472
+   },
+   {
+    "src": "/work/google/13.webp",
+    "w": 1540,
+    "h": 1076
+   },
+   {
+    "src": "/work/google/14.webp",
+    "w": 1540,
+    "h": 1576
+   },
+   {
+    "src": "/work/google/15.webp",
+    "w": 1540,
+    "h": 1515
+   },
+   {
+    "src": "/work/google/16.webp",
+    "w": 1540,
+    "h": 1094
+   }
+  ]
+ },
+ "super-nintendo": {
+  "cover": {
+   "src": "/work/super-nintendo/cover.webp",
+   "w": 800,
+   "h": 686
+  },
+  "images": [
+   {
+    "src": "/work/super-nintendo/01.webp",
+    "w": 1540,
+    "h": 1320
+   },
+   {
+    "src": "/work/super-nintendo/02.webp",
+    "w": 1540,
+    "h": 1803
+   },
+   {
+    "src": "/work/super-nintendo/03.webp",
+    "w": 1540,
+    "h": 1616
+   },
+   {
+    "src": "/work/super-nintendo/04.webp",
+    "w": 1540,
+    "h": 1361
+   },
+   {
+    "src": "/work/super-nintendo/05.webp",
+    "w": 1540,
+    "h": 1748
+   },
+   {
+    "src": "/work/super-nintendo/06.webp",
+    "w": 1540,
+    "h": 1554
+   },
+   {
+    "src": "/work/super-nintendo/07.webp",
+    "w": 1540,
+    "h": 1752
+   },
+   {
+    "src": "/work/super-nintendo/08.webp",
+    "w": 1540,
+    "h": 1733
+   },
+   {
+    "src": "/work/super-nintendo/09.webp",
+    "w": 1540,
+    "h": 2311
+   },
+   {
+    "src": "/work/super-nintendo/10.webp",
+    "w": 1540,
+    "h": 2105
+   },
+   {
+    "src": "/work/super-nintendo/11.webp",
+    "w": 1540,
+    "h": 1727
+   },
+   {
+    "src": "/work/super-nintendo/12.webp",
+    "w": 1540,
+    "h": 1021
+   }
+  ]
+ }
+}

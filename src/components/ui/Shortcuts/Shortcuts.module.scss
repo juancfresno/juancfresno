@@ -1,0 +1,111 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: $z-modal;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: calc(#{$nav-height} + #{$space-4}) $gutter $space-4;
+  background: transparent;
+}
+
+.panel {
+  width: min(22rem, 100%);
+  padding: $space-4;
+  border: 1px solid $color-line;
+  border-radius: 4px;
+  background: $color-bg;
+  color: $color-text;
+  font-family: $font-mono;
+  font-size: 0.75rem;
+  outline: none;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+
+  @media (prefers-reduced-motion: no-preference) {
+    animation: in 0.18s $ease-out-quart;
+  }
+}
+
+@keyframes in {
+  from { opacity: 0; transform: translateY(-6px); }
+}
+
+.head {
+  @include flex-between;
+  padding-bottom: $space-3;
+  border-bottom: 1px solid $color-line;
+}
+
+.title {
+  text-transform: uppercase;
+  font-size: 0.6875rem;
+  color: $color-text-hi;
+}
+
+.close {
+  padding: 0.2rem 0.5rem;
+  border: 1px solid $color-line;
+  border-radius: 999px;
+  color: $color-text-mid;
+  font: inherit;
+  font-size: 0.6875rem;
+  cursor: pointer;
+
+  &:hover, &:focus-visible { color: $color-text; border-color: $color-text; }
+}
+
+.list { list-style: none; }
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  padding-block: $space-3;
+  border-bottom: 1px solid $color-line;
+
+  &:last-child { border-bottom: 0; padding-bottom: 0; }
+}
+
+.key {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.75rem;
+  height: 1.75rem;
+  border: 1px solid $color-line;
+  border-radius: 3px;
+  font: inherit;
+  color: $color-text;
+}
+
+.label { flex: 1; color: $color-text; }
+
+.soon {
+  color: $color-text-muted;
+  text-transform: uppercase;
+  font-size: 0.625rem;
+}
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: $space-6;
+  z-index: $z-toast;
+  transform: translateX(-50%);
+  padding: 0.4rem 0.75rem;
+  border-radius: 3px;
+  background: $raw-chip;
+  color: $raw-ink;
+  font-family: $font-mono;
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity $duration-fast;
+
+  &[data-on] { opacity: 1; }
+
+  @include respond-to(md) { bottom: calc(#{$space-6} + 3.5rem); }
+}

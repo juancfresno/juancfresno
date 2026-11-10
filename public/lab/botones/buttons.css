@@ -1,0 +1,60 @@
+/* Fresno Lab · 001 · Buttons — https://juancfresno.com/lab/botones
+   No dependencies. Theme with --fb-fg (ink) and --fb-inv (ink on fill). MIT. */
+.fb {
+  --fb-fg: #10100e;
+  --fb-inv: #fcfcf7;
+  --fb-ease: cubic-bezier(0.19, 1, 0.22, 1);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.1em 1.9em;
+  border: 1px solid var(--fb-fg);
+  border-radius: 0;
+  background: transparent;
+  color: var(--fb-fg);
+  font: inherit;
+  font-size: 0.8125rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1.2;
+  cursor: pointer;
+  overflow: hidden;
+  isolation: isolate;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.5s var(--fb-ease), color 0.3s var(--fb-ease);
+}
+.fb:focus-visible { outline: 2px solid var(--fb-fg); outline-offset: 4px; }
+.fb:active { transform: scale(0.97); }
+.fb__label { display: inline-block; transition: transform 0.5s var(--fb-ease); }
+
+/* 1 · Magnet: follows the pointer, the label a bit more (JS). */
+.fb--magnet { overflow: visible; }
+
+/* 2 · Columns: a 12-column fill sweeps in, column by column. */
+.fb__cols {
+  position: absolute; inset: 0; z-index: -1;
+  display: grid; grid-template-columns: repeat(12, 1fr);
+  pointer-events: none;
+}
+.fb__cols span {
+  background: var(--fb-fg);
+  transform: scaleY(0); transform-origin: bottom;
+  transition: transform 0.45s var(--fb-ease);
+  transition-delay: calc(var(--i) * 18ms);
+}
+.fb--cols:hover, .fb--cols:focus-visible { color: var(--fb-inv); }
+.fb--cols:hover .fb__cols span, .fb--cols:focus-visible .fb__cols span { transform: scaleY(1); }
+
+/* 3 · Roll: the label rolls up into a copy of itself. */
+.fb--roll .fb__label { position: relative; overflow: hidden; height: 1.2em; }
+.fb--roll .fb__label > span { display: block; position: relative; transition: transform 0.5s var(--fb-ease); }
+.fb--roll .fb__label > span::after { content: attr(data-text); position: absolute; left: 0; top: 100%; }
+.fb--roll:hover .fb__label > span, .fb--roll:focus-visible .fb__label > span { transform: translateY(-100%); }
+
+/* 4 · Scramble: characters shuffle and resolve (JS). Mono keeps the width still. */
+.fb--scramble { font-family: ui-monospace, 'Geist Mono', 'SFMono-Regular', Menlo, monospace; }
+
+@media (prefers-reduced-motion: reduce) {
+  .fb, .fb__label, .fb__cols span, .fb--roll .fb__label > span { transition: none !important; }
+}

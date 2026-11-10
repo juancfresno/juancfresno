@@ -1,0 +1,384 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+$in-ease: cubic-bezier(0.16, 1, 0.3, 1); // expo-out: fast start, long soft landing
+
+// WIP landing (lib/wip.ts) · Figma "Home · v0" (6944:8590, 1680 × 1024):
+// header 72 · hero (copy 83 px under the header line) · footer. The page
+// fills the screen so the footer sits at the bottom, as in the frame.
+
+.page {
+  position: relative;
+  box-sizing: border-box;
+  min-height: calc(100svh - 122px); // footer ≈ 122 px (Figma web/footer)
+  padding-top: calc(72px + 83px);
+  padding-bottom: 6rem;
+
+  @include respond-to(md) {
+    min-height: calc(100svh - 160px);
+    padding-top: calc(72px + 40px);
+    padding-bottom: 9rem;
+  }
+}
+
+// ─── Hero copy (Figma 6944:8593: gap 24, the two heading lines gap 8) ──────────
+.hero {
+  @include container;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+// Geist 40/46 −0.8 in Figma → Switzer (body font).
+.head {
+  display: block;
+  margin: 0;
+  font-family: $font-body;
+  font-weight: 400;
+  font-size: clamp(1.75rem, 1.2rem + 1.6vw, 2.5rem);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.name { color: $color-text; }
+.title { display: block; color: var(--c-text-hi); }
+.titleMask { margin-top: 8px; } // Figma: the two lines 8 px apart
+
+// Line mask for the entrance: the inner [data-in='mask'] rises into view.
+// The padding keeps descenders out of the clip.
+.mask {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.16em;
+  margin-bottom: -0.16em;
+  > [data-in] { display: block; }
+}
+
+// Geist Mono 11 uppercase → Fragment Mono.
+.disciplines {
+  margin: 0;
+  font-family: $font-mono;
+  font-size: 11px;
+  line-height: normal;
+  text-transform: uppercase;
+  color: $color-text;
+}
+
+// Geist 18/1.4 #9c9ea0 → Switzer, text-mid.
+.intro,
+.contact {
+  margin: 0;
+  max-width: 62rem;
+  font-family: $font-body;
+  font-size: clamp(1rem, 0.9rem + 0.3vw, 1.125rem);
+  line-height: 1.4;
+  color: $color-text-mid;
+}
+
+.email {
+  color: inherit;
+  text-decoration: none;
+  background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat;
+  transition: color $duration-fast $ease-out-quart, background-size $duration-base $ease-out-expo;
+  @include focus-ring;
+
+  &:hover,
+  &:focus-visible {
+    color: $color-text;
+    background-size: 100% 1px;
+  }
+}
+
+// ─── Resting hint (Figma 6944:8776 / 8777) ────────────────────────────────────
+// Dot at 1425 × 457 of the 1680 × 830 hero; label to its left, 14 px lower.
+.hint {
+  position: absolute;
+  left: 84.8%;
+  top: calc(72px + (100% - 72px) * 0.55);
+  z-index: 3;
+  width: 10px;
+  height: 10px;
+  pointer-events: none;
+  mix-blend-mode: difference;
+  color: #fff;
+  transition: opacity 0.4s $ease-out-quart;
+
+  &[data-gone] { opacity: 0; }
+
+  @include respond-to(md) {
+    left: auto;
+    right: max(#{$gutter}, env(safe-area-inset-right, 0px));
+    top: auto;
+    bottom: 4rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) { display: none; }
+}
+
+.hintDot {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.hintLabel {
+  position: absolute;
+  right: calc(100% + 10px);
+  top: 14px;
+  font-family: $font-mono;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+.hintTouch { display: none; }
+@media (hover: none) {
+  .hintMouse { display: none; }
+  .hintTouch { display: inline; }
+}
+
+// ─── Cursor trail ───────────────────────────────────────────────────────────
+// Fixed layer inside <main> (its stacking context, z 10): above the hero copy,
+// under the footer (20) and the header. Pieces only animate transform/opacity.
+.trail {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 2;
+  contain: strict;
+}
+
+// Figma shots: 4:3, cover, radius 2.
+.piece {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: block;
+  opacity: 0;
+  object-fit: cover;
+  border-radius: 2px;
+  background: var(--c-stage, #111);
+  transform-origin: 50% 50%;
+  will-change: transform, opacity;
+  user-select: none;
+}
+
+// 4 · Grid: a piece = 12 strips of the same image.
+.gridPiece {
+  position: absolute;
+  left: 0;
+  top: 0;
+  overflow: hidden;
+  border-radius: 2px;
+  will-change: transform;
+}
+
+.strip {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  background-repeat: no-repeat;
+  transform: scaleY(0);
+  will-change: transform;
+}
+
+.tint {
+  position: absolute;
+  inset: 0;
+  background: var(--c-g);
+  opacity: 0;
+}
+
+// ─── Grain (Grain.tsx) ───────────────────────────────────────────────────────
+// Over everything (header and footer included, so there is no seam), never
+// catches the pointer. Subtler than the feed canvas (× 1 / × 0.7): 0.5 / 0.35.
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0.5;
+
+  :global(html[data-theme='light']) & { opacity: 0.35; }
+}
+
+.grainTex {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: calc(100% + 256px);
+  height: calc(100% + 256px);
+  background: url('/feed/grain.webp') repeat;
+  background-size: 256px 256px;
+  will-change: transform;
+}
+
+// ─── ?trail switcher (previews only) ─────────────────────────────────────────
+.switcher {
+  position: fixed;
+  left: max(#{$gutter}, env(safe-area-inset-left, 0px));
+  top: calc(72px + 12px); // under the header line, clear of the hero copy and the footer
+  @include respond-to(md) { top: auto; bottom: calc(10px + env(safe-area-inset-bottom, 0px)); }
+  z-index: 160;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  max-width: calc(100vw - 2 * #{$gutter});
+  padding: 4px;
+  border: 1px solid $color-line;
+  border-radius: 2px;
+  background: $color-bg;
+  font-family: $font-mono;
+  font-size: 10px;
+  line-height: 1.2;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.switcherLabel {
+  padding: 4px 6px;
+  color: $color-text-mid;
+}
+
+.switcherBtn {
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  padding: 4px 6px;
+  border: 0;
+  border-radius: 2px;
+  background: none;
+  color: $color-text-mid;
+  cursor: pointer;
+  @include focus-ring;
+
+  &:hover { color: $color-text; }
+
+  &[aria-pressed='true'] {
+    background: $color-text;
+    color: $color-bg;
+  }
+}
+
+// ─── Backgrounds (CanvasBackdrop.tsx = plane, bg/OrbBackdrop.tsx) ───────────
+// The feed plane, fixed under everything (portalled to <body>, z 1: below
+// main 10, footer 20, header 100, grain 150). The veil keeps the copy legible
+// in both themes: a light overall dim, a strong wash behind the hero (left)
+// and bands under the header and the footer.
+.canvasStage {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+  background: $color-bg;
+  animation: bgIn 500ms $in-ease both;
+
+  > canvas, > div:not(.canvasVeil) { animation: bgZoom 900ms $in-ease both; }
+
+  :global(html[data-intro='full']) & { animation-duration: 1100ms; > canvas, > div:not(.canvasVeil) { animation-duration: 1500ms; } }
+  :global(html[data-intro='fast']) & { animation-duration: 550ms; > canvas, > div:not(.canvasVeil) { animation-duration: 750ms; } }
+  // Underneath the wireframe: waits for the hand-over like the copy.
+  :global(html[data-intro='full']:not([data-intro-go])) &, :global(html[data-intro='fast']:not([data-intro-go])) & { &, > canvas, > div:not(.canvasVeil) { animation-play-state: paused; } }
+  :global(html[data-intro='reduced']) &, :global(html[data-intro-skip]) & { animation-duration: 300ms; > canvas, > div:not(.canvasVeil) { animation: none; } }
+  @media (prefers-reduced-motion: reduce) { > canvas, > div:not(.canvasVeil) { animation: none; } }
+}
+
+@keyframes bgIn { from { opacity: 0; } }
+@keyframes bgZoom { from { transform: scale(1.08); } }
+
+.canvasGl, .canvasDom {
+  position: absolute;
+  inset: 0;
+  display: block;
+  &[hidden] { display: none; }
+}
+
+.canvasTile {
+  position: absolute;
+  left: 0;
+  top: 0;
+  overflow: hidden;
+  border-radius: 2px;
+  background: $color-bg-2;
+  will-change: transform;
+  img { display: block; width: 100%; height: 100%; object-fit: cover; }
+}
+
+.canvasVeil {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--c-bg) 80%, transparent) 0, transparent 140px),
+    linear-gradient(0deg, color-mix(in srgb, var(--c-bg) 92%, transparent) 0, color-mix(in srgb, var(--c-bg) 60%, transparent) 130px, transparent 260px),
+    linear-gradient(90deg, color-mix(in srgb, var(--c-bg) 90%, transparent) 0, color-mix(in srgb, var(--c-bg) 84%, transparent) 50%, color-mix(in srgb, var(--c-bg) 62%, transparent) 70%, color-mix(in srgb, var(--c-bg) 22%, transparent) 88%, color-mix(in srgb, var(--c-bg) 15%, transparent) 100%);
+
+  @include respond-to(md) {
+    background:
+      linear-gradient(180deg, color-mix(in srgb, var(--c-bg) 88%, transparent) 0, color-mix(in srgb, var(--c-bg) 82%, transparent) 60%, color-mix(in srgb, var(--c-bg) 70%, transparent) 75%, color-mix(in srgb, var(--c-bg) 92%, transparent) 100%);
+  }
+}
+
+// While a WebGL background is on: the page lets it through and takes drags.
+:global(html[data-bg]) {
+  :global(footer) { background: transparent; }
+  .page { touch-action: none; }
+  .hint { display: none; }
+  .hero { user-select: text; }
+  @media (pointer: fine) { :global(body) { cursor: grab; } }
+}
+
+:global(html).canvasDragging,
+:global(html).canvasDragging * {
+  cursor: grabbing !important;
+  user-select: none !important;
+}
+
+// ─── Entrance (Intro.tsx) ────────────────────────────────────────────────────
+// html[data-intro] is set in <head> (introScript.ts): full / fast / reduced.
+// The wireframe (Intro.tsx) runs first; the page's own entrance waits paused
+// until it hands over (html[data-intro-go]). Elements carry
+// data-in="fade | mask | line | rise" and --in-d (delay after GO, full run);
+// "fast" scales delays and durations by 0.5. Base styles are the final
+// state, so a skip just drops the animations.
+:global(html[data-intro]) { --in-k: 1; }
+:global(html[data-intro='fast']) { --in-k: 0.5; }
+
+:global(html[data-intro='full']),
+:global(html[data-intro='fast']) {
+  [data-in] {
+    animation-delay: calc(var(--in-d, 0ms) * var(--in-k));
+    animation-fill-mode: both;
+    animation-timing-function: $in-ease;
+    animation-play-state: paused;
+  }
+  [data-in='fade'] { animation-name: inFade; animation-duration: calc(700ms * var(--in-k)); animation-timing-function: cubic-bezier(0.33, 1, 0.68, 1); }
+  [data-in='mask'] { animation-name: inMask; animation-duration: calc(900ms * var(--in-k)); }
+  [data-in='line'] { animation-name: inLine; animation-duration: calc(900ms * var(--in-k)); transform-origin: 0 50%; }
+  [data-in='rise'] { animation-name: inRise; animation-duration: calc(700ms * var(--in-k)); }
+}
+:global(html[data-intro-go]) [data-in] { animation-play-state: running; }
+
+:global(html[data-intro='reduced']) [data-in] { animation: inFade 400ms ease both; }
+:global(html[data-intro-skip]) [data-in] { animation: none !important; }
+
+@keyframes inFade { from { opacity: 0; } }
+@keyframes inMask { from { transform: translate3d(0, 110%, 0); } }
+@keyframes inLine { from { transform: scaleX(0); } }
+@keyframes inRise { from { opacity: 0; transform: translate3d(0, 18px, 0); } }
+
+// The wireframe canvas: over header, copy and footer, under the grain (150).
+.wire {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 140;
+  pointer-events: none;
+  :global(html:not([data-intro])) & { display: none; }
+}

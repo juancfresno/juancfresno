@@ -1,0 +1,73 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.wrap {
+  @include container;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: $space-6;
+  min-height: calc(100svh - #{$nav-height} - 14rem);
+  padding-block: clamp(4rem, 10vw, 10rem);
+}
+
+.top {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: $space-4;
+  align-items: start;
+  margin-bottom: clamp(1.5rem, 3vw, 3rem);
+}
+
+.cuts {
+  grid-column: 8 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  height: 100%;
+  padding-top: 2%;
+
+  span {
+    position: relative;
+    display: block;
+    width: 100%;
+    border: 1px dashed var(--c-faint);
+  }
+
+  em {
+    position: absolute;
+    left: 6px;
+    top: 4px;
+    font-family: $font-mono;
+    font-size: 0.5rem;
+    font-style: normal;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--c-faint);
+    white-space: nowrap;
+  }
+
+  @include respond-to(md) { display: none; }
+}
+
+.title {
+  grid-column: 1 / span 7;
+  font-family: $font-body;
+  font-weight: 200;
+  font-size: clamp(7rem, 31vw, 32.5rem);
+  line-height: 0.8;
+  margin-left: -0.04em;
+  letter-spacing: -0.06em;
+  color: $color-text-hi;
+}
+
+.line {
+  font-family: $font-body;
+  font-weight: $fw-light;
+  font-size: clamp(1.25rem, 1vw + 0.95rem, 1.875rem);
+  line-height: 1.25;
+  color: $color-text-mid;
+  max-width: 30ch;
+}
+
+.links { display: flex; flex-wrap: wrap; gap: $space-3 $space-8; padding-top: $space-4; }

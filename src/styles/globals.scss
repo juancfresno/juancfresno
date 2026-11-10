@@ -4,6 +4,53 @@
 @use 'reset';
 @use 'typography';
 
+// ─── Theme: dark by default, light with html[data-theme="light"] ──────────────
+// Set before paint by the inline script in layout.tsx; toggled by ThemeToggle.
+:root {
+  --c-bg:         #{$raw-ink};
+  --c-bg-2:       #1a1a18;
+  --c-surface:    #242420;
+  --c-border:     rgba(252, 252, 247, 0.1);
+  --c-bar:        rgba(16, 16, 14, 0.85);
+  --c-text:       #{$raw-pearl};
+  --c-text-mid:   rgba(252, 252, 247, 0.6);
+  --c-text-muted: rgba(252, 252, 247, 0.35);
+  --c-text-hi:    #ddedff;   // headings / hero tint (Figma v0)
+  --c-text-dim:   #4d5257;   // second half of the About bio
+  --c-line:       #3c3c3a;   // row and section rules (Figma v0)
+  --c-line-hi:    #{$raw-pearl};
+  --c-overlay:    rgba(16, 16, 14, 0.92); // chips inside images
+  --c-stage:      #0c0c0b;   // media stages inside alt modules (Figma v1.0 #0E0E0E)
+  --c-faint:      #5a5a56;   // faint labels (Figma v1.0)
+  --c-g:          #ff5c1f;   // G orange: grid, annotations, live dots
+  color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+  --c-bg:         #{$raw-pearl};
+  --c-bg-2:       #f3f2ec;
+  --c-surface:    #e9e8e1;
+  --c-border:     rgba(16, 16, 14, 0.12);
+  --c-bar:        rgba(252, 252, 247, 0.85);
+  --c-text:       #{$raw-ink};
+  --c-text-mid:   rgba(16, 16, 14, 0.6);
+  --c-text-muted: rgba(16, 16, 14, 0.45);
+  --c-text-hi:    #{$raw-ink};
+  --c-text-dim:   rgba(16, 16, 14, 0.4);
+  --c-line:       rgba(16, 16, 14, 0.16);
+  --c-line-hi:    #{$raw-ink};
+  --c-overlay:    rgba(252, 252, 247, 0.92);
+  --c-stage:      #e9e8e1;
+  --c-faint:      rgba(16, 16, 14, 0.4);
+  --c-g:          #e5480e;
+  color-scheme: light;
+}
+
+// Smooth swap between themes (colors only).
+html.theme-anim, html.theme-anim * {
+  transition: background-color 0.35s ease, color 0.35s ease, border-color 0.35s ease, fill 0.35s ease !important;
+}
+
 // ─── Custom properties (CSS vars exposed for JS/GSAP access) ──────────────────
 :root {
   --color-bg:         #{$color-bg};
@@ -11,13 +58,6 @@
   --nav-height:       #{$nav-height};
   --gutter:           #{$gutter};
   --ease-out-expo:    #{$ease-out-expo};
-}
-
-// ─── Custom cursor — hide OS cursor on fine-pointer devices ───────────────────
-@media (pointer: fine) {
-  *, *::before, *::after {
-    cursor: none !important;
-  }
 }
 
 // ─── Selection ────────────────────────────────────────────────────────────────
@@ -31,29 +71,18 @@
 ::-webkit-scrollbar-track { background: $color-bg; }
 ::-webkit-scrollbar-thumb { background: $color-surface; border-radius: 2px; }
 
-// ─── Lenis smooth scroll class ────────────────────────────────────────────────
-html.lenis, html.lenis body {
-  height: auto;
-}
-
-.lenis.lenis-smooth {
-  scroll-behavior: auto !important;
-}
-
-.lenis.lenis-smooth [data-lenis-prevent] {
-  overscroll-behavior: contain;
-}
-
-.lenis.lenis-stopped {
-  overflow: hidden;
-}
 
 // ─── Mobile bottom bar spacing ─────────────────────────────────────────────
 // Ensure content isn't hidden behind the fixed bottom tab bar on mobile
+// --tabbar-h = the bar's real height (44 px + the home-indicator inset).
+:root { --tabbar-h: 0px; }
 @include respond-to(md) {
+  :root { --tabbar-h: calc(2.75rem + env(safe-area-inset-bottom, 0px)); }
   body {
-    padding-bottom: calc(3.25rem + env(safe-area-inset-bottom));
+    padding-bottom: var(--tabbar-h);
   }
+  // WIP landing (lib/wip.ts): no tab bar.
+  :root[data-wip] { --tabbar-h: 0px; }
 }
 
 // ─── Main content — above pixel canvas (z-index: 5) ─────────────────────────
@@ -61,6 +90,9 @@ main {
   position: relative;
   z-index: 10;
 }
+
+// Focus target after a page transition (PageTransition provider): no ring on the h1.
+[data-transition-focus]:focus { outline: none; }
 
 // ─── Utility ──────────────────────────────────────────────────────────────────
 .visually-hidden {
@@ -70,3 +102,27 @@ main {
 .container {
   @include container;
 }
+
+// Skip link (a11y): hidden until it gets keyboard focus, then a chip top-left.
+.skip-link {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: $z-toast;
+  padding: 8px 12px;
+  border-radius: 2px;
+  background: $color-text;
+  color: $color-bg;
+  font-family: $font-mono;
+  font-size: 0.75rem;
+  text-decoration: none;
+  transform: translateY(-200%);
+
+  &:focus-visible { transform: none; }
+}
+
+#content:focus { outline: none; }
+
+// ─── Language switch (providers/langSwitch.ts) ───────────────────────────────
+// The new page stays hidden until the site transition reveals it.
+html[data-lang-switch] main { visibility: hidden; }

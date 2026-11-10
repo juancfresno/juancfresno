@@ -1,11 +1,18 @@
 'use client'
 
+import type { CSSProperties } from 'react'
+
 import { useState, useEffect, useRef } from 'react'
 import { usePathname } from 'next/navigation'
 import clsx from 'clsx'
 import s from './Nav.module.scss'
 import ElasticLine from '@/components/ui/ElasticLine/ElasticLine'
+import ThemeToggle from '@/components/ui/ThemeToggle/ThemeToggle'
+import NavClock from '@/components/ui/NavClock/NavClock'
 import { usePageTransition } from '@/providers/PageTransition'
+import { useHref, useUi } from '@/i18n/client'
+import { parsePath } from '@/i18n/config'
+import { WIP } from '@/lib/wip'
 
 // ─── Scramble character pool ───────────────────────────────────────────────────
 const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%?'
@@ -152,20 +159,14 @@ const NavArrow = () => (
 )
 
 // ─── Nav links data ───────────────────────────────────────────────────────────
+// Internal paths; labels per locale (getUi(l).nav.links), hrefs via localePath.
 const NAV_LINKS = [
-  { label: 'About',     href: '/about'      },
-  { label: 'Projects',   href: '/projects'   },
-  { label: 'Contact',    href: '/contact'    },
-  { label: 'Playground', href: '/playground' },
-] as const
-
-// ─── Mobile bottom tab bar links (includes Home) ────────────────────────────
-const MOBILE_LINKS = [
-  { label: 'Home',       href: '/'           },
-  { label: 'About',      href: '/about'      },
-  { label: 'Projects',   href: '/projects'   },
-  { label: 'Contact',    href: '/contact'    },
-  { label: 'Playground', href: '/playground' },
+  { id: 'about',   href: '/about'   },
+  { id: 'work',    href: '/work'    },
+  { id: 'feed',    href: '/feed'    },
+  { id: 'lab',     href: '/lab'     },
+  { id: 'journal', href: '/journal' },
+  { id: 'contact', href: '/contact' },
 ] as const
 
 // ─── NavLinkItem — scramble + chip + transition ───────────────────────────────
@@ -186,6 +187,7 @@ function NavLinkItem({
     <a
       href={href}
       className={clsx(s.navLink, active && s.active)}
+      aria-current={active ? 'page' : undefined}
       onClick={(e) => {
         // Permitir Cmd/Ctrl+click para abrir en nueva pestaña
         if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
@@ -207,7 +209,12 @@ export default function Nav() {
   const [hidden,   setHidden]   = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const lastY    = useRef(0)
-  const pathname = usePathname()
+  const ui       = useUi()
+  const href     = useHref()
+  // Internal path (no /es, no rewritten /en) for the active state.
+  const pathname = parsePath(usePathname() || '/').path
+  const links    = NAV_LINKS.map((x) => ({ ...x, label: ui.nav.links[x.id], url: href(x.href) }))
+  const home     = href('/')
 
   useEffect(() => {
     const onScroll = () => {
@@ -225,22 +232,16 @@ export default function Nav() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  // ── Light pages get inverted (dark) nav ────────────────────────────────────
-  const isHome  = pathname === '/'
-  const isLight = pathname === '/contact' || isHome
-  // Static light pages force the face icon dark directly; home relies on
-  // mix-blend-mode instead since its background changes under the icon
-  const isLightStatic = pathname === '/contact'
-
   const logoLink = (
     <a
-      href="/"
+      href={home}
       className={s.logo}
-      aria-label="Fresno — ir a inicio"
+      {...(WIP ? { 'data-in': 'fade', 'data-wire': 'LOGO · FRESNO©', style: { '--in-d': '120ms' } as CSSProperties } : {})}
+      aria-label={ui.nav.logo}
       onClick={(e) => {
         if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
         e.preventDefault()
-        navigate('/')
+        navigate(home)
       }}
     >
       <GlitchLogo />
@@ -249,13 +250,14 @@ export default function Nav() {
 
   const faceLink = (
     <a
-      href="/"
+      href={home}
       className={s.face}
-      aria-label="Ir a inicio"
+      {...(WIP ? { 'data-in': 'fade', 'data-wire': 'NAV', style: { '--in-d': '0ms' } as CSSProperties } : {})}
+      aria-label={ui.nav.home}
       onClick={(e) => {
         if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
         e.preventDefault()
-        navigate('/')
+        navigate(home)
       }}
     >
       <GlitchFace />
@@ -264,64 +266,60 @@ export default function Nav() {
 
   return (
     <>
-      <header className={clsx(s.nav, hidden && s.hidden, scrolled && s.scrolled, isLight && s.light, isLightStatic && s.lightStatic)}>
-        <div className={clsx(s.inner, isHome && s.innerHome)}>
-          {isHome ? (
-            // ── Home: minimal chrome — wordmark left, face right, no menu ──
-            <>
-              {logoLink}
-              {faceLink}
-            </>
-          ) : (
-            <>
-              {/* ── Left cluster: face + nav menu ── */}
-              <div className={s.left}>
-                {faceLink}
+      <header data-site-header className={clsx(s.nav, hidden && s.hidden, scrolled && s.scrolled)}>
+        <div className={s.inner}>
+          {/* ── Left cluster: face + nav menu ── */}
+          <div className={s.left}>
+            {faceLink}
 
-                <nav className={s.navMenu} aria-label="Navegación principal">
-                  {NAV_LINKS.map(({ label, href }) => (
-                    <NavLinkItem
-                      key={href}
-                      label={label}
-                      href={href}
-                      active={pathname === href}
-                    />
-                  ))}
-                </nav>
-              </div>
+            {/* WIP landing (lib/wip.ts): no menu, only the home page exists. */}
+            {!WIP && <nav className={s.navMenu} aria-label={ui.nav.main}>
+              {links.map(({ label, href, url }) => (
+                <NavLinkItem
+                  key={href}
+                  label={label}
+                  href={url}
+                  active={pathname === href || pathname.startsWith(href + '/')}
+                />
+              ))}
+            </nav>}
 
-              {/* ── Right: wordmark ── */}
-              {logoLink}
-            </>
-          )}
+            {!WIP && <ThemeToggle className={s.theme} />}
+          </div>
+
+          {/* ── Right: local time, then the wordmark (ES / EN and "?" live in the footer) ── */}
+          <div className={s.right}>
+            {!WIP && <NavClock className={s.clock} />}
+            {logoLink}
+          </div>
         </div>
-        <div className={clsx(s.lineWrap, isHome && s.lineWrapHome)}>
+        <div className={s.lineWrap} {...(WIP ? { 'data-in': 'line', style: { '--in-d': '0ms' } as CSSProperties } : {})}>
           <ElasticLine className={s.line} />
         </div>
       </header>
 
-      {/* ── Mobile bottom tab bar — hidden on home's minimal chrome ── */}
-      {!isHome && (
-        <nav className={clsx(s.bottomBar, isLight && s.bottomBarLight)} aria-label="Navegación móvil">
-          {MOBILE_LINKS.map(({ label, href }) => {
-            const isActive = pathname === href
+      {/* ── Mobile bottom tab bar (none on the WIP landing) ── */}
+      {!WIP && <nav className={s.bottomBar} aria-label={ui.nav.mainMobile}>
+          {links.map(({ label, href, url }) => {
+            const isActive = pathname === href || pathname.startsWith(href + '/')
             return (
               <a
                 key={href}
-                href={href}
+                href={url}
                 className={clsx(s.bottomTab, isActive && s.bottomTabActive)}
+                aria-current={isActive ? 'page' : undefined}
                 onClick={(e) => {
                   if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
                   e.preventDefault()
-                  navigate(href)
+                  navigate(url)
                 }}
               >
                 {label}
               </a>
             )
           })}
-        </nav>
-      )}
+        </nav>}
+
     </>
   )
 }

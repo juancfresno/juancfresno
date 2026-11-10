@@ -1,0 +1,185 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+// Feed — Figma "Feed · Desktop" (6770:9789), "04 · Sesiones".
+
+.feed {
+  @include container;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(3rem, 5vw, 5rem);
+}
+
+.group { display: flex; flex-direction: column; gap: $space-4; }
+
+.head {
+  display: flex;
+  justify-content: space-between;
+  gap: $space-4;
+  padding-bottom: $space-3;
+  border-bottom: 1px solid $color-line;
+  font-family: $font-mono;
+  font-size: 0.75rem;
+}
+
+.headLabel { color: $color-text; }
+.headMeta { color: $color-text-mid; white-space: nowrap; }
+
+// Masonry-ish: CSS columns, 3 / 2 / 1.
+.masonry {
+  list-style: none;
+  column-count: 3;
+  column-gap: $space-4;
+
+  @include respond-to(lg) { column-count: 2; }
+  @include respond-to(sm) { column-count: 1; }
+}
+
+.item {
+  break-inside: avoid;
+  margin-bottom: $space-4;
+}
+
+.link {
+  position: relative;
+  display: block;
+  border-radius: 4px;
+  overflow: hidden;
+  color: $color-text;
+  text-decoration: none;
+  background: $color-surface;
+
+  &:focus-visible { outline: 1px solid $color-text; outline-offset: 3px; }
+}
+
+.media {
+  position: relative;
+  display: block;
+
+  // Ordered-dither texture over the monochrome image (4×4 Bayer tile).
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url('/feed/_dither.png') repeat;
+    background-size: 4px 4px;
+    image-rendering: pixelated;
+    mix-blend-mode: multiply;
+    opacity: 0.55;
+    transition: opacity 0.35s ease;
+    pointer-events: none;
+  }
+}
+
+.img {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: grayscale(1) contrast(1.35) brightness(1.02);
+  transition: filter 0.35s ease;
+}
+
+.link:hover, .link:focus-visible {
+  .img { filter: none; }
+  .media::after { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .img, .media::after { transition: none; }
+}
+
+// Title + month inside the image, bottom edge.
+.tags {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: $space-2;
+}
+
+.tag {
+  min-width: 0;
+  padding: 4px 6px;
+  border-radius: 2px;
+  background: $color-overlay;
+  color: $color-text;
+  font-family: $font-mono;
+  font-size: 0.625rem;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tagDate { flex-shrink: 0; color: $color-text-mid; }
+
+// ─── Views: Canvas / Rejilla ─────────────────────────────────────────────────
+// html[data-feed-view] (set before paint) decides which one shows; with no
+// attribute (no JS) the grid shows.
+.views { position: relative; display: flex; flex-direction: column; }
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.top {
+  @include container;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: $space-4 $space-8;
+  padding-block: clamp(3rem, 6vw, 5.5rem);
+}
+
+.intro {
+  max-width: 60ch;
+  font-family: $font-body;
+  font-size: clamp(1.125rem, 0.6vw + 0.95rem, 1.375rem);
+  line-height: 1.35;
+  color: $color-text;
+}
+
+.canvasView { display: none; }
+
+:global(html[data-feed-view='canvas']) {
+  .canvasView { display: block; }
+  .gridView { display: none; }
+
+  // Over the canvas: intro as a small chip top-left, toggle top-right.
+  .top {
+    position: absolute;
+    inset: 0 0 auto;
+    z-index: 4;
+    align-items: flex-start;
+    padding-block: $space-4;
+    pointer-events: none;
+  }
+
+  .intro {
+    max-width: 44ch;
+    padding: 6px 9px;
+    border-radius: 2px;
+    background: $color-overlay;
+    font-size: 0.8125rem;
+    line-height: 1.4;
+    color: $color-text-mid;
+
+    @include respond-to(md) { display: none; }
+  }
+
+  .toggle {
+    pointer-events: auto;
+    padding: 4px 4px 4px 10px;
+    border-radius: 999px;
+    background: $color-overlay;
+  }
+}

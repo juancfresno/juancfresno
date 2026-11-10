@@ -1,0 +1,207 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+// Home — Figma "Home · v0" (6770:9448), "02 · Hero" and blocks below.
+
+.hero {
+  @include container;
+  display: flex;
+  flex-direction: column;
+  padding-top: clamp(4rem, 8.1vw, 8.5rem);
+  padding-bottom: clamp(4.5rem, 8.6vw, 9rem);
+}
+
+.heroHead { display: flex; flex-direction: column; font-weight: $fw-regular; }
+
+.name {
+  font-family: $font-body;
+  font-weight: $fw-regular;
+  font-size: clamp(1.375rem, 1.8vw, 1.875rem);
+  line-height: 1.3;
+  letter-spacing: -0.015em;
+  color: $color-text;
+}
+
+.title {
+  margin-top: 28px;
+  font-family: $font-body;
+  font-weight: $fw-light;
+  font-size: clamp(2.75rem, 7.15vw, 7.5rem);
+  line-height: 0.92;
+  letter-spacing: -0.045em;
+  color: $color-text-hi;
+  max-width: min(100%, 76.8vw);
+}
+
+// ─── Headline cycle (HeadlineCycle.tsx) ──────────────────────────────────────
+// Every language's first line sits invisibly in the same grid cell as the
+// live one, so the slot keeps the size of the longest greeting: no jumps.
+.hc {
+  display: block;
+  outline: none;
+  border-radius: 2px;
+  &:focus-visible .hcStage { box-shadow: 0 2px 0 0 currentColor; }
+}
+
+.hcStage {
+  display: inline-grid;
+  max-width: 100%;
+  cursor: default;
+  vertical-align: top;
+}
+
+.hcSizer,
+.hcLive { grid-area: 1 / 1; }
+
+// When a longer language needs two lines (phones), the spare line goes ABOVE
+// the greeting, so it always sits tight on the role.
+.hcLive { align-self: end; }
+
+.hcSizer { visibility: hidden; }
+
+// Desktop: the live line never wraps (noise can be a little wider than the
+// text it becomes); it may overhang its slot for a frame, never push.
+@media (min-width: 769px) { .hcLive { white-space: nowrap; } }
+
+// WIP intro: the line stays hidden until the decode starts (JS sets
+// data-run); a CSS safety net shows it anyway after 1.4 s.
+:global(html[data-intro='full']) .hcLive:not([data-run]),
+:global(html[data-intro='fast']) .hcLive:not([data-run]) {
+  opacity: 0;
+  animation: hcSafety 0s linear 1.4s forwards;
+}
+@keyframes hcSafety { to { opacity: 1; } }
+
+// Switzer has no Cyrillic or CJK: Latin stays in Switzer (the name), the rest
+// falls to the system fonts. No webfont is loaded for them.
+$sys: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans', sans-serif;
+.hcSizer[data-script], .hcLive[data-script] { font-family: var(--font-switzer), $sys; }
+.hcSizer[lang='ja'], .hcLive[lang='ja'] { font-family: var(--font-switzer), 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'Meiryo', 'Noto Sans JP', 'Noto Sans CJK JP', $sys; }
+.hcSizer[lang='zh-Hans'], .hcLive[lang='zh-Hans'] { font-family: var(--font-switzer), 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans SC', 'Noto Sans CJK SC', $sys; }
+.hcSizer[data-script='cjk'], .hcLive[data-script='cjk'] { letter-spacing: 0; }
+
+.disciplines {
+  margin-top: 44px;
+  font-family: $font-mono;
+  font-size: 0.6875rem;
+  line-height: 1.6;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: $color-text;
+}
+
+.disc { white-space: nowrap; }
+.dash { color: $color-text-mid; white-space: pre; }
+
+.introRow {
+  margin-top: clamp(4rem, 7.1vw, 7.5rem);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: $space-4;
+
+  @include respond-to(md) { grid-template-columns: 1fr; gap: $space-6; }
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-family: $font-mono;
+  font-size: 0.625rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: $color-text-mid;
+
+  @include respond-to(md) { order: 2; }
+}
+
+.intro {
+  font-family: $font-body;
+  font-size: clamp(1.1875rem, 1.45vw, 1.5rem);
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+  color: $color-text;
+  max-width: 48rem;
+}
+
+.signature { color: $color-text-hi; }
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+// Featured: the section head only; the Arco and the index follow.
+.featured { padding-bottom: $space-2; }
+
+.asideLinks { display: inline-flex; gap: $space-6; }
+
+.indexWrap {
+  @include container;
+  padding-top: clamp(2rem, 4vw, 4rem);
+  padding-bottom: clamp(4rem, 8vw, 8rem);
+}
+
+// Feed strip: 6 portrait pieces on the 12-col grid (2 cols each), caption under.
+.strip {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: $space-4;
+  list-style: none;
+  padding-top: 24px;
+
+  @include respond-to(lg) { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: $space-8; }
+  @include respond-to(sm) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+.stripLink { display: flex; flex-direction: column; gap: 10px; }
+
+.stripMedia {
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+
+  img { width: 100%; height: 100%; object-fit: cover; }
+}
+
+.stripCap {
+  font-family: $font-mono;
+  font-size: 0.5625rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: $color-text-mid;
+  line-height: 1.4;
+}
+
+// Lab teaser: three cards (Figma 6882:617)
+.lab {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: $space-4;
+  padding-top: 24px;
+
+  @include respond-to(md) { grid-template-columns: 1fr; gap: $space-8; }
+}
+
+.labCard {
+  display: flex;
+  flex-direction: column;
+  padding-top: 20px;
+  border-top: 1px solid $color-line;
+  color: $color-text;
+  text-decoration: none;
+  transition: border-color $duration-fast;
+
+  &:hover, &:focus-visible { border-top-color: $color-line-hi; .labName { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.15em; } }
+  @include focus-ring($color-text);
+}
+
+.labTop { display: flex; justify-content: space-between; align-items: flex-start; gap: $space-4; }
+.labN { font-family: $font-mono; font-size: clamp(2.5rem, 3.3vw, 3.5rem); line-height: 1; letter-spacing: -0.02em; }
+.labMeta { font-family: $font-mono; font-size: 0.5625rem; letter-spacing: 0.03em; text-transform: uppercase; color: $color-text-mid; text-align: right; }
+.labName { margin-top: 28px; font-family: $font-body; font-size: 1.75rem; letter-spacing: -0.015em; }
+.labWhat { margin-top: 10px; font-family: $font-body; font-size: 1rem; line-height: 1.45; letter-spacing: -0.01em; color: $color-text-mid; max-width: 24rem; }
