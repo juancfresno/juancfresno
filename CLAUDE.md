@@ -28,6 +28,7 @@ No i18n library: a small typed setup (Next 16 App Router pattern: one root layou
 ## Page margin and grid (single token)
 
 ONE proportional page margin for header/footer chrome AND content, defined once in `globals.scss` `:root`: `--m: max(20px, 3.8vw)` (64 at 1680, ~97 at 2560, 20 at 390) and `--gutter: max(12px, 0.952vw)` (16 at 1680; forced to 12px ≤ 768). **The layout is liquid: no max width anywhere** (the old `$page-max` 1680 cap and centring are gone; content and chrome span the full viewport at every width; typography is unchanged and does not scale with the viewport yet). Sass: `$m` / `$gutter` in `_variables.scss` point at those vars. The `container` mixin (`_mixins.scss`) is the only place that applies it (`width: 100%`, `padding-inline: max(var(--m), safe-area)`); the G `GridOverlay`, Nav, Footer, Arco, feed HUD/zoom and Shortcuts all read the same token, and the feed canvas mirrors it in JS (`gridMetrics` in `feed/canvas/layout.ts`: margin `max(20, 0.038·W)`, gutter `max(12, 0.00952·W)`, 12 at ≤ 768, so keep both in sync). Grid: 12 cols desktop, 4 cols ≤ 768. Never hard-code a page margin (64 / 24 / 20 px) in a component: use `$m` (margin) or `$gutter` (column gap) so the overlay stays true.
+Type does not scale up above the design size (Juan, 10 Nov 2026): sizes may shrink on small screens via existing clamps, never grow beyond the 1680 values.
 
 ## Routing (App Router, `app/[lang]/(site)`) — v1.0 copy on branch `web-v2`
 

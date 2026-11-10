@@ -38,7 +38,7 @@
   margin: 0;
   font-family: $font-body;
   font-weight: $fw-regular;
-  font-size: fluid(24px);
+  font-size: 24px;
   line-height: normal;
   letter-spacing: -0.02em;
   text-align: right;
@@ -50,7 +50,7 @@
 .intro {
   margin: 0;
   font-family: $font-body;
-  font-size: clamp(1rem, 0.4vw + 0.85rem, fluid(18px));
+  font-size: clamp(1rem, 0.4vw + 0.85rem, 18px);
   line-height: 1.4;
   color: $color-text-mid;
   max-width: 64rem;
@@ -99,8 +99,8 @@
   grid-column: 1 / -1;
   margin: 24px 0 0;
   font-family: $font-mono;
-  font-size: fluid(11px);
-  line-height: fluid(15px);
+  font-size: 11px;
+  line-height: 15px;
   letter-spacing: 0.03em;
   text-transform: uppercase;
   color: $color-text-hi;
@@ -111,7 +111,7 @@
   grid-column: 7 / span 5;
   margin: 40px 0 56px;
   font-family: $font-body;
-  font-size: clamp(1rem, 0.4vw + 0.85rem, fluid(18px));
+  font-size: clamp(1rem, 0.4vw + 0.85rem, 18px);
   line-height: 1.5;
   letter-spacing: -0.01em;
   color: $color-text-mid;
