@@ -1,7 +1,7 @@
 @use '../../../styles/variables' as *;
 
 // Shared travelling preview for social links. The clip is drawn on the canvas
-// (12-column wipe, Bayer dissolve); the DOM only gets transform and opacity.
+// (depixelate entry, mirrored exit, re-pixelate swap); the DOM only gets transform and opacity.
 // Colours for the canvas are read from these custom properties, so it follows
 // the theme.
 .float {
