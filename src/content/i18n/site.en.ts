@@ -84,6 +84,8 @@ export const SITE_EN = {
     intro: ['Working with studios and brands since 2012.', 'Art direction and design for digital products, identities and interactive experiences — built with clarity, detail and intent.'],
     contactLabel: 'Let’s collaborate↘',
     contactLine: 'For enquiries, collaborations or new projects',
+    feedLabel: '{ Latest from Instagram & Dribbble ↘',
+    feedAria: 'Latest posts',
   },
 
   // ─── Page intros ──────────────────────────────────────────────────────────────

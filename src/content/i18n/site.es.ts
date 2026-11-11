@@ -84,6 +84,8 @@ export const SITE_ES: SiteDict = {
     intro: ['Trabajo con estudios y marcas desde 2012.', 'Dirección de arte y diseño de productos digitales, identidades y experiencias interactivas — con claridad, detalle e intención.'],
     contactLabel: 'Colaboremos↘',
     contactLine: 'Para consultas, colaboraciones o proyectos nuevos',
+    feedLabel: '{ Lo último en Instagram y Dribbble ↘',
+    feedAria: 'Últimas publicaciones',
   },
 
   INTROS: {

@@ -5,12 +5,15 @@ import { FEED_SELECTED } from '@/content/feed'
 import { localeOf, type LangParams } from '@/i18n/server'
 import { headlineCycle } from '@/content/headline'
 import HeadlineCycle from '@/components/home/HeadlineCycle'
+import LatestFeed from '@/components/home/LatestFeed'
 import HomeContact from '@/components/home/HomeContact'
 import Backdrop from '@/components/wip/Backdrop'
 import Grain from '@/components/wip/Grain'
 import Intro from '@/components/wip/Intro'
 import type { CSSProperties } from 'react'
 import w from '@/components/wip/wip.module.scss'
+
+export const revalidate = 21600
 
 type Props = { params: Promise<LangParams> }
 
@@ -54,6 +57,7 @@ export default async function HomePage({ params }: Props) {
           </p>
         </header>
       </section>
+      <LatestFeed locale={l} />
       <HomeContact locale={l} />
     </>
   )
