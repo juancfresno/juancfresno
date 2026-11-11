@@ -23,7 +23,7 @@
   --c-overlay:    rgba(16, 16, 14, 0.92); // chips inside images
   --c-stage:      #0c0c0b;   // media stages inside alt modules (Figma v1.0 #0E0E0E)
   --c-faint:      #5a5a56;   // faint labels (Figma v1.0)
-  --c-g:          #ff5c1f;   // G orange: grid, annotations, live dots
+  --c-g:          #003dff;   // G blue: grid, annotations, live dots
   --c-control:    rgba(252, 252, 247, 0.6);  // control outlines (Pending tags)
   --c-control-ink: rgba(252, 252, 247, 0.6); // text inside those controls
   --c-chip:       #{$raw-chip};  // active / hover nav chip
@@ -48,7 +48,7 @@
   --c-overlay:    rgba(252, 252, 247, 0.92);
   --c-stage:      #e9e8e1;
   --c-faint:      rgba(16, 16, 14, 0.4);
-  --c-g:          #e5480e;
+  --c-g:          #003dff;
   --c-control:    rgba(16, 16, 14, 0.6);
   --c-control-ink: rgba(16, 16, 14, 0.6);
   --c-chip:       #{$raw-chip};
@@ -58,7 +58,7 @@
 }
 
 // Brand blue page (Figma "Contact" 7014:18145, Diseño spec): bg/brand-blue with
-// the light-theme ink tokens. Same in dark and light; orange text → text/brand.
+// the light-theme ink tokens. Same in dark and light; accent = G blue.
 @mixin theme-blue {
   --c-bg:         #{$raw-chip};  // bg/brand-blue #C6DBF9
   --c-bg-2:       #{$raw-chip};
@@ -73,9 +73,9 @@
   --c-line:       #a9aea9;
   --c-line-hi:    #141414;       // border/strongest
   --c-overlay:    rgba(198, 219, 249, 0.92);
-  --c-stage:      #141414;       // dark stages keep their orange
+  --c-stage:      #141414;       // dark stages keep the G blue
   --c-faint:      #4a4d4b;
-  --c-g:          #344e9b;       // text/brand: orange fails on blue
+  --c-g:          #003dff;       // G blue (≈5.3:1 on #C6DBF9)
   --c-control:    #636965;       // border/control
   --c-control-ink: #4a4d4b;
   --c-chip:       #141414;       // inverted chip: ink with blue text

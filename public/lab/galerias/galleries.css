@@ -8,7 +8,7 @@
   --fg-muted: rgba(252, 252, 247, 0.35);
   --fg-line: rgba(252, 252, 247, 0.12);
   --fg-overlay: rgba(16, 16, 14, 0.92); /* chips over images */
-  --fg-accent: #ff5c1e;                  /* grid lines (the site's G grid) */
+  --fg-accent: #003dff;                  /* grid lines (the site's G grid) */
   --fg-mono: 'Geist Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
   --fg-ease: cubic-bezier(0.19, 1, 0.22, 1);
   --fg-gutter: 16px;

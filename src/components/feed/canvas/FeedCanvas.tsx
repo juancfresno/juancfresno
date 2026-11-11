@@ -157,7 +157,7 @@ export default function FeedCanvas({ items, active }: Props) {
       mctx.drawImage(mapBase, 0, 0)
       const s = (MW * 2) / L.TW
       const vx0 = mod(cx, L.TW) * s, vy0 = mod(cy, L.TH) * s, vw = W * s, vh = H * s
-      mctx.strokeStyle = '#ff5c1e'
+      mctx.strokeStyle = '#003dff'
       mctx.lineWidth = 2
       for (const [ox, oy] of [[0, 0], [-mini.width, 0], [0, -mini.height], [-mini.width, -mini.height]]) mctx.strokeRect(vx0 + ox, vy0 + oy, vw, vh)
     }

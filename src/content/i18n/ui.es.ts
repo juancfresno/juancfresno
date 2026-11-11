@@ -181,7 +181,7 @@ export const UI_ES: UiDict = {
     resources: 'Recursos',
     openSource: 'Código abierto',
     experiments: 'Experimentos',
-    framesCaption: 'Lab 002 · opción 11a · la retícula real de 12 columnas (64 / 16 a 1680) en el naranja G',
+    framesCaption: 'Lab 002 · opción 11a · la retícula real de 12 columnas (64 / 16 a 1680) en el azul G',
     howBuilt: 'Cómo está hecho',
     oneLine: 'Una línea de Juan.',
     crumb: 'Lab',

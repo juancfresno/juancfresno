@@ -7,7 +7,7 @@ import s from './wip.module.scss'
 
 // ─── WIP entrance: from structure to design ───────────────────────────────────
 // The site transition's language (Lab 002 · 11a "Cae la retícula",
-// components/transition/effects.ts: same grid probe, eases, orange, glyphs)
+// components/transition/effects.ts: same grid probe, eases, blue, glyphs)
 // played once over the landing, then resolved into the real page:
 //   1. the 12 grid lines drop, the gutters open, the columns fill;
 //   2. outlined boxes with mono labels appear where the real elements are
