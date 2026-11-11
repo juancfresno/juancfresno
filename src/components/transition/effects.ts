@@ -6,6 +6,7 @@
 // SITE_TRANSITION. Nothing outside this file knows how an effect looks.
 
 import grid from '@/components/ui/GridOverlay/GridOverlay.module.scss'
+import { GRID_COLS } from '@/components/ui/GridOverlay/config'
 
 export type SiteTransitionId = 'wireframe-grid' | 'pixels' | 'instant'
 
@@ -150,8 +151,8 @@ const instant: Factory = () => ({
 //  +110     content shows, grid and boxes fade.  ≈ 750 ms + the route wait.
 // Browser back runs mirrored (right → left, last box first). The grid is the G
 // overlay's own CSS (GridOverlay.module.scss) measured live, so it is the real
-// grid at every width: 12 columns, margin 64 / gutter 16 at 1680, liquid;
-// 4 columns ≤ 768 px. Grid in the G orange; boxes and labels in --c-text/--c-bg.
+// grid at every width: 24 columns (Figma grid/desktop), margin 40 / gutter 16 at 1680, liquid;
+// 4 columns ≤ 768 px. Grid in #003DFF; boxes and labels in --c-text/--c-bg.
 // Theme change (o.fill, Figma note 7013:6997): the columns fill solid with the
 // destination background (190–355), the margins and gutters follow (300–390),
 // no boxes; on reveal only the grid lines and that layer fade (110 ms) over a
@@ -163,7 +164,7 @@ const WF = {
   move: 230, moveStagger: 4, staggerCap: 28, relabel: 0.7,
   out: 110, maxBoxes: 40,
 }
-export const ACCENT = '255, 92, 30' // GridOverlay orange
+export const ACCENT = '0, 61, 255' // grid colour #003DFF
 export const GLYPHS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#%&*+=/'
 
 const bezier = (x1: number, y1: number, x2: number, y2: number) => {
@@ -282,7 +283,7 @@ export function gridProbe() {
     probe.style.fontFamily = 'var(--font-fragment-mono), ui-monospace, monospace'
     const inner = document.createElement('div')
     inner.className = grid.inner
-    for (let i = 0; i < 12; i++) {
+    for (let i = 0; i < GRID_COLS; i++) {
       const c = document.createElement('span')
       c.className = grid.col
       inner.appendChild(c)
@@ -392,7 +393,7 @@ const wireframeGrid: Factory = (canvas) => {
 
     // Grid: lines drop, gutters split open, columns fill.
     const n = cols.length
-    const k = n > 1 ? 11 / (n - 1) : 0 // 4 mobile columns keep the 12-column rhythm
+    const k = n > 1 ? 11 / (n - 1) : 0 // same total stagger for 24 (or 4 mobile) columns
     for (let i = 0; i < n; i++) {
       const c = cols[i]
       const o = (back ? n - 1 - i : i) * k

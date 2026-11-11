@@ -1,8 +1,8 @@
 @use '../../../styles/variables' as *;
 @use '../../../styles/mixins' as *;
 
-// Grid overlay — toggled with "G". Mirrors `@mixin container` + the 12-column
-// grid ($cols-12, $space-4 gap); 4 columns at ≤ md.
+// Grid overlay — toggled with "G". Mirrors Figma "grid/desktop": 24 columns,
+// margin 40 / gutter 16 at 1680 (liquid, --m / --gutter); 4 columns at ≤ md.
 .overlay {
   position: fixed;
   inset: 0;
@@ -14,7 +14,7 @@
   @include container;
   height: 100%;
   display: grid;
-  grid-template-columns: $cols-12;
+  grid-template-columns: $cols-24;
   column-gap: $gutter;
 
   @include respond-to(md) {
@@ -24,8 +24,8 @@
 }
 
 .col {
-  background: rgba(255, 92, 30, 0.07);
-  border-inline: 1px solid rgba(255, 92, 30, 0.35);
+  background: rgba(0, 61, 255, 0.07);
+  border-inline: 1px solid rgba(0, 61, 255, 0.35);
 }
 
 .badge {
@@ -45,5 +45,5 @@
 }
 
 .key {
-  color: #ff5c1e;
+  color: #003dff;
 }

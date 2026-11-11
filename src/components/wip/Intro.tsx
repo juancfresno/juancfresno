@@ -135,7 +135,7 @@ export default function Intro() {
       // then it dissolves. Everything eased, no step changes in alpha.
       const gridA = 1 - EASE_SOFT(prog(t, T.gridOutAt, T.gridOut))
       const n = cols.length
-      const step = n > 1 ? 11 / (n - 1) : 0 // 4 phone columns keep the 12-column rhythm
+      const step = n > 1 ? 11 / (n - 1) : 0 // same total stagger for 24 (or 4 phone) columns
       if (gridA > 0) {
         for (let i = 0; i < n; i++) {
           const c = cols[i], o = i * step

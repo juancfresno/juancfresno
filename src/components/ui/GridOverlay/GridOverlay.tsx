@@ -2,11 +2,12 @@
 
 import { useEffect, useRef, useState } from 'react'
 import s from './GridOverlay.module.scss'
+import { GRID_COLS } from './config'
 
 // ─── Grid overlay ─────────────────────────────────────────────────────────────
 // Press "G" anywhere (outside form fields) to show the layout grid the site is
 // built on: same container, margins and gutter as `@mixin container` + the
-// 12-column grid (4 columns on mobile). Esc hides it. The badge reads the live
+// 24-column Figma grid (grid/desktop; 4 columns on mobile). Esc hides it. The badge reads the live
 // values from the DOM, so it stays true at every viewport width.
 export default function GridOverlay() {
   const [visible, setVisible] = useState(false)
@@ -46,7 +47,7 @@ export default function GridOverlay() {
   return (
     <div className={s.overlay} aria-hidden="true">
       <div ref={innerRef} className={s.inner}>
-        {Array.from({ length: 12 }, (_, i) => (
+        {Array.from({ length: GRID_COLS }, (_, i) => (
           <span key={i} className={s.col} />
         ))}
       </div>

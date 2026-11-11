@@ -81,6 +81,7 @@ $gutter:            var(--gutter);
 $nav-height:        5rem;
 
 $cols-12:           repeat(12, 1fr);
+$cols-24:           repeat(24, 1fr);   // Figma layout guide "grid/desktop" (G overlay, transitions)
 $cols-6:            repeat(6, 1fr);
 
 // ─── Breakpoints ──────────────────────────────────────────────────────────────
