@@ -441,7 +441,7 @@ export default function FeedCanvas({ items, active }: Props) {
       aria-roledescription="canvas"
       aria-label={ui.feed.canvasAria(items.length)}
     >
-      <canvas ref={glRef} className={c.gl} aria-hidden="true" data-wf-label={`CANVAS · ${items.length}`} />
+      <canvas ref={glRef} className={c.gl} aria-hidden="true" data-wf="media" />
       <div ref={domRef} className={c.dom} aria-hidden="true" hidden />
       <div className={c.grainCss} aria-hidden="true" />
       <div ref={capsRef} className={c.caps} aria-hidden="true" />

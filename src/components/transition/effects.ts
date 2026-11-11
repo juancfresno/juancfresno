@@ -1,12 +1,14 @@
 // ─── Site page transitions ────────────────────────────────────────────────────
-// Each effect draws on one fixed <canvas> that sits over the content area
-// (below the nav, under the footer and the mobile tab bar). The provider calls
-// cover() before the route changes and reveal() once the new page has painted.
-// To try another Lab 002 option on the real site, add it here and change
-// SITE_TRANSITION. Nothing outside this file knows how an effect looks.
+// Each effect draws on one fixed <canvas> over the WHOLE viewport (z 450: above
+// the nav, the footer, the tab bar and the G grid overlay). While it is visible
+// it swallows clicks. The provider calls cover() before the route changes and
+// reveal() once the new page has painted. To try another Lab 002 option on the
+// real site, add it here and change SITE_TRANSITION. Nothing outside this file
+// knows how an effect looks.
 
 import grid from '@/components/ui/GridOverlay/GridOverlay.module.scss'
 import { GRID_COLS } from '@/components/ui/GridOverlay/config'
+import { currentPageTheme } from '@/lib/pageTheme'
 
 export type SiteTransitionId = 'wireframe-grid' | 'pixels' | 'instant'
 
@@ -16,14 +18,16 @@ export const SITE_TRANSITION: SiteTransitionId = 'wireframe-grid'
 export type CoverOptions = {
   /** Browser back (or a pop we can't place): the effect runs mirrored. */
   back?: boolean
-  /** Page-theme change (into / out of the blue Contact): the columns fill
-   *  solid with this colour and it stays as the new page's background (no
-   *  wireframe boxes). Only 'wireframe-grid' draws it; the others ignore it. */
-  fill?: string
+  /** clientX of the click: the grid lines drop from that column outwards. */
+  originX?: number
+  /** Destination line typed once on the HUD if the route takes > 120 ms. */
+  hud?: string
+  /** Reduced motion: only the --c-bg veil fades (120 ms), no grid or boxes. */
+  still?: boolean
 }
 
 export type TransitionEffect = {
-  /** Animate until the content area is fully covered. */
+  /** Animate until the viewport is fully covered. */
   cover: (o?: CoverOptions) => Promise<void>
   /** Cover at once (browser back/forward: the route is already changing). */
   coverNow: (o?: CoverOptions) => void
@@ -35,10 +39,15 @@ export type TransitionEffect = {
 
 type Factory = (canvas: HTMLCanvasElement) => TransitionEffect
 
+const show = (canvas: HTMLCanvasElement, on: boolean) => {
+  canvas.style.visibility = on ? 'visible' : 'hidden'
+  canvas.style.pointerEvents = on ? 'auto' : 'none'
+}
+
 // ─── 05 · Disolución en píxeles (Bayer order) ─────────────────────────────────
 // Same timing as the Lab piece: each block switches after its Bayer-ordered
 // delay across 240 ms, plus a 40 ms step → 280 ms per half, 560 ms in total.
-// 12 square blocks across the viewport; rows fill the content area height.
+// 12 square blocks across the viewport; rows fill the viewport height.
 const PX = { cols: 12, spread: 240, step: 40 }
 const BAYER = [[0, 8, 2, 10], [12, 4, 14, 6], [3, 11, 1, 9], [15, 7, 13, 5]]
 
@@ -49,15 +58,9 @@ const pixels: Factory = (canvas) => {
   let settle: (() => void) | null = null
 
   const layout = () => {
-    // Top edge = bottom of the fixed header (0 when it is scrolled away).
-    const header = document.querySelector<HTMLElement>('[data-site-header]')
-    const top = Math.max(0, Math.round(header?.getBoundingClientRect().bottom ?? 0))
     const w = document.documentElement.clientWidth
-    const h = Math.max(1, window.innerHeight - top)
+    const h = Math.max(1, window.innerHeight)
     const dpr = Math.min(2, window.devicePixelRatio || 1)
-    canvas.style.top = `${top}px`
-    canvas.style.width = `${w}px`
-    canvas.style.height = `${h}px`
     canvas.width = Math.round(w * dpr)
     canvas.height = Math.round(h * dpr)
     const size = w / PX.cols
@@ -108,23 +111,21 @@ const pixels: Factory = (canvas) => {
   return {
     cover: () => {
       layout()
-      canvas.style.visibility = 'visible'
+      show(canvas, true)
       return play(true)
     },
     coverNow: () => {
       stop()
       layout()
-      canvas.style.visibility = 'visible'
+      show(canvas, true)
       draw(() => true)
     },
     reveal: () =>
-      play(false).then(() => {
-        canvas.style.visibility = 'hidden'
-      }),
+      play(false).then(() => show(canvas, false)),
     cancel: () => {
       stop()
       g?.clearRect(0, 0, canvas.width, canvas.height)
-      canvas.style.visibility = 'hidden'
+      show(canvas, false)
     },
   }
 }
@@ -137,32 +138,39 @@ const instant: Factory = () => ({
   cancel: () => {},
 })
 
-// ─── 11a · Cae la retícula ('wireframe-grid') ─────────────────────────────────
-// Lab 002 option 11a on the real pages. Times in ms from the click:
-//    0–186  one line per gutter drops (6 ms stagger across 12 columns)
-//  120–286  each gutter line splits open into its gutter
-//  190–355  the columns fill (5 ms stagger)
-//  300–390  the old page fades under its wireframe: one outlined box per
-//           visible block in <main> (≤ 40) with a mono label ("H1 · 96/96",
-//           "IMG 16:9", "P · 16")  → covered: route change, wait for the page
-//  +0–258   the new page is measured; the boxes travel (FLIP) to its blocks
-//           in 230 ms + ≤ 28 ms stagger while the labels re-type; extra boxes
-//           fade in, leftovers fade out
-//  +110     content shows, grid and boxes fade.  ≈ 750 ms + the route wait.
-// Browser back runs mirrored (right → left, last box first). The grid is the G
-// overlay's own CSS (GridOverlay.module.scss) measured live, so it is the real
-// grid at every width: 24 columns (Figma grid/desktop), margin 40 / gutter 16 at 1680, liquid;
-// 4 columns ≤ 768 px. Grid in #003DFF; boxes and labels in --c-text/--c-bg.
-// Theme change (o.fill, Figma note 7013:6997): the columns fill solid with the
-// destination background (190–355), the margins and gutters follow (300–390),
-// no boxes; on reveal only the grid lines and that layer fade (110 ms) over a
-// page that already has the same background, so the colour stays.
+// ─── 'wireframe-grid' · Plano total (Lab 002 · 11a, Propuesta A) ──────────────
+// The whole screen becomes a construction plan for an instant: header, content
+// and footer are blocks of the same wireframe. Layers, bottom → top: real page
+// → full-screen --c-bg veil → grid lines → boxes → one HUD line. Times in ms:
+//   0–60    header, footer and tab bar appear as 1 px bands (--c-text 0.5)
+//           exactly on their real rects; they never move.
+//   0–180   the 25 column-edge lines (outer edges + gutter centres) drop from
+//           y 0 to the full height, 4 ms stagger from the clicked column out.
+//  80–220   the veil rises 0 → 1 over everything: the old page goes while the
+//           grid falls. No column fill.
+// 120–180   ≤ 8 section boxes (≤ 5 on phones), outline only (--c-text 0.55),
+//           snapped to the column edges, fade in.
+//    240    covered → route change; nav chip, page theme and scroll change
+//           under the cover. Wait > 120 ms → the HUD types "→ ABOUT · 01".
+//  +0–280   new page measured; boxes travel (FLIP, expo-out, ≤ 40 ms total
+//           stagger) matched by kind, then overlap. Leftovers collapse into
+//           the nearest gutter line (width → 0); new ones grow out of one.
+// +200–320  the veil and the boxes fade out (120 ms), the lines go up and out
+//           through the header (100 ms).  ≈ 560 ms + the route wait.
+// Back/forward covers at once (lines down, veil 1) and runs mirrored. Into the
+// blue Contact (or out of it) the plane re-tints to the new page's colours in
+// the first 120 ms of the reveal; on blue the lines are --c-text at 0.35.
 const WF = {
-  drop: 120, dropStagger: 6, splitAt: 120, split: 100,
-  fillAt: 190, fill: 110, fillStagger: 5,
-  boxesAt: 300, boxes: 90,
-  move: 230, moveStagger: 4, staggerCap: 28, relabel: 0.7,
-  out: 110, maxBoxes: 40,
+  bands: 60,
+  drop: 180, dropStagger: 4,
+  veilAt: 80, veil: 140,
+  boxesAt: 120, boxes: 60,
+  coverEnd: 240,
+  hudAfter: 120, hudChar: 16,
+  move: 280, staggerCap: 40, tint: 120,
+  outAt: 200, out: 120, linesOut: 100,
+  still: 120,
+  maxBoxes: 8, maxBoxesMobile: 5,
 }
 export const ACCENT = '0, 61, 255' // grid colour #003DFF
 export const GLYPHS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#%&*+=/'
@@ -185,7 +193,7 @@ const bezier = (x1: number, y1: number, x2: number, y2: number) => {
     return sy(t)
   }
 }
-// Shared with the WIP intro (wip/IntroWire.tsx): same eases, grid and glyphs.
+// Shared with the WIP intro (wip/Intro.tsx) and lib/scramble: same eases, grid and glyphs.
 export const EASE = bezier(0.19, 1, 0.22, 1)     // Lab EASE (expo out)
 export const EASE_IO = bezier(0.76, 0, 0.24, 1)  // Lab EASE_IO
 export const EASE_OUT = bezier(0, 0, 0.58, 1)
@@ -194,83 +202,6 @@ export const EASE_DROP = bezier(0.33, 1, 0.68, 1) // WIP intro line drop: visibl
 export const EASE_ENTER = bezier(0.22, 1, 0.36, 1) // WIP: everything that enters (masks, background, decode)
 export const prog = (t: number, at: number, dur: number) => Math.max(0, Math.min(1, (t - at) / dur))
 const lerp = (a: number, b: number, p: number) => a + (b - a) * p
-
-type Block = { x: number; y: number; w: number; h: number; label: string }
-type Pair = { a: Block; b: Block; born: boolean; dies: boolean }
-
-const RATIOS: [number, number][] = [[1, 1], [5, 4], [4, 3], [3, 2], [16, 10], [16, 9], [21, 9], [4, 5], [3, 4], [2, 3], [9, 16]]
-const ratio = (w: number, h: number) => {
-  let best = RATIOS[0]
-  for (const q of RATIOS) if (Math.abs(w / h - q[0] / q[1]) < Math.abs(w / h - best[0] / best[1])) best = q
-  return `${best[0]}:${best[1]}`
-}
-
-// What counts as a block: text, media, rows and cards. Containers (rows,
-// cards, links) become ONE box unless they are taller than half the screen,
-// in which case their children come through instead.
-const BLOCKS = 'h1,h2,h3,h4,h5,h6,p,blockquote,pre,figure,picture,img,video,canvas,svg,li,tr,dt,dd,button,a,[data-wf]'
-const CONTAINERS = 'li,tr,figure,a,button,[data-wf]'
-const MEDIA = 'img,video,canvas,picture'
-
-function labelOf(el: Element, r: DOMRect, row: () => number) {
-  const own = el.getAttribute('data-wf-label') // e.g. the feed canvas: "CANVAS · 201"
-  if (own) return own
-  const tag = el.tagName.toUpperCase()
-  const cs = getComputedStyle(el)
-  const fs = Math.round(parseFloat(cs.fontSize) || 16)
-  const lh = Math.round(parseFloat(cs.lineHeight) || fs * 1.2)
-  if (/^H[1-6]$/.test(tag)) return `${tag} · ${fs}/${lh}`
-  const media = el.matches(MEDIA) ? el : el.querySelector('img,video,canvas')
-  if (media) {
-    const m = media.getBoundingClientRect()
-    if (m.width * m.height >= 0.45 * r.width * r.height && m.height > 0) {
-      return `${media.tagName === 'VIDEO' ? 'VID' : 'IMG'} ${ratio(m.width, m.height)}`
-    }
-  }
-  if (tag === 'SVG') return 'SVG'
-  const mono = /mono/i.test(cs.fontFamily) ? ' MONO' : ''
-  if (/^(P|BLOCKQUOTE|PRE|DD|DT)$/.test(tag)) return `P · ${fs}${mono}`
-  if (tag === 'BUTTON') return `BTN · ${fs}`
-  if (tag === 'A' && r.height < 64) return `LINK · ${fs}${mono}`
-  return `ROW · ${String(row()).padStart(2, '0')}`
-}
-
-// Text blocks hug their text (padding and empty line space don't count).
-const TEXT = /^(H[1-6]|P|BLOCKQUOTE|PRE|DD|DT)$/
-function textRect(el: Element) {
-  const range = document.createRange()
-  range.selectNodeContents(el)
-  const r = range.getBoundingClientRect()
-  return r.width > 0 && r.height > 0 ? r : el.getBoundingClientRect()
-}
-
-// Visible blocks inside <main>, in reading order, relative to the canvas.
-function collectBlocks(top: number, height: number): Block[] {
-  const main = document.querySelector('main')
-  if (!main) return []
-  const vh = window.innerHeight
-  const picked: Element[] = []
-  const out: { el: Element; r: DOMRect }[] = []
-  for (const el of Array.from(main.querySelectorAll(BLOCKS))) {
-    if (picked.some((p) => p.contains(el))) continue
-    const r = TEXT.test(el.tagName) ? textRect(el) : el.getBoundingClientRect()
-    if (r.width < 8 || r.height < 6) continue
-    if (r.bottom <= top || r.top >= top + height || r.right <= 0 || r.left >= window.innerWidth) continue
-    if (el.closest('[aria-hidden="true"]') && !el.matches(MEDIA)) continue
-    if (typeof el.checkVisibility === 'function' && !el.checkVisibility({ opacityProperty: true, visibilityProperty: true })) continue
-    if (el.matches(CONTAINERS) && r.height > vh * 0.5) continue
-    // Inline links inside running text belong to their paragraph.
-    if (el.tagName === 'A' && getComputedStyle(el).display === 'inline') continue
-    picked.push(el)
-    out.push({ el, r })
-  }
-  out.sort((p, q) => (Math.round(p.r.top / 6) - Math.round(q.r.top / 6)) || (p.r.left - q.r.left))
-  let rows = 0
-  const row = () => ++rows
-  return out.slice(0, WF.maxBoxes).map(({ el, r }) => ({
-    x: r.left, y: r.top - top, w: r.width, h: r.height, label: labelOf(el, r, row),
-  }))
-}
 
 // A hidden copy of the G overlay: its columns ARE the site grid.
 let probe: HTMLDivElement | null = null
@@ -298,6 +229,7 @@ export function gridProbe() {
   return { cols, font: getComputedStyle(probe).fontFamily }
 }
 
+// Used by the WIP intro (wip/Intro.tsx); the site transition has no labels.
 export const scramble = (from: string, to: string, p: number) => {
   if (p <= 0) return from
   if (p >= 1) return to
@@ -310,127 +242,371 @@ export const scramble = (from: string, to: string, p: number) => {
   return s
 }
 
+// ─── Colours ──────────────────────────────────────────────────────────────────
+type RGBA = [number, number, number, number]
+let parser: CanvasRenderingContext2D | null = null
+function rgba(css: string, fallback: RGBA): RGBA {
+  if (!css) return fallback
+  parser ??= document.createElement('canvas').getContext('2d')
+  if (!parser) return fallback
+  parser.fillStyle = '#000'
+  parser.fillStyle = css
+  const v = String(parser.fillStyle)
+  if (v[0] === '#') return [parseInt(v.slice(1, 3), 16), parseInt(v.slice(3, 5), 16), parseInt(v.slice(5, 7), 16), 1]
+  const m = v.match(/[\d.]+/g)
+  return m ? [+m[0], +m[1], +m[2], m[3] != null ? +m[3] : 1] : fallback
+}
+type Palette = { bg: RGBA; ink: RGBA; dim: RGBA; line: RGBA }
+function palette(): Palette {
+  const root = getComputedStyle(document.documentElement)
+  const bg = rgba(root.getPropertyValue('--c-bg').trim(), [16, 16, 14, 1])
+  const ink = rgba(root.getPropertyValue('--c-text').trim(), [252, 252, 247, 1])
+  const dim = rgba(root.getPropertyValue('--c-text-dim').trim(), [ink[0], ink[1], ink[2], 0.5])
+  // On the blue page (Contact) the blue grid would vanish: --c-text at 0.35.
+  const line: RGBA = currentPageTheme() === 'blue' ? [ink[0], ink[1], ink[2], 0.35] : [0, 61, 255, 1]
+  return { bg, ink, dim, line }
+}
+const mix = (a: RGBA, b: RGBA, p: number): RGBA => [lerp(a[0], b[0], p), lerp(a[1], b[1], p), lerp(a[2], b[2], p), lerp(a[3], b[3], p)]
+const css = (c: RGBA, alpha = 1) => `rgba(${Math.round(c[0])}, ${Math.round(c[1])}, ${Math.round(c[2])}, ${Math.max(0, Math.min(1, c[3] * alpha))})`
+
+// ─── Blocks ───────────────────────────────────────────────────────────────────
+type Kind = 'head' | 'text' | 'media' | 'index' | 'fixed'
+type Rect = { x: number; y: number; w: number; h: number }
+type Box = Rect & { kind: Kind }
+type Pair = { a: Rect; b: Rect; born: boolean; dies: boolean; order: number }
+
+const SKIP = 'script,style,template,noscript,link,meta'
+const MEDIA = 'img,video,canvas,picture,svg'
+const KINDS: Kind[] = ['head', 'text', 'media', 'index']
+
+const area = (r: Rect) => Math.max(0, r.w) * Math.max(0, r.h)
+const union = (a: Rect, b: Rect): Rect => {
+  const x = Math.min(a.x, b.x), y = Math.min(a.y, b.y)
+  return { x, y, w: Math.max(a.x + a.w, b.x + b.w) - x, h: Math.max(a.y + a.h, b.y + b.h) - y }
+}
+const inter = (a: Rect, b: Rect) => {
+  const w = Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x)
+  const h = Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y)
+  return w > 0 && h > 0 ? w * h : 0
+}
+const iou = (a: Rect, b: Rect) => { const i = inter(a, b); return i ? i / (area(a) + area(b) - i) : 0 }
+const fromDOM = (r: DOMRect): Rect => ({ x: r.left, y: r.top, w: r.width, h: r.height })
+const visible = (el: Element) =>
+  typeof el.checkVisibility !== 'function' || el.checkVisibility({ opacityProperty: true, visibilityProperty: true })
+
+// What the eye sees of a block: the union of its text runs and media, not the
+// padding or the empty width of a wrapper.
+let range: Range | null = null
+function hug(el: Element, r: Rect): Rect | null {
+  range ??= document.createRange()
+  let out: Rect | null = null
+  const add = (q: Rect) => { if (q.w > 0 && q.h > 0) out = out ? union(out, q) : q }
+  const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT)
+  let n = 0
+  for (let t = walker.nextNode(); t && n < 400; t = walker.nextNode(), n++) {
+    if (!t.textContent?.trim()) continue
+    range.selectNodeContents(t)
+    add(fromDOM(range.getBoundingClientRect()))
+  }
+  if (el.matches(MEDIA)) add(r)
+  for (const m of Array.from(el.querySelectorAll(MEDIA)).slice(0, 40)) add(fromDOM(m.getBoundingClientRect()))
+  const q = out as Rect | null
+  if (!q || !inter(q, r)) return null
+  const x0 = Math.max(r.x, q.x), y0 = Math.max(r.y, q.y)
+  return { x: x0, y: y0, w: Math.min(r.x + r.w, q.x + q.w) - x0, h: Math.min(r.y + r.h, q.y + q.h) - y0 }
+}
+
+function kindOf(el: Element, r: Rect): Kind {
+  const own = el.getAttribute('data-wf')
+  if (own && (KINDS as string[]).includes(own)) return own as Kind
+  if (own != null) return 'media'
+  let m = 0
+  if (el.matches(MEDIA)) m = area(r)
+  else for (const q of Array.from(el.querySelectorAll('img,video,canvas,picture')).slice(0, 40)) m += inter(fromDOM(q.getBoundingClientRect()), r)
+  if (m >= 0.45 * area(r)) return 'media'
+  if (el.matches('h1,h2') || el.querySelector('h1,h2')) return 'head'
+  if (parseFloat(getComputedStyle(el).fontSize) >= 40) return 'head'
+  if (el.matches('li,tr,[role="row"]') || el.querySelectorAll('li,tr,[role="row"]').length >= 3) return 'index'
+  return 'text'
+}
+
+// The chrome: header, mobile tab bar and the footer (when it is on screen).
+// They stay where they are; only the veil and the reveal touch them.
+function chromeBands(W: number, H: number): Box[] {
+  const out: Box[] = []
+  for (const sel of ['[data-site-header]', '[data-site-tabbar]', '[data-site-footer]']) {
+    const el = document.querySelector(sel)
+    if (!el) continue
+    const r = el.getBoundingClientRect()
+    const y0 = Math.max(0, r.top), y1 = Math.min(H, r.bottom)
+    if (r.width < 1 || y1 - y0 < 4 || getComputedStyle(el).display === 'none') continue
+    out.push({ x: Math.max(0, r.left), y: y0, w: Math.min(W, r.right) - Math.max(0, r.left), h: y1 - y0, kind: 'fixed' })
+  }
+  return out
+}
+
+// Section-level blocks of <main>: [data-wf] (media such as the Arco and the
+// feed canvas, even when aria-hidden) and anything short enough to read as one
+// block; taller wrappers open up into their children. Then: snap to the column
+// edges, y to 8 px, merge what shares columns and sits ≤ 24 px apart, cap.
+function collectSections(W: number, H: number, cols: { x: number; w: number }[], top: number, bottom: number): Box[] {
+  const main = document.querySelector('main')
+  if (!main || !cols.length) return []
+  const tall = H * 0.45
+  const raw: Box[] = []
+  const take = (el: Element, r: Rect) => {
+    const wf = el.hasAttribute('data-wf')
+    const q = wf || el.matches(MEDIA) ? r : hug(el, r)
+    if (!q || q.w < 16 || q.h < 8) return
+    raw.push({ ...q, kind: kindOf(el, q) })
+  }
+  const visit = (el: Element, depth: number) => {
+    if (raw.length > 120 || el.matches(SKIP)) return
+    const d = el.getBoundingClientRect()
+    if (d.width < 1 || d.height < 1) {
+      if (getComputedStyle(el).display === 'contents') for (const c of Array.from(el.children)) visit(c, depth + 1)
+      return
+    }
+    if (d.bottom <= top || d.top >= bottom || d.right <= 0 || d.left >= W) return
+    if (!visible(el)) return
+    const r = fromDOM(d)
+    if (el.hasAttribute('data-wf') || (el !== main && d.height <= tall) || !el.children.length || depth > 14) {
+      take(el, r)
+      return
+    }
+    for (const c of Array.from(el.children)) visit(c, depth + 1)
+  }
+  visit(main, 0)
+
+  // Snap: x0 to the nearest column left edge at or before it, x1 to the nearest
+  // right edge at or after it; y to 8 px; clipped between the chrome bands.
+  const lefts = cols.map((c) => c.x), rights = cols.map((c) => c.x + c.w)
+  const snap = (b: Box): Box | null => {
+    const y0 = Math.max(top, Math.floor(b.y / 8) * 8)
+    const y1 = Math.min(bottom, Math.ceil((b.y + b.h) / 8) * 8)
+    if (y1 - y0 < 8) return null
+    let x0 = lefts[0], x1 = rights[rights.length - 1]
+    for (const l of lefts) if (l <= b.x + 1) x0 = l
+    for (let i = rights.length - 1; i >= 0; i--) if (rights[i] >= b.x + b.w - 1) x1 = rights[i]
+    if (x1 <= x0) x1 = rights[Math.min(rights.length - 1, lefts.indexOf(x0))]
+    return { x: x0, y: y0, w: x1 - x0, h: y1 - y0, kind: b.kind }
+  }
+  let boxes = raw.map(snap).filter((b): b is Box => !!b)
+
+  const kindOfMerge = (a: Box, b: Box): Kind => {
+    if ((a.kind === 'head' && b.kind === 'text') || (b.kind === 'head' && a.kind === 'text')) return 'head'
+    return area(a) >= area(b) ? a.kind : b.kind
+  }
+  const merge = (a: Box, b: Box): Box => ({ ...union(a, b), kind: kindOfMerge(a, b) })
+  // Merge what overlaps, or shares columns and sits ≤ 24 px apart (up to half a screen tall).
+  for (let changed = true; changed;) {
+    changed = false
+    boxes.sort((p, q) => p.y - q.y || p.x - q.x)
+    outer: for (let i = 0; i < boxes.length; i++) {
+      for (let j = i + 1; j < boxes.length; j++) {
+        const a = boxes[i], b = boxes[j]
+        const shareCols = Math.min(a.x + a.w, b.x + b.w) > Math.max(a.x, b.x)
+        const gapY = Math.max(a.y, b.y) - Math.min(a.y + a.h, b.y + b.h)
+        const u = union(a, b)
+        // Text over media (a full-bleed hero, a canvas) stays its own box.
+        const layered = (a.kind === 'media') !== (b.kind === 'media')
+        if ((!layered && inter(a, b) > 0) || (!layered && shareCols && gapY <= 24 && u.h <= H * 0.5)) {
+          boxes[i] = merge(a, b)
+          boxes.splice(j, 1)
+          changed = true
+          break outer
+        }
+      }
+    }
+  }
+  // Cap: merge the closest neighbours in reading order until it fits.
+  const cap = W <= 768 ? WF.maxBoxesMobile : WF.maxBoxes
+  while (boxes.length > cap) {
+    boxes.sort((p, q) => p.y - q.y || p.x - q.x)
+    let bi = 0, bj = 1, bestGap = Infinity
+    for (let i = 0; i < boxes.length; i++) {
+      for (let j = i + 1; j < boxes.length; j++) {
+        const a = boxes[i], b = boxes[j]
+        const gap = Math.max(0, Math.max(a.y, b.y) - Math.min(a.y + a.h, b.y + b.h))
+          + Math.max(0, Math.max(a.x, b.x) - Math.min(a.x + a.w, b.x + b.w)) * 0.25
+          + ((a.kind === 'media') !== (b.kind === 'media') ? 1e4 : 0)
+        if (gap < bestGap) { bestGap = gap; bi = i; bj = j }
+      }
+    }
+    const m = merge(boxes[bi], boxes[bj])
+    boxes.splice(bj, 1)
+    boxes[bi] = m
+  }
+  return boxes.sort((p, q) => p.y - q.y || p.x - q.x)
+}
+
+// Pairs by kind first, then overlap and distance; never by index alone.
+function match(A: Box[], B: Box[], W: number, line: (x: number) => number): Pair[] {
+  const score = (a: Box, b: Box) => iou(a, b) * 2 + 1 / (1 + Math.hypot(a.x + a.w / 2 - b.x - b.w / 2, a.y + a.h / 2 - b.y - b.h / 2) / (W / 4))
+  const usedA = new Set<number>(), usedB = new Set<number>()
+  const pairs: Pair[] = []
+  const pass = (ok: (a: Box, b: Box) => boolean) => {
+    const cand: [number, number, number][] = []
+    A.forEach((a, i) => B.forEach((b, j) => { if (!usedA.has(i) && !usedB.has(j) && ok(a, b)) cand.push([score(a, b), i, j]) }))
+    cand.sort((p, q) => q[0] - p[0])
+    for (const [, i, j] of cand) {
+      if (usedA.has(i) || usedB.has(j)) continue
+      usedA.add(i); usedB.add(j)
+      pairs.push({ a: A[i], b: B[j], born: false, dies: false, order: B[j].y })
+    }
+  }
+  pass((a, b) => a.kind === b.kind)
+  pass((a, b) => iou(a, b) > 0.3)
+  // Leftovers fold into the nearest gutter line; new boxes grow out of one.
+  A.forEach((a, i) => {
+    if (usedA.has(i)) return
+    pairs.push({ a, b: { x: line(a.x + a.w / 2), y: a.y, w: 0, h: a.h }, born: false, dies: true, order: a.y })
+  })
+  B.forEach((b, j) => {
+    if (usedB.has(j)) return
+    pairs.push({ a: { x: line(b.x + b.w / 2), y: b.y, w: 0, h: b.h }, b, born: true, dies: false, order: b.y })
+  })
+  return pairs.sort((p, q) => p.order - q.order)
+}
+
+// QA hook: set window.__wfDebug = [] and each phase pushes what it drew.
+type Dbg = { ev: string; t: number; A?: Box[]; B?: Box[]; bands?: Box[]; lines?: number[]; cols?: { x: number; w: number }[] }
+const debug = (d: Dbg) => { const w = window as unknown as { __wfDebug?: Dbg[] }; if (Array.isArray(w.__wfDebug)) w.__wfDebug.push(d) }
+
 const wireframeGrid: Factory = (canvas) => {
   const g = canvas.getContext('2d')
   let raf = 0
   let W = 0, H = 0, dpr = 1
   let cols: { x: number; w: number }[] = []
-  let gap = 16
+  let lines: number[] = []
+  let origin = 0
   let font = 'monospace'
-  let bg = '#10100e', ink = '#fcfcf7'
-  let A: Block[] = []
+  let P0: Palette | null = null, P1: Palette | null = null
+  let bands: Box[] = []
+  let A: Box[] = []
   let pairs: Pair[] = []
-  let back = false, pop = false
-  let fill: string | null = null
-  let t0 = 0, t1 = -1
-  let stagger = 0, outAt = 0
-  let coverEnd = 0
+  let back = false, pop = false, still = false
+  let hud = ''
+  let t0 = 0, t1 = -1, tCovered = -1
+  let stagger = 0
   let onCovered: (() => void) | null = null
   let onRevealed: (() => void) | null = null
   let covered: Promise<void> = Promise.resolve()
 
   const layout = () => {
-    const header = document.querySelector<HTMLElement>('[data-site-header]')
-    const top = Math.max(0, Math.round(header?.getBoundingClientRect().bottom ?? 0))
-    W = document.documentElement.clientWidth
-    H = Math.max(1, window.innerHeight - top)
+    const r = canvas.getBoundingClientRect()
+    W = r.width || document.documentElement.clientWidth
+    H = r.height || window.innerHeight
     dpr = Math.min(2, window.devicePixelRatio || 1)
-    canvas.style.top = `${top}px`
-    canvas.style.width = `${W}px`
-    canvas.style.height = `${H}px`
     canvas.width = Math.round(W * dpr)
     canvas.height = Math.round(H * dpr)
     const p = gridProbe()
     cols = p.cols
     font = p.font || 'monospace'
-    gap = cols.length > 1 ? cols[1].x - (cols[0].x + cols[0].w) : 16
-    const root = getComputedStyle(document.documentElement)
-    bg = root.getPropertyValue('--c-bg').trim() || bg
-    ink = root.getPropertyValue('--c-text').trim() || ink
-    return top
+    // 25 lines for 24 columns (5 for 4): outer edges + the centre of each gutter.
+    lines = []
+    if (cols.length) {
+      lines.push(cols[0].x)
+      for (let i = 1; i < cols.length; i++) lines.push((cols[i - 1].x + cols[i - 1].w + cols[i].x) / 2)
+      lines.push(cols[cols.length - 1].x + cols[cols.length - 1].w - 1)
+    }
   }
 
-  const box = (r: { x: number; y: number; w: number; h: number }, label: string, a: number, master: number) => {
-    if (!g || a <= 0 || r.w < 1 || r.h < 1) return
-    g.fillStyle = ink
-    g.globalAlpha = master * a * 0.05
-    g.fillRect(r.x, r.y, r.w, r.h)
-    g.globalAlpha = master * a * 0.85
-    g.strokeStyle = ink
+  const nearestLine = (x: number) => {
+    let best = 0
+    for (let i = 1; i < lines.length; i++) if (Math.abs(lines[i] - x) < Math.abs(lines[best] - x)) best = i
+    return best
+  }
+  const lineX = (x: number) => (lines.length ? lines[nearestLine(x)] : x)
+
+  // Content sits between the header band and the bottom chrome (tab bar).
+  const contentSpan = () => {
+    let top = 0, bottom = H
+    for (const b of bands) {
+      if (b.y <= 1) top = Math.max(top, b.y + b.h)
+      else if (b.y + b.h >= H - 1 && b.h < H * 0.2) bottom = Math.min(bottom, b.y)
+    }
+    return { top, bottom }
+  }
+
+  const box = (r: Rect, color: string) => {
+    if (!g || r.h < 1) return
+    g.fillStyle = color
+    g.strokeStyle = color
+    if (r.w < 2) { g.fillRect(Math.round(r.x * dpr) / dpr, r.y, 1, r.h); return }
     g.lineWidth = 1
-    g.strokeRect(r.x + 0.5, r.y + 0.5, r.w - 1, r.h - 1)
-    if (r.w < 40 || r.h < 16) return
-    const tw = g.measureText(label).width
-    const cw = Math.min(r.w, tw + 10)
-    g.globalAlpha = master * a
-    g.fillRect(r.x, r.y, cw, 16)
-    g.save()
-    g.beginPath()
-    g.rect(r.x, r.y, cw, 16)
-    g.clip()
-    g.fillStyle = bg
-    g.fillText(label, r.x + 5, r.y + 11.5)
-    g.restore()
+    g.strokeRect(Math.round(r.x) + 0.5, Math.round(r.y) + 0.5, Math.round(r.w) - 1, Math.round(r.h) - 1)
   }
 
   const draw = (now: number) => {
-    if (!g) return
+    if (!g || !P0) return
     const tc = now - t0
     const tr = t1 >= 0 ? now - t1 : -1
     g.setTransform(dpr, 0, 0, dpr, 0, 0)
     g.globalAlpha = 1
     g.clearRect(0, 0, W, H)
-    const master = tr < 0 ? 1 : 1 - EASE_OUT(prog(tr, outAt, WF.out))
-    if (master <= 0) return
+    // Colours: the old page's, re-tinted to the new page's as the reveal starts.
+    const P = tr >= 0 && P1 ? (() => {
+      const p = EASE_OUT(prog(tr, 0, WF.tint))
+      return { bg: mix(P0.bg, P1.bg, p), ink: mix(P0.ink, P1.ink, p), dim: mix(P0.dim, P1.dim, p), line: mix(P0.line, P1.line, p) }
+    })() : P0
+    const out = tr < 0 ? 0 : EASE_OUT(prog(tr, still ? 0 : WF.outAt, still ? WF.still : WF.out))
 
-    // The old page fades under the wireframe (at once on back/forward).
-    const veil = pop ? 1 : EASE_OUT(prog(tc, WF.boxesAt, WF.boxes))
+    // Veil over the whole screen (chrome included).
+    const veilIn = pop ? 1 : EASE_OUT(prog(tc, still ? 0 : WF.veilAt, still ? WF.still : WF.veil))
+    const veil = veilIn * (1 - out)
     if (veil > 0) {
-      g.globalAlpha = master * veil
-      g.fillStyle = fill ?? bg
+      g.fillStyle = css(P.bg, veil)
       g.fillRect(0, 0, W, H)
     }
+    if (still) return
 
-    // Grid: lines drop, gutters split open, columns fill.
-    const n = cols.length
-    const k = n > 1 ? 11 / (n - 1) : 0 // same total stagger for 24 (or 4 mobile) columns
+    // Grid lines: drop from the clicked column outwards, leave upwards.
+    const n = lines.length
+    const spread = Math.max(origin, n - 1 - origin)
     for (let i = 0; i < n; i++) {
-      const c = cols[i]
-      const o = (back ? n - 1 - i : i) * k
-      const pf = EASE(prog(tc, WF.fillAt + o * WF.fillStagger, WF.fill))
-      if (pf > 0) {
-        g.globalAlpha = master
-        g.fillStyle = fill ?? `rgba(${ACCENT}, 0.07)`
-        g.fillRect(c.x, 0, c.w, H * pf)
-      }
-      const pd = EASE(prog(tc, o * WF.dropStagger, WF.drop))
+      const d = Math.abs(i - origin)
+      const pd = pop ? 1 : EASE(prog(tc, d * WF.dropStagger, WF.drop))
       if (pd <= 0) continue
-      const ps = EASE_IO(prog(tc, WF.splitAt + o * WF.dropStagger, WF.split))
-      g.globalAlpha = master
-      g.fillStyle = `rgba(${ACCENT}, 0.6)`
-      const left = c.x + (i > 0 ? -gap / 2 : 0) * (1 - ps)
-      const right = c.x + c.w - 1 + (i < n - 1 ? gap / 2 : 0) * (1 - ps)
-      g.fillRect(Math.round(left * dpr) / dpr, 0, 1, H * pd)
-      g.fillRect(Math.round(right * dpr) / dpr, 0, 1, H * pd)
+      const k = back ? spread - d : d
+      const pu = tr < 0 ? 0 : EASE_IO(prog(tr, WF.outAt + k * 1.5, WF.linesOut))
+      const h = H * pd * (1 - pu)
+      if (h <= 0) continue
+      g.fillStyle = css(P.line)
+      g.fillRect(Math.round(lines[i] * dpr) / dpr, 0, 1, h)
     }
 
-    // Boxes (none on a theme change: the colour is the cover).
-    if (fill) return
-    g.font = `10px ${font}`
-    const boxIn = EASE_OUT(prog(tc, pop ? 0 : WF.boxesAt, WF.boxes))
+    // Chrome bands: fixed anchors.
+    const bandIn = pop ? 1 : EASE_OUT(prog(tc, 0, WF.bands))
+    for (const b of bands) box(b, css(P.ink, 0.5 * bandIn * (1 - out)))
+
+    // Section boxes.
+    const boxIn = pop ? 1 : EASE_OUT(prog(tc, WF.boxesAt, WF.boxes))
+    const ink = css(P.ink, 0.55 * boxIn * (1 - out))
     if (tr < 0) {
-      for (const b of A) box(b, b.label, boxIn, master)
-      return
+      for (const b of A) box(b, ink)
+    } else {
+      const m = pairs.length
+      for (let j = 0; j < m; j++) {
+        const x = pairs[j]
+        const at = (back ? m - 1 - j : j) * stagger
+        const p = EASE(prog(tr, at, WF.move))
+        box({ x: lerp(x.a.x, x.b.x, p), y: lerp(x.a.y, x.b.y, p), w: lerp(x.a.w, x.b.w, p), h: lerp(x.a.h, x.b.h, p) }, ink)
+      }
     }
-    const m = pairs.length
-    for (let j = 0; j < m; j++) {
-      const x = pairs[j]
-      const at = (back ? m - 1 - j : j) * stagger
-      const p = EASE(prog(tr, at, WF.move))
-      const a = boxIn * (x.born ? p : x.dies ? 1 - p : 1)
-      const r = { x: lerp(x.a.x, x.b.x, p), y: lerp(x.a.y, x.b.y, p), w: lerp(x.a.w, x.b.w, p), h: lerp(x.a.h, x.b.h, p) }
-      const label = x.born ? x.b.label : x.dies ? x.a.label : scramble(x.a.label, x.b.label, prog(tr, at, WF.move * WF.relabel))
-      box(r, label, a, master)
+
+    // HUD: one mono line, typed once, only when the route is slow.
+    if (hud && tCovered >= 0) {
+      const since = (tr >= 0 ? t1 : now) - tCovered - WF.hudAfter
+      if (since > 0) {
+        const typed = hud.slice(0, Math.min(hud.length, Math.ceil((tr >= 0 ? Infinity : since) / WF.hudChar)))
+        // On the footer band (top-left, inside it); else just above the bottom edge.
+        const foot = bands.filter((b) => b.y > H * 0.5).sort((p, q) => p.y - q.y)[0]
+        const y = foot ? Math.min(H - 10, foot.y + 20) : H - 16
+        g.font = `10px ${font}`
+        g.fillStyle = css(P.dim, 1 - out)
+        g.fillText(typed, Math.round(cols[0]?.x ?? 16), Math.round(y))
+      }
     }
   }
 
@@ -441,10 +617,14 @@ const wireframeGrid: Factory = (canvas) => {
 
   const settle = () => {
     stop()
+    g?.setTransform(1, 0, 0, 1, 0, 0)
     g?.clearRect(0, 0, canvas.width, canvas.height)
-    canvas.style.visibility = 'hidden'
+    show(canvas, false)
+    if (t1 >= 0) debug({ ev: 'end', t: performance.now() - t1 })
     t1 = -1
+    tCovered = -1
     A = []
+    bands = []
     pairs = []
     onCovered?.()
     onCovered = null
@@ -453,14 +633,19 @@ const wireframeGrid: Factory = (canvas) => {
     done?.()
   }
 
+  const coverEnd = () => (pop ? 0 : still ? WF.still : WF.coverEnd)
+  const revealEnd = () => (still ? WF.still : WF.outAt + Math.max(WF.out, WF.linesOut + lines.length * 1.5))
+
   const loop = (now: number) => {
     raf = 0
     draw(now)
-    if (onCovered && now - t0 >= coverEnd) {
+    if (onCovered && now - t0 >= coverEnd()) {
+      debug({ ev: 'covered', t: now - t0 })
+      tCovered = now
       onCovered()
       onCovered = null
     }
-    if (t1 >= 0 && now - t1 >= outAt + WF.out) {
+    if (t1 >= 0 && now - t1 >= revealEnd()) {
       settle()
       return
     }
@@ -471,17 +656,22 @@ const wireframeGrid: Factory = (canvas) => {
     stop()
     back = !!o?.back
     pop = isPop
-    fill = o?.fill ?? null
-    const top = layout()
-    A = fill ? [] : collectBlocks(top, H)
+    still = !!o?.still
+    hud = o?.hud ?? ''
+    layout()
+    P0 = palette()
+    P1 = null
+    bands = still ? [] : chromeBands(W, H)
+    const { top, bottom } = contentSpan()
+    A = still ? [] : collectSections(W, H, cols, top, bottom)
+    origin = o?.originX != null ? nearestLine(o.originX) : back ? lines.length - 1 : 0
     pairs = []
     t1 = -1
+    tCovered = -1
     t0 = performance.now()
-    // Covered = grid filled (back/forward) or old page gone under the boxes.
-    const spread = (cols.length > 1 ? 11 : 0) * WF.fillStagger
-    coverEnd = pop ? WF.fillAt + WF.fill + spread : WF.boxesAt + WF.boxes
     covered = new Promise<void>((r) => { onCovered = r })
-    canvas.style.visibility = 'visible'
+    debug({ ev: 'start', t: t0, A, bands, lines, cols })
+    show(canvas, true)
     draw(t0)
     raf = requestAnimationFrame(loop)
     return covered
@@ -493,17 +683,16 @@ const wireframeGrid: Factory = (canvas) => {
     reveal: async () => {
       await covered
       if (canvas.style.visibility !== 'visible') return
-      const top = Math.round(parseFloat(canvas.style.top) || 0)
-      const B = fill ? [] : collectBlocks(top, H)
-      const n = Math.max(A.length, B.length)
-      pairs = []
-      for (let i = 0; i < n; i++) {
-        const b = B[i] ?? B[B.length - 1]
-        const a = A[i] ?? A[A.length - 1] ?? b
-        pairs.push({ a, b: b ?? a, born: !A[i], dies: !B[i] })
+      // The new page (and its theme) is in place under the cover.
+      P1 = palette()
+      if (!still) {
+        const { top, bottom } = contentSpan()
+        const B = collectSections(W, H, cols, top, bottom)
+        pairs = match(A, B, W, lineX)
+        debug({ ev: 'reveal', t: performance.now() - t0, B })
+        const m = pairs.length
+        stagger = m > 1 ? WF.staggerCap / (m - 1) : 0
       }
-      stagger = n > 1 ? Math.min(WF.moveStagger, WF.staggerCap / (n - 1)) : 0
-      outAt = n ? WF.move + (n - 1) * stagger : 0
       return new Promise<void>((r) => {
         onRevealed = r
         t1 = performance.now()
@@ -515,4 +704,3 @@ const wireframeGrid: Factory = (canvas) => {
 }
 
 export const EFFECTS: Record<SiteTransitionId, Factory> = { 'wireframe-grid': wireframeGrid, pixels, instant }
-

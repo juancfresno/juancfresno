@@ -1,11 +1,15 @@
-// Site transition canvas: fixed over the content area. Above <main> (z 10),
-// under the footer (z 20) and the nav / mobile tab bar ($z-nav), so the
-// persistent chrome never gets covered. Top/size are set by the effect.
+// Site transition canvas: fixed over the WHOLE viewport (Propuesta A «Plano
+// total»): above the nav / tab bar ($z-nav 100), the footer and the G grid
+// overlay ($z-toast 400), under $z-cursor (500). Header, footer and tab bar are
+// part of the wireframe. Visibility and pointer-events are set by the effect:
+// while it shows it swallows clicks; hidden = none.
 .canvas {
   position: fixed;
-  left: 0;
-  top: 0;
-  z-index: 15;
+  inset: 0;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  z-index: 450;
   display: block;
   visibility: hidden;
   pointer-events: none;

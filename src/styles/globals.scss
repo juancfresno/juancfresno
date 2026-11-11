@@ -99,7 +99,7 @@
 // html[data-page-theme="blue"] = the whole page; html[data-chrome="blue"] =
 // nav, tab bar and footer only. Both are set before paint on a direct load
 // (PAGE_THEME_SCRIPT) and kept in sync with the route by PageTransition, which
-// flips the chrome at cover start and the page once the grid has covered it.
+// flips both under the site transition's full-screen cover.
 $chrome: '[data-site-header], [data-site-tabbar]';
 :root[data-page-theme="blue"] { @include theme-blue; }
 :root[data-chrome="blue"] :is(#{$chrome}) { @include theme-blue; }
@@ -108,14 +108,6 @@ $chrome: '[data-site-header], [data-site-tabbar]';
 // Leaving Contact: the chrome goes back to the site theme before the page does.
 :root[data-page-theme="blue"]:not([data-chrome="blue"]) :is(#{$chrome}, [data-site-footer]) { @include theme-dark; }
 :root[data-theme="light"][data-page-theme="blue"]:not([data-chrome="blue"]) :is(#{$chrome}, [data-site-footer]) { @include theme-light; }
-
-// 160 ms colour fade of the chrome while it changes theme; the header gets a
-// solid background meanwhile, since the page under it changes later.
-html.chrome-anim :is(#{$chrome}, [data-site-footer]),
-html.chrome-anim :is(#{$chrome}, [data-site-footer]) * {
-  transition: background-color 0.16s ease, color 0.16s ease, border-color 0.16s ease, fill 0.16s ease, stroke 0.16s ease !important;
-}
-html.chrome-hold [data-site-header] { background-color: var(--c-bg); }
 
 // Smooth swap between themes (colors only).
 html.theme-anim, html.theme-anim * {
@@ -198,5 +190,5 @@ main {
 #content:focus { outline: none; }
 
 // ─── Language switch (providers/langSwitch.ts) ───────────────────────────────
-// The new page stays hidden until the site transition reveals it.
-html[data-lang-switch] main { visibility: hidden; }
+// The new page (chrome included) stays hidden until the site transition reveals it.
+html[data-lang-switch] :is(main, [data-site-header], [data-site-tabbar], [data-site-footer]) { visibility: hidden; }

@@ -6,7 +6,7 @@ import { EFFECTS, SITE_TRANSITION, type TransitionEffect } from '@/components/tr
 import s from '@/components/transition/SiteTransition.module.scss'
 import { parsePath } from '@/i18n/config'
 import { LANG_SWITCH_KEY } from './langSwitch'
-import { applyPageTheme, currentPageTheme, pageThemeOf, type PageTheme } from '@/lib/pageTheme'
+import { applyPageTheme, currentPageTheme, pageThemeOf } from '@/lib/pageTheme'
 
 // ─── Context ──────────────────────────────────────────────────────────────────
 type TransitionCtx = { navigate: (href: string) => void }
@@ -17,21 +17,25 @@ const frame = () => new Promise<void>((r) => requestAnimationFrame(() => r()))
 const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
 // ─── Page theme (blue Contact) ────────────────────────────────────────────────
-// Chrome (nav, tab bar, footer) changes theme at cover start with a 160 ms
-// colour fade ('chrome-anim'); the header keeps a solid background
-// ('chrome-hold') until the page itself has changed under the cover.
-const cssVar = (name: string) => getComputedStyle(document.documentElement).getPropertyValue(name).trim()
-let fadeTimer = 0
-function flipChrome(t: PageTheme) {
-  const cl = document.documentElement.classList
-  cl.add('chrome-anim', 'chrome-hold')
-  applyPageTheme(t, 'chrome')
-  clearTimeout(fadeTimer)
-  fadeTimer = window.setTimeout(() => cl.remove('chrome-anim'), 200)
+// Page and chrome (nav, tab bar, footer) change theme together once the
+// full-screen cover is down, so nothing shows the switch; the effect re-tints
+// its plane to the new page's colours as it reveals.
+
+// Destination line for the transition HUD: "→ ABOUT · 01" (nav label and its
+// position), "→ WORK · SHOECIETY" below a section, "→ HOME" for the home page.
+function hudLine(pathname: string): string {
+  const path = pathname.replace(/\/$/, '') || '/'
+  const links = Array.from(document.querySelectorAll<HTMLAnchorElement>('[data-site-header] nav a[href]'))
+  for (let i = 0; i < links.length; i++) {
+    const p = new URL(links[i].href).pathname.replace(/\/$/, '')
+    if (path !== p && !path.startsWith(p + '/')) continue
+    const label = (links[i].getAttribute('aria-label') || links[i].textContent || '').trim().toUpperCase()
+    const rest = path.slice(p.length + 1).split('/')[0]
+    return `→ ${label} · ${rest ? rest.replace(/-/g, ' ').toUpperCase() : String(i + 1).padStart(2, '0')}`
+  }
+  const home = document.querySelector<HTMLAnchorElement>('[data-site-header] a[aria-label]')?.getAttribute('aria-label')
+  return `→ ${(home || 'Home').toUpperCase()}`
 }
-const releaseChrome = () => document.documentElement.classList.remove('chrome-hold')
-// Fill of the transition columns: the brand blue going in, the site theme's own bg going out.
-const themeFill = (t: PageTheme) => cssVar(t ? '--c-brand-blue' : '--c-base-bg') || undefined
 
 // After a navigation, focus the new page's h1 (or <main>) without scrolling.
 function focusPage() {
@@ -66,7 +70,8 @@ function linkTarget(e: MouseEvent): URL | null {
 // Owns the `navigate` seam and the site transition (SITE_TRANSITION in
 // components/transition/effects.ts): cover → router.push → wait for the new
 // pathname + 2 frames → reveal (the effect measures the new page here) → focus.
-// Back/forward covers at once and runs the effect mirrored. Internal <a>/<Link> clicks are caught
+// Back/forward covers at once and runs the effect mirrored. Reduced motion =
+// the effect's veil-only fade. Internal <a>/<Link> clicks are caught
 // here, so pages and links don't need to know about it.
 export default function PageTransitionProvider({ children }: { children: ReactNode }) {
   const router = useRouter()
@@ -79,6 +84,7 @@ export default function PageTransitionProvider({ children }: { children: ReactNo
   // In-memory history (pathnames + index) so back/forward knows its direction.
   const stack = useRef<string[]>([pathname])
   const at = useRef(0)
+  const lastClick = useRef<{ x: number; t: number } | null>(null)
 
   useEffect(() => {
     if (canvasRef.current) effect.current = EFFECTS[SITE_TRANSITION](canvasRef.current)
@@ -86,10 +92,13 @@ export default function PageTransitionProvider({ children }: { children: ReactNo
     let flagged = false
     try { flagged = !!sessionStorage.getItem(LANG_SWITCH_KEY); sessionStorage.removeItem(LANG_SWITCH_KEY) } catch {}
     const root = document.documentElement
-    if (flagged && effect.current && !reduced()) {
+    if (flagged && effect.current) {
       busy.current = true
       const fx = effect.current
-      fx.cover({ back: false }).then(async () => {
+      // Same full cover as the old page ended with (header/footer bands, lines),
+      // then the boxes grow out of the grid into the new page.
+      const still = reduced()
+      ;(still ? (fx.coverNow({ still }), Promise.resolve()) : fx.cover({ back: false })).then(async () => {
         delete root.dataset.langSwitch
         await frame()
         await fx.reveal()
@@ -131,7 +140,6 @@ export default function PageTransitionProvider({ children }: { children: ReactNo
     await frame()
     await frame()
     if (animate) await effect.current?.reveal()
-    releaseChrome()
     focusPage()
     busy.current = false
   }, [routeChanged])
@@ -144,11 +152,15 @@ export default function PageTransitionProvider({ children }: { children: ReactNo
     const from = current.current
     if (url.pathname === from) { router.push(to); return }
     busy.current = true
-    const animate = !reduced() && !!effect.current
-    // Another language = another root layout: cover, then a full page load.
+    const animate = !!effect.current
+    // The grid drops from the clicked column (a pointer click in the last 600 ms).
+    const c = lastClick.current
+    const originX = c && performance.now() - c.t < 600 ? c.x : undefined
+    const opts = { back: false, originX, still: reduced(), hud: hudLine(url.pathname) }
+    // Another language = another root layout: full cover, then a full page load.
     if (parsePath(url.pathname).locale !== parsePath(location.pathname).locale) {
       if (animate) {
-        await effect.current!.cover({ back: false })
+        await effect.current!.cover(opts)
         try { sessionStorage.setItem(LANG_SWITCH_KEY, '1') } catch {}
       }
       location.assign(to)
@@ -156,16 +168,11 @@ export default function PageTransitionProvider({ children }: { children: ReactNo
     }
     stack.current = stack.current.slice(0, at.current + 1).concat(url.pathname)
     at.current = stack.current.length - 1
+    if (animate) await effect.current!.cover(opts)
+    // Covered: the page theme (blue Contact), the nav chip (pathname) and the
+    // scroll all change under the cover.
     const theme = pageThemeOf(url.pathname)
-    if (animate && theme !== currentPageTheme()) {
-      // Into / out of the blue page: the columns fill with the destination
-      // background and it stays; leaving Contact runs mirrored.
-      flipChrome(theme)
-      await effect.current!.cover({ back: !theme, fill: themeFill(theme) })
-      applyPageTheme(theme, 'page')
-    } else if (animate) {
-      await effect.current!.cover({ back: false })
-    }
+    if (theme !== currentPageTheme()) applyPageTheme(theme)
     router.push(to)
     await finish(from, animate)
   }, [router, finish])
@@ -173,6 +180,7 @@ export default function PageTransitionProvider({ children }: { children: ReactNo
   // Every internal link goes through navigate (capture on window, before Link/React handlers).
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
+      if (e.detail > 0) lastClick.current = { x: e.clientX, t: performance.now() }
       const url = linkTarget(e)
       if (!url) return
       e.preventDefault()
@@ -192,15 +200,10 @@ export default function PageTransitionProvider({ children }: { children: ReactNo
       const forward = stack.current[at.current + 1] === location.pathname
       if (forward) at.current += 1
       else if (stack.current[at.current - 1] === location.pathname) at.current -= 1
-      const animate = !reduced() && !!effect.current
+      const animate = !!effect.current
+      if (animate) effect.current!.coverNow({ back: !forward, still: reduced() })
       const theme = pageThemeOf(location.pathname)
-      if (animate && theme !== currentPageTheme()) {
-        flipChrome(theme)
-        effect.current!.coverNow({ back: !forward !== !theme, fill: themeFill(theme) })
-        applyPageTheme(theme, 'page')
-      } else if (animate) {
-        effect.current!.coverNow({ back: !forward })
-      }
+      if (theme !== currentPageTheme()) applyPageTheme(theme)
       finish(from, animate)
     }
     window.addEventListener('popstate', onPop)

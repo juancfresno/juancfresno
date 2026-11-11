@@ -250,6 +250,7 @@ export default function Arco({ items, label = 'Featured work', start = 0, hint =
           <div
             ref={viewRef}
             className={s.view}
+            data-wf="media"
             tabIndex={0}
             role="group"
             aria-roledescription="carousel"
