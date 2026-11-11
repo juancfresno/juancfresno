@@ -22,7 +22,7 @@
   // ─── Variants. mode = shader branch. px in site (CSS) px. ─────────────────
   var VARIANTS = [
     { n: '00', mode: 0, name: 'Twelve columns', tag: 'Reference · on the site today', dur: 386, exit: 239 / 386, px: null, ease: 'site',
-      text: 'What the site does now: the clip drops in through the 12 grid columns, outwards from the cursor’s column (16 ms stagger, 210 ms each), with an orange scan line. The exit retracts them.' },
+      text: 'What the site does now: the clip drops in through the 12 grid columns, outwards from the cursor’s column (16 ms stagger, 210 ms each), with a blue scan line. The exit retracts them.' },
     { n: '01', mode: 1, name: 'Fine bitmap', tag: 'Bayer 8×8 sweep', dur: 560, exit: 0.65, px: 2, min: 1, max: 6, ease: 'cubicOut',
       text: '2 px cells, thousands at once. An 8×8 Bayer threshold sweeps down the frame and the bitmap fills in; the cells on the front flash as 1-bit before they turn into the clip.' },
     { n: '02', mode: 2, name: 'Depixelate', tag: '32 → 16 → 8 → 4 → 2 → 1', dur: 520, exit: 0.65, px: 32, min: 8, max: 64, ease: 'linear',
@@ -30,7 +30,7 @@
     { n: '03', mode: 3, name: '1-bit to colour', tag: 'Old Mac, then colour', dur: 680, exit: 0.65, px: 2, min: 1, max: 4, ease: 'quadInOut',
       text: 'Arrives as a black-and-white Bayer-dithered image, like an old Mac screen drawing itself, then the colour dithers in cell by cell.' },
     { n: '04', mode: 4, name: 'From the cursor', tag: 'Radial · dithered edge', dur: 480, exit: 0.65, px: 2, min: 1, max: 6, ease: 'expoOut',
-      text: 'Pixels are born where the cursor enters and spread out in a circle; the edge is dithered and lit in the G orange. The exit collapses towards the point where you leave.' },
+      text: 'Pixels are born where the cursor enters and spread out in a circle; the edge is dithered and lit in the G blue. The exit collapses towards the point where you leave.' },
     { n: '05', mode: 5, name: 'CRT sweep', tag: 'Row by row', dur: 440, exit: 0.65, px: 2, min: 1, max: 6, ease: 'linear',
       text: 'Drawn row by row, left to right, like a CRT beam or a printer head: a bright leading line, a short phosphor glow and scanlines that fade once it lands.' }
   ];
@@ -45,7 +45,7 @@
   var EASE_LABELS = { linear: 'Linear', cubicOut: 'Cubic out', expoOut: 'Expo out', quadInOut: 'Quad in-out', steps6: 'Steps (6)' };
 
   var HOLD = 1100, GAP = 600; // autoplay: time shown, time hidden
-  var INK = [16 / 255, 16 / 255, 14 / 255], PAPER = [252 / 255, 252 / 255, 247 / 255], ACCENT = [1, 92 / 255, 30 / 255];
+  var INK = [16 / 255, 16 / 255, 14 / 255], PAPER = [252 / 255, 252 / 255, 247 / 255], ACCENT = [0, 61 / 255, 1];
 
   var clamp = function (v, a, b) { return v < a ? a : v > b ? b : v; };
   var el = function (tag, cls, text) {
@@ -114,7 +114,7 @@
     '    if(A>ta){ float l=luma(clipAt((c+.5)*uPx/uRes,L+.5)); col=l>b?uPaper:uInk; a=1.;',
     '      if(B>=bayer8(c+vec2(3.,5.))) col=clipAt(uv,L); }',
     '  } else if(uMode==4){',
-    // 04 · From the cursor: radial threshold from the entry point, dithered orange edge.
+    // 04 · From the cursor: radial threshold from the entry point, dithered blue edge.
     '    vec2 c=floor(pos/uPx); vec2 cc=(c+.5)*uPx; vec2 o2=uOrigin*uRes;',
     '    vec2 far=max(o2, uRes-o2); float md=length(far);',
     '    float dn=length(cc-o2)/md; float b=bayer8(c);',

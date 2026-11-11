@@ -6,7 +6,7 @@ import { getSite, getUi } from '@/content/site'
 
 // Open Graph cards (1200 × 630), rendered at build time with next/og.
 // Fresno style: ink background, pearl text, Fragment Mono only (no bold),
-// thin rules, G orange as the single accent. Used by (site)/opengraph-image
+// thin rules, G blue as the single accent. Used by (site)/opengraph-image
 // (default card) and work/[slug]/opengraph-image (case cover card).
 
 export const OG_SIZE = { width: 1200, height: 630 }
@@ -17,7 +17,7 @@ const PEARL = '#fcfcf7'
 const MID = 'rgba(252, 252, 247, 0.6)'
 const FAINT = 'rgba(252, 252, 247, 0.38)'
 const LINE = '#3c3c3a'
-const G = '#ff5c1f'
+const G = '#003dff'
 
 async function mono() {
   // Fragment Mono (OFL), latin subset in WOFF: satori can't read woff2.

@@ -4,7 +4,7 @@ Source (no dependencies, MIT): https://juancfresno.com/lab/entradas-pixel
 - pixels.js — fresnoPixels(root) builds the comparison demo; the effects themselves are the fragment shader `FS` (one `uMode` branch per variant) plus the timeline in `go()` / `tick()`
 - pixels.css — demo styles, themed with the --fp-* variables
 
-Variants (uMode): 0 twelve columns (reference), 1 fine bitmap (8×8 Bayer sweep), 2 depixelate (32 → 1 px, mipmapped blocks), 3 1-bit to colour, 4 from the cursor (radial, dithered orange edge), 5 CRT sweep.
+Variants (uMode): 0 twelve columns (reference), 1 fine bitmap (8×8 Bayer sweep), 2 depixelate (32 → 1 px, mipmapped blocks), 3 1-bit to colour, 4 from the cursor (radial, dithered blue edge), 5 CRT sweep.
 
 What I want:
 1. Ask me which variant, pixel size, duration and easing to use (the demo shows the values next to each card).

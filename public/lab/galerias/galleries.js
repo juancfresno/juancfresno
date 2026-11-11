@@ -456,7 +456,7 @@
           [p.y, p.y - BH].forEach(function (yy) { x.fillRect(k * pitch * ms * 2, yy * msy * 2, Math.max(1, tw * ms * 2), Math.max(1, p.h * msy * 2)); });
         });
       });
-      mctx.strokeStyle = cs.getPropertyValue('--fg-accent') || '#ff5c1e';
+      mctx.strokeStyle = cs.getPropertyValue('--fg-accent') || '#003dff';
     }
     function drawMini() {
       mctx.clearRect(0, 0, mini.width, mini.height);

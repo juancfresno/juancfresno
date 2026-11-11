@@ -119,7 +119,7 @@
   &::before, &::after {
     content: '';
     position: absolute;
-    background: #ff5c1e;
+    background: #003dff;
   }
 
   &::before { left: 6px; top: 0; width: 1px; height: 13px; }
@@ -161,10 +161,10 @@
   @include respond-to(md) { padding: 3px 6px; font-size: 0.625rem; }
 }
 
-// Velocity readout: only while moving, in the G orange.
+// Velocity readout: only while moving, in the G blue.
 .vel {
   display: none;
-  color: #ff5c1e;
+  color: #003dff;
 }
 
 .fast .vel { display: inline-block; }

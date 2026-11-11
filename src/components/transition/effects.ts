@@ -151,7 +151,7 @@ const instant: Factory = () => ({
 // Browser back runs mirrored (right → left, last box first). The grid is the G
 // overlay's own CSS (GridOverlay.module.scss) measured live, so it is the real
 // grid at every width: 12 columns, margin 64 / gutter 16 at 1680, liquid;
-// 4 columns ≤ 768 px. Grid in the G orange; boxes and labels in --c-text/--c-bg.
+// 4 columns ≤ 768 px. Grid in the G blue; boxes and labels in --c-text/--c-bg.
 // Theme change (o.fill, Figma note 7013:6997): the columns fill solid with the
 // destination background (190–355), the margins and gutters follow (300–390),
 // no boxes; on reveal only the grid lines and that layer fade (110 ms) over a
@@ -163,7 +163,7 @@ const WF = {
   move: 230, moveStagger: 4, staggerCap: 28, relabel: 0.7,
   out: 110, maxBoxes: 40,
 }
-export const ACCENT = '255, 92, 30' // GridOverlay orange
+export const ACCENT = '0, 61, 255' // GridOverlay blue (G blue)
 export const GLYPHS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#%&*+=/'
 
 const bezier = (x1: number, y1: number, x2: number, y2: number) => {

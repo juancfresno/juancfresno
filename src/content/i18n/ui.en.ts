@@ -182,7 +182,7 @@ export const UI_EN = {
     resources: 'Resources',
     openSource: 'Open source',
     experiments: 'Experiments',
-    framesCaption: 'Lab 002 · option 11a · the real 12-col grid (64 / 16 at 1680) in the G orange',
+    framesCaption: 'Lab 002 · option 11a · the real 12-col grid (64 / 16 at 1680) in the G blue',
     howBuilt: 'How it’s built',
     oneLine: 'One line from Juan.',
     crumb: 'Lab',

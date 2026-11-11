@@ -10,7 +10,7 @@ import s from './SocialPreview.module.scss'
 // (footer wordmarks, ContactBlock text links). ONE preview, shared by all the
 // links, drawn on a canvas:
 // - Entry: the clip drops in through 12 columns (the site grid), staggered
-//   outwards from the column under the cursor; an orange scan line rides the
+//   outwards from the column under the cursor; a blue scan line rides the
 //   bottom edge of each column. Exit: the columns retract.
 // - Travel: moving to another network, the same preview flies there on a
 //   spring (slight overshoot) and skews with its own velocity, then settles.
@@ -53,7 +53,7 @@ const SPRING = { k: 380, zeta: 0.62 }
 const SKEW_MAX = 9 // deg
 const BAYER = [[0, 8, 2, 10], [12, 4, 14, 6], [3, 11, 1, 9], [15, 7, 13, 5]]
 const GLYPHS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#%&*+=/'
-const ACCENT = 'rgb(255, 92, 30)' // GridOverlay orange
+const ACCENT = 'rgb(0, 61, 255)' // GridOverlay blue (G blue)
 
 const expoOut = (t: number) => (t >= 1 ? 1 : 1 - Math.pow(2, -10 * t))
 const quadInOut = (t: number) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2)
