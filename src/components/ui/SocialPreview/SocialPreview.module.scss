@@ -13,7 +13,7 @@
   top: 0;
   left: 0;
   z-index: $z-overlay;
-  width: 256px;
+  width: max-content;
   pointer-events: none;
   visibility: hidden;
   transform-origin: 50% 100%;
@@ -22,10 +22,22 @@
   @media (hover: none), (pointer: coarse) { display: none; }
 }
 
-.canvas {
-  display: block;
+// The visible frame: its size follows the current entry (eased in the loop);
+// the canvas inside is always the largest size and is clipped to it.
+.stage {
+  position: relative;
   width: 256px;
   height: 160px;
+  overflow: hidden;
+}
+
+.canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  width: 256px;
+  height: 400px;
 }
 
 // Mono chip riding under the clip: "BEHANCE ↗ @juancfresno · 03/05".

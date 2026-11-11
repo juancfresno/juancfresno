@@ -11,7 +11,7 @@ export { getUi, type UiDict } from './ui'
 
 export { PERSON_BASE } from './person'
 
-export { SOCIALS, SOCIAL_PREVIEWS, type SocialId } from './socials'
+export { SOCIALS, SOCIAL_PREVIEWS, type SocialId, type PreviewId } from './socials'
 
 // Lab experiment files (public/lab/<slug>/): css, js, snippet.html, prompt.md.
 // `init` = global init fn: window[init](root) → cleanup. `repo` = public

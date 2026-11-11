@@ -144,6 +144,8 @@
 
 .location {
   color: $color-text-muted;
+  cursor: default;
+  @include focus-ring;
 
   @include respond-to(sm) {
     display: none;

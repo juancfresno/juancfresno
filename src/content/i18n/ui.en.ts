@@ -16,7 +16,7 @@ export const UI_EN = {
   },
   theme: { group: 'Colour theme', dark: 'dark', light: 'light' },
   lang: { group: 'Idioma / Language', to: { en: 'Read this page in English', es: 'Leer esta página en español' } },
-  footer: { socials: 'Social profiles', legal: 'Legal', place: 'Valencia {Spain}' },
+  footer: { socials: 'Social profiles', legal: 'Legal', place: 'Valencia {Spain}', placeLabel: 'Valencia, Spain' },
   pending: {
     word: 'Pending',
     role: 'role',

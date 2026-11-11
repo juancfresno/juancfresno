@@ -62,7 +62,14 @@ export default function Footer() {
           </div>
           <div className={s.metaRight}>
             <LiveClock />
-            <span className={s.location}>
+            {/* Hover / focus shows the Valencia clip (components/ui/SocialPreview). */}
+            <span
+              className={s.location}
+              data-social="valencia"
+              tabIndex={0}
+              role="group"
+              aria-label={ui.footer.placeLabel}
+            >
               ⌖ {ui.footer.place}&nbsp;&nbsp;39.6649° N , 0.2126° W
             </span>
           </div>

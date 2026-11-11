@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 import { usePathname } from 'next/navigation'
-import { SOCIALS, SOCIAL_PREVIEWS, type SocialId } from '@/content/socials'
+import { SOCIALS, SOCIAL_PREVIEWS, type PreviewId } from '@/content/socials'
 import s from './SocialPreview.module.scss'
 
 // ─── Social hover preview ─────────────────────────────────────────────────────
@@ -21,20 +21,26 @@ import s from './SocialPreview.module.scss'
 //   covers the links. Keyboard focus anchors it centred above the link.
 // - Label: a mono chip riding under the clip, "BEHANCE ↗ @juancfresno · 03/05",
 //   scrambles on every change.
+// - Size: each entry may bring its own display size (the footer location is a
+//   vertical 224 × 400 clip; the socials are 256 × 160). Moving between sizes
+//   the frame resizes smoothly while the clip dissolves.
 // Rules kept: hover-capable fine pointers only (touch gets nothing); no bytes
 // until the first hover (each network's video + poster load on its first
 // activation, then stay); prefers-reduced-motion = poster only, no spring,
 // skew, wipe, dissolve or scramble; Esc, blur, leave or scroll hides.
 // transform/opacity on the DOM, everything else on the canvas, one rAF loop.
 
-const W = 256
+const W = 256 // default frame (css px)
 const H = 160
+const MAXW = 256 // canvas backing store: the largest frame any entry uses
+const MAXH = 400
 const COLS = 12
 const LABEL = 24 // label band under the clip (chip 18 + 6 gap)
 const LIFT = 12 // space between the label band and the link
 const EDGE = 16
 const BLOCK = 8 // dissolve cell, css px
 
+const SIZE_RATE = 14 // 1/s, exponential ease of the frame towards its target size
 const T = {
   wipeIn: 210, wipeInStagger: 16,
   wipeOut: 140, wipeOutStagger: 9,
@@ -53,13 +59,15 @@ const expoOut = (t: number) => (t >= 1 ? 1 : 1 - Math.pow(2, -10 * t))
 const quadInOut = (t: number) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2)
 const clamp = (v: number, a: number, b: number) => Math.max(a, Math.min(b, v))
 
-const isSocialId = (v: string | undefined): v is SocialId => !!v && v in SOCIAL_PREVIEWS
+const isPreviewId = (v: string | undefined): v is PreviewId => !!v && v in SOCIAL_PREVIEWS
+const sizeOf = (id: PreviewId | null) => ({ w: SOCIAL_PREVIEWS[id as PreviewId]?.w ?? W, h: SOCIAL_PREVIEWS[id as PreviewId]?.h ?? H })
 
 type Source = { video: HTMLVideoElement | null; poster: HTMLImageElement | null }
 
 export default function SocialPreview() {
   const floatRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const stageRef = useRef<HTMLDivElement>(null)
   const labelRef = useRef<HTMLSpanElement>(null)
   const poolRef = useRef<HTMLDivElement>(null)
   const hideRef = useRef<() => void>(() => {})
@@ -71,10 +79,11 @@ export default function SocialPreview() {
   useEffect(() => {
     const float = floatRef.current
     const canvas = canvasRef.current
+    const stage = stageRef.current
     const labelEl = labelRef.current
     const pool = poolRef.current
     const g = canvas?.getContext('2d')
-    if (!float || !canvas || !labelEl || !pool || !g) return
+    if (!float || !canvas || !stage || !labelEl || !pool || !g) return
 
     const canHover = window.matchMedia('(hover: hover) and (pointer: fine)')
     const rmq = window.matchMedia('(prefers-reduced-motion: reduce)')
@@ -83,12 +92,12 @@ export default function SocialPreview() {
     rmq.addEventListener('change', onRm)
 
     const dpr = Math.min(2, window.devicePixelRatio || 1)
-    canvas.width = W * dpr
-    canvas.height = H * dpr
+    canvas.width = MAXW * dpr
+    canvas.height = MAXH * dpr
 
     // Per-network media, created on first activation only.
-    const sources: Partial<Record<SocialId, Source>> = {}
-    const load = (id: SocialId): Source => {
+    const sources: Partial<Record<PreviewId, Source>> = {}
+    const load = (id: PreviewId): Source => {
       const have = sources[id]
       if (have) return have
       const m = SOCIAL_PREVIEWS[id]!
@@ -127,8 +136,10 @@ export default function SocialPreview() {
     let phase: Phase = 'hidden'
     let phaseAt = 0
     let origin = COLS / 2 // column the wipe starts from
-    let cur: SocialId | null = null
-    let prev: SocialId | null = null
+    let cur: PreviewId | null = null
+    let prev: PreviewId | null = null
+    const sz = { w: W, h: H } // frame being drawn (eases to the target)
+    let tgt = { w: W, h: H } // size of the current entry
     let switchAt = -1
     let link: HTMLElement | null = null
     let cursorX = 0
@@ -142,9 +153,11 @@ export default function SocialPreview() {
 
     const groupOf = (a: HTMLElement) => {
       const root = a.closest('nav, ul, footer, section') ?? document.body
-      return Array.from(root.querySelectorAll<HTMLElement>('[data-social]')).filter((x) => isSocialId(x.dataset.social))
+      return Array.from(root.querySelectorAll<HTMLElement>('[data-social]')).filter((x) => SOCIALS.some((o) => o.id === x.dataset.social))
     }
-    const labelFor = (a: HTMLElement, id: SocialId) => {
+    const labelFor = (a: HTMLElement, id: PreviewId) => {
+      const fixed = SOCIAL_PREVIEWS[id]?.label
+      if (fixed) return fixed
       const name = (SOCIALS.find((x) => x.id === id)?.label ?? id).toUpperCase()
       let handle = ''
       try {
@@ -162,42 +175,45 @@ export default function SocialPreview() {
       const r = link.getBoundingClientRect()
       const cx = r.left + r.width / 2
       const x = useCursor ? cx + (clamp(cursorX, r.left, r.right) - cx) * T.follow : cx
-      pos.tx = clamp(x - W / 2, EDGE, window.innerWidth - W - EDGE)
-      const above = r.top - LIFT - LABEL - H
-      pos.ty = above >= EDGE ? above : r.bottom + LIFT
+      pos.tx = clamp(x - tgt.w / 2, EDGE, window.innerWidth - tgt.w - EDGE)
+      const above = r.top - LIFT - LABEL - tgt.h
+      const ty = above >= EDGE ? above : r.bottom + LIFT
+      // A tall frame near the bottom of the viewport: keep it on screen.
+      pos.ty = clamp(ty, EDGE, Math.max(EDGE, window.innerHeight - tgt.h - LABEL - EDGE))
     }
 
     const snap = () => { pos.x = pos.tx; pos.y = pos.ty; pos.vx = 0; pos.vy = 0 }
 
-    const play = (id: SocialId) => {
+    const play = (id: PreviewId) => {
       const v = sources[id]?.video
       if (!v || reduce) return
       try { v.currentTime = 0 } catch { /* not seekable yet */ }
       v.play().catch(() => {})
     }
-    const rest = (id: SocialId | null) => {
+    const rest = (id: PreviewId | null) => {
       const v = id ? sources[id]?.video : null
       if (!v) return
       v.pause()
       try { v.currentTime = 0 } catch { /* ignore */ }
     }
 
-    const activate = (a: HTMLElement, id: SocialId, now: number, viaCursor: boolean) => {
+    const activate = (a: HTMLElement, id: PreviewId, now: number, viaCursor: boolean) => {
       clearTimeout(hideTimer)
       link = a
       load(id)
+      tgt = sizeOf(id)
       aim(viaCursor)
       const text = labelFor(a, id)
       if (phase === 'hidden' || phase === 'out') {
         // Fresh entry: appear in place, columns drop in from the cursor's column.
-        if (phase === 'hidden') snap()
+        if (phase === 'hidden') { snap(); sz.w = tgt.w; sz.h = tgt.h }
         rest(prev)
         prev = null
         switchAt = -1
         if (cur && cur !== id) rest(cur)
         cur = id
         play(id)
-        origin = viaCursor ? clamp(((cursorX - pos.x) / W) * COLS, 0, COLS - 1) : (COLS - 1) / 2
+        origin = viaCursor ? clamp(((cursorX - pos.x) / tgt.w) * COLS, 0, COLS - 1) : (COLS - 1) / 2
         phase = 'in'
         phaseAt = now
         labelFrom = ''
@@ -233,19 +249,26 @@ export default function SocialPreview() {
     const line = () => getComputedStyle(float).getPropertyValue('--sp-line').trim() || '#3c3c3a'
     let colors = { surface: '#1a1a18', ink: '#fcfcf7', line: '#3c3c3a' }
 
-    const paint = (id: SocialId | null) => {
+    // Cover-fit a source into the current frame (the ratios match except while
+    // the frame is resizing between two entries).
+    const cover = (img: CanvasImageSource, iw: number, ih: number) => {
+      if (!iw || !ih) return
+      const k = Math.max(sz.w / iw, sz.h / ih)
+      const sw = sz.w / k, sh = sz.h / k
+      g.drawImage(img, (iw - sw) / 2, (ih - sh) / 2, sw, sh, 0, 0, sz.w, sz.h)
+    }
+    const paint = (id: PreviewId | null) => {
       if (!id) return
       const src = sources[id]
       const v = src?.video
-      if (v && v.readyState >= 2) { g.drawImage(v, 0, 0, W, H); return }
+      if (v && v.readyState >= 2) { cover(v, v.videoWidth, v.videoHeight); return }
       const p = src?.poster
-      if (p && p.complete && p.naturalWidth) { g.drawImage(p, 0, 0, W, H); return }
+      if (p && p.complete && p.naturalWidth) { cover(p, p.naturalWidth, p.naturalHeight); return }
       g.fillStyle = colors.surface
-      g.fillRect(0, 0, W, H)
+      g.fillRect(0, 0, sz.w, sz.h)
     }
 
     // Column heights 0…1 for the current phase.
-    const colW = W / COLS
     const heights = (now: number) => {
       const t = now - phaseAt
       const h: number[] = []
@@ -261,8 +284,10 @@ export default function SocialPreview() {
 
     const draw = (now: number) => {
       const h = heights(now)
+      const { w: W, h: H } = sz
+      const colW = W / COLS
       g.setTransform(dpr, 0, 0, dpr, 0, 0)
-      g.clearRect(0, 0, W, H)
+      g.clearRect(0, 0, MAXW, MAXH)
       g.save()
       g.beginPath()
       for (let i = 0; i < COLS; i++) {
@@ -319,7 +344,7 @@ export default function SocialPreview() {
       let out = ''
       for (let i = 0; i < to.length; i++) {
         const ch = to[i]
-        if (i < n || ch === ' ' || ch === '·' || ch === '↗' || ch === '/') out += ch
+        if (i < n || !/[A-Za-z0-9]/.test(ch) || ch === '@') out += ch
         else out += i < labelFrom.length && Math.random() < 0.25 ? labelFrom[i] : GLYPHS[(Math.random() * GLYPHS.length) | 0]
       }
       labelEl.textContent = out
@@ -339,6 +364,16 @@ export default function SocialPreview() {
         pos.x += pos.vx * dt
         pos.y += pos.vy * dt
       }
+      if (reduce) { sz.w = tgt.w; sz.h = tgt.h }
+      else {
+        const k = 1 - Math.exp(-SIZE_RATE * dt)
+        sz.w += (tgt.w - sz.w) * k
+        sz.h += (tgt.h - sz.h) * k
+        if (Math.abs(tgt.w - sz.w) < 0.25) sz.w = tgt.w
+        if (Math.abs(tgt.h - sz.h) < 0.25) sz.h = tgt.h
+      }
+      stage.style.width = `${sz.w.toFixed(2)}px`
+      stage.style.height = `${sz.h.toFixed(2)}px`
       const skew = reduce ? 0 : clamp(-pos.vx / 110, -SKEW_MAX, SKEW_MAX)
       float.style.transform = `translate3d(${pos.x.toFixed(2)}px, ${pos.y.toFixed(2)}px, 0) skewX(${skew.toFixed(2)}deg) rotate(${(skew * 0.12).toFixed(3)}deg)`
 
@@ -382,7 +417,7 @@ export default function SocialPreview() {
       if (e.pointerType !== 'mouse' || !canHover.matches) return
       const a = linkOf(e.target)
       const id = a?.dataset.social
-      if (!a || !isSocialId(id)) return
+      if (!a || !isPreviewId(id)) return
       cursorX = e.clientX
       if (a === link && phase !== 'out' && phase !== 'hidden') { clearTimeout(hideTimer); return }
       activate(a, id, performance.now(), true)
@@ -402,7 +437,7 @@ export default function SocialPreview() {
       if (!canHover.matches) return
       const a = linkOf(e.target)
       const id = a?.dataset.social
-      if (!a || !isSocialId(id) || !a.matches(':focus-visible')) return
+      if (!a || !isPreviewId(id) || !a.matches(':focus-visible')) return
       activate(a, id, performance.now(), false)
     }
     const onFocusOut = (e: FocusEvent) => {
@@ -443,7 +478,9 @@ export default function SocialPreview() {
 
   return (
     <div ref={floatRef} className={s.float} aria-hidden="true">
-      <canvas ref={canvasRef} className={s.canvas} />
+      <div ref={stageRef} className={s.stage}>
+        <canvas ref={canvasRef} className={s.canvas} />
+      </div>
       <span ref={labelRef} className={s.label} />
       <div ref={poolRef} className={s.pool} />
     </div>

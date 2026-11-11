@@ -16,7 +16,7 @@ export const UI_ES: UiDict = {
   },
   theme: { group: 'Tema de color', dark: 'oscuro', light: 'claro' },
   lang: { group: 'Idioma / Language', to: { en: 'Read this page in English', es: 'Leer esta página en español' } },
-  footer: { socials: 'Perfiles sociales', legal: 'Aviso legal', place: 'Valencia {España}' },
+  footer: { socials: 'Perfiles sociales', legal: 'Aviso legal', place: 'Valencia {España}', placeLabel: 'Valencia, España' },
   pending: {
     word: 'Pendiente',
     role: 'rol',
