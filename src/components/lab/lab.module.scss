@@ -45,6 +45,27 @@
     @include respond-to(sm) { padding: $space-6 $space-4; }
   }
 
+  // 004 · Entradas de píxel: full-width comparison grid, site tokens.
+  &:has(> :global(.fp)) {
+    display: block;
+    padding: $space-8;
+
+    @include respond-to(sm) { padding: $space-6 $space-4; }
+  }
+
+  :global(.fp) {
+    --fp-bg: var(--c-bg);
+    --fp-stage: var(--c-stage);
+    --fp-surface: var(--c-surface);
+    --fp-fg: var(--c-text);
+    --fp-mid: var(--c-text-mid);
+    --fp-muted: var(--c-text-muted);
+    --fp-line: var(--c-border);
+    --fp-frame: var(--c-line);
+    --fp-mono: #{$font-mono};
+    --fp-gutter: #{$space-4};
+  }
+
   :global(.fg) {
     --fg-bg: var(--c-bg-2);
     --fg-bg-2: var(--c-surface);

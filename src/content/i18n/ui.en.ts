@@ -194,6 +194,7 @@ export const UI_EN = {
     source: 'Source code',
     buttons: ['Magnetic', 'Columns', 'Roller', 'Scramble'],
     galleries: ['Arc', 'Canvas', 'Plates', 'Strip', 'Deck', 'Zoom grid', 'Bars', 'Runway'],
+    pixels: ['Columns', 'Bitmap', 'Depixelate', '1-bit', 'Cursor', 'CRT'],
   },
   journal: { h1: 'Journal' },
   shortcuts: {

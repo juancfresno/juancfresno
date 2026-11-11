@@ -20,6 +20,7 @@ export const EXPERIMENT_FILES: Record<string, { css: string; js: string; init: s
   botones: { css: 'buttons.css', js: 'buttons.js', init: 'fresnoButtons', files: ['buttons.css', 'buttons.js', 'snippet.html'], repo: null },
   transiciones: { css: 'transitions.css', js: 'transitions.js', init: 'fresnoTransitions', files: ['transitions.css', 'transitions.js', 'snippet.html'], repo: null },
   galerias: { css: 'galleries.css', js: 'galleries.js', init: 'fresnoGalleries', files: ['galleries.css', 'galleries.js', 'snippet.html'], repo: null },
+  'entradas-pixel': { css: 'pixels.css', js: 'pixels.js', init: 'fresnoPixels', files: ['pixels.css', 'pixels.js', 'snippet.html'], repo: null },
 }
 
 const SITES: Record<Locale, SiteDict> = { en: SITE_EN, es: SITE_ES }

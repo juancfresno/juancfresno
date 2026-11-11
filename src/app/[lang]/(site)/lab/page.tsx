@@ -7,7 +7,7 @@ import { localeOf, type LangParams } from '@/i18n/server'
 import ContactBlock from '@/components/blocks/ContactBlock'
 import Pending from '@/components/blocks/Pending'
 import ElasticLine from '@/components/ui/ElasticLine/ElasticLine'
-import { FramesStage, ButtonsStage, TransitionsStage, GalleriesStage } from '@/components/lab/LabStages'
+import { FramesStage, ButtonsStage, TransitionsStage, GalleriesStage, PixelsStage } from '@/components/lab/LabStages'
 import v from '@/components/blocks/v0.module.scss'
 import l from '@/components/lab/labv1.module.scss'
 
@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return pageMeta({ locale: loc, path: '/lab', title: META.lab.title, description: META.lab.description })
 }
 
-const STAGES: Record<string, (p: { labels: string[] }) => React.ReactElement> = { botones: ButtonsStage, transiciones: TransitionsStage, galerias: GalleriesStage }
+const STAGES: Record<string, (p: { labels: string[] }) => React.ReactElement> = { botones: ButtonsStage, transiciones: TransitionsStage, galerias: GalleriesStage, 'entradas-pixel': PixelsStage }
 
 function Head({ label, link }: { label: string; link?: React.ReactNode }) {
   return (
@@ -41,7 +41,7 @@ export default async function LabPage({ params }: Props) {
   const href = (p: string) => localePath(loc, p)
   const F = LAB_FEATURED
   const featured = EXPERIMENTS.find((e) => e.slug === F.slug)
-  const labels: Record<string, string[]> = { botones: ui.lab.buttons, galerias: ui.lab.galleries }
+  const labels: Record<string, string[]> = { botones: ui.lab.buttons, galerias: ui.lab.galleries, 'entradas-pixel': ui.lab.pixels }
 
   return (
     <div className={v.page}>

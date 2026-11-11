@@ -534,6 +534,62 @@ $grey: color-mix(in srgb, $color-text-mid 80%, transparent);
   i:nth-child(3) { width: 30%; opacity: 0.4; }
 }
 
+// Pixel entrances stage: 6 mini frames mid-entry
+.stagePx {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-content: center;
+  gap: 9% 5%;
+  padding: 0 8%;
+}
+
+$px-on: color-mix(in srgb, $color-text 70%, transparent);
+
+.pxFrame {
+  position: relative;
+  display: block;
+  aspect-ratio: 8 / 5;
+  outline: 1px dashed $color-line;
+  overflow: hidden;
+}
+
+.pxFrame[data-kind='cols'] {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  align-items: start;
+  i { display: block; height: var(--h); background: $px-on; border-bottom: 1px solid var(--c-g); }
+}
+
+.pxFrame[data-kind='bitmap'] {
+  background:
+    linear-gradient(to bottom, transparent 55%, var(--c-stage) 80%),
+    repeating-conic-gradient($px-on 0 25%, transparent 0 50%) 0 0 / 4px 4px;
+}
+
+.pxFrame[data-kind='blocks'] {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  i { display: block; background: $color-text; opacity: calc(0.15 + var(--o) * 0.6); }
+}
+
+.pxFrame[data-kind='onebit'] {
+  background:
+    linear-gradient(to right, $px-on 0 40%, transparent 40%),
+    repeating-conic-gradient($color-text 0 25%, transparent 0 50%) 0 0 / 2px 2px;
+}
+
+.pxFrame[data-kind='cursor'] {
+  background:
+    radial-gradient(circle at 30% 40%, $px-on 0 34%, var(--c-g) 34% 40%, transparent 40%);
+}
+
+.pxFrame[data-kind='crt'] {
+  background:
+    linear-gradient(to bottom, transparent 58%, var(--c-stage) 58%),
+    linear-gradient(to bottom, transparent 54%, $color-text 54% 58%, transparent 58%),
+    repeating-linear-gradient(to bottom, $px-on 0 1px, transparent 1px 2px);
+}
+
 // ─── 04 · Own products (shelf) ──────────────────────────────────────────────
 .shelf { list-style: none; }
 

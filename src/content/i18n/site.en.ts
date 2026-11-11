@@ -63,6 +63,7 @@ export const SITE_EN = {
       botones: 'Four buttons with a point of view: magnetic, columns, roller and scramble.',
       transiciones: '22 page transitions, side by side. 11a is the one this site uses.',
       galerias: 'Eight ways to show 200 images, built on the real feed.',
+      'entradas-pixel': 'Six pixel entrances for the social hover preview, with the real clips.',
     } as Record<string, string>,
     labels: {
       featured: '{ Featured work ↘',
@@ -223,6 +224,18 @@ export const SITE_EN = {
       note: '★ 02 Infinite canvas now runs the Feed · ★ 01 Arc now runs the Home',
       card: 'Eight ways to show 200 images, built on the real feed: arc, infinite canvas, plates, strip, deck, zoom grid, bars and runway.',
       how: 'JavaScript with no libraries: one requestAnimationFrame loop per gallery that sleeps when nothing moves, only transform and opacity, and virtualisation (only the visible pieces exist in the DOM, so it holds 200). The arc and the runway are CSS 3D: each piece is cut into strips so it can curve or fold. Images load as they appear, with 600 px thumbnails and the large file only on zoom. The zoom is a FLIP from the thumbnail. With reduced motion every gallery becomes a still grid. The public version uses generated images.',
+    },
+    {
+      slug: 'entradas-pixel',
+      n: '004',
+      name: 'Pixel entrances',
+      kind: 'Motion',
+      year: '2026',
+      what: 'Six ways for the social hover preview to appear, with the real clips: the twelve columns it uses today, a fine bitmap, depixelate, 1-bit to colour, from the cursor and a CRT sweep. The exit is the entry played backwards. Pixel size, duration and easing per card.',
+      built: 'WebGL2 · one shader · no libraries',
+      note: null as string | null,
+      card: 'Six ways for the social hover preview to appear, with the real clips: fine bitmap, depixelate, 1-bit to colour, from the cursor, CRT sweep, and the twelve columns it uses today.',
+      how: 'One WebGL2 context for every card and one fragment shader with a branch per variant; each card copies its frame into its own canvas. The clip is a texture updated every frame, with mipmaps so the big blocks show the mean colour. Cells snap to device pixels and the thresholds are an 8×8 Bayer matrix. The exit is the entry played backwards, and switching halfway stays continuous. With reduced motion it is instant and the clip stays still; without WebGL2, a plain 2D preview.',
     },
   ],
 

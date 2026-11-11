@@ -193,6 +193,7 @@ export const UI_ES: UiDict = {
     source: 'Código fuente',
     buttons: ['Magnético', 'Columnas', 'Rodillo', 'Scramble'],
     galleries: ['Arco', 'Canvas', 'Láminas', 'Tira', 'Mazo', 'Rejilla con zoom', 'Barras', 'Pasarela'],
+    pixels: ['Columnas', 'Bitmap', 'Despixelado', '1-bit', 'Cursor', 'CRT'],
   },
   journal: { h1: 'Notas' },
   shortcuts: {

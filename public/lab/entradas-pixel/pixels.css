@@ -1,0 +1,155 @@
+/* Fresno Lab · 004 · Pixel entrances — https://juancfresno.com/lab/entradas-pixel
+   No dependencies. Theme with the --fp-* variables on .fp. MIT. */
+.fp {
+  --fp-bg: #10100e;
+  --fp-stage: #161614;      /* card stage behind the frame */
+  --fp-surface: #1a1a18;    /* frame before the clip loads */
+  --fp-fg: #fcfcf7;
+  --fp-mid: rgba(252, 252, 247, 0.6);
+  --fp-muted: rgba(252, 252, 247, 0.35);
+  --fp-line: rgba(252, 252, 247, 0.12);
+  --fp-frame: #3c3c3a;      /* 1 px line around the clip (as on the site) */
+  --fp-accent: #ff5c1e;     /* the site's G orange */
+  --fp-mono: var(--font-fragment-mono, 'Fragment Mono'), ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  --fp-gutter: 16px;
+  --fp-frame-h: 160px;
+  width: 100%;
+  color: var(--fp-fg);
+  font-family: inherit;
+}
+.fp *, .fp *::before, .fp *::after { box-sizing: border-box; }
+.fp :where(button, select, input) { font: inherit; color: inherit; }
+
+.fp__head { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+.fp__bar { display: flex; flex-wrap: wrap; gap: 16px 32px; align-items: flex-end; }
+.fp__set { margin: 0; padding: 0; border: 0; min-width: 0; }
+.fp__set legend, .fp__k, .fp__note, .fp__tag, .fp__read, .fp__meta, .fp__n, .fp__v, .fp__chip, .fp__sel, .fp__hint {
+  font-family: var(--fp-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  line-height: 1.5;
+}
+.fp__set legend { padding: 0 0 8px; color: var(--fp-muted); text-transform: uppercase; letter-spacing: 0.08em; }
+.fp__seg { display: flex; flex-wrap: wrap; gap: 6px; }
+.fp__chip {
+  appearance: none;
+  padding: 5px 10px;
+  border: 1px solid var(--fp-line);
+  border-radius: 999px;
+  background: none;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color 0.15s, background-color 0.15s, color 0.15s;
+}
+.fp__chip:hover { border-color: var(--fp-mid); }
+.fp__chip[aria-pressed='true'] { background: var(--fp-fg); border-color: var(--fp-fg); color: var(--fp-bg); }
+.fp__chip:focus-visible, .fp__frame:focus-visible, .fp__sel:focus-visible, .fp input:focus-visible { outline: 1px solid var(--fp-fg); outline-offset: 2px; }
+.fp__note { margin: 0; color: var(--fp-mid); }
+
+/* ─── Cards ─────────────────────────────────────────────────────────────── */
+.fp__cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 48px var(--fp-gutter);
+}
+@media (min-width: 701px) { .fp[data-fp-scale='2'] .fp__cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 1100px) { .fp__cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 700px) { .fp__cards { grid-template-columns: minmax(0, 1fr); gap: 40px; } }
+
+.fp__card { display: flex; flex-direction: column; min-width: 0; }
+.fp__cardHead { display: flex; align-items: baseline; gap: 12px; padding-top: 10px; border-top: 1px solid var(--fp-line); margin-bottom: 12px; }
+.fp__n { font-size: 1.5rem; line-height: 1; letter-spacing: -0.03em; }
+.fp__titles { min-width: 0; }
+.fp__name { margin: 0; font-size: 1.125rem; font-weight: 400; letter-spacing: -0.01em; line-height: 1.2; }
+.fp__tag { margin: 2px 0 0; color: var(--fp-muted); text-transform: uppercase; }
+.fp__tag--ref { color: var(--fp-accent); }
+
+.fp__stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  padding: 40px 16px 48px;
+  background: var(--fp-stage);
+  overflow: hidden;
+}
+/* The site's 12 columns, faint, behind the frame. */
+.fp__grid {
+  position: absolute;
+  inset: 0 16px;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 8px;
+  pointer-events: none;
+}
+.fp__grid i { border-inline: 1px solid var(--fp-line); opacity: 0.45; }
+.fp__frame {
+  position: relative;
+  max-width: 100%;
+  outline: 1px dashed var(--fp-line);
+  outline-offset: 0;
+  cursor: crosshair;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+.fp__canvas { display: block; max-width: 100%; height: auto; }
+.fp__hint {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--fp-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+.fp__read {
+  position: absolute;
+  left: 16px;
+  bottom: 12px;
+  margin: 0;
+  color: var(--fp-mid);
+  white-space: pre;
+  font-variant-numeric: tabular-nums;
+}
+.fp__text { margin: 16px 0 0; font-size: 0.9375rem; line-height: 1.5; color: var(--fp-mid); }
+
+.fp__ctrls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 16px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--fp-line);
+  align-items: center;
+}
+.fp__ctrl { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 8px; align-items: center; min-width: 0; }
+.fp__k { color: var(--fp-muted); text-transform: uppercase; }
+.fp__v { color: var(--fp-fg); text-align: right; min-width: 5ch; font-variant-numeric: tabular-nums; }
+.fp__v--fixed { grid-column: 2 / -1; text-align: left; color: var(--fp-mid); text-transform: uppercase; }
+.fp__sel {
+  grid-column: 2 / -1;
+  appearance: none;
+  padding: 4px 8px;
+  border: 1px solid var(--fp-line);
+  border-radius: 0;
+  background: transparent;
+  text-transform: uppercase;
+}
+.fp__sel option { background: var(--fp-bg); color: var(--fp-fg); }
+.fp__replay { justify-self: end; grid-column: 2; }
+@media (max-width: 480px) {
+  .fp__ctrls { grid-template-columns: minmax(0, 1fr); }
+  .fp__replay { grid-column: 1; justify-self: start; }
+}
+.fp input[type='range'] { width: 100%; min-width: 0; margin: 0; accent-color: var(--fp-fg); height: 16px; }
+.fp__meta { margin: 10px 0 0; color: var(--fp-muted); text-transform: uppercase; }
+.fp__rec { margin: 40px 0 0; font-family: var(--fp-mono); font-size: 0.6875rem; letter-spacing: 0.04em; line-height: 1.6; color: var(--fp-mid); max-width: 72ch; }
+.fp__rec strong { font-weight: 400; color: var(--fp-fg); }
+
+/* Hidden video pool. */
+.fp__pool { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .fp__chip, .fp__hint { transition: none; }
+}

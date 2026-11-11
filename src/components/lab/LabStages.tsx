@@ -102,3 +102,22 @@ export function GalleriesStage({ labels: L }: { labels: string[] }) {
     </div>
   )
 }
+
+// 004 · Pixel entrances: six mini frames caught mid-entry, drawn in CSS.
+// Names come per locale (getUi(l).lab.pixels), in this order.
+const PX_KINDS = ['cols', 'bitmap', 'blocks', 'onebit', 'cursor', 'crt']
+export function PixelsStage({ labels: L }: { labels: string[] }) {
+  return (
+    <div className={`${s.stage} ${s.stagePx}`} aria-hidden="true">
+      {PX_KINDS.map((k, i) => (
+        <div key={k} className={s.gCell}>
+          <span className={s.pxFrame} data-kind={k}>
+            {k === 'cols' && Array.from({ length: 12 }, (_, c) => <i key={c} style={{ ['--h' as string]: `${Math.max(8, 100 - Math.abs(c - 4) * 18)}%` }} />)}
+            {k === 'blocks' && Array.from({ length: 24 }, (_, c) => <i key={c} style={{ ['--o' as string]: ((c * 37) % 10) / 10 }} />)}
+          </span>
+          <p className={`${s.cap} ${i === 0 ? s.capStar : ''}`}>{String(i).padStart(2, '0')} {L[i]}</p>
+        </div>
+      ))}
+    </div>
+  )
+}
