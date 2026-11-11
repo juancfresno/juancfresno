@@ -226,7 +226,7 @@ export const SITE_ES: SiteDict = {
       year: '2026',
       what: 'Seis formas de que aparezca el preview de redes, con los clips reales: las doce columnas de ahora, bitmap fino, despixelado, 1-bit a color, desde el cursor y barrido CRT. La salida es la entrada al revés. Tamaño de píxel, duración y curva en cada tarjeta.',
       built: 'WebGL2 · un shader · sin librerías',
-      note: null,
+      note: '★ 02 Despixelado ya es el preview de redes',
       card: 'Seis formas de que aparezca el preview de redes, con los clips reales: bitmap fino, despixelado, 1-bit a color, desde el cursor, barrido CRT y las doce columnas de ahora.',
       how: 'Un solo contexto WebGL2 para todas las tarjetas y un fragment shader con una rama por variante; cada tarjeta copia su fotograma a su propio canvas. El clip es una textura que se actualiza en cada fotograma, con mipmaps para que los bloques grandes den el color medio. Las celdas encajan en píxeles del dispositivo y los umbrales salen de una matriz Bayer 8×8. La salida es la entrada al revés y cambiar a mitad no da saltos. Con «reducir movimiento» es instantáneo y el clip queda quieto; sin WebGL2, una vista 2D simple.',
     },

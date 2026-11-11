@@ -233,7 +233,7 @@ export const SITE_EN = {
       year: '2026',
       what: 'Six ways for the social hover preview to appear, with the real clips: the twelve columns it uses today, a fine bitmap, depixelate, 1-bit to colour, from the cursor and a CRT sweep. The exit is the entry played backwards. Pixel size, duration and easing per card.',
       built: 'WebGL2 · one shader · no libraries',
-      note: null as string | null,
+      note: '★ 02 Depixelate now runs the social hover preview' as string | null,
       card: 'Six ways for the social hover preview to appear, with the real clips: fine bitmap, depixelate, 1-bit to colour, from the cursor, CRT sweep, and the twelve columns it uses today.',
       how: 'One WebGL2 context for every card and one fragment shader with a branch per variant; each card copies its frame into its own canvas. The clip is a texture updated every frame, with mipmaps so the big blocks show the mean colour. Cells snap to device pixels and the thresholds are an 8×8 Bayer matrix. The exit is the entry played backwards, and switching halfway stays continuous. With reduced motion it is instant and the clip stays still; without WebGL2, a plain 2D preview.',
     },
