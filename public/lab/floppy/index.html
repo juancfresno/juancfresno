@@ -1,0 +1,862 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#10100E">
+<title>Floppy · Fresno© Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@700&family=Sometype+Mono:wght@500&display=swap" rel="stylesheet">
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+} }
+</script>
+<style>
+  :root { --ink: #10100E; --pearl: #FCFCF7; --blue: #003DFF; --m: max(20px, 2.381vw); }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; background: var(--ink); color: var(--pearl); overflow: hidden; overscroll-behavior: none; }
+  body { -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent; }
+  .stage { position: fixed; inset: 0; height: 100dvh; }
+  .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  #bg { pointer-events: none; }
+  #gl { touch-action: none; cursor: grab; outline: none; opacity: 0; transition: opacity 1.1s cubic-bezier(.2, .7, .2, 1); -webkit-user-select: none; user-select: none; }
+  #gl.ready { opacity: 1; }
+  #gl.dragging { cursor: grabbing; }
+  #gl:focus-visible { outline: 1px solid var(--blue); outline-offset: -8px; }
+  .hud {
+    position: absolute; left: max(var(--m), env(safe-area-inset-left)); bottom: max(var(--m), env(safe-area-inset-bottom));
+    margin: 0; font: 500 10.5px/1 "Sometype Mono", ui-monospace, Menlo, monospace; letter-spacing: .04em; text-transform: uppercase;
+    color: rgba(252, 252, 247, .44); pointer-events: none; white-space: nowrap;
+  }
+  .hud .touch { display: none; }
+  @media (hover: none), (pointer: coarse) { .hud .fine { display: none; } .hud .touch { display: inline; } }
+  /* Real buttons for keyboard and screen readers; visible only on focus */
+  .controls { position: absolute; left: max(var(--m), env(safe-area-inset-left)); top: max(var(--m), env(safe-area-inset-top)); display: flex; gap: 8px; }
+  .controls button {
+    font: 500 10.5px/1 "Sometype Mono", ui-monospace, Menlo, monospace; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--pearl); background: var(--ink); border: 1px solid rgba(252, 252, 247, .3); padding: 9px 10px; border-radius: 0;
+    opacity: 0; pointer-events: none;
+  }
+  .controls button:focus-visible { opacity: 1; pointer-events: auto; outline: 1px solid var(--blue); outline-offset: 2px; }
+  .fallback { position: absolute; inset: 0; display: none; place-items: center; }
+  .fallback svg { width: min(62vw, 46vh); height: auto; }
+  .no-gl .fallback { display: grid; }
+  .no-gl canvas { display: none; }
+</style>
+</head>
+<body>
+<main class="stage" id="stage">
+  <canvas id="bg" aria-hidden="true"></canvas>
+  <canvas id="gl" tabindex="0" role="img" aria-label="Floppy disk, Lab 001, Botones, 2026"></canvas>
+  <div class="controls">
+    <button type="button" id="btn-shutter" aria-pressed="false">Shutter</button>
+    <button type="button" id="btn-flip">Flip</button>
+    <button type="button" id="btn-protect" aria-pressed="false">Write-protect</button>
+  </div>
+  <p class="hud">Lab · Floppy · Drag ↔ ↕ · <span class="fine">Hover shutter</span><span class="touch">Tap shutter</span></p>
+  <div class="fallback" aria-hidden="true">
+    <!-- Static fallback when WebGL or the CDN is not available -->
+    <svg viewBox="0 0 90 94" role="img" aria-label="Floppy disk, Lab 001, Botones, 2026">
+      <path d="M1.2 0H86.5L90 3.5V92.8A1.2 1.2 0 0 1 88.8 94H1.2A1.2 1.2 0 0 1 0 92.8V1.2A1.2 1.2 0 0 1 1.2 0Z" fill="#1b1b18"/>
+      <rect x="31" y="0.4" width="44" height="29" fill="#cfcdc5"/>
+      <rect x="53" y="3.5" width="9" height="24" fill="#1b1b18"/>
+      <rect x="10" y="33.8" width="70" height="58" rx="1.1" fill="#FCFCF7"/>
+      <text x="13" y="62" font-family="ui-monospace, Menlo, monospace" font-size="22" font-weight="500" fill="#10100E">001</text>
+      <text x="13" y="72" font-family="system-ui, sans-serif" font-size="7" font-weight="700" fill="#10100E">Botones</text>
+      <text x="13" y="88" font-family="ui-monospace, Menlo, monospace" font-size="2.2" fill="#10100E">LAB 001 · BOTONES · 2026</text>
+      <rect x="83.5" y="86.6" width="3.5" height="4" fill="#003DFF"/>
+    </svg>
+  </div>
+</main>
+
+<script type="module">
+/* FLOPPY · Phase 1 (hero object). Units: 1 = 1 mm. Spec: ./SPEC.md
+   createFloppy(data, options) is the reusable factory; everything after it is the demo scene. */
+
+const INK = '#10100E', PEARL = '#FCFCF7', BLUE = '#003DFF';
+const TAU = Math.PI * 2, HALF = Math.PI / 2;
+const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+
+let THREE, RoomEnvironment;
+
+// ───────────────────────────────────────────── 2D polygon helpers
+const pt = (x, y, s = 1) => ({ x, y, s }); // s scales the bevel at that vertex
+function arcPts(cx, cy, r, a0, a1, n, s = 1) {
+  const out = [];
+  for (let i = 0; i <= n; i++) { const a = a0 + (a1 - a0) * i / n; out.push(pt(cx + Math.cos(a) * r, cy + Math.sin(a) * r, s)); }
+  return out;
+}
+function rrect(x0, y0, x1, y1, r = 0, s = 1, n = 4) {
+  if (r <= 0) return [pt(x0, y0, s), pt(x1, y0, s), pt(x1, y1, s), pt(x0, y1, s)];
+  return [
+    ...arcPts(x0 + r, y0 + r, r, 2 * HALF, 3 * HALF, n, s), ...arcPts(x1 - r, y0 + r, r, 3 * HALF, 4 * HALF, n, s),
+    ...arcPts(x1 - r, y1 - r, r, 0, HALF, n, s), ...arcPts(x0 + r, y1 - r, r, HALF, 2 * HALF, n, s),
+  ];
+}
+const circle = (cx, cy, r, n = 64, s = 1) => arcPts(cx, cy, r, 0, TAU, n, s).slice(0, n);
+const moved = (pts, dx, dy, rot = 0) => pts.map(p => {
+  const c = Math.cos(rot), q = Math.sin(rot);
+  return pt(p.x * c - p.y * q + dx, p.x * q + p.y * c + dy, p.s);
+});
+function clean(pts) { // drop duplicates, force counter-clockwise
+  const out = [];
+  for (const p of pts) { const l = out[out.length - 1]; if (!l || Math.hypot(p.x - l.x, p.y - l.y) > 1e-5) out.push(p); }
+  while (out.length > 1 && Math.hypot(out[0].x - out[out.length - 1].x, out[0].y - out[out.length - 1].y) < 1e-5) out.pop();
+  let a = 0;
+  for (let i = 0; i < out.length; i++) { const p = out[i], q = out[(i + 1) % out.length]; a += p.x * q.y - q.x * p.y; }
+  return a < 0 ? out.reverse() : out;
+}
+function offsetPoly(pts, d) { // d > 0 moves a CCW polygon inwards
+  if (!d) return pts;
+  const n = pts.length, out = new Array(n);
+  for (let i = 0; i < n; i++) {
+    const a = pts[(i + n - 1) % n], b = pts[i], c = pts[(i + 1) % n];
+    let e1x = b.x - a.x, e1y = b.y - a.y, e2x = c.x - b.x, e2y = c.y - b.y;
+    const l1 = Math.hypot(e1x, e1y) || 1, l2 = Math.hypot(e2x, e2y) || 1;
+    e1x /= l1; e1y /= l1; e2x /= l2; e2y /= l2;
+    let mx = -e1y - e2y, my = e1x + e2x;
+    const ml = Math.hypot(mx, my) || 1; mx /= ml; my /= ml;
+    const k = d * b.s / Math.max(0.35, mx * -e1y + my * e1x);
+    out[i] = { x: b.x + mx * k, y: b.y + my * k, s: b.s };
+  }
+  return out;
+}
+
+// ───────────────────────────────────────────── mesh builder (auto winding, material groups)
+class MeshBuilder {
+  constructor() { this.g = [0, 1, 2, 3].map(() => ({ p: [], n: [], u: [] })); }
+  tri(gi, a, b, c) {
+    const ux = b.p[0] - a.p[0], uy = b.p[1] - a.p[1], uz = b.p[2] - a.p[2];
+    const vx = c.p[0] - a.p[0], vy = c.p[1] - a.p[1], vz = c.p[2] - a.p[2];
+    const nx = uy * vz - uz * vy, ny = uz * vx - ux * vz, nz = ux * vy - uy * vx;
+    if (nx * nx + ny * ny + nz * nz < 1e-14) return;
+    const d = nx * (a.n[0] + b.n[0] + c.n[0]) + ny * (a.n[1] + b.n[1] + c.n[1]) + nz * (a.n[2] + b.n[2] + c.n[2]);
+    const g = this.g[gi];
+    for (const v of d >= 0 ? [a, b, c] : [a, c, b]) { g.p.push(...v.p); g.n.push(...v.n); g.u.push(...v.u); }
+  }
+  quad(gi, a, b, c, d) { this.tri(gi, a, b, c); this.tri(gi, a, c, d); }
+  build() {
+    const p = [], n = [], u = [], geo = new THREE.BufferGeometry();
+    let start = 0;
+    this.g.forEach((g, i) => {
+      if (!g.p.length) return;
+      p.push(...g.p); n.push(...g.n); u.push(...g.u);
+      geo.addGroup(start, g.p.length / 3, i); start += g.p.length / 3;
+    });
+    geo.setAttribute('position', new THREE.Float32BufferAttribute(p, 3));
+    geo.setAttribute('normal', new THREE.Float32BufferAttribute(n, 3));
+    geo.setAttribute('uv', new THREE.Float32BufferAttribute(u, 2));
+    return geo;
+  }
+}
+const nrm3 = v => { const l = Math.hypot(v[0], v[1], v[2]) || 1; return [v[0] / l, v[1] / l, v[2] / l]; };
+
+/* A slab: outline + holes extruded from z0 to z1 with a bevel profile ("rings": [{ z, d }], d = inset).
+   Groups: 0 outer wall · 1 top cap · 2 bottom cap · 3 hole walls. */
+function slab({ outline, holes = [], z0, z1, rings, uvScale = 1 / 24, capUv, capTop = true, capBottom = false }) {
+  const mb = new MeshBuilder();
+  const O = clean(outline);
+  const oR = rings || [{ z: z0, d: 0 }, { z: z1, d: 0 }];
+  const hs = holes.map(h => (Array.isArray(h) ? { pts: h } : h)).map(h => ({
+    pts: clean(h.pts),
+    rings: h.bevel ? [{ z: z0, d: 0 }, { z: z1 - h.bevel, d: 0 }, { z: z1, d: h.bevel }] : [{ z: z0, d: 0 }, { z: z1, d: 0 }],
+  }));
+  wall(mb, O, oR, false, 0, uvScale);
+  for (const h of hs) wall(mb, h.pts, h.rings, true, 3, uvScale);
+  const capAt = (pick, dir, gi) => {
+    const oRing = pick(oR), oc = offsetPoly(O, oRing.d), hp = hs.map(h => offsetPoly(h.pts, -pick(h.rings).d));
+    const v2 = a => a.map(p => new THREE.Vector2(p.x, p.y));
+    const faces = THREE.ShapeUtils.triangulateShape(v2(oc), hp.map(v2));
+    const all = oc.concat(...hp);
+    for (const f of faces) {
+      const v = f.map(i => ({ p: [all[i].x, all[i].y, oRing.z], n: [0, 0, dir], u: capUv ? capUv(all[i].x, all[i].y) : [all[i].x * uvScale, all[i].y * uvScale] }));
+      mb.tri(gi, v[0], v[1], v[2]);
+    }
+  };
+  if (capTop) capAt(r => r[r.length - 1], 1, 1);
+  if (capBottom) capAt(r => r[0], -1, 2);
+  return mb.build();
+}
+function wall(mb, C, R, isHole, gi, uvS) {
+  const n = C.length, sg = isHole ? -1 : 1;
+  const rp = R.map(r => offsetPoly(C, sg * r.d));
+  const en = [], arc = [0];
+  for (let i = 0; i < n; i++) {
+    const a = C[i], b = C[(i + 1) % n], l = Math.hypot(b.x - a.x, b.y - a.y) || 1;
+    const ex = (b.x - a.x) / l, ey = (b.y - a.y) / l;
+    en.push(isHole ? [-ey, ex] : [ey, -ex]); arc.push(arc[i] + l);
+  }
+  const vn = []; // smoothed 2D normal where the contour turns gently, null on hard corners
+  for (let i = 0; i < n; i++) {
+    const p = en[(i + n - 1) % n], q = en[i];
+    if (p[0] * q[0] + p[1] * q[1] > 0.8) { const l = Math.hypot(p[0] + q[0], p[1] + q[1]); vn.push([(p[0] + q[0]) / l, (p[1] + q[1]) / l]); } else vn.push(null);
+  }
+  const sn = []; // profile direction per ring segment: [horizontal weight, z weight]
+  for (let k = 0; k < R.length - 1; k++) { const dz = R[k + 1].z - R[k].z, dd = R[k + 1].d - R[k].d, l = Math.hypot(dz, dd) || 1; sn.push([dz / l, dd / l]); }
+  const ringN = (k, seg) => { // smooth along the bevel, hard where the profile breaks
+    const other = seg === k ? k - 1 : k;
+    if (other < 0 || other >= sn.length) return sn[seg];
+    const a = sn[seg], b = sn[other];
+    if (a[0] * b[0] + a[1] * b[1] < 0.72) return a;
+    const l = Math.hypot(a[0] + b[0], a[1] + b[1]); return [(a[0] + b[0]) / l, (a[1] + b[1]) / l];
+  };
+  for (let k = 0; k < R.length - 1; k++) {
+    const nb = ringN(k, k), nt = ringN(k + 1, k);
+    for (let i = 0; i < n; i++) {
+      const j = (i + 1) % n, nA = vn[i] || en[i], nB = vn[j] || en[i];
+      const V = (p, z, n2, pr, u) => ({ p: [p.x, p.y, z], n: nrm3([n2[0] * pr[0], n2[1] * pr[0], pr[1]]), u: [u * uvS, z * uvS] });
+      mb.quad(gi,
+        V(rp[k][i], R[k].z, nA, nb, arc[i]), V(rp[k][j], R[k].z, nB, nb, arc[i + 1]),
+        V(rp[k + 1][j], R[k + 1].z, nB, nt, arc[i + 1]), V(rp[k + 1][i], R[k + 1].z, nA, nt, arc[i]));
+    }
+  }
+}
+
+// ───────────────────────────────────────────── procedural textures
+function rng(seed) { let s = seed >>> 0; return () => ((s = Math.imul(s ^ (s >>> 15), 2246822507) ^ Math.imul(s ^ (s >>> 13), 3266489909), (s ^= s >>> 16) >>> 0) / 4294967296); }
+function makeCanvas(w, h) { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; }
+function tex(canvas, { srgb = false, repeat = [1, 1], aniso = 8 } = {}) {
+  const t = new THREE.CanvasTexture(canvas);
+  t.colorSpace = srgb ? THREE.SRGBColorSpace : THREE.NoColorSpace;
+  t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(repeat[0], repeat[1]); t.anisotropy = aniso;
+  return t;
+}
+function grainNormalCanvas(size = 256, seed = 7) { // moulded ABS texture: two octaves of noise as a tangent-space normal map
+  const r = rng(seed), h = new Float32Array(size * size), low = new Float32Array((size / 4) ** 2), ls = size / 4;
+  for (let i = 0; i < low.length; i++) low[i] = r();
+  for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
+    const fx = x / 4, fy = y / 4, x0 = Math.floor(fx), y0 = Math.floor(fy), tx = fx - x0, ty = fy - y0;
+    const L = (a, b) => low[((b + ls) % ls) * ls + ((a + ls) % ls)];
+    const lo = (L(x0, y0) * (1 - tx) + L(x0 + 1, y0) * tx) * (1 - ty) + (L(x0, y0 + 1) * (1 - tx) + L(x0 + 1, y0 + 1) * tx) * ty;
+    h[y * size + x] = lo * 0.3 + r() * 0.7;
+  }
+  const c = makeCanvas(size, size), ctx = c.getContext('2d'), img = ctx.createImageData(size, size);
+  const H = (x, y) => h[((y + size) % size) * size + ((x + size) % size)];
+  for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
+    const v = nrm3([(H(x - 1, y) - H(x + 1, y)) * 1.6, (H(x, y - 1) - H(x, y + 1)) * 1.6, 1]), i = (y * size + x) * 4;
+    img.data[i] = (v[0] * 0.5 + 0.5) * 255; img.data[i + 1] = (v[1] * 0.5 + 0.5) * 255; img.data[i + 2] = (v[2] * 0.5 + 0.5) * 255; img.data[i + 3] = 255;
+  }
+  ctx.putImageData(img, 0, 0); return c;
+}
+function brushedCanvas(size = 512, seed = 3) { // horizontal brushing, used as roughness
+  const r = rng(seed), c = makeCanvas(size, size), ctx = c.getContext('2d');
+  ctx.fillStyle = '#b4b4b4'; ctx.fillRect(0, 0, size, size);
+  for (let y = 0; y < size; y++) { const v = 150 + r() * 70; ctx.fillStyle = `rgba(${v},${v},${v},.55)`; ctx.fillRect(0, y, size, 1); }
+  for (let i = 0; i < 2600; i++) {
+    const y = r() * size, x = r() * size, len = 40 + r() * 420, light = r() > 0.5;
+    ctx.fillStyle = light ? `rgba(255,255,255,${0.04 + r() * 0.16})` : `rgba(40,40,40,${0.04 + r() * 0.16})`;
+    const hgt = r() > 0.85 ? 2 : 1;
+    ctx.fillRect(x, y, len, hgt); ctx.fillRect(x - size, y, len, hgt);
+  }
+  return c;
+}
+function ringsCanvas(size = 512, seed = 11) { // lathe-turned steel for the hub (planar, concentric)
+  const r = rng(seed), c = makeCanvas(size, size), ctx = c.getContext('2d');
+  ctx.fillStyle = '#b8b8b8'; ctx.fillRect(0, 0, size, size);
+  for (let i = 0; i < 230; i++) {
+    const v = 120 + r() * 120; ctx.strokeStyle = `rgba(${v},${v},${v},.5)`; ctx.lineWidth = 0.6 + r() * 1.4;
+    ctx.beginPath(); ctx.arc(size / 2, size / 2, 4 + (i / 230) * size * 0.5, 0, TAU); ctx.stroke();
+  }
+  return c;
+}
+function mylarCanvas(w = 1024, h = 256, seed = 23) { // polar: u = angle, v = radius. Fine tracks plus soft angular streaks
+  const r = rng(seed), c = makeCanvas(w, h), ctx = c.getContext('2d');
+  ctx.fillStyle = '#9a9a9a'; ctx.fillRect(0, 0, w, h);
+  for (let y = 0; y < h; y++) { const v = 110 + r() * 90; ctx.fillStyle = `rgba(${v},${v},${v},.6)`; ctx.fillRect(0, y, w, 1); }
+  for (let i = 0; i < 26; i++) { // angular streaks: these are what make the spin readable
+    const x = r() * w, ww = 8 + r() * 90, light = r() > 0.45, a = 0.05 + r() * 0.16;
+    const g = ctx.createLinearGradient(x - ww, 0, x + ww, 0), col = light ? '255,255,255' : '0,0,0';
+    g.addColorStop(0, `rgba(${col},0)`); g.addColorStop(0.5, `rgba(${col},${a})`); g.addColorStop(1, `rgba(${col},0)`);
+    ctx.fillStyle = g; const y0 = r() * h * 0.5, hh = h * (0.3 + r() * 0.7);
+    for (const ox of [0, -w, w]) ctx.fillRect(x - ww + ox, y0, ww * 2, hh);
+  }
+  return c;
+}
+
+// ───────────────────────────────────────────── label (CanvasTexture drawn from data)
+const BAYER4 = [[0, 8, 2, 10], [12, 4, 14, 6], [3, 11, 1, 9], [15, 7, 13, 5]];
+const GLYPHS = {
+  '001': ['........', '.######.', '#......#', '#.####.#', '#.####.#', '#......#', '.######.', '........'],
+};
+function glyphFor(n) { // one tiny pixel glyph per project; unknown numbers get a symmetric hash glyph
+  if (GLYPHS[n]) return GLYPHS[n];
+  const r = rng([...String(n)].reduce((a, c) => a * 31 + c.charCodeAt(0), 17)), rows = [];
+  for (let y = 0; y < 8; y++) { let h = ''; for (let x = 0; x < 4; x++) h += r() > 0.5 ? '#' : '.'; rows.push(h + [...h].reverse().join('')); }
+  return rows;
+}
+function drawLabel(data, opts = {}) {
+  const W = 2048, H = 1700, M = 96, G = 32, COLS = 24, colW = (W - 2 * M - (COLS - 1) * G) / COLS;
+  const colX = i => M + i * (colW + G), R = W - M;
+  const total = opts.total || '005', up = s => String(s).toLocaleUpperCase('es');
+  const c = makeCanvas(W, H), ctx = c.getContext('2d');
+  const INK_MID = 'rgba(16,16,14,.56)', INK_LOW = 'rgba(16,16,14,.26)';
+  ctx.fillStyle = PEARL; ctx.fillRect(0, 0, W, H);
+
+  const MONO = '"Sometype Mono", ui-monospace, Menlo, monospace', SANS = '"Inter Tight", "Helvetica Neue", Arial, sans-serif';
+  const mono = (text, x, y, size, { align = 'left', color = INK, track = 0.04 } = {}) => {
+    ctx.font = `500 ${size}px ${MONO}`; ctx.fillStyle = color; ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+    const chars = [...text], adv = ctx.measureText('0').width + size * track, tw = adv * chars.length - size * track;
+    const x0 = align === 'right' ? x - tw : align === 'center' ? x - tw / 2 : x;
+    chars.forEach((ch, i) => ctx.fillText(ch, x0 + i * adv, y));
+    return tw;
+  };
+  const rule = (x0, x1, y, color = INK, w = 3) => { ctx.fillStyle = color; ctx.fillRect(x0, y - w / 2, x1 - x0, w); };
+  const MICRO = 38;
+
+  // register crop marks
+  ctx.fillStyle = INK_MID;
+  for (const [x, y, sx, sy] of [[M, M, -1, -1], [R, M, 1, -1], [M, H - M, -1, 1], [R, H - M, 1, 1]]) {
+    ctx.fillRect(Math.min(x + sx * 18, x + sx * 52), y - 1.5, 34, 3); ctx.fillRect(x - 1.5, Math.min(y + sy * 18, y + sy * 52), 3, 34);
+  }
+
+  // top band
+  mono('Fresno© Lab'.toUpperCase(), M, 160, MICRO);
+  mono(`LAB ${data.n} · ${up(data.title)} · ${data.year}`, colX(8), 160, MICRO);
+  mono('3.5 IN · HD', R, 160, MICRO, { align: 'right', color: INK_MID });
+  rule(M, R, 196);
+  for (let i = 0; i < COLS; i++) { ctx.fillStyle = INK; ctx.fillRect(colX(i) - 1.5, 196, 3, 16); ctx.fillStyle = INK_LOW; ctx.fillRect(colX(i) + colW - 1, 196, 2, 9); }
+
+  // big number
+  ctx.font = `500 640px ${MONO}`; ctx.fillStyle = INK; ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+  const adv = ctx.measureText('0').width - 26;
+  [...data.n].forEach((ch, i) => ctx.fillText(ch, M - 30 + i * adv, 720));
+
+  // spec table, right block
+  const tx = colX(16), rows = [['No.', `${data.n} / ${total}`], ['Kind', up(data.kind)], ['EN', up(data.en || data.title)], ['Year', data.year], ['Format', '1.44 MB']];
+  rows.forEach(([k, v], i) => {
+    const y = 318 + i * 86;
+    mono(up(k), tx, y, MICRO, { color: INK_MID }); mono(v, R, y, MICRO, { align: 'right' });
+    rule(tx, R, y + 30, INK_LOW, 2);
+  });
+
+  // title, shrunk to fit
+  let size = 196; ctx.textAlign = 'left';
+  const setTitle = () => { ctx.font = `700 ${size}px ${SANS}`; if ('letterSpacing' in ctx) ctx.letterSpacing = `${-size * 0.025}px`; };
+  setTitle(); while (ctx.measureText(data.title).width > R - M && size > 80) { size -= 6; setTitle(); }
+  ctx.fillStyle = INK; ctx.fillText(data.title, M - size * 0.045, 960);
+  if ('letterSpacing' in ctx) ctx.letterSpacing = '0px';
+
+  // ruled field ("handwritten-looking", empty by default)
+  mono('{ Notes ↘'.toUpperCase(), M, 1090, MICRO, { color: INK_MID });
+  const fx1 = colX(14) + colW;
+  for (let i = 0; i < 3; i++) rule(M, fx1, 1178 + i * 88, INK_LOW, 2);
+  if (opts.note) { ctx.font = `400 74px "Permanent Marker", "Marker Felt", cursive`; ctx.fillStyle = INK; ctx.fillText(opts.note, M + 8, 1166); }
+
+  // pixel glyph
+  const glyph = glyphFor(data.n), cell = 22, gx = R - cell * 8, gy = 1094;
+  ctx.fillStyle = INK;
+  glyph.forEach((row, y) => [...row].forEach((ch, x) => { if (ch === '#') ctx.fillRect(gx + x * cell, gy + y * cell, cell, cell); }));
+  mono(`GLYPH ${data.n}`, gx - 28, gy + cell * 8 - 2, MICRO, { align: 'right', color: INK_MID });
+
+  // Bayer dither strip: the single accent
+  const bx = tx, bw = R - tx, bc = 9, bcols = Math.floor(bw / bc);
+  ctx.fillStyle = BLUE;
+  for (let x = 0; x < bcols; x++) for (let y = 0; y < 4; y++) {
+    if (1 - x / (bcols - 1) > (BAYER4[y][x % 4] + 0.5) / 16) ctx.fillRect(bx + x * bc, 1400 + y * bc, bc, bc);
+  }
+
+  // bottom band
+  rule(M, R, 1476);
+  for (let i = 0; i < COLS; i++) { ctx.fillStyle = INK; ctx.fillRect(colX(i) - 1.5, 1460, 3, 16); }
+  mono('{ LAB ↘', M, 1560, MICRO);
+  mono('JUANCFRESNO.COM/LAB', colX(8), 1560, MICRO, { color: INK_MID });
+  mono('SIDE A', R, 1560, MICRO, { align: 'right' });
+
+  // paper: faint fibre noise
+  const r = rng(91), noise = makeCanvas(256, 256), nctx = noise.getContext('2d'), img = nctx.createImageData(256, 256);
+  for (let i = 0; i < img.data.length; i += 4) { const v = r() * 255; img.data[i] = img.data[i + 1] = img.data[i + 2] = v; img.data[i + 3] = 255; }
+  nctx.putImageData(img, 0, 0);
+  ctx.globalCompositeOperation = 'multiply'; ctx.globalAlpha = 0.05; ctx.fillStyle = ctx.createPattern(noise, 'repeat'); ctx.fillRect(0, 0, W, H);
+  ctx.globalAlpha = 1; ctx.strokeStyle = 'rgba(60,56,44,.05)'; ctx.lineWidth = 1.5;
+  for (let i = 0; i < 520; i++) {
+    const x = r() * W, y = r() * H, a = r() * TAU, l = 14 + r() * 46;
+    ctx.beginPath(); ctx.moveTo(x, y); ctx.quadraticCurveTo(x + Math.cos(a) * l * 0.5 + (r() - 0.5) * 14, y + Math.sin(a) * l * 0.5 + (r() - 0.5) * 14, x + Math.cos(a) * l, y + Math.sin(a) * l); ctx.stroke();
+  }
+  ctx.globalCompositeOperation = 'source-over';
+  return c;
+}
+
+// ───────────────────────────────────────────── the object
+/* Layout, front view, shutter up (x right, y up, z towards the label side):
+   shell 90 × 94 × 3.3, chamfer top right, head window on the centre line, label on the lower part.
+   The back half is built in "back view" coordinates and turned 180° around Y. */
+const SHELL = { hw: 45, hh: 47, t: 1.65, corner: 1.2, chamfer: 3.5, bevel: 0.35, seam: 0.1 };
+const HUB_Y = 2;                       // media centre
+const NOTCH = { x0: -28, x1: 31, y: 17.5 }; // shutter recess (front view)
+const SHUT = { x0: -14, x1: 30, y0: 17.9, travel: 12.5, t: 0.2 };
+const LABEL = { x0: -35, x1: 35, y0: -45, y1: 13.1 };
+const TAB = { x: 40.3, yOn: -41.6, yOff: -36.4 };
+
+function shellOutline(notch, mirror) {
+  const { hw, hh, corner: r, chamfer: ch } = SHELL, p = [];
+  p.push(...arcPts(-hw + r, -hh + r, r, 2 * HALF, 3 * HALF, 5), ...arcPts(hw - r, -hh + r, r, 3 * HALF, 4 * HALF, 5));
+  p.push(pt(hw, hh - ch), pt(hw - ch, hh));
+  if (notch) {
+    const { x0, x1, y, r: nr = 0, s = 0, sm = 0 } = notch;
+    p.push(pt(x1 + 1.2, hh), pt(x1, hh, sm));
+    if (nr > 0) p.push(...arcPts(x1 - nr, y + nr, nr, 0, -HALF, 4, s), ...arcPts(x0 + nr, y + nr, nr, -HALF, -2 * HALF, 4, s));
+    else p.push(pt(x1, y, s), pt(x0, y, s));
+    p.push(pt(x0, hh, sm), pt(x0 - 1.2, hh));
+  }
+  p.push(...arcPts(-hw + r, hh - r, r, HALF, 2 * HALF, 5));
+  return mirror ? p.map(q => pt(-q.x, q.y, q.s)).reverse() : p;
+}
+function outerInset(z) { // shell edge profile: seam chamfer at the bottom, rounded edge at the top
+  const { t, bevel: b, seam } = SHELL;
+  if (z < seam) return seam - z;
+  if (z > t - b) { const k = z - (t - b); return b - Math.sqrt(Math.max(0, b * b - k * k)); }
+  return 0;
+}
+function outerRings(z0, z1) {
+  const { t, bevel: b, seam } = SHELL, zs = new Set([z0, z1]);
+  for (const k of [seam, t - b]) if (k > z0 + 1e-4 && k < z1 - 1e-4) zs.add(k);
+  for (let i = 1; i <= 7; i++) { const z = t - b + b * Math.sin(i / 7 * HALF); if (z > z0 + 1e-4 && z < z1 - 1e-4) zs.add(z); }
+  return [...zs].sort((a, b2) => a - b2).map(z => ({ z, d: outerInset(z) }));
+}
+
+export function createFloppy(data, options = {}) {
+  const maxAniso = options.maxAnisotropy || 8;
+  const disposables = [];
+  const keep = o => (disposables.push(o), o);
+
+  // ── textures
+  const grainN = keep(tex(grainNormalCanvas(), { repeat: [3, 3], aniso: maxAniso }));
+  const brushed = keep(tex(brushedCanvas(), { repeat: [1, 5], aniso: maxAniso }));
+  const ringsT = keep(tex(ringsCanvas(), { aniso: maxAniso }));
+  const mylarC = mylarCanvas();
+  const mylarR = keep(tex(mylarC, { aniso: maxAniso })), mylarA = keep(tex(mylarC, { srgb: true, aniso: maxAniso }));
+  const labelT = keep(new THREE.CanvasTexture(drawLabel(data, options.label)));
+  labelT.colorSpace = THREE.SRGBColorSpace; labelT.anisotropy = maxAniso; labelT.generateMipmaps = true; labelT.minFilter = THREE.LinearMipmapLinearFilter;
+
+  // ── materials ("Fresno ink")
+  const fresnel = (mat, strength) => { // soft edge lift at grazing angles
+    mat.onBeforeCompile = sh => {
+      sh.uniforms.uFresnel = { value: strength };
+      sh.fragmentShader = sh.fragmentShader
+        .replace('#include <common>', '#include <common>\nuniform float uFresnel;')
+        .replace('#include <opaque_fragment>', 'outgoingLight += vec3( 0.60, 0.64, 0.72 ) * uFresnel * pow( 1.0 - saturate( dot( normalize( vViewPosition ), normal ) ), 5.0 );\n#include <opaque_fragment>');
+    };
+    return mat;
+  };
+  const M = {
+    absTex: fresnel(new THREE.MeshPhysicalMaterial({ color: INK, roughness: 0.6, normalMap: grainN, normalScale: new THREE.Vector2(0.2, 0.2) }), 0.07),
+    absSmooth: fresnel(new THREE.MeshPhysicalMaterial({ color: INK, roughness: 0.42 }), 0.07),
+    absInner: new THREE.MeshPhysicalMaterial({ color: '#0a0a09', roughness: 0.66, specularIntensity: 0.45, envMapIntensity: 0.3 }),
+    metal: new THREE.MeshPhysicalMaterial({ color: '#dcdad3', metalness: 1, roughness: 0.36, roughnessMap: brushed, anisotropy: 0.6, anisotropyRotation: HALF }),
+    steel: new THREE.MeshPhysicalMaterial({ color: '#c6c6c2', metalness: 1, roughness: 0.4, roughnessMap: ringsT }),
+    mylar: new THREE.MeshPhysicalMaterial({ color: '#4a3526', map: mylarA, metalness: 0.7, roughness: 0.46, roughnessMap: mylarR, anisotropy: 0.85, anisotropyRotation: HALF, side: THREE.DoubleSide }),
+    blue: new THREE.MeshPhysicalMaterial({ color: BLUE, roughness: 0.62, specularIntensity: 0.3 }),
+    paper: new THREE.MeshStandardMaterial({ color: '#ffffff', map: labelT, roughness: 0.92 }),
+    paperEdge: new THREE.MeshStandardMaterial({ color: PEARL, roughness: 0.95 }),
+    dark: new THREE.MeshBasicMaterial({ color: '#050504' }),
+  };
+  Object.values(M).forEach(keep);
+  const metalSide = keep(M.metal.clone()); metalSide.side = THREE.DoubleSide;
+
+  const root = new THREE.Group(); root.name = 'floppy';
+  const add = (parent, geo, mats) => { const m = new THREE.Mesh(keep(geo), mats); parent.add(m); return m; };
+  const shellMats = top => [M.absSmooth, top, M.absSmooth, M.absInner];
+  const steelAll = [M.steel, M.steel, M.steel, M.steel], metalAll = [M.metal, M.metal, M.metal, M.metal], blueAll = [M.blue, M.blue, M.blue, M.blue];
+  const sq = (cx, cy, w, h, r = 0.3) => rrect(cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2, r, 1, 3);
+  const T = SHELL.t, Z = { cav: 0.45, floor: T - 0.35, rec: T - 0.15 };
+
+  const CAV = circle(0, HUB_Y, 43.6, 96, 0);
+  const WIN = () => rrect(-4.5, 20, 4.5, 43.5, 0.8, 0, 3);
+  const half = ({ mirror, parent }) => {
+    const core = shellOutline({ x0: NOTCH.x0, x1: NOTCH.x1, y: SHELL.hh - 0.25 }, mirror);
+    const skin = shellOutline({ x0: NOTCH.x0, x1: NOTCH.x1, y: NOTCH.y, r: 0.8, s: 0.2, sm: 0.4 }, mirror);
+    return (z0, z1, outline, holes, top, capTop = true) =>
+      add(parent, slab({ outline: outline === 'core' ? core : skin, holes, z0, z1, rings: outerRings(z0, z1), capTop }), shellMats(top));
+  };
+
+  // ── front half
+  const front = new THREE.Group(); root.add(front);
+  {
+    const L = half({ mirror: false, parent: front });
+    const wp = () => sq(TAB.x, TAB.yOn, 3.5, 4), hd = () => sq(-TAB.x, TAB.yOn, 3.5, 4);
+    const ax = -36.5, ay = 37.5; // moulded insertion arrow
+    const arrow = () => [pt(ax - 0.55, ay - 2.6, 0), pt(ax + 0.55, ay - 2.6, 0), pt(ax + 0.55, ay + 0.2, 0), pt(ax + 1.7, ay + 0.2, 0), pt(ax, ay + 2.6, 0), pt(ax - 1.7, ay + 0.2, 0), pt(ax - 0.55, ay + 0.2, 0)];
+    const hx = 34.6, hy = 28.2, lw = 2.5, lh = 3.5, lt = 0.72; // moulded "HD"
+    const letterH = () => [[0, 0], [lt, 0], [lt, (lh - lt) / 2], [lw - lt, (lh - lt) / 2], [lw - lt, 0], [lw, 0], [lw, lh], [lw - lt, lh], [lw - lt, (lh + lt) / 2], [lt, (lh + lt) / 2], [lt, lh], [0, lh]].map(([x, y]) => pt(hx + x, hy + y, 0));
+    const dx = hx + lw + 0.9;
+    const letterD = (i = 0) => [pt(dx + i, hy + i, 0), ...arcPts(dx + lw - 1.25, hy + 1.25, 1.25 - i, -HALF, 0, 4, 0), ...arcPts(dx + lw - 1.25, hy + lh - 1.25, 1.25 - i, 0, HALF, 4, 0), pt(dx + i, hy + lh - i, 0)];
+    const marks = () => [arrow(), letterH(), letterD()];
+    L(0, Z.cav, 'core', [CAV, wp(), hd()], M.absSmooth, false);
+    L(Z.cav, Z.floor, 'core', [WIN(), wp(), hd()], M.absSmooth);
+    L(Z.floor, Z.rec, 'skin', [wp(), hd(), ...marks()], M.absSmooth);
+    L(Z.rec, T, 'skin', [{ pts: rrect(LABEL.x0 - 0.3, LABEL.y0 - 0.3, LABEL.x1 + 0.3, LABEL.y1 + 0.3, 1.4), bevel: 0.05 }, { pts: wp(), bevel: 0.08 }, { pts: hd(), bevel: 0.08 }, ...marks()], M.absTex);
+    add(front, slab({ outline: letterD(lt), z0: Z.floor, z1: T }), shellMats(M.absTex)); // counter of the D
+    // label
+    const lw2 = LABEL.x1 - LABEL.x0, lh2 = LABEL.y1 - LABEL.y0;
+    add(front, slab({
+      outline: rrect(LABEL.x0, LABEL.y0, LABEL.x1, LABEL.y1, 1.1), z0: Z.rec, z1: Z.rec + 0.09,
+      rings: [{ z: Z.rec, d: 0 }, { z: Z.rec + 0.06, d: 0 }, { z: Z.rec + 0.09, d: 0.03 }],
+      capUv: (x, y) => [(x - LABEL.x0) / lw2, (y - LABEL.y0) / lh2],
+    }), [M.paperEdge, M.paper, M.paperEdge, M.paperEdge]);
+  }
+
+  // ── back half (back-view coordinates, turned around Y)
+  const back = new THREE.Group(); back.rotation.y = Math.PI; root.add(back);
+  {
+    const L = half({ mirror: true, parent: back });
+    const hub = (b = 0) => ({ pts: circle(0, HUB_Y, 13.6, 72), bevel: b });
+    const wp = () => sq(-TAB.x, TAB.yOn, 3.5, 4), hd = () => sq(TAB.x, TAB.yOn, 3.5, 4);
+    const slot = () => rrect(-TAB.x - 2, -44.1, -TAB.x + 2, -34.1, 0.4, 1, 3);
+    const loc = () => [circle(-40.3, 33.5, 1.5, 20), rrect(38.7, 31.8, 41.9, 35.2, 1.3, 1, 4)]; // drive locating holes
+    L(0, Z.cav, 'core', [CAV, wp(), hd()], M.absSmooth, false);
+    L(Z.cav, Z.floor, 'core', [WIN(), hub(), wp(), hd()], M.absSmooth);
+    L(Z.floor, Z.rec, 'skin', [hub(), slot(), hd(), ...loc()], M.absSmooth);
+    L(Z.rec, T, 'skin', [hub(0.14), { pts: slot(), bevel: 0.06 }, { pts: hd(), bevel: 0.08 }, ...loc().map(pts => ({ pts, bevel: 0.06 })),
+      { pts: rrect(LABEL.x0 - 0.3, LABEL.y0 - 0.3, LABEL.x1 + 0.3, -29, 1.4), bevel: 0.05 }], M.absTex);
+    // blue seat ring around the hub
+    add(back, slab({ outline: circle(0, HUB_Y, 13.4, 72), holes: [circle(0, HUB_Y, 12.7, 72)], z0: 0.6, z1: 0.98 }), blueAll);
+  }
+
+  // ── write-protect tab (lives in the back half, also seen from the front through its hole)
+  const tab = new THREE.Group(); tab.position.set(-TAB.x, TAB.yOn, 0); back.add(tab);
+  add(tab, slab({ outline: rrect(-1.85, -2.3, 1.85, 2.3, 0.3), z0: -Z.floor, z1: Z.rec, rings: [{ z: -Z.floor, d: 0 }, { z: Z.rec - 0.12, d: 0 }, { z: Z.rec, d: 0.12 }], capBottom: true }), blueAll);
+  add(tab, slab({ outline: rrect(-1.25, -0.4, 1.25, 0.4, 0.2), z0: Z.rec, z1: Z.rec + 0.13, rings: [{ z: Z.rec, d: 0 }, { z: Z.rec + 0.07, d: 0 }, { z: Z.rec + 0.13, d: 0.06 }] }), blueAll);
+
+  // ── chamfer accent
+  {
+    const m = add(root, new THREE.BoxGeometry(3.1, 0.1, 2.2), M.blue);
+    const c = SHELL.chamfer / 2, k = -0.03 / Math.SQRT2;
+    m.position.set(SHELL.hw - c + k, SHELL.hh - c + k, 0); m.rotation.z = -Math.PI / 4;
+  }
+
+  // ── shutter: U clip with its own window, slides along x
+  const shutter = new THREE.Group(); root.add(shutter);
+  {
+    const zf = Z.floor + 0.01, zt = zf + SHUT.t, yTop = 46.45, br = 0.5;
+    const plate = (x0, x1, wx0, wx1) => slab({
+      outline: [...arcPts(x0 + 0.4, SHUT.y0 + 0.4, 0.4, 2 * HALF, 3 * HALF, 3), ...arcPts(x1 - 0.4, SHUT.y0 + 0.4, 0.4, 3 * HALF, 4 * HALF, 3), pt(x1, yTop, 0), pt(x0, yTop, 0)],
+      holes: [{ pts: rrect(wx0, 19.8, wx1, 43.7, 0.7, 1, 3), bevel: 0.04 }],
+      z0: zf, z1: zt, rings: [{ z: zf, d: 0 }, { z: zt - 0.05, d: 0 }, { z: zt, d: 0.05 }], uvScale: 1 / 40,
+    });
+    add(shutter, plate(SHUT.x0, SHUT.x1, 7.8, 17.2), metalAll);
+    const bp = new THREE.Group(); bp.rotation.y = Math.PI; shutter.add(bp);
+    add(bp, plate(-SHUT.x1, -SHUT.x0, -17.2, -7.8), metalAll);
+    // bridge over the shutter edge, with two small bends
+    const prof = [], zi = zt - br;
+    for (let i = 0; i <= 6; i++) { const a = i / 6 * HALF; prof.push({ y: yTop + br * Math.sin(a), z: zi + br * Math.cos(a), ny: Math.sin(a), nz: Math.cos(a) }); }
+    for (let i = 6; i >= 0; i--) { const a = i / 6 * HALF; prof.push({ y: yTop + br * Math.sin(a), z: -zi - br * Math.cos(a), ny: Math.sin(a), nz: -Math.cos(a) }); }
+    const mb = new MeshBuilder(); let len = 0;
+    for (let i = 0; i < prof.length - 1; i++) {
+      const a = prof[i], b = prof[i + 1], l = Math.hypot(b.y - a.y, b.z - a.z);
+      const V = (x, q, v) => ({ p: [x, q.y, q.z], n: [0, q.ny, q.nz], u: [x / 40, v / 40] });
+      mb.quad(0, V(SHUT.x0, a, len), V(SHUT.x1, a, len), V(SHUT.x1, b, len + l), V(SHUT.x0, b, len + l)); len += l;
+    }
+    add(shutter, mb.build(), [metalSide]);
+  }
+
+  // ── media: mylar disk + steel hub, spins around z
+  const spin = new THREE.Group(); spin.position.set(0, HUB_Y, 0); root.add(spin);
+  {
+    const mb = new MeshBuilder(), seg = 128, r0 = 12.4, r1 = 43, rad = 6;
+    for (let i = 0; i < seg; i++) for (let j = 0; j < rad; j++) {
+      const a0 = i / seg * TAU, a1 = (i + 1) / seg * TAU, ra = r0 + (r1 - r0) * j / rad, rb = r0 + (r1 - r0) * (j + 1) / rad;
+      const V = (a, r, u) => ({ p: [Math.cos(a) * r, Math.sin(a) * r, 0], n: [0, 0, 1], u: [u, (r - r0) / (r1 - r0)] });
+      mb.quad(0, V(a0, ra, i / seg), V(a1, ra, (i + 1) / seg), V(a1, rb, (i + 1) / seg), V(a0, rb, i / seg));
+    }
+    add(spin, mb.build(), [M.mylar]);
+    const hubG = new THREE.Group(); hubG.rotation.y = Math.PI; spin.add(hubG); // back-view coordinates
+    const pinSlot = moved(rrect(-1.3, -2.2, 1.3, 2.2, 0.4, 1, 3), 6.3, 1.4, 0.38);
+    const ruv = (x, y) => [x / 26 + 0.5, y / 26 + 0.5];
+    add(hubG, slab({ outline: circle(0, 0, 12.4, 72), holes: [{ pts: sq(0, 0, 4, 4, 0.5), bevel: 0.08 }, { pts: pinSlot, bevel: 0.08 }], z0: 0.95, z1: 1.2, capUv: ruv }), steelAll);
+    add(hubG, slab({ outline: circle(0, 0, 12.4, 72), holes: [{ pts: circle(0, 0, 9.3, 64), bevel: 0.16 }], z0: 1.2, z1: 1.38, rings: [{ z: 1.2, d: 0 }, { z: 1.24, d: 0 }, { z: 1.38, d: 0.14 }], capUv: ruv }), steelAll);
+    const blk = add(hubG, new THREE.CircleGeometry(12.2, 48), M.dark); blk.position.z = 0.9;
+  }
+
+  // ── state and motion
+  const s = { open: 0, openV: 0, openTarget: 0, spinV: 0, protect: 0, protectTarget: 0 };
+  const api = {
+    group: root, data, state: s,
+    bounds: new THREE.Box3(new THREE.Vector3(-SHELL.hw - 1, -SHELL.hh - 1, -2.6), new THREE.Vector3(SHELL.hw + 1, SHELL.hh + 1, 2.6)),
+    setShutter(v) { s.openTarget = v ? 1 : 0; },
+    setProtect(v) { s.protectTarget = v ? 1 : 0; },
+    get busy() { return Math.abs(s.openTarget - s.open) > 1e-3 || Math.abs(s.openV) > 1e-3 || s.spinV > 0.02 || Math.abs(s.protectTarget - s.protect) > 1e-3; },
+    setData(next, labelOpts) { // swap the label from data (dissolve / peel come in a later phase)
+      api.data = next; labelT.image = drawLabel(next, labelOpts); labelT.needsUpdate = true;
+    },
+    update(dt, instant = false) {
+      if (instant) { s.open = s.openTarget; s.openV = 0; s.protect = s.protectTarget; } else {
+        // shutter: an underdamped spring, stiffer on the way back (that is the real spring closing it)
+        const k = s.openTarget ? 300 : 420, c = s.openTarget ? 19 : 30, h = dt / 2;
+        for (let i = 0; i < 2; i++) { s.openV += (k * (s.openTarget - s.open) - c * s.openV) * h; s.open += s.openV * h; }
+        if (s.open < 0) { s.open = 0; s.openV = Math.abs(s.openV) * 0.22; } // hits its stop
+        s.protect += (s.protectTarget - s.protect) * (1 - Math.exp(-dt * 16));
+      }
+      shutter.position.x = -SHUT.travel * s.open;
+      const want = s.openTarget ? 9.5 : 0; // rad/s, slowed from the real 300 rpm so the turn reads on screen
+      s.spinV += (want - s.spinV) * (1 - Math.exp(-dt * (want ? 2.4 : 1.1)));
+      if (instant) s.spinV = 0;
+      spin.rotation.z -= s.spinV * dt;
+      tab.position.y = TAB.yOn + (TAB.yOff - TAB.yOn) * s.protect;
+    },
+    dispose() { disposables.forEach(d => d.dispose && d.dispose()); },
+  };
+  return api;
+}
+
+// ───────────────────────────────────────────── demo scene
+const PROJECT = { n: '001', title: 'Botones', en: 'Buttons', kind: 'Interacción', year: '2026' };
+const REST = { yaw: -0.5, pitch: 0.1 };
+
+async function main() {
+  const stage = document.getElementById('stage'), canvas = document.getElementById('gl'), bg = document.getElementById('bg');
+  const t0 = performance.now(), timing = {};
+  // fonts load while three.js downloads; the label waits for them (up to 2.5 s), then is redrawn if they land late
+  const fontsP = Promise.all([document.fonts.load('500 64px "Sometype Mono"', 'LAB 001 ÓÍ©·↘{'), document.fonts.load('700 64px "Inter Tight"', 'Botones í')])
+    .then(() => { timing.fonts = Math.round(performance.now() - t0); return true; }).catch(() => false);
+  THREE = await import('three');
+  ({ RoomEnvironment } = await import('three/addons/environments/RoomEnvironment.js'));
+
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.18;
+  renderer.setClearColor(0x000000, 0);
+
+  timing.three = Math.round(performance.now() - t0);
+  const fontsInTime = await Promise.race([fontsP, new Promise(r => setTimeout(() => r(false), 2500))]);
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(24, 1, 50, 3000);
+
+  // ── studio: a dimmed RoomEnvironment as base + key softbox, strip and cool rim
+  {
+    const room = new RoomEnvironment();
+    room.traverse(o => {
+      if (o.isPointLight) o.intensity *= 0.16;
+      else if (o.isMesh && o.material.isMeshBasicMaterial) o.material.color.multiplyScalar(0.3);
+    });
+    const panel = (w, h, color, k, pos) => {
+      const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color: new THREE.Color(color).multiplyScalar(k), side: THREE.DoubleSide }));
+      m.position.set(...pos); m.lookAt(0, 0, 0); room.add(m);
+    };
+    panel(13, 11, '#fff6ea', 5, [-7, 9, 10]);    // key softbox, upper left behind the camera
+    panel(0.9, 14, '#ffffff', 34, [10, 5, 7]);  // strip, right
+    panel(12, 3.5, '#bfd2ff', 9, [3, 9, -11]);  // cool rim, behind
+    panel(16, 2.4, '#ffffff', 6, [2, 0.6, 11]); // low fill line
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    scene.environment = pmrem.fromScene(room, 0.035).texture;
+    scene.environmentIntensity = 0.9;
+    pmrem.dispose(); room.dispose?.();
+  }
+  const key = new THREE.DirectionalLight('#fff4e8', 1.9); key.position.set(-160, 220, 260); scene.add(key);
+  const rim = new THREE.DirectionalLight('#b9ccff', 1.6); rim.position.set(170, 130, -240); scene.add(rim);
+
+  const floppy = createFloppy(PROJECT, { maxAnisotropy: renderer.capabilities.getMaxAnisotropy() });
+  const tilt = new THREE.Group(), turn = new THREE.Group();
+  scene.add(tilt); tilt.add(turn); turn.add(floppy.group);
+
+  // ── contact shadow: depth seen from the floor, blurred, drawn as a soft alpha plane
+  const FLOOR_Y = -65, SH = { size: 230, height: 150, res: 256 };
+  const shadow = new THREE.Group(); shadow.position.y = FLOOR_Y; scene.add(shadow);
+  const rtA = new THREE.WebGLRenderTarget(SH.res, SH.res), rtB = new THREE.WebGLRenderTarget(SH.res, SH.res);
+  rtA.texture.generateMipmaps = rtB.texture.generateMipmaps = false;
+  const planeGeo = new THREE.PlaneGeometry(SH.size, SH.size).rotateX(HALF);
+  const shadowPlane = new THREE.Mesh(planeGeo, new THREE.MeshBasicMaterial({ map: rtA.texture, transparent: true, opacity: 0.9, depthWrite: false, toneMapped: false }));
+  shadowPlane.scale.y = -1; shadowPlane.renderOrder = -1; shadow.add(shadowPlane);
+  const blurPlane = new THREE.Mesh(planeGeo); blurPlane.visible = false; shadow.add(blurPlane);
+  const shadowCam = new THREE.OrthographicCamera(-SH.size / 2, SH.size / 2, SH.size / 2, -SH.size / 2, 0, SH.height);
+  shadowCam.rotation.x = HALF; shadow.add(shadowCam);
+  const depthMat = new THREE.ShaderMaterial({
+    vertexShader: 'void main(){ gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 ); }',
+    fragmentShader: 'void main(){ float a = pow( 1.0 - gl_FragCoord.z, 2.4 ); gl_FragColor = vec4( 0.0, 0.0, 0.0, a ); }',
+    blending: THREE.NoBlending, side: THREE.DoubleSide,
+  });
+  const blurMat = new THREE.ShaderMaterial({
+    uniforms: { tD: { value: null }, dir: { value: new THREE.Vector2() } }, depthTest: false, depthWrite: false, blending: THREE.NoBlending,
+    vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 ); }',
+    fragmentShader: `uniform sampler2D tD; uniform vec2 dir; varying vec2 vUv;
+      void main(){ vec4 s = texture2D( tD, vUv ) * 0.1633;
+        s += ( texture2D( tD, vUv + dir ) + texture2D( tD, vUv - dir ) ) * 0.1531;
+        s += ( texture2D( tD, vUv + dir * 2.0 ) + texture2D( tD, vUv - dir * 2.0 ) ) * 0.12245;
+        s += ( texture2D( tD, vUv + dir * 3.0 ) + texture2D( tD, vUv - dir * 3.0 ) ) * 0.0918;
+        s += ( texture2D( tD, vUv + dir * 4.0 ) + texture2D( tD, vUv - dir * 4.0 ) ) * 0.051;
+        gl_FragColor = s; }`,
+  });
+  function renderShadow() {
+    shadowPlane.visible = false; scene.overrideMaterial = depthMat;
+    renderer.setRenderTarget(rtA); renderer.clear(); renderer.render(scene, shadowCam);
+    scene.overrideMaterial = null; blurPlane.visible = true; blurPlane.material = blurMat;
+    for (const step of [2.6, 1.3]) {
+      blurMat.uniforms.tD.value = rtA.texture; blurMat.uniforms.dir.value.set(step / SH.res, 0);
+      renderer.setRenderTarget(rtB); renderer.render(blurPlane, shadowCam);
+      blurMat.uniforms.tD.value = rtB.texture; blurMat.uniforms.dir.value.set(0, step / SH.res);
+      renderer.setRenderTarget(rtA); renderer.render(blurPlane, shadowCam);
+    }
+    blurPlane.visible = false; shadowPlane.visible = true; renderer.setRenderTarget(null);
+  }
+
+  // ── framing and backdrop
+  const TARGET_Y = -9, ELEV = 9 * Math.PI / 180;
+  let W = 1, Hh = 1, coarse = matchMedia('(pointer: coarse)').matches;
+  function drawBackdrop() { // a very low-contrast lift where the floor is; dithered so it never bands
+    const k = Math.min(1, Math.sqrt(1.4e6 / (W * Hh))), w = Math.max(2, Math.round(W * k)), h = Math.max(2, Math.round(Hh * k));
+    bg.width = w; bg.height = h;
+    const ctx = bg.getContext('2d'), img = ctx.createImageData(w, h), d = img.data;
+    const P = (x, y, z) => { const v = new THREE.Vector3(x, y, z).project(camera); return [(v.x * 0.5 + 0.5) * w, (-v.y * 0.5 + 0.5) * h]; };
+    const [fx, fy] = P(0, FLOOR_Y, 0), [ex] = P(125, FLOOR_Y, 0), [, cy] = P(0, 0, 0);
+    const rx = ex - fx, ry = rx * 0.3, Rr = rx * 1.9, r = rng(5);
+    for (let y = 0, i = 0; y < h; y++) for (let x = 0; x < w; x++, i += 4) {
+      const a = (x - fx) / rx, b = (y - fy) / ry, c = (x - fx) / Rr, e = (y - cy) / Rr;
+      const lift = 15 * Math.exp(-(a * a + b * b) * 1.15) + 7 * Math.exp(-(c * c + e * e) * 1.3) + (r() - 0.5);
+      d[i] = 16 + lift; d[i + 1] = 16 + lift; d[i + 2] = 14 + lift * 0.94; d[i + 3] = 255;
+    }
+    ctx.putImageData(img, 0, 0);
+  }
+  let bgTimer = 0;
+  function fit() {
+    W = stage.clientWidth; Hh = stage.clientHeight;
+    renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2)); renderer.setSize(W, Hh, false);
+    camera.aspect = W / Hh;
+    const need = Math.max(152, 118 / camera.aspect), D = need / (2 * Math.tan(camera.fov * Math.PI / 360));
+    camera.position.set(0, TARGET_Y + D * Math.sin(ELEV), D * Math.cos(ELEV)); camera.lookAt(0, TARGET_Y, 0);
+    camera.near = D * 0.3; camera.far = D * 3; camera.updateProjectionMatrix(); camera.updateMatrixWorld();
+    clearTimeout(bgTimer); bgTimer = setTimeout(drawBackdrop, bg.width ? 120 : 0);
+    wake();
+  }
+
+  // ── rotation: the pointer drives a target, the object follows it on a spring (that lag is the weight)
+  const st = {
+    yawT: REST.yaw, pitchT: REST.pitch, yaw: REST.yaw - 0.9, pitch: REST.pitch + 0.25, vy: 0, vp: 0, iy: 0, ip: 0, roll: 0,
+    dragging: false, lastInput: -1e9, hover: false, manual: false, protect: false, float: 0, hold: false,
+  };
+  const PMAX = 1.05, K = 95, C = 2 * 0.74 * Math.sqrt(K);
+  const nearestRest = yaw => REST.yaw + Math.round((yaw - REST.yaw) / Math.PI) * Math.PI;
+  const ray = new THREE.Raycaster(), inv = new THREE.Matrix4(), ndc = new THREE.Vector2();
+  function hit(e) {
+    const r = canvas.getBoundingClientRect();
+    ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+    ray.setFromCamera(ndc, camera); inv.copy(floppy.group.matrixWorld).invert(); ray.ray.applyMatrix4(inv);
+    return ray.ray.intersectsBox(floppy.bounds);
+  }
+  const applyOpen = () => { const o = st.manual || st.hover; floppy.setShutter(o); btnShutter.setAttribute('aria-pressed', String(o)); wake(); };
+  const ptr = { id: null, x: 0, y: 0, t: 0, sx: 0, sy: 0, st: 0, vx: 0, vy: 0, travel: 0 };
+  canvas.addEventListener('pointerdown', e => {
+    if (ptr.id !== null) return;
+    ptr.id = e.pointerId; try { canvas.setPointerCapture(e.pointerId); } catch {}
+    ptr.x = ptr.sx = e.clientX; ptr.y = ptr.sy = e.clientY; ptr.t = ptr.st = performance.now(); ptr.vx = ptr.vy = 0; ptr.travel = 0;
+    st.dragging = true; st.iy = st.ip = 0; st.lastInput = ptr.t; canvas.classList.add('dragging'); wake();
+  });
+  canvas.addEventListener('pointermove', e => {
+    if (e.pointerType === 'mouse' && !st.dragging) { const h = hit(e); if (h !== st.hover) { st.hover = h; applyOpen(); } }
+    if (e.pointerId !== ptr.id) return;
+    const now = performance.now(), dt = Math.max(1, now - ptr.t) / 1000, S = e.pointerType === 'mouse' ? 0.0062 : 0.0082;
+    const dx = (e.clientX - ptr.x) * S, dy = (e.clientY - ptr.y) * S;
+    ptr.travel += Math.hypot(e.clientX - ptr.x, e.clientY - ptr.y);
+    st.yawT += dx;
+    st.pitchT += dy * (Math.abs(st.pitchT) > PMAX && Math.sign(dy) === Math.sign(st.pitchT) ? 0.25 : 1); // rubber band at the poles
+    const a = Math.min(1, dt * 22);
+    ptr.vx += (dx / dt - ptr.vx) * a; ptr.vy += (dy / dt - ptr.vy) * a;
+    ptr.x = e.clientX; ptr.y = e.clientY; ptr.t = now; st.lastInput = now; wake();
+  });
+  const release = e => {
+    if (e.pointerId !== ptr.id) return;
+    ptr.id = null; st.dragging = false; canvas.classList.remove('dragging');
+    const now = performance.now(), tap = ptr.travel < 6 && now - ptr.st < 400;
+    if (tap && e.type === 'pointerup' && e.pointerType !== 'mouse' && hit(e)) { st.manual = !st.manual; applyOpen(); }
+    if (!tap && now - ptr.t < 90 && !reducedMotion.matches) {
+      st.iy = Math.max(-16, Math.min(16, ptr.vx)); st.ip = Math.max(-8, Math.min(8, ptr.vy));
+    }
+    if (e.pointerType === 'mouse') { const h = hit(e); if (h !== st.hover) { st.hover = h; applyOpen(); } }
+    st.lastInput = now; wake();
+  };
+  canvas.addEventListener('pointerup', release); canvas.addEventListener('pointercancel', release);
+  canvas.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse' && st.hover && !st.dragging) { st.hover = false; applyOpen(); } });
+
+  const btnShutter = document.getElementById('btn-shutter'), btnFlip = document.getElementById('btn-flip'), btnProtect = document.getElementById('btn-protect');
+  const toggleShutter = () => { st.manual = !st.manual; applyOpen(); };
+  const flip = () => { st.yawT = nearestRest(st.yawT) + Math.PI; st.pitchT = REST.pitch; st.iy = st.ip = 0; st.lastInput = performance.now(); wake(); };
+  const toggleProtect = () => { st.protect = !st.protect; floppy.setProtect(st.protect); btnProtect.setAttribute('aria-pressed', String(st.protect)); wake(); };
+  btnShutter.addEventListener('click', toggleShutter); btnFlip.addEventListener('click', flip); btnProtect.addEventListener('click', toggleProtect);
+  canvas.addEventListener('keydown', e => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const k = e.key, push = reducedMotion.matches ? 0 : 1;
+    if (k === 'ArrowLeft' || k === 'ArrowRight') { const d = k === 'ArrowLeft' ? -1 : 1; st.yawT += d * 0.22; st.iy += d * 1.6 * push; }
+    else if (k === 'ArrowUp' || k === 'ArrowDown') { const d = k === 'ArrowUp' ? -1 : 1; st.pitchT = Math.max(-PMAX, Math.min(PMAX, st.pitchT + d * 0.16)); }
+    else if (k === ' ' || k === 'Enter') toggleShutter();
+    else if (k === 'f' || k === 'F') flip();
+    else if (k === 'w' || k === 'W') toggleProtect();
+    else return;
+    e.preventDefault(); st.lastInput = performance.now(); wake();
+  });
+
+  // ── loop: runs while something moves or breathes, sleeps when hidden, off screen or fully still
+  let raf = 0, last = 0, visible = true, onScreen = true, clock = 0;
+  const frames = [];
+  function settled() {
+    return !st.dragging && Math.abs(st.iy) < 1e-3 && Math.abs(st.ip) < 1e-3 && Math.abs(st.vy) < 1e-3 && Math.abs(st.vp) < 1e-3
+      && Math.abs(st.yawT - st.yaw) < 1e-4 && Math.abs(st.pitchT - st.pitch) < 1e-4 && !floppy.busy;
+  }
+  function wake() { if (!raf && visible && onScreen) { last = 0; raf = requestAnimationFrame(tick); } }
+  function tick(now) {
+    raf = 0;
+    const raw = last ? (now - last) / 1000 : 1 / 60; last = now;
+    if (raw > 0 && raw < 0.5) { frames.push(raw); if (frames.length > 90) frames.shift(); }
+    const dt = Math.min(raw, 1 / 20), rm = reducedMotion.matches;
+    clock += dt;
+
+    if (!st.dragging) {
+      st.yawT += st.iy * dt; st.pitchT += st.ip * dt;
+      const decay = Math.pow(0.92, dt * 60); st.iy *= decay; st.ip *= decay;
+      if (Math.abs(st.pitchT) > PMAX) { st.pitchT += (Math.sign(st.pitchT) * PMAX - st.pitchT) * (1 - Math.exp(-dt * 9)); st.ip *= 0.8; }
+      if (!rm && !st.hold && now - st.lastInput > 3000 && Math.abs(st.iy) < 0.08) { // soft return to rest, on the face you left it
+        const k = 1 - Math.exp(-dt * 1.7); st.yawT += (nearestRest(st.yawT) - st.yawT) * k; st.pitchT += (REST.pitch - st.pitchT) * k;
+      }
+    }
+    if (rm) { st.yaw = st.yawT; st.pitch = st.pitchT; st.vy = st.vp = 0; st.roll = 0; } else {
+      const h = dt / 3;
+      for (let i = 0; i < 3; i++) {
+        st.vy += (K * (st.yawT - st.yaw) - C * st.vy) * h; st.yaw += st.vy * h;
+        st.vp += (K * (st.pitchT - st.pitch) - C * st.vp) * h; st.pitch += st.vp * h;
+      }
+      st.roll += (Math.max(-0.11, Math.min(0.11, -st.vy * 0.022)) - st.roll) * (1 - Math.exp(-dt * 7));
+    }
+    // idle breathing, faded out while you hold it
+    const idle = !rm && !st.dragging && now - st.lastInput > 900;
+    st.float += ((idle ? 1 : 0) - st.float) * (1 - Math.exp(-dt * 2));
+    const f = st.float;
+    tilt.position.y = 0.4 * Math.sin(clock * 0.9) * f;
+    tilt.rotation.set(st.pitch + 0.0105 * Math.sin(clock * 0.62) * f, 0, st.roll + 0.006 * Math.sin(clock * 0.47 + 1) * f);
+    turn.rotation.y = st.yaw;
+    floppy.update(dt, rm);
+
+    renderShadow();
+    renderer.render(scene, camera);
+    if (!(rm && settled())) raf = requestAnimationFrame(tick);
+  }
+  document.addEventListener('visibilitychange', () => { visible = !document.hidden; if (visible) wake(); else { cancelAnimationFrame(raf); raf = 0; } });
+  new IntersectionObserver(([e]) => { onScreen = e.isIntersecting; if (onScreen) wake(); else { cancelAnimationFrame(raf); raf = 0; } }).observe(stage);
+  new ResizeObserver(fit).observe(stage);
+  reducedMotion.addEventListener?.('change', wake);
+  fit();
+  if (!fontsInTime) fontsP.then(ok => { if (ok) { floppy.setData(PROJECT); wake(); } });
+  cancelAnimationFrame(raf); raf = 0; tick(performance.now()); // first frame right away, not on the next rAF
+  timing.ready = Math.round(performance.now() - t0);
+  canvas.classList.add('ready');
+
+  // QA probe, as on the rest of the site
+  window.__floppy = {
+    floppy, state: st, renderer, timing,
+    get fps() { return frames.length ? Math.round(frames.length / frames.reduce((a, b) => a + b, 0)) : 0; },
+    get frameMs() { return frames.length ? +(1000 * frames.reduce((a, b) => a + b, 0) / frames.length).toFixed(2) : 0; },
+    pose(yaw, pitch = REST.pitch, hold = true) { st.yawT = st.yaw = yaw; st.pitchT = st.pitch = pitch; st.vy = st.vp = st.iy = st.ip = 0; st.hold = hold; wake(); },
+    shutter(v) { st.manual = !!v; applyOpen(); },
+    zoom(k = 1, x = 0, y = 0) { camera.zoom = k; camera.setViewOffset(W, Hh, x * W, y * Hh, W, Hh); if (!x && !y) camera.clearViewOffset(); camera.updateProjectionMatrix(); wake(); },
+  };
+}
+
+main().catch(err => {
+  console.error('[floppy]', err);
+  document.getElementById('stage').classList.add('no-gl');
+});
+</script>
+</body>
+</html>
