@@ -362,6 +362,10 @@ export default function FeedCanvas({ items, active }: Props) {
     // ── wheel / trackpad ──
     on(stage, 'wheel', (e: WheelEvent) => {
       if (e.ctrlKey) return // pinch-zoom stays the browser's
+      // Under the page hero the wheel belongs to the page until the stage
+      // docks below the header (it is not full-viewport at the top of the page).
+      const r = stage.getBoundingClientRect()
+      if (r.top > 80 || r.bottom < window.innerHeight - 80) return
       e.preventDefault()
       const f = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? H : 1
       const dx = (e.shiftKey && !e.deltaX ? e.deltaY : e.deltaX) * f, dy = (e.shiftKey && !e.deltaX ? 0 : e.deltaY) * f

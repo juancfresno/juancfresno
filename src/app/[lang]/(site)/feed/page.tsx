@@ -4,8 +4,10 @@ import Image from 'next/image'
 import { getSite, getUi } from '@/content/site'
 import { localeOf, type LangParams } from '@/i18n/server'
 import { FEED_SELECTED, groupFeed, groupRange, monthYear } from '@/content/feed'
-import ContactBlock from '@/components/blocks/ContactBlock'
+import PageHero from '@/components/blocks/PageHero'
+import CloseArchivo from '@/components/blocks/CloseArchivo'
 import v from '@/components/blocks/v0.module.scss'
+import hs from '@/components/blocks/pageHero.module.scss'
 import f from '@/components/feed/feed.module.scss'
 import FeedViews from '@/components/feed/FeedViews'
 import { FEED_VIEW_SCRIPT } from '@/components/feed/feedView'
@@ -26,16 +28,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 // always server-rendered; the inline script picks the view before paint.
 export default async function FeedPage({ params }: Props) {
   const l = await localeOf(params)
-  const { INTROS } = getSite(l)
+  const { HEROES } = getSite(l)
   const ui = getUi(l)
   // Only the curated selection (content/feed-selection.ts); the grid by date.
   const groups = groupFeed([...FEED_SELECTED].sort((a, b) => b.date.localeCompare(a.date)), ui.feed)
   let n = 0
 
   return (
-    <div className={v.page}>
+    <div className={hs.shell}>
       <script dangerouslySetInnerHTML={{ __html: FEED_VIEW_SCRIPT }} />
-      <FeedViews items={FEED_SELECTED} intro={INTROS.feed}>
+      <PageHero letter={HEROES.feed.letter} name={ui.feed.h1} intro={HEROES.feed.intro} note={HEROES.feed.note} />
+      <FeedViews items={FEED_SELECTED}>
       <div className={f.feed}>
         {groups.map((g) => (
           <section key={g.key} className={f.group} aria-label={`${g.label} · ${groupRange(g)}`}>
@@ -80,9 +83,8 @@ export default async function FeedPage({ params }: Props) {
         ))}
         <p className={v.mono}>{ui.feed.total(FEED_SELECTED.length)}</p>
       </div>
-
-      <ContactBlock locale={l} />
       </FeedViews>
+      <CloseArchivo locale={l} />
     </div>
   )
 }

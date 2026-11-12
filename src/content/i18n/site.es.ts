@@ -88,6 +88,23 @@ export const SITE_ES: SiteDict = {
     feedAria: 'Últimas publicaciones',
   },
 
+  // Hero de página (Figma 6964:15100 feed, 6964:15013 lab). ES de Figma (Lab) o traducido (Feed, cierre): pendiente de revisar por Copywriter.
+  HEROES: {
+    feed: {
+      letter: 'F',
+      intro: 'Un archivo visual en marcha de fragmentos, estudios, direcciones descartadas y pequeñas cosas que hago por el camino.',
+      note: 'Sin casos de estudio, solo cosas que merece la pena guardar.',
+    },
+    lab: {
+      letter: 'L',
+      intro: 'Sin brief, sin cliente.\nProbar ideas, romper cosas, aprender y divertirme — pequeños experimentos digitales.',
+      note: 'Hiperactiva curiosidad gráfica',
+    },
+  },
+  CLOSE_ARCHIVO: {
+    label: 'Colaboremos↘',
+    line: 'Para consultas, colaboraciones o proyectos nuevos',
+  },
   INTROS: {
     work: 'Una selección de los últimos años: marcas, webs y producto digital. Unos con estudios y agencias, otros mano a mano con la marca.',
     // Hero de /es/work (Figma 6951:13221). Traducción pendiente de revisar por Copywriter.

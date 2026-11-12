@@ -8,7 +8,8 @@
   --fc-muted: var(--c-text-muted);
   position: relative;
   width: 100%;
-  height: calc(100svh - #{$nav-height});
+  // Below the page hero; fills the viewport once docked under the 72 px header.
+  height: max(560px, calc(100svh - 72px));
   overflow: hidden;
   background: $color-bg;
   cursor: grab;
@@ -22,7 +23,7 @@
   // the minimap sit above the bar.
   @include respond-to(md) {
     --fc-bottom: calc(var(--tabbar-h) + #{$space-3});
-    height: calc(100svh - #{$nav-height});
+    height: max(480px, calc(100svh - 72px - var(--tabbar-h)));
   }
 
   &:focus-visible { box-shadow: inset 0 0 0 1px $color-text; }

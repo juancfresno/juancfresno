@@ -133,20 +133,14 @@
 .top {
   @include container;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: flex-end;
   flex-wrap: wrap;
   gap: $space-4 $space-8;
-  padding-block: clamp(3rem, 6vw, 5.5rem);
+  padding-block: clamp(2rem, 3vw, 3rem) 0; // intro moved to the page hero
 }
 
-.intro {
-  max-width: 60ch;
-  font-family: $font-body;
-  font-size: clamp(1.125rem, 0.6vw + 0.95rem, 1.375rem);
-  line-height: 1.35;
-  color: $color-text;
-}
+.feed { padding-bottom: clamp(3rem, 5vw, 83px); }
 
 .canvasView { display: none; }
 
@@ -154,27 +148,17 @@
   .canvasView { display: block; }
   .gridView { display: none; }
 
-  // Over the canvas: intro as a small chip top-left, toggle top-right.
+  // Over the canvas: the view toggle sits top-right.
   .top {
     position: absolute;
     inset: 0 0 auto;
     z-index: 4;
     align-items: flex-start;
+    justify-content: flex-end;
     padding-block: $space-4;
     pointer-events: none;
   }
 
-  .intro {
-    max-width: 44ch;
-    padding: 6px 9px;
-    border-radius: 2px;
-    background: $color-overlay;
-    font-size: 0.8125rem;
-    line-height: 1.4;
-    color: $color-text-mid;
-
-    @include respond-to(md) { display: none; }
-  }
 
   .toggle {
     pointer-events: auto;

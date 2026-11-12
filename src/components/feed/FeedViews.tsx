@@ -34,7 +34,7 @@ function decide(): View {
 
 const useIsoLayout = typeof window === 'undefined' ? useEffect : useLayoutEffect
 
-export default function FeedViews({ items, intro, children }: { items: FeedItem[]; intro: string; children: React.ReactNode }) {
+export default function FeedViews({ items, children }: { items: FeedItem[]; children: React.ReactNode }) {
   const ui = useUi()
   const [view, setView] = useState<View | null>(null)
 
@@ -67,9 +67,7 @@ export default function FeedViews({ items, intro, children }: { items: FeedItem[
 
   return (
     <div className={f.views}>
-      <h1 className={f.srOnly}>{ui.feed.h1}</h1>
       <div className={f.top}>
-        <p className={f.intro}>{intro}</p>
         <div className={f.toggle}>{toggle}</div>
       </div>
       <div className={f.canvasView}>

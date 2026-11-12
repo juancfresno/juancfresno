@@ -89,6 +89,25 @@ export const SITE_EN = {
   },
 
   // ─── Page intros ──────────────────────────────────────────────────────────────
+  // Page heroes (Figma 6964:15100 feed, 6964:15013 lab): ficha letter, intro, note.
+  HEROES: {
+    feed: {
+      letter: 'F',
+      intro: 'An ongoing visual archive of fragments, studies, unused directions and small things I make along the way.',
+      note: 'No case studies — just things worth keeping.',
+    },
+    lab: {
+      letter: 'L',
+      // Figma has the Spanish text in the EN frame; EN is a translation (to review).
+      intro: 'No brief, no client.\nTrying ideas, breaking things, learning and having fun — small digital experiments.',
+      note: 'Hyperactive graphic curiosity',
+    },
+  },
+  // Close band "04 · Archivo" (Figma 6856:14014): label, line, email link.
+  CLOSE_ARCHIVO: {
+    label: "Let's collaborate↘",
+    line: 'For enquiries, collaborations or new projects',
+  },
   INTROS: {
     work: 'Selected projects from recent years: brands, websites and digital products. Some with studios and agencies, some directly with the brand.',
     // Work page hero (Figma 6951:13221, Juan's text, 10 Nov 2026). Line break explicit.

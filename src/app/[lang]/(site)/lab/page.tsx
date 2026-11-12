@@ -4,7 +4,9 @@ import Link from 'next/link'
 import { getSite, getUi } from '@/content/site'
 import { localePath } from '@/i18n/config'
 import { localeOf, type LangParams } from '@/i18n/server'
-import ContactBlock from '@/components/blocks/ContactBlock'
+import PageHero from '@/components/blocks/PageHero'
+import CloseArchivo from '@/components/blocks/CloseArchivo'
+import hs from '@/components/blocks/pageHero.module.scss'
 import Pending from '@/components/blocks/Pending'
 import ElasticLine from '@/components/ui/ElasticLine/ElasticLine'
 import { FramesStage, ButtonsStage, TransitionsStage, GalleriesStage, PixelsStage } from '@/components/lab/LabStages'
@@ -36,7 +38,7 @@ function Head({ label, link }: { label: string; link?: React.ReactNode }) {
 // with status dots; resources; global close.
 export default async function LabPage({ params }: Props) {
   const loc = await localeOf(params)
-  const { LAB, LAB_FEATURED, LAB_FEATURED_SPECS, LAB_FEATURED_FRAMES, LAB_LABELS, LAB_LOG, EXPERIMENTS, INTROS } = getSite(loc)
+  const { LAB, LAB_FEATURED, LAB_FEATURED_SPECS, LAB_FEATURED_FRAMES, LAB_LABELS, LAB_LOG, EXPERIMENTS, HEROES } = getSite(loc)
   const ui = getUi(loc)
   const href = (p: string) => localePath(loc, p)
   const F = LAB_FEATURED
@@ -44,10 +46,10 @@ export default async function LabPage({ params }: Props) {
   const labels: Record<string, string[]> = { botones: ui.lab.buttons, galerias: ui.lab.galleries, 'entradas-pixel': ui.lab.pixels }
 
   return (
-    <div className={v.page}>
-      <header className={`${l.mod} ${l.header}`}>
+    <div className={hs.shell}>
+      <PageHero letter={HEROES.lab.letter} name={ui.lab.h1} intro={HEROES.lab.intro} note={HEROES.lab.note} />
+      <div className={`${l.mod} ${l.header}`}>
         <div className={l.headRow}>
-          <h1 className={l.h1}>{ui.lab.h1}</h1>
           <ul className={l.index} aria-label={ui.lab.onPage}>
             {EXPERIMENTS.map((e) => (
               <li key={e.slug}>
@@ -63,8 +65,7 @@ export default async function LabPage({ params }: Props) {
           </ul>
           <div className={l.log}>{LAB_LOG.map((x) => <p key={x}>{x}</p>)}</div>
         </div>
-        <div className={l.intro}><p>{INTROS.lab}</p></div>
-      </header>
+      </div>
 
       <section className={`${l.mod} ${l.alt}`} aria-labelledby="lab-featured">
         <Head label={LAB_LABELS.featured} link={<Link href={href(`/lab/${F.slug}`)}>{LAB_LABELS.runs}</Link>} />
@@ -134,7 +135,7 @@ export default async function LabPage({ params }: Props) {
         </div>
       </section>
 
-      <ContactBlock locale={loc} />
+      <CloseArchivo locale={loc} />
     </div>
   )
 }

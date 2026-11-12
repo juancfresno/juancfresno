@@ -1,0 +1,45 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+// Figma "04 · Archivo" at 1680: padding 40 / 40 sides / 64, gap 16, label pt 16,
+// the two 24 px lines at line-height 46.
+.close {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: $m max(#{$m}, env(safe-area-inset-right, 0px)) clamp(2.5rem, 3.81vw, 64px) max(#{$m}, env(safe-area-inset-left, 0px));
+  background: $color-bg;
+}
+
+.rule { display: block; width: 100%; color: $color-line; }
+
+.label {
+  margin: 0;
+  padding-top: 16px;
+  font-family: $font-mono;
+  font-weight: $fw-mono;
+  font-size: 11px;
+  line-height: normal;
+  text-transform: uppercase;
+  color: $color-text-hi;
+}
+
+.line {
+  margin: 0;
+  font-family: $font-body;
+  font-size: clamp(1.25rem, 0.6vw + 1.05rem, 24px);
+  line-height: 46px;
+  letter-spacing: -0.02em;
+  color: $color-text-hi;
+  @include respond-to(md) { line-height: 1.4; }
+}
+
+.mail {
+  align-self: flex-end;
+  text-align: right;
+  text-decoration: none;
+  &:hover, &:focus-visible { text-decoration: underline; text-underline-offset: 4px; }
+  @include respond-to(md) { align-self: flex-start; text-align: left; margin-top: 8px; }
+}

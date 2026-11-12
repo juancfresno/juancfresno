@@ -1,0 +1,79 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+// Page shell for pages that start with the hero: header height is 72 (Figma v1/nav).
+.shell {
+  display: flex;
+  flex-direction: column;
+  padding-top: 72px;
+}
+
+// Figma "02 · Hero" at 1680: padding 88 / 64 sides / 112, ficha 376 wide,
+// cabecera 1029.33 wide (inner 1552 → 24.23 % and 66.32 %), gap 56, intro
+// 898.67 wide (87.3 % of the cabecera), note under a 1 px rule with pt 24.
+.hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+  box-sizing: border-box;
+  padding: clamp(2.5rem, 5.238vw, 88px) max(#{$m}, 3.81vw) clamp(3.5rem, 6.667vw, 112px);
+  background: $color-bg;
+
+  @include respond-to(md) {
+    padding-inline: max(#{$m}, env(safe-area-inset-left, 0px)) max(#{$m}, env(safe-area-inset-right, 0px));
+  }
+}
+
+.ficha {
+  flex: 0 0 24.227%;
+  font-family: $font-body;
+  font-size: 24px;
+  line-height: normal;
+  letter-spacing: -0.02em;
+  color: $color-text-hi;
+  // Same height as the page name so the two baselines align.
+  @include respond-to(md) { display: none; }
+}
+
+.cab {
+  flex: 0 0 66.31%;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(2rem, 3.333vw, 56px);
+  @include respond-to(md) { flex-basis: 100%; }
+}
+
+.name {
+  margin: 0;
+  font-family: $font-body;
+  font-weight: $fw-regular;
+  font-size: 24px;
+  line-height: normal;
+  letter-spacing: -0.02em;
+  text-align: right;
+  color: $color-text-hi;
+  // Phones: clear the vertical FRESNO wordmark hanging from the header.
+  @include respond-to(md) { padding-right: 24px; }
+}
+
+.intro {
+  margin: 0;
+  max-width: 87.3%;
+  font-family: $font-body;
+  font-size: clamp(1rem, 0.4vw + 0.85rem, 18px);
+  line-height: 1.4;
+  color: $color-text;
+  @include respond-to(md) { max-width: none; }
+}
+
+.note {
+  margin: 0;
+  padding-top: 24px;
+  border-top: 1px solid $color-line;
+  font-family: $font-body;
+  font-weight: $fw-light;
+  font-size: clamp(1rem, 0.4vw + 0.85rem, 18px);
+  line-height: 1.4;
+  color: $color-text-mid;
+}
