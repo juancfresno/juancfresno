@@ -13,7 +13,9 @@
 
 // ─── Hero: "/Contact" on the right + one line (same pattern as Work) ────────
 .hero {
-  @include container;
+  width: 100%;
+  box-sizing: border-box;
+  padding-inline: max(#{$m-hero}, env(safe-area-inset-left, 0px)) max(#{$m-hero}, env(safe-area-inset-right, 0px));
   display: flex;
   flex-direction: column;
   gap: 24px;

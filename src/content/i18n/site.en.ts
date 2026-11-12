@@ -96,6 +96,12 @@ export const SITE_EN = {
       intro: 'An ongoing visual archive of fragments, studies, unused directions and small things I make along the way.',
       note: 'No case studies — just things worth keeping.',
     },
+    work: {
+      letter: 'W',
+      intro: 'Selected work across digital products, identities and interactive experiences.',
+      // Figma 6951:13221 has the Spanish note "La crema" in the EN frame; EN is a translation (to review).
+      note: 'The cream of the crop',
+    },
     lab: {
       letter: 'L',
       // Figma has the Spanish text in the EN frame; EN is a translation (to review).
@@ -110,8 +116,6 @@ export const SITE_EN = {
   },
   INTROS: {
     work: 'Selected projects from recent years: brands, websites and digital products. Some with studios and agencies, some directly with the brand.',
-    // Work page hero (Figma 6951:13221, Juan's text, 10 Nov 2026). Line break explicit.
-    workHero: 'Working with studios and brands since 2012.\nArt direction and design for digital products, identities and interactive experiences — built with clarity, detail and intent.',
     feed: 'A selection of what I post: single pieces, work in progress and things that never became a case study. Newest first.',
     lab: 'This is where I build things myself, with no brief. I play, break things and learn: interactions, layouts, small tools and my own apps. It keeps me restless, and now and then something ends up in client work.',
     archive: 'The longer list, since I went independent in 2016. Most of it came through studios and agencies, so the Via column says who brought me in. Work under NDA stays unnamed.',

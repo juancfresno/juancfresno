@@ -25,37 +25,6 @@
   padding-inline: max(#{$m}, env(safe-area-inset-left, 0px)) max(#{$m}, env(safe-area-inset-right, 0px));
 }
 
-// ─── 02 · Hero: "/Work" on the right, intro under it (py 83, gap 24) ─────────
-.hero {
-  @include margins;
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  padding-block: clamp(2.5rem, 4.94vw, 83px);
-}
-
-.name {
-  margin: 0;
-  font-family: $font-body;
-  font-weight: $fw-regular;
-  font-size: 24px;
-  line-height: normal;
-  letter-spacing: -0.02em;
-  text-align: right;
-  color: $color-text-hi;
-  // Phones: clear the vertical FRESNO wordmark hanging from the header.
-  @include respond-to(md) { padding-right: 24px; }
-}
-
-.intro {
-  margin: 0;
-  font-family: $font-body;
-  font-size: clamp(1rem, 0.4vw + 0.85rem, 18px);
-  line-height: 1.4;
-  color: $color-text-mid;
-  max-width: 64rem;
-}
-
 // ─── Reserved band for the future gallery (537 px at 1680, liquid) ───────────
 .gallery {
   position: relative;

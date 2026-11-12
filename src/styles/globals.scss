@@ -126,12 +126,13 @@ html.theme-anim, html.theme-anim * {
   --color-accent:     #{$color-accent};
   --nav-height:       #{$nav-height};
   --m:                max(20px, 2.381vw);         // page margin (chrome + content): 40 at 1680, ~61 at 2560, 20 on mobile
+  --m-hero:           max(12px, 1.19vw);          // page-hero side margin (PageHero, About, Contact): 20 at 1680, 20 on mobile
   --gutter:           max(12px, 0.952vw);         // column gap: 16 at 1680; 12 ≤ 768
   --ease-out-expo:    #{$ease-out-expo};
 }
 
 @include respond-to(md) {
-  :root { --gutter: 12px; }
+  :root { --gutter: 12px; --m-hero: var(--m); }
 }
 
 // ─── Selection ────────────────────────────────────────────────────────────────

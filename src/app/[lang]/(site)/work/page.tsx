@@ -6,7 +6,8 @@ import { localeOf, type LangParams } from '@/i18n/server'
 import type { WorkItem } from '@/components/work/archive/types'
 import WorkArchive from '@/components/work/archive/WorkArchive'
 import ElasticLine from '@/components/ui/ElasticLine/ElasticLine'
-import ContactBlock from '@/components/blocks/ContactBlock'
+import PageHero from '@/components/blocks/PageHero'
+import CloseArchivo from '@/components/blocks/CloseArchivo'
 import s from '@/components/work/archive/page.module.scss'
 
 type Props = { params: Promise<LangParams> }
@@ -18,13 +19,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 // Work — Figma "work" (AXxkCCuckrXGKDUCk8lNyQ · 6951:13221, 10 Nov 2026):
-// hero with the page name on the right + intro, an empty reserved band for the
+// PageHero (letter, "/ Work", intro, note) + CloseArchivo close, an empty reserved band for the
 // future featured gallery (537 px at 1680), then the list of the 30 cases
 // (03 · Archive, 6951:13618) in ALL_PROJECTS order. Rows don't navigate to
 // /work/[slug]: they open the project in place (?open=drawer|expand|stage).
 export default async function WorkPage({ params }: Props) {
   const l = await localeOf(params)
-  const { INTROS } = getSite(l)
+  const { INTROS, HEROES } = getSite(l)
   const ui = getUi(l)
   const cases = getCases(l)
 
@@ -54,17 +55,9 @@ export default async function WorkPage({ params }: Props) {
     }
   })
 
-  const [first, ...rest] = INTROS.workHero.split('\n')
-
   return (
     <div className={s.page} data-work-page>
-      <header className={s.hero}>
-        <h1 className={s.name}>/{ui.work.h1}</h1>
-        <p className={s.intro}>
-          {first}
-          {rest.length > 0 && <><br />{rest.join(' ')}</>}
-        </p>
-      </header>
+      <PageHero letter={HEROES.work.letter} name={ui.work.h1} intro={HEROES.work.intro} note={HEROES.work.note} />
 
       {/* Reserved for the featured gallery (Juan designs it later): exact
           Figma height, nothing inside but four crop marks. */}
@@ -80,7 +73,7 @@ export default async function WorkPage({ params }: Props) {
       </section>
 
       <div data-flip-after>
-        <ContactBlock locale={l} />
+        <CloseArchivo locale={l} />
       </div>
     </div>
   )

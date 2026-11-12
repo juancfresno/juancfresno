@@ -8,8 +8,8 @@
   padding-top: 72px;
 }
 
-// Figma "02 · Hero" at 1680: padding 88 / 64 sides / 112, ficha 376 wide,
-// cabecera 1029.33 wide (inner 1552 → 24.23 % and 66.32 %), gap 56, intro
+// Figma "02 · Hero" at 1680: padding 88 / 40 sides in Figma / 112 (Juan: 20 sides,
+// --m-hero), ficha and cabecera keep their share of the inner width (24.23 % / 66.32 %), gap 56, intro
 // 898.67 wide (87.3 % of the cabecera), note under a 1 px rule with pt 24.
 .hero {
   display: flex;
@@ -17,11 +17,10 @@
   align-items: flex-start;
   width: 100%;
   box-sizing: border-box;
-  padding: clamp(2.5rem, 5.238vw, 88px) max(#{$m}, 3.81vw) clamp(3.5rem, 6.667vw, 112px);
+  padding: clamp(2.5rem, 5.238vw, 88px) max(#{$m-hero}, env(safe-area-inset-right, 0px)) clamp(3.5rem, 6.667vw, 112px) max(#{$m-hero}, env(safe-area-inset-left, 0px));
   background: $color-bg;
 
   @include respond-to(md) {
-    padding-inline: max(#{$m}, env(safe-area-inset-left, 0px)) max(#{$m}, env(safe-area-inset-right, 0px));
   }
 }
 

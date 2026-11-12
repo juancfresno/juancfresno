@@ -78,6 +78,7 @@ $max-width:         1440px;   // reference only; the layout is liquid (no cap)
 //   --m      max(20px, 2.381vw)  (40 at 1680, ~61 at 2560, 20 at 390; no max width)
 //   --gutter max(12px, 0.952vw) (16 at 1680) desktop / 12 ≤ 768
 $m:                 var(--m);
+$m-hero:            var(--m-hero);  // hero blocks only (20 at 1680, same as --m on mobile)
 $gutter:            var(--gutter);
 $nav-height:        5rem;
 
