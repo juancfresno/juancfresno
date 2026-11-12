@@ -54,6 +54,10 @@ async function fds(request: NextRequest, host: string) {
   if (pathname === '/fds-tokens.css') {
     return withHeaders(NextResponse.rewrite(new URL('/FDS/fds-tokens.css', request.url)))
   }
+  // Self-hosted Switzer (FDS v1.7.0), only for signed-in viewers.
+  if (/^\/fonts\/[a-z0-9-]+\.woff2$/.test(pathname)) {
+    return withHeaders(NextResponse.rewrite(new URL(`/FDS${pathname}`, request.url)))
+  }
   return NextResponse.redirect(new URL('/', request.url), 307)
 }
 
