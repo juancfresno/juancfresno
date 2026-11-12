@@ -106,6 +106,8 @@ export const SITE_ES: SiteDict = {
       note: 'Hiperactiva curiosidad gráfica',
     },
   },
+  // Work · band under the close (Figma 7014:18140), links to /lab.
+  LAB_BAND: { label: '{ Lab ↘' },
   CLOSE_ARCHIVO: {
     label: 'Colaboremos↘',
     line: 'Para consultas, colaboraciones o proyectos nuevos',

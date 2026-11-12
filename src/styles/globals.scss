@@ -87,10 +87,34 @@
   color-scheme: light;
 }
 
+// bg/subtle (Figma web/footer Theme=Light, Work's "{ Lab ↘" band 7014:18140):
+// warm grey with the light ink tokens. Same in dark and light.
+@mixin theme-subtle {
+  --c-bg:         #c9c5bd;       // bg/subtle
+  --c-bg-2:       #c9c5bd;
+  --c-surface:    #f4f2ea;
+  --c-border:     #3c3c3a;
+  --c-bar:        rgba(201, 197, 189, 0.85);
+  --c-text:       #141414;       // text/primary
+  --c-text-mid:   #373737;
+  --c-text-muted: #4a4d4b;       // text/tertiary
+  --c-text-hi:    #141414;
+  --c-text-dim:   #4a4d4b;
+  --c-line:       #3c3c3a;       // the band's rule
+  --c-line-hi:    #141414;
+  --c-faint:      #4a4d4b;
+  --c-control:    #636965;
+  --c-control-ink: #4a4d4b;
+  color-scheme: light;
+}
+
 :root {
   @include theme-dark;
   --c-brand-blue: #{$raw-chip};  // bg/brand-blue, read by the site transition
   --c-base-bg:    #{$raw-ink};   // the theme's own bg (never blue)
+  --c-subtle-bg:  #c9c5bd;       // bg/subtle (Work's Lab band + footer)
+  --c-subtle-ink: #141414;
+  --c-subtle-line: #3c3c3a;
 }
 
 :root[data-theme="light"] {
@@ -108,6 +132,8 @@ $chrome: '[data-site-header], [data-site-tabbar]';
 :root[data-chrome="blue"] :is(#{$chrome}) { @include theme-blue; }
 // Footer on the blue page = web/footer Theme=Dark (Figma 7014:18145).
 :root[data-chrome="blue"] [data-site-footer] { @include theme-dark; }
+// Work: the footer continues the subtle "{ Lab ↘" band (Figma 6951:13221).
+:root:has([data-foot="subtle"]) [data-site-footer] { @include theme-subtle; }
 // Leaving Contact: the chrome goes back to the site theme before the page does.
 :root[data-page-theme="blue"]:not([data-chrome="blue"]) :is(#{$chrome}, [data-site-footer]) { @include theme-dark; }
 :root[data-theme="light"][data-page-theme="blue"]:not([data-chrome="blue"]) :is(#{$chrome}, [data-site-footer]) { @include theme-light; }

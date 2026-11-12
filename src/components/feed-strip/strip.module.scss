@@ -1,0 +1,96 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+// Curved strip of the latest posts (LatestStrip). Full bleed; the canvas is
+// the card zone (centre card height = stage height − 24), the progress arc
+// sits under it. Card height: 380 at 1680, 200 minimum.
+.wrap {
+  position: relative;
+  width: 100%;
+}
+
+.stage {
+  position: relative;
+  width: 100%;
+  height: calc(clamp(200px, 22.62vw, 380px) + 24px);
+  touch-action: pan-y;        // vertical scroll stays native, horizontal = drag
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  cursor: grab;
+  background: $color-bg;
+}
+
+.gl {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+// Hover caption under the card: mono 10, `IG · MM/YYYY`.
+.cap {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  font-family: $font-mono; font-weight: $fw-mono;
+  font-size: 10px;
+  line-height: 1;
+  text-transform: uppercase;
+  color: $color-text-hi;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  &[data-on] { opacity: 1; }
+}
+
+.dot {
+  width: 5px;
+  height: 5px;
+  background: var(--c-g);
+}
+
+// Keyboard focus: a ring around the centred card.
+.ring {
+  position: absolute;
+  left: 0;
+  top: 0;
+  box-sizing: border-box;
+  border: 1px solid $color-text-hi;
+  outline: 3px solid transparent;
+  pointer-events: none;
+  opacity: 0;
+  &[data-on] { opacity: 1; }
+}
+
+// Progress arc (ref.): track in the text colour at low opacity, position in G blue.
+.arc {
+  display: block;
+  width: 120px;
+  height: 16px;
+  margin: 20px auto 0;
+  overflow: visible;
+  path { fill: none; stroke-width: 1; vector-effect: non-scaling-stroke; stroke-linecap: round; }
+}
+.track { stroke: $color-text; opacity: 0.22; }
+.pos { stroke: var(--c-g); stroke-width: 1.5; }
+
+// The real links, for keyboard and screen readers (focus centres the card).
+.links {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  list-style: none;
+}
+
+:global(html).dragging, :global(html).dragging * { cursor: grabbing !important; }

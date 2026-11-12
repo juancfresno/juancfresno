@@ -109,6 +109,8 @@ export const SITE_EN = {
       note: 'Hyperactive graphic curiosity',
     },
   },
+  // Work · band under the close (Figma 7014:18140), links to /lab.
+  LAB_BAND: { label: '{ Lab ↘' },
   // Close band "04 · Archivo" (Figma 6856:14014): label, line, email link.
   CLOSE_ARCHIVO: {
     label: "Let's collaborate↘",

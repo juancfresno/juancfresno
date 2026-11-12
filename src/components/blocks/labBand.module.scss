@@ -1,0 +1,31 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+// Figma 7014:18140 at 1680: 685 tall, rule at 64 / 64 sides, link row 30 px
+// (pt 16) 16 px under it, mono 11 uppercase. Liquid below 1680.
+.band {
+  --sb-side: max(20px, 3.81vw);
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: clamp(320px, 40.77vw, 685px);
+  padding: clamp(40px, 3.81vw, 64px) max(var(--sb-side), env(safe-area-inset-right, 0px)) 0 max(var(--sb-side), env(safe-area-inset-left, 0px));
+  background: var(--c-subtle-bg);
+  color: var(--c-subtle-ink);
+}
+
+.rule { display: block; width: 100%; color: var(--c-subtle-line); }
+
+.link {
+  display: inline-block;
+  margin-top: 16px;
+  padding-top: 16px;
+  font-family: $font-mono; font-weight: $fw-mono;
+  font-size: 11px;
+  line-height: normal;
+  text-transform: uppercase;
+  color: inherit;
+  text-decoration: none;
+  @include touch-target;
+  &:hover, &:focus-visible { text-decoration: underline; text-underline-offset: 3px; }
+}
