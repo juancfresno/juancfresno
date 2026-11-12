@@ -254,6 +254,7 @@ export default function FeedCanvas({ items, active }: Props) {
       if (key === hoverKey) return
       hoverKey = key
       stage.classList.toggle(c.overPiece, !!key)
+      stage.dataset.cursor = key ? 'view' : 'drag' // site cursor: VIEW MORE over a piece
       wake()
     }
     function hitTest() {
@@ -440,6 +441,7 @@ export default function FeedCanvas({ items, active }: Props) {
     <div
       ref={stageRef}
       className={c.stage}
+      data-cursor="drag"
       tabIndex={0}
       role="region"
       aria-roledescription="canvas"

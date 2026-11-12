@@ -63,7 +63,7 @@ export const SITE_ES: SiteDict = {
       transiciones: '22 transiciones de página, una al lado de otra. La 11a es la que usa esta web.',
       galerias: 'Ocho formas de enseñar 200 imágenes, montadas sobre el feed real.',
       'entradas-pixel': 'Seis entradas de píxel para el preview de redes, con los clips reales.',
-      cursores: 'Seis cursores propios que cambian según lo que tienen debajo.',
+      cursores: 'Siete cursores propios que cambian según lo que tienen debajo.',
     },
     labels: {
       featured: '{ Proyectos destacados ↘',
@@ -263,11 +263,11 @@ export const SITE_ES: SiteDict = {
       name: 'Cursores',
       kind: 'Interacción',
       year: '2026',
-      what: 'Seis cursores propios que cambian según lo que tienen debajo: flecha en los enlaces, «Ver más» en las imágenes, «Arrastra» en una tira, «Play» en el vídeo, «Copiar» en el email y un caret en el texto. Punto y anillo, píxel, retícula, negativo, velocidad y solo etiqueta, cada uno sobre la misma página de prueba.',
+      what: 'Siete cursores propios que cambian según lo que tienen debajo: flecha en los enlaces, «Ver más» en las imágenes, «Arrastra» en una tira, «Play» en el vídeo, «Copiar» en el email y un caret en el texto. Punto y anillo, píxel, retícula, negativo, velocidad, solo etiqueta y etiqueta en negativo, cada uno sobre la misma página de prueba. Velocidad (05) es el que usa ahora esta web.',
       built: 'Un bucle rAF · solo transform · sin librerías',
       note: null,
-      card: 'Seis cursores propios que cambian según lo que tienen debajo: punto y anillo, píxel, retícula, negativo, velocidad y solo etiqueta.',
-      how: 'Cada estado se declara en el marcado con data-cursor (link, view, drag, play, copy, text) y un data-cursor-label opcional; el cursor lo lee con closest() desde el elemento bajo el puntero. Un solo bucle de requestAnimationFrame mueve los seis y duerme en reposo; en cada fotograma solo cambian transform y opacity. Un muelle marca el retraso, el de píxel se disuelve con una matriz Bayer 4×4 y el de etiqueta se reescribe con el scramble de la web. En táctil el cursor nativo nunca se oculta (un toque enseña el estado); con «reducir movimiento» todo va pegado, sin retraso ni estelas.',
+      card: 'Siete cursores propios que cambian según lo que tienen debajo: punto y anillo, píxel, retícula, negativo, velocidad, solo etiqueta y etiqueta en negativo.',
+      how: 'Cada estado se declara en el marcado con data-cursor (link, view, drag, play, copy, text) y un data-cursor-label opcional; el cursor lo lee con closest() desde el elemento bajo el puntero. Un solo bucle de requestAnimationFrame mueve los siete y duerme en reposo; en cada fotograma solo cambian transform y opacity. Un muelle marca el retraso, el de píxel se disuelve con una matriz Bayer 4×4 y el de etiqueta se reescribe con el scramble de la web; el de etiqueta en negativo es una caja blanca en difference con el texto recortado. En táctil el cursor nativo nunca se oculta (un toque enseña el estado); con «reducir movimiento» todo va pegado, sin retraso ni estelas.',
     },
   ],
 

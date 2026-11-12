@@ -102,7 +102,7 @@ export default function HoverIndex({ rows, head = true, label, numbers = true }:
               onPointerEnter={(e) => { if (e.pointerType === 'mouse' && r.cover) setActive(i); else setActive(null) }}
             >
               {r.href ? (
-                <Link href={r.href} className={s.row} onFocus={() => r.cover && setActive(null)}>
+                <Link href={r.href} className={s.row} data-cursor="view" data-cursor-label={ui.cursor.row} onFocus={() => r.cover && setActive(null)}>
                   {inner}
                 </Link>
               ) : (

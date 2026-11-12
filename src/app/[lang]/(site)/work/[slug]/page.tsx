@@ -95,11 +95,11 @@ export default async function CasePage({ params }: Props) {
           <ul className={s.chips} aria-label={t.disciplines}>
             {c.chips.map((x) => <li key={x}>{x}</li>)}
           </ul>
-          <p className={s.lead}>{c.lead}</p>
+          <p className={s.lead} data-cursor="text">{c.lead}</p>
           {c.question && (
             <div className={s.question}>
               <p className={s.qLabel}><span>{t.question}</span><span className={s.rowN}>01</span></p>
-              <p className={s.questionText}>{c.question}</p>
+              <p className={s.questionText} data-cursor="text">{c.question}</p>
             </div>
           )}
         </div>
@@ -108,7 +108,7 @@ export default async function CasePage({ params }: Props) {
       {c.copyEn && c.context && (
         <Row label={t.context} n="02" className={s.rowFirst}>
           <p className={s.contextLead}>{c.context.lead}</p>
-          <p className={s.text}>{c.context.text}</p>
+          <p className={s.text} data-cursor="text">{c.context.text}</p>
         </Row>
       )}
 

@@ -56,6 +56,7 @@ export default function EmailLink({ email, pillClassName }: { email: string; pil
         href={`mailto:${email}`}
         aria-label={email}
         data-no-transition
+        data-cursor="copy"
         onClick={onClick}
         onMouseEnter={() => setActive(true)}
         onMouseLeave={() => setActive(false)}

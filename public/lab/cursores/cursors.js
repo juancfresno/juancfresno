@@ -1,5 +1,5 @@
 /* Fresno Lab · 005 · Cursors — https://juancfresno.com/lab/cursores
-   Six custom cursors that change with what they are over, side by side.
+   Seven custom cursors that change with what they are over, side by side.
    Context is declared in the markup:
      data-cursor="link | view | drag | play | copy | text"   (anything else = base)
      data-cursor-label="View case"                           (optional text override)
@@ -26,7 +26,9 @@
     { n: '05', key: 'speed', name: 'Velocity', tag: 'RGB split · stretch',
       text: 'Speed splits it into red and blue along the movement and stretches it. At rest it is one clean dot; the labels split too.' },
     { n: '06', key: 'label', name: 'Label only', tag: 'Mono · inertia · scramble',
-      text: 'No dot. A small mono label drifts behind the pointer with inertia, tilts with its speed and retypes itself with the site’s scramble when the context changes.' }
+      text: 'No dot. A small mono label drifts behind the pointer with inertia, tilts with its speed and retypes itself with the site’s scramble when the context changes.' },
+    { n: '07', key: 'neg', name: 'Label negative', tag: 'Difference box · knocked-out text',
+      text: 'The same drifting label, but its box is a white difference layer: it inverts whatever is under it and the text is knocked out, so the words show the page itself through the inverted box.' }
   ];
 
   // Default label per state (data-cursor-label overrides it).
@@ -674,11 +676,12 @@
 
   // 06 · Label only: a mono chip that trails with extra inertia, tilts with its
   // horizontal speed and scrambles to the new text (260 ms) on every change.
+  // 07 · Label negative reuses it with a different chip class (see fc7-chip).
   var BASE6 = 'Explore';
-  IMPL.label = {
+  function labelImpl(cls) { return {
     lagScale: 1.6,
     build: function (P, L) {
-      var E = { chip: el('div', 'fc__lbl fc6-chip', { 'data-s': 'base' }) };
+      var E = { chip: el('div', 'fc__lbl ' + cls, { 'data-s': 'base' }) };
       E.chip.textContent = BASE6.toUpperCase();
       L.appendChild(E.chip);
       P.sc = { from: '', to: BASE6.toUpperCase(), at: -1 };
@@ -713,7 +716,9 @@
       op(E.chip, P.vis);
       return busy || Math.abs(P.m.rot) > 0.05;
     }
-  };
+  }; }
+  IMPL.label = labelImpl('fc6-chip');
+  IMPL.neg = labelImpl('fc7-chip');
 
   function fresnoCursors(root) {
     root = root || document;
