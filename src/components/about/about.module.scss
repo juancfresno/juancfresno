@@ -37,7 +37,7 @@
   @include respond-to(md) { padding-right: 24px; }
 }
 
-// ─── Bio: 28/34 in three tints, 48 between the lead and the last paragraph ──
+// ─── Bio: 28/34, scroll-lit word by word (BioReveal), 48 between lead and last ──
 .bio {
   @include container;
   display: flex;
@@ -52,9 +52,15 @@
   p { margin: 0; }
 }
 
-.hi  { color: var(--c-bio-hi); }
-.mid { color: var(--c-bio-mid); }
-.dim { color: var(--c-text-dim); }
+// --k (0 dim → 1 lit) is set per word by BioReveal; only colour changes.
+.w {
+  --k: 0;
+  color: color-mix(in srgb, var(--c-text) calc(var(--k) * 100%), var(--c-reveal-off));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .w { color: var(--c-text); }
+}
 
 // ─── Brand-blue band reserved for the photo / 3D piece (830 at 1680) ────────
 .stage {
