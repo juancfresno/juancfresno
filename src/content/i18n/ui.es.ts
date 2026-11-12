@@ -5,6 +5,8 @@
 import type { UiDict } from './ui.en'
 
 export const UI_ES: UiDict = {
+  // Etiquetas del cursor del sitio (estados data-cursor). `row` = filas de Proyectos / archivo.
+  cursor: { link: '↗', view: 'Ver más', row: 'Ver', drag: 'Arrastra ↔', play: 'Play', pause: 'Pausa', copy: 'Copiar', copied: 'Copiado' },
   skip: 'Saltar al contenido',
   nav: {
     main: 'Principal',
@@ -194,7 +196,7 @@ export const UI_ES: UiDict = {
     buttons: ['Magnético', 'Columnas', 'Rodillo', 'Scramble'],
     galleries: ['Arco', 'Canvas', 'Láminas', 'Tira', 'Mazo', 'Rejilla con zoom', 'Barras', 'Pasarela'],
     pixels: ['Columnas', 'Bitmap', 'Despixelado', '1-bit', 'Cursor', 'CRT'],
-    cursors: ['Anillo', 'Píxel', 'Retícula', 'Negativo', 'Velocidad', 'Etiqueta'],
+    cursors: ['Anillo', 'Píxel', 'Retícula', 'Negativo', 'Velocidad', 'Etiqueta', 'Etiqueta negativa'],
   },
   journal: { h1: 'Notas' },
   shortcuts: {

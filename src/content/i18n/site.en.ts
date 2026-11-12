@@ -64,7 +64,7 @@ export const SITE_EN = {
       transiciones: '22 page transitions, side by side. 11a is the one this site uses.',
       galerias: 'Eight ways to show 200 images, built on the real feed.',
       'entradas-pixel': 'Six pixel entrances for the social hover preview, with the real clips.',
-      cursores: 'Six custom cursors that change with what they are over.',
+      cursores: 'Seven custom cursors that change with what they are over.',
     } as Record<string, string>,
     labels: {
       featured: '{ Featured work ↘',
@@ -273,11 +273,11 @@ export const SITE_EN = {
       name: 'Cursors',
       kind: 'Interaction',
       year: '2026',
-      what: 'Six custom cursors that change with what they are over: an arrow on links, “View more” on images, “Drag” on a strip, “Play” on video, “Copy” on the email, a caret on text. Dot and ring, pixel, crosshair, negative, velocity and label only, each on the same mock page.',
+      what: 'Seven custom cursors that change with what they are over: an arrow on links, “View more” on images, “Drag” on a strip, “Play” on video, “Copy” on the email, a caret on text. Dot and ring, pixel, crosshair, negative, velocity, label only and label negative, each on the same mock page. Velocity (05) is the one this site now uses.',
       built: 'One rAF loop · transform only · no libraries',
       note: null as string | null,
-      card: 'Six custom cursors that change with what they are over: dot and ring, pixel, crosshair, negative, velocity and label only.',
-      how: 'Every state is declared in the markup with data-cursor (link, view, drag, play, copy, text) and an optional data-cursor-label; the cursor reads it with closest() on the pointer target. One requestAnimationFrame loop drives all six and sleeps at rest; per frame only transform and opacity change. A spring sets the lag, the pixel one dissolves through a 4×4 Bayer matrix and the label one retypes with the site’s scramble. On touch the native cursor is never hidden (a tap previews the state); with reduced motion everything snaps, with no lag or trails.',
+      card: 'Seven custom cursors that change with what they are over: dot and ring, pixel, crosshair, negative, velocity, label only and label negative.',
+      how: 'Every state is declared in the markup with data-cursor (link, view, drag, play, copy, text) and an optional data-cursor-label; the cursor reads it with closest() on the pointer target. One requestAnimationFrame loop drives all seven and sleeps at rest; per frame only transform and opacity change. A spring sets the lag, the pixel one dissolves through a 4×4 Bayer matrix and the label one retypes with the site’s scramble; label negative is a white difference box with knocked-out text. On touch the native cursor is never hidden (a tap previews the state); with reduced motion everything snaps, with no lag or trails.',
     },
   ],
 

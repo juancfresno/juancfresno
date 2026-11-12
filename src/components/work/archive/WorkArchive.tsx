@@ -46,7 +46,8 @@ function Row({ it, i, active, expanded, mode, panelId, onEnter, onLeave, onFocus
   onBlurRow: () => void
   onOpen: (i: number, el: HTMLButtonElement) => void
 }) {
-  const t = useUi().work
+  const ui0 = useUi()
+  const t = ui0.work
   const rowRef = useRef<HTMLButtonElement>(null)
   const fillRef = useRef<HTMLCanvasElement>(null)
   usePixelFill(fillRef, rowRef, active)
@@ -65,6 +66,8 @@ function Row({ it, i, active, expanded, mode, panelId, onEnter, onLeave, onFocus
       type="button"
       className={s.row}
       data-row-btn={it.slug}
+      data-cursor="view"
+      data-cursor-label={ui0.cursor.row}
       aria-label={`${it.name} · ${it.via} · ${it.category} · ${it.role} · ${it.year}. ${t.open(it.name)}`}
       aria-expanded={mode === 'expand' ? expanded : undefined}
       aria-controls={mode === 'expand' && expanded ? panelId : undefined}

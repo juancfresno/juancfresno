@@ -54,7 +54,7 @@ export default async function FeedPage({ params }: Props) {
                 const eager = n++ < 6
                 return (
                   <li key={it.id} className={f.item}>
-                    <a href={it.url} target="_blank" rel="noopener noreferrer" className={f.link}>
+                    <a href={it.url} target="_blank" rel="noopener noreferrer" className={f.link} data-cursor="view">
                       <span className={f.media}>
                         <Image
                           src={it.src}

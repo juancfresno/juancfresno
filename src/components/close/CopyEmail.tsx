@@ -40,10 +40,10 @@ export default function CopyEmail({ size = 'xl', className }: { size?: 'xl' | 'm
 
   return (
     <div className={clsx(s.email, size === 'md' && s.emailMd, className)}>
-      <a className={s.emailLink} href={`mailto:${PERSON.email}`} data-no-transition>
+      <a className={s.emailLink} href={`mailto:${PERSON.email}`} data-no-transition data-cursor="copy">
         {PERSON.email}
       </a>
-      <button type="button" className={clsx(s.copy, done && s.copyDone)} onClick={copy} aria-label={done ? ui.copy.copied : ui.copy.copyEmail(PERSON.email)}>
+      <button type="button" data-cursor="copy" className={clsx(s.copy, done && s.copyDone)} onClick={copy} aria-label={done ? ui.copy.copied : ui.copy.copyEmail(PERSON.email)}>
         <span aria-hidden="true">[ {done ? ui.copy.done : ui.copy.copy} ]</span>
       </button>
       <span className={s.srOnly} role="status" aria-live="polite">{done ? ui.copy.status : ''}</span>

@@ -60,7 +60,7 @@ export default function WorkViews({ rows }: { rows: IndexRow[] }) {
             return (
               <li key={r.key}>
                 {r.href && r.cover ? (
-                  <Link href={r.href} className={s.cover}>
+                  <Link href={r.href} className={s.cover} data-cursor="view" data-cursor-label={ui.cursor.row}>
                     <div className={s.coverMedia}>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={r.cover.src} width={r.cover.w} height={r.cover.h} alt="" loading={i < 2 ? 'eager' : 'lazy'} decoding="async" />

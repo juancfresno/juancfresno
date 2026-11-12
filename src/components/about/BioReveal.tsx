@@ -79,7 +79,7 @@ export default function BioReveal({ lead, last }: { lead: string[]; last: Seg[] 
     })
 
   return (
-    <section ref={root} className={a.bio} data-wf="bio">
+    <section ref={root} className={a.bio} data-wf="bio" data-cursor="text">
       <noscript><style>{'[data-w]{--k:1!important}'}</style></noscript>
       <div>
         {lead.map((p, n) => <p key={n}>{render(p)}</p>)}

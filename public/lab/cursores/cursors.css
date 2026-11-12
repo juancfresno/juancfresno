@@ -160,6 +160,12 @@ button.fc__video { appearance: none; border: 0; padding: 0; width: 100%; color: 
 .fc6-chip { padding: 5px 8px 4px; border: 1px solid var(--fc-line); background: var(--fc-bg); color: var(--fc-fg); }
 .fc6-chip[data-s]:not([data-s='base']) { border-color: var(--fc-fg); }
 
+/* 07 · Label negative: a white box in difference mode inverts what is under it; the
+   black text is knocked out of the group, so it shows the untouched page through the
+   inverted box (difference with black = no change). Mid-grey backdrops are the one
+   weak spot (a grey inverts to itself), hence the extra weight and padding. */
+.fc7-chip { padding: 7px 10px 6px; font-size: 0.8125rem; background: #fff; color: #000; mix-blend-mode: difference; font-weight: 500; }
+
 .fc__rec { margin: 48px 0 0; color: var(--fc-mid); max-width: 72ch; }
 .fc__rec strong { font-weight: 400; color: var(--fc-fg); }
 

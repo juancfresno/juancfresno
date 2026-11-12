@@ -650,7 +650,7 @@ $px-on: color-mix(in srgb, $color-text 70%, transparent);
   white-space: nowrap;
 }
 
-// Cursors stage: 6 mini frames, one cursor each
+// Cursors stage: 7 mini frames, one cursor each
 .cuFrame {
   position: relative;
   display: block;
@@ -705,3 +705,9 @@ $px-on: color-mix(in srgb, $color-text 70%, transparent);
 
 // 06 · just a mono label
 .cuFrame[data-kind='label'] b { left: 30%; top: 42%; padding: 3px 5px; border: 1px solid $color-text; color: $color-text; transform: rotate(-4deg); }
+
+// 07 · label with a negative box (difference, text knocked out) over a block
+.cuFrame[data-kind='neg'] {
+  i { left: 14%; top: 18%; width: 52%; height: 64%; background: color-mix(in srgb, $color-text 55%, transparent); }
+  b { left: 40%; top: 42%; padding: 3px 5px; background: #fff; color: #000; mix-blend-mode: difference; }
+}

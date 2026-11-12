@@ -7,6 +7,7 @@ import Nav from '@/components/layout/Nav/Nav'
 import Footer from '@/components/layout/Footer/Footer'
 import GridOverlay from '@/components/ui/GridOverlay/GridOverlay'
 import Shortcuts from '@/components/ui/Shortcuts/Shortcuts'
+import Cursor from '@/components/ui/Cursor/Cursor'
 import SocialPreview from '@/components/ui/SocialPreview/SocialPreview'
 import PageTransitionProvider from '@/providers/PageTransition'
 import { SITE_URL } from '@/lib/site'
@@ -110,6 +111,7 @@ export default async function RootLayout({ children, params }: Props) {
           <GridOverlay />
           <Shortcuts />
           <SocialPreview />
+          <Cursor />
         </LocaleProvider>
         <Analytics />
       </body>

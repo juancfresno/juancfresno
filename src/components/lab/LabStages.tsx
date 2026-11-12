@@ -103,7 +103,7 @@ export function GalleriesStage({ labels: L }: { labels: string[] }) {
   )
 }
 
-// 004 · Pixel entrances: six mini frames caught mid-entry, drawn in CSS.
+// 004 · Pixel entrances: seven mini frames caught mid-entry, drawn in CSS.
 // Names come per locale (getUi(l).lab.pixels), in this order.
 const PX_KINDS = ['cols', 'bitmap', 'blocks', 'onebit', 'cursor', 'crt']
 export function PixelsStage({ labels: L }: { labels: string[] }) {
@@ -122,9 +122,9 @@ export function PixelsStage({ labels: L }: { labels: string[] }) {
   )
 }
 
-// 005 · Cursors: six mini frames, one cursor each, caught over its target.
+// 005 · Cursors: seven mini frames, one cursor each, caught over its target.
 // Names come per locale (getUi(l).lab.cursors), in this order.
-const CU_KINDS = ['ring', 'pixel', 'cross', 'blend', 'speed', 'label']
+const CU_KINDS = ['ring', 'pixel', 'cross', 'blend', 'speed', 'label', 'neg']
 export function CursorsStage({ labels: L }: { labels: string[] }) {
   return (
     <div className={`${s.stage} ${s.stagePx}`} aria-hidden="true">
@@ -137,6 +137,7 @@ export function CursorsStage({ labels: L }: { labels: string[] }) {
             {k === 'blend' && <><i /><b /></>}
             {k === 'speed' && <><i /><i /><i /></>}
             {k === 'label' && <b>VIEW MORE</b>}
+            {k === 'neg' && <><i /><b>VIEW MORE</b></>}
           </span>
           <p className={s.cap}>{String(i + 1).padStart(2, '0')} {L[i]}</p>
         </div>

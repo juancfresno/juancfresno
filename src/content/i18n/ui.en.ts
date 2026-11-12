@@ -6,6 +6,8 @@
 
 export const UI_EN = {
   skip: 'Skip to content',
+  // Site cursor labels (data-cursor states). `row` = Work index / archive rows.
+  cursor: { link: '↗', view: 'View more', row: 'View', drag: 'Drag ↔', play: 'Play', pause: 'Pause', copy: 'Copy', copied: 'Copied' },
   nav: {
     main: 'Main',
     mainMobile: 'Main (mobile)',
@@ -195,7 +197,7 @@ export const UI_EN = {
     buttons: ['Magnetic', 'Columns', 'Roller', 'Scramble'],
     galleries: ['Arc', 'Canvas', 'Plates', 'Strip', 'Deck', 'Zoom grid', 'Bars', 'Runway'],
     pixels: ['Columns', 'Bitmap', 'Depixelate', '1-bit', 'Cursor', 'CRT'],
-    cursors: ['Ring', 'Pixel', 'Crosshair', 'Negative', 'Velocity', 'Label'],
+    cursors: ['Ring', 'Pixel', 'Crosshair', 'Negative', 'Velocity', 'Label', 'Label negative'],
   },
   journal: { h1: 'Journal' },
   shortcuts: {

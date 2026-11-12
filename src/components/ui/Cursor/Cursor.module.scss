@@ -1,0 +1,63 @@
+@use '../../../styles/variables' as *;
+
+// Site cursor (Lab 005 · 05 Velocity). Seven sibling layers fixed to the viewport,
+// NOT wrapped in a container: mix-blend-mode needs the page as its backdrop, and a
+// fixed wrapper would be an isolated group. z-index $z-cursor (500) is above the
+// site transition canvas (450), so the cursor never disappears under it.
+// Dark: R/G/B screen (white at rest). Light and the blue Contact page: C/M/Y
+// multiply (black at rest). Only transform and opacity change per frame.
+.dot, .chip, .lbl {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: $z-cursor;
+  pointer-events: none;
+  opacity: 0;
+  will-change: transform, opacity;
+  @media (hover: none), (pointer: coarse) { display: none; }
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+  border-radius: 50%;
+  mix-blend-mode: screen;
+  background: var(--c);
+}
+.lbl {
+  mix-blend-mode: screen;
+  color: var(--c);
+  font-family: $font-mono;
+  font-weight: $fw-mono;
+  font-size: 0.8125rem;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+// Its own backdrop, so the split label reads over images, video and the WebGL canvas.
+.chip {
+  border-radius: 999px;
+  background: var(--c-bg);
+}
+
+.r { --c: #ff0000; }
+.g { --c: #00ff00; }
+.b { --c: #0000ff; }
+
+:global(html[data-theme='light']) .dot, :global(html[data-theme='light']) .lbl,
+:global(html[data-page-theme='blue']) .dot, :global(html[data-page-theme='blue']) .lbl { mix-blend-mode: multiply; }
+:global(html[data-theme='light']) .r, :global(html[data-page-theme='blue']) .r { --c: #00ffff; }
+:global(html[data-theme='light']) .g, :global(html[data-page-theme='blue']) .g { --c: #ff00ff; }
+:global(html[data-theme='light']) .b, :global(html[data-page-theme='blue']) .b { --c: #ffff00; }
+
+// Hide the native cursor only once the component has confirmed a fine pointer.
+// (hover: hover) and (pointer: fine) is repeated here so touch can never lose it.
+@media (hover: hover) and (pointer: fine) {
+  :global(html[data-cursor-on][data-cursor-on]), :global(html[data-cursor-on][data-cursor-on]) :global(*) { cursor: none !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dot, .lbl, .chip { will-change: auto; }
+}
