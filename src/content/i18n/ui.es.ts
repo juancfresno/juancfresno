@@ -194,6 +194,7 @@ export const UI_ES: UiDict = {
     buttons: ['Magnético', 'Columnas', 'Rodillo', 'Scramble'],
     galleries: ['Arco', 'Canvas', 'Láminas', 'Tira', 'Mazo', 'Rejilla con zoom', 'Barras', 'Pasarela'],
     pixels: ['Columnas', 'Bitmap', 'Despixelado', '1-bit', 'Cursor', 'CRT'],
+    cursors: ['Anillo', 'Píxel', 'Retícula', 'Negativo', 'Velocidad', 'Etiqueta'],
   },
   journal: { h1: 'Notas' },
   shortcuts: {

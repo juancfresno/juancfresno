@@ -64,6 +64,7 @@ export const SITE_EN = {
       transiciones: '22 page transitions, side by side. 11a is the one this site uses.',
       galerias: 'Eight ways to show 200 images, built on the real feed.',
       'entradas-pixel': 'Six pixel entrances for the social hover preview, with the real clips.',
+      cursores: 'Six custom cursors that change with what they are over.',
     } as Record<string, string>,
     labels: {
       featured: '{ Featured work ↘',
@@ -264,6 +265,18 @@ export const SITE_EN = {
       card: 'Six ways for the social hover preview to appear, with the real clips: fine bitmap, depixelate, 1-bit to colour, from the cursor, CRT sweep, and the twelve columns it uses today.',
       how: 'One WebGL2 context for every card and one fragment shader with a branch per variant; each card copies its frame into its own canvas. The clip is a texture updated every frame, with mipmaps so the big blocks show the mean colour. Cells snap to device pixels and the thresholds are an 8×8 Bayer matrix. The exit is the entry played backwards, and switching halfway stays continuous. With reduced motion it is instant and the clip stays still; without WebGL2, a plain 2D preview.',
     },
+    {
+      slug: 'cursores',
+      n: '005',
+      name: 'Cursors',
+      kind: 'Interaction',
+      year: '2026',
+      what: 'Six custom cursors that change with what they are over: an arrow on links, “View more” on images, “Drag” on a strip, “Play” on video, “Copy” on the email, a caret on text. Dot and ring, pixel, crosshair, negative, velocity and label only, each on the same mock page.',
+      built: 'One rAF loop · transform only · no libraries',
+      note: null as string | null,
+      card: 'Six custom cursors that change with what they are over: dot and ring, pixel, crosshair, negative, velocity and label only.',
+      how: 'Every state is declared in the markup with data-cursor (link, view, drag, play, copy, text) and an optional data-cursor-label; the cursor reads it with closest() on the pointer target. One requestAnimationFrame loop drives all six and sleeps at rest; per frame only transform and opacity change. A spring sets the lag, the pixel one dissolves through a 4×4 Bayer matrix and the label one retypes with the site’s scramble. On touch the native cursor is never hidden (a tap previews the state); with reduced motion everything snaps, with no lag or trails.',
+    },
   ],
 
   // ─── About ────────────────────────────────────────────────────────────────────
@@ -274,8 +287,18 @@ export const SITE_EN = {
       bio: [
         { hi: 'Since 2012 I’ve worked independently on digital products, identities and interactive experiences, collaborating with brands, studios, agencies and teams on projects of every scale.', mid: ' My focus is defining clear visual lines and systems, caring for the interaction and building digital products and experiences that don’t just look good, ', dim: 'but work with sense and coherence.' },
         { dim: 'Curiosity is an important part of how I work. I like exploring new tools, interactions and ways of doing things, learning along the way and carrying that knowledge into whatever comes next.' },
-        { dim: 'I’m especially interested in projects where product thinking and strong visual direction meet — clear enough to work and distinctive enough to be remembered. I work from Valencia, Spain, remotely, for the world, adapting to different contexts, paces and ways of working, with small clients and large organizations alike.' },
       ],
+      // Last line of the hero (Figma "Based in Madrid Valencia"): `strike` = struck-through
+      // word; `tip` = hover preview id (components/ui/SocialPreview), keyboard focusable.
+      based: [
+        { t: 'Based in ' },
+        { t: 'Madrid', strike: true },
+        { t: ' ' },
+        { t: 'Valencia', tip: 'valencia', aria: 'Valencia, Spain. Preview of the city' },
+        { t: ', Spain — ' },
+        { t: 'working independently', tip: 'juan', aria: 'Juan C. Fresno, photo at his desk' },
+        { t: ' worldwide.' },
+      ] as { t: string; strike?: boolean; tip?: string; aria?: string }[],
       close: { label: 'Let’s collaborate↘', line: 'For enquiries, collaborations or new projects' },
       frame: 'Space reserved for the photo / 3D piece',
     },

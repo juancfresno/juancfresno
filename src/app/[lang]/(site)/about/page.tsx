@@ -5,6 +5,7 @@ import { localeOf, type LangParams } from '@/i18n/server'
 import ElasticLine from '@/components/ui/ElasticLine/ElasticLine'
 import a from '@/components/about/about.module.scss'
 import BioReveal from '@/components/about/BioReveal'
+import FresnoLogo from '@/components/about/FresnoLogo'
 
 type Props = { params: Promise<LangParams> }
 
@@ -15,7 +16,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 // About — Figma "about" (AXxkCCuckrXGKDUCk8lNyQ · 6964:14926): hero row with
-// the ficha marker left and "/ About" right (Work / Contact pattern), the bio
+// the ficha marker left and "/ About" right (Work / Contact pattern), the big
+// FRESNO© wordmark (7151:22515), the bio
 // lit word by word on scroll (BioReveal), a brand-blue band reserved for the photo / 3D piece (empty
 // frame with crop marks) and the "collaborate" close (04 · Archivo).
 export default async function AboutPage({ params }: Props) {
@@ -31,9 +33,13 @@ export default async function AboutPage({ params }: Props) {
         <h1 className={a.name}>/ {ui.about.h1}</h1>
       </header>
 
+      <div className={a.logo} data-wf="logo">
+        <FresnoLogo />
+      </div>
+
       <BioReveal
         lead={P.bio.slice(0, 2).map((p) => [('hi' in p && p.hi) || '', ('mid' in p && p.mid) || '', p.dim].join(''))}
-        last={P.bio[2].dim}
+        last={P.based}
       />
 
       <section className={a.stage} data-wf="media" aria-label={P.frame}>

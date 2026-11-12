@@ -121,3 +121,26 @@ export function PixelsStage({ labels: L }: { labels: string[] }) {
     </div>
   )
 }
+
+// 005 · Cursors: six mini frames, one cursor each, caught over its target.
+// Names come per locale (getUi(l).lab.cursors), in this order.
+const CU_KINDS = ['ring', 'pixel', 'cross', 'blend', 'speed', 'label']
+export function CursorsStage({ labels: L }: { labels: string[] }) {
+  return (
+    <div className={`${s.stage} ${s.stagePx}`} aria-hidden="true">
+      {CU_KINDS.map((k, i) => (
+        <div key={k} className={s.gCell}>
+          <span className={s.cuFrame} data-kind={k}>
+            {k === 'ring' && <><i /><b>VIEW</b></>}
+            {k === 'pixel' && <i />}
+            {k === 'cross' && <><i /><i /><b /></>}
+            {k === 'blend' && <><i /><b /></>}
+            {k === 'speed' && <><i /><i /><i /></>}
+            {k === 'label' && <b>VIEW MORE</b>}
+          </span>
+          <p className={s.cap}>{String(i + 1).padStart(2, '0')} {L[i]}</p>
+        </div>
+      ))}
+    </div>
+  )
+}

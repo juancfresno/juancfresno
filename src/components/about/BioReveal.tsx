@@ -15,7 +15,11 @@ const END = 0.35 // progress 1 when the block bottom reaches 35 %
 
 const words = (text: string) => text.split(/(\s+)/)
 
-export default function BioReveal({ lead, last }: { lead: string[]; last: string }) {
+// Inline pieces of the last line: struck-through words and hover previews
+// (data-social, see components/ui/SocialPreview), focusable by keyboard.
+export type Seg = { t: string; strike?: boolean; tip?: string; aria?: string }
+
+export default function BioReveal({ lead, last }: { lead: string[]; last: Seg[] }) {
   const root = useRef<HTMLElement>(null)
 
   useEffect(() => {
@@ -66,6 +70,13 @@ export default function BioReveal({ lead, last }: { lead: string[]; last: string
     words(text).map((t, j) =>
       /^\s+$/.test(t) || t === '' ? t : <span key={j} className={a.w} data-w={i++}>{t}</span>
     )
+  const renderSegs = (segs: Seg[]) =>
+    segs.map((g, k) => {
+      const inner = render(g.t)
+      if (g.tip) return <span key={k} className={a.tip} data-social={g.tip} tabIndex={0} role="note" aria-label={g.aria}>{inner}</span>
+      if (g.strike) return <span key={k} className={a.strike}>{inner}</span>
+      return <span key={k}>{inner}</span>
+    })
 
   return (
     <section ref={root} className={a.bio} data-wf="bio">
@@ -73,7 +84,7 @@ export default function BioReveal({ lead, last }: { lead: string[]; last: string
       <div>
         {lead.map((p, n) => <p key={n}>{render(p)}</p>)}
       </div>
-      <p>{render(last)}</p>
+      <p>{renderSegs(last)}</p>
     </section>
   )
 }
