@@ -1,7 +1,7 @@
 /* ==========================================================================
-   FDS — Fresno Design System · Tokens v1.6.0 (fds-tokens.css 2.0.0)
+   FDS — Fresno Design System · Tokens v1.7.0 (fds-tokens.css 2.1.0)
    Generated from Figma "01 · FDS — Foundations" (7Uco2E5gV4JdqojI7J3kTX)
-   on 2026-11-02. Do not edit by hand: Figma is the source.
+   on 2026-11-12. Do not edit by hand: Figma is the source.
    Variable names = Figma WEB code syntax.
      --fds-ref-*        Primitives — reference only, never consume in product code
      --fds-brand-*      Brand collection — switch with data-brand="fresno|biakone|glyf|medida|forma|tracker"
@@ -11,7 +11,11 @@
    Brand: default Fresno; set data-brand on <html> or any container.
    ========================================================================== */
 
-@import url("https://fonts.googleapis.com/css2?family=Geist:wght@300;400&family=Geist+Mono:wght@400&family=Instrument+Serif:ital@0;1&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Sometype+Mono:wght@400&family=Instrument+Serif:ital@0;1&display=swap");
+
+/* Switzer (Fontshare, ITF Free Font License) — self-hosted next to this file */
+@font-face{font-family:'Switzer';src:url('/fonts/switzer-light.woff2') format('woff2');font-weight:300;font-style:normal;font-display:swap}
+@font-face{font-family:'Switzer';src:url('/fonts/switzer-regular.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap}
 
 /* 01 · Primitives (--fds-ref-*) */
 :root {
@@ -111,8 +115,9 @@
   --fds-ref-breakpoint-4xl: 2560px;
   --fds-ref-interaction-target-min-web: 24px;
   --fds-ref-interaction-target-min-touch: 44px;
-  --fds-ref-font-family-geist: 'Geist';
-  --fds-ref-font-family-geist-mono: 'Geist Mono';
+  --fds-ref-font-family-sometype-mono: 'Sometype Mono';
+  --fds-ref-font-family-geist: 'Geist'; /* deprecated v1.7.0 */
+  --fds-ref-font-family-geist-mono: 'Geist Mono'; /* deprecated v1.7.0 */
   --fds-ref-font-family-instrument-serif: 'Instrument Serif';
   --fds-ref-font-family-switzer: 'Switzer';
 }
@@ -136,9 +141,9 @@
   --fds-brand-color-logo-default: var(--fds-ref-color-neutral-950);
   --fds-brand-color-logo-inverse: var(--fds-ref-color-brand-yellow);
   --fds-brand-color-logo-accent: var(--fds-ref-color-accent-electric);
-  --fds-brand-font-body: var(--fds-ref-font-family-geist);
-  --fds-brand-font-display: 'Geist Mono';
-  --fds-brand-font-ui: 'Geist Mono';
+  --fds-brand-font-body: var(--fds-ref-font-family-switzer);
+  --fds-brand-font-display: var(--fds-ref-font-family-sometype-mono);
+  --fds-brand-font-ui: var(--fds-ref-font-family-sometype-mono);
   --fds-brand-font-editorial: 'Instrument Serif';
 }
 /* Biakone · GLYF · Medida · Forma share the neutral base; only logo/accent differs for GLYF */
@@ -160,9 +165,9 @@
   --fds-brand-color-logo-default: var(--fds-ref-color-neutral-950);
   --fds-brand-color-logo-inverse: var(--fds-ref-color-neutral-50);
   --fds-brand-color-logo-accent: var(--fds-ref-color-neutral-950);
-  --fds-brand-font-body: var(--fds-ref-font-family-geist);
-  --fds-brand-font-display: 'Geist Mono';
-  --fds-brand-font-ui: 'Geist Mono';
+  --fds-brand-font-body: var(--fds-ref-font-family-switzer);
+  --fds-brand-font-display: var(--fds-ref-font-family-sometype-mono);
+  --fds-brand-font-ui: var(--fds-ref-font-family-sometype-mono);
   --fds-brand-font-editorial: 'Instrument Serif';
 }
 [data-brand="glyf"] {
