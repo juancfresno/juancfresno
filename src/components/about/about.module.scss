@@ -1,376 +1,121 @@
 @use '../../styles/variables' as *;
 @use '../../styles/mixins' as *;
 
-// About v1.0 — Figma "About · v1.0 · 1680" (6888:1117).
+// About — Figma "about" (6964:14926), 1680 reference. Geist → $font-body
+// (Switzer), Sometype Mono → $font-mono. Side insets: 64 in the hero and the
+// blue band, 40 (--m) in the bio and the close.
 
-.hero {
-  @include container;
-  padding-top: clamp(4rem, 7vw, 7.5rem);
-  padding-bottom: clamp(4.5rem, 8vw, 8.5rem);
+.page {
+  display: flex;
+  flex-direction: column;
+  padding-top: 72px; // web/nav height
 }
 
-.heroRow {
+// ─── Hero: ficha marker left, "/ About" right (pt 88, pb 112) ───────────────
+.hero {
   display: flex;
-  flex-wrap: wrap;
   justify-content: space-between;
-  align-items: flex-end;
-  gap: $space-6;
-  margin-bottom: clamp(3rem, 4.3vw, 4.5rem);
+  align-items: flex-start;
+  box-sizing: border-box;
+  padding: clamp(3rem, 5.238vw, 88px) max(#{$m}, 3.81vw, env(safe-area-inset-right, 0px)) clamp(4rem, 6.667vw, 112px) max(#{$m}, 3.81vw, env(safe-area-inset-left, 0px));
+}
+
+.marker,
+.name {
+  margin: 0;
+  font-family: $font-body;
+  font-weight: $fw-regular;
+  font-size: 24px;
+  line-height: normal;
+  letter-spacing: -0.02em;
+  color: $color-text-hi;
 }
 
 .name {
-  font-family: $font-body;
-  font-weight: 200;
-  font-size: clamp(5rem, 13.1vw, 13.75rem);
-  line-height: 0.84;
-  letter-spacing: -0.06em;
-  color: $color-text-hi;
-  margin-left: -0.04em;
+  text-align: right;
+  // Phones: clear the vertical FRESNO wordmark hanging from the header.
+  @include respond-to(md) { padding-right: 24px; }
 }
 
-.toggle {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding-bottom: 24px;
-
-  @include respond-to(md) { padding-bottom: 0; }
-
-  button {
-    padding: 4px 8px;
-    border: 1px solid $color-text-mid;
-    border-radius: 3px;
-    font-family: $font-mono; font-weight: $fw-mono;
-    font-size: 0.625rem;
-    letter-spacing: 0.03em;
-    text-transform: uppercase;
-    color: $color-text;
-    cursor: pointer;
-    transition: background $duration-fast, color $duration-fast, border-color $duration-fast;
-
-    &[aria-pressed='true'] { background: $color-text; border-color: $color-text; color: $color-bg; }
-    &:hover:not([aria-pressed='true']) { border-color: $color-text; }
-    @include focus-ring($color-text);
-  }
-}
-
-.toggleLabel {
-  margin-right: 6px;
-  font-family: $font-mono; font-weight: $fw-mono;
-  font-size: 0.625rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: $color-text-mid;
-}
-
-.split {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 1px minmax(0, 1fr);
-
-  &[data-view='professional'], &[data-view='personal'] { grid-template-columns: minmax(0, 1fr); }
-
-  @include respond-to(md) { grid-template-columns: 1fr; row-gap: $space-16; }
-}
-
-.splitDivider {
-  background: $color-line;
-  &[hidden] { display: none; }
-  @include respond-to(md) { display: none; }
-}
-
-.pane {
+// ─── Bio: 28/34 in three tints, 48 between the lead and the last paragraph ──
+.bio {
+  @include container;
   display: flex;
   flex-direction: column;
-  padding-right: 48px;
-  min-width: 0;
-
-  &[hidden] { display: none; }
-
-  @media (prefers-reduced-motion: no-preference) {
-    animation: paneIn 0.5s $ease-out-expo both;
-  }
-  @include respond-to(md) { padding-right: 0; }
-}
-
-.panePersonal {
-  padding-right: 0;
-  padding-left: 48px;
-  @include respond-to(md) { padding-left: 0; }
-}
-
-.split[data-view='personal'] .panePersonal { padding-left: 0; }
-
-@keyframes paneIn { from { opacity: 0; transform: translateY(6px); } }
-
-.paneLabel {
-  display: flex;
-  justify-content: space-between;
-  gap: $space-4;
-  font-family: $font-mono; font-weight: $fw-mono;
-  text-transform: uppercase;
-
-  span:first-child { font-size: 0.6875rem; letter-spacing: 0.03em; color: $color-text-hi; }
-  span:last-child { font-size: 0.625rem; letter-spacing: 0.03em; color: $color-text-mid; }
-}
-
-.photo {
-  margin-top: 28px;
-  width: min(100%, 23.5rem);
-  aspect-ratio: 4 / 5;
-  overflow: hidden;
-  background: var(--c-stage);
-
-  img { width: 100%; height: 100%; object-fit: cover; display: block; }
-}
-
-.bioLead {
-  margin-top: 40px;
+  gap: 48px;
+  padding-block: clamp(4rem, 6.667vw, 112px);
   font-family: $font-body;
-  font-weight: $fw-light;
-  font-size: clamp(1.375rem, 1.7vw, 1.75rem);
-  line-height: 1.36;
-  letter-spacing: -0.012em;
-  color: $color-text;
-  max-width: 45rem;
-}
-
-.bioRest {
-  font-family: $font-body;
-  font-size: 1.125rem;
-  line-height: 1.52;
-  letter-spacing: -0.01em;
-  color: $color-text-mid;
-  max-width: 45rem;
-}
-
-.bioLead + .bioRest { margin-top: 24px; }
-
-.hobbies {
-  margin-top: 24px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 10px;
-
-  :global([class*='pending']) { margin-left: 0; }
-}
-
-.footnote {
-  margin-top: 40px;
-  padding-top: 14px;
-  border-top: 1px solid $color-line;
-  font-family: $font-body;
-  font-size: 0.8125rem;
-  color: $color-text-mid;
-
-  a { color: $color-text; text-underline-offset: 3px; }
-}
-
-// ─── Alt band (Services, Experience) ────────────────────────────────────────
-.alt { background: $color-bg-2; }
-
-// ─── Services: rows 1 · 4 · 4 · 3 ──────────────────────────────────────────
-.services {
-  list-style: none;
-
-  > li {
-    display: grid;
-    grid-template-columns: 1fr 4fr 4fr 3fr;
-    gap: $space-4;
-    align-items: start;
-    padding-block: 28px;
-    border-bottom: 1px solid $color-line;
-
-    @include respond-to(lg) { grid-template-columns: 2rem minmax(0, 1fr) minmax(0, 1fr); > :last-child { grid-column: 2 / -1; } }
-    @include respond-to(md) { grid-template-columns: 2rem minmax(0, 1fr); > :nth-child(n + 3) { grid-column: 2; } }
-  }
-}
-
-.n {
-  font-family: $font-mono; font-weight: $fw-mono;
-  font-size: 0.625rem;
-  letter-spacing: 0.02em;
-  color: $color-text-mid;
-  padding-top: 0.6em;
-}
-
-.serviceName {
-  font-family: $font-body;
-  font-weight: $fw-light;
-  font-size: clamp(1.75rem, 2.15vw, 2.25rem);
-  line-height: 1.1;
+  font-size: clamp(1.25rem, 1.2vw + 0.9rem, 28px);
+  line-height: 1.2143; // 34 / 28
   letter-spacing: -0.02em;
-  color: $color-text;
+
+  p { margin: 0; }
 }
 
-.serviceText {
-  font-family: $font-body;
-  font-size: 1.0625rem;
-  line-height: 1.5;
-  letter-spacing: -0.01em;
-  color: $color-text-mid;
-  max-width: 32rem;
+.hi  { color: var(--c-bio-hi); }
+.mid { color: var(--c-bio-mid); }
+.dim { color: var(--c-text-dim); }
+
+// ─── Brand-blue band reserved for the photo / 3D piece (830 at 1680) ────────
+.stage {
+  box-sizing: border-box;
+  height: clamp(26rem, 49.42vw, 830px);
+  padding: clamp(2rem, 4.94vw, 83px) max(#{$m}, 3.81vw);
+  background: var(--c-brand-blue);
 }
 
-.tags {
-  list-style: none;
+.frame {
+  position: relative;
+  width: 100%;
+  height: 100%;
+
+  // Four crop marks, nothing else (same as the Work gallery slot).
+  span {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border: 0 solid rgba(20, 20, 20, 0.45); // ink on the brand blue, both themes
+  }
+  span:nth-child(1) { top: 0; left: 0; border-top-width: 1px; border-left-width: 1px; }
+  span:nth-child(2) { top: 0; right: 0; border-top-width: 1px; border-right-width: 1px; }
+  span:nth-child(3) { bottom: 0; left: 0; border-bottom-width: 1px; border-left-width: 1px; }
+  span:nth-child(4) { bottom: 0; right: 0; border-bottom-width: 1px; border-right-width: 1px; }
+}
+
+// ─── Close: "Let´s collaborate↘" (04 · Archivo; pt 40, pb 64, gap 16) ───────
+.close {
+  @include container;
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-
-  li {
-    padding: 4px 8px;
-    border: 1px solid $color-text-mid;
-    border-radius: 999px;
-    font-family: $font-mono; font-weight: $fw-mono;
-    font-size: 0.5625rem;
-    letter-spacing: 0.03em;
-    text-transform: uppercase;
-    color: $color-text;
-  }
-}
-
-.after { margin-top: 40px; align-self: flex-start; }
-
-// ─── Studios & brands ───────────────────────────────────────────────────────
-.sentence {
-  font-family: $font-body;
-  font-weight: $fw-light;
-  font-size: clamp(1.75rem, 2.9vw, 3rem);
-  line-height: 1.06;
-  letter-spacing: -0.03em;
-  color: $color-text-hi;
-  max-width: 30ch;
-  margin-top: 16px;
-  margin-bottom: clamp(2.5rem, 3.8vw, 4rem);
-}
-
-.lists {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: $space-8 $space-4;
-
-  @include respond-to(md) { grid-template-columns: 1fr; }
-
-  > div { display: flex; flex-direction: column; gap: 20px; }
-}
-
-.names {
-  font-family: $font-body;
-  font-weight: $fw-light;
-  font-size: clamp(1.125rem, 1.3vw, 1.375rem);
-  line-height: 1.6;
-  color: $color-text;
-  max-width: 46rem;
-}
-
-.namesTail { color: $color-text-mid; }
-
-// ─── Experience ─────────────────────────────────────────────────────────────
-.figures {
-  list-style: none;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: $space-4;
-  margin-top: 16px;
-  margin-bottom: clamp(3rem, 4.8vw, 5rem);
-
-  @include respond-to(sm) { grid-template-columns: 1fr; row-gap: $space-8; }
-
-  li {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    padding-top: 16px;
-    border-top: 1px solid $color-text-mid;
-  }
-}
-
-.figLabel {
-  font-family: $font-mono; font-weight: $fw-mono;
-  font-size: 0.625rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: $color-text-mid;
-}
-
-.figValue {
-  font-family: $font-body;
-  font-weight: 200;
-  font-size: clamp(4rem, 9.5vw, 10rem);
-  line-height: 0.9;
-  letter-spacing: -0.06em;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: $m;
+  padding-bottom: 64px;
   color: $color-text-hi;
 }
 
-.exp { list-style: none; }
+.rule { display: block; width: 100%; color: $color-line; }
 
-// Rows on the index grid: 1 · 5 · 3 · 2 · 1 (v1/index-row)
-.tr {
-  display: grid;
-  grid-template-columns: 1fr 5fr 3fr 2fr 1fr;
-  gap: $space-4;
-  align-items: center;
-  min-height: 4rem;
-  border-bottom: 1px solid $color-line;
-
-  @include respond-to(md) {
-    grid-template-columns: 2.25rem minmax(0, 1fr) auto;
-    padding-block: 12px;
-    > :nth-child(3) { grid-column: 2 / -1; grid-row: 2; }
-    > :nth-child(4) { display: none; }
-    > :nth-child(5) { grid-column: 3; grid-row: 1; }
-  }
-}
-
-.th {
-  min-height: 0;
-  padding-bottom: 12px;
-  border-bottom: 1px solid $color-line;
+.closeLabel {
+  margin: 0;
+  padding-top: 16px;
   font-family: $font-mono; font-weight: $fw-mono;
-  font-size: 0.625rem;
-  letter-spacing: 0.02em;
+  font-size: 11px;
+  line-height: normal;
   text-transform: uppercase;
-  color: $color-text-mid;
-
-  @include respond-to(md) { display: none !important; }
 }
 
-.company {
+.closeLine,
+.closeMail {
+  margin: 0;
   font-family: $font-body;
-  font-size: clamp(1.125rem, 1.3vw, 1.375rem);
-  letter-spacing: -0.015em;
-  color: $color-text;
+  font-size: clamp(1.25rem, 0.5vw + 1rem, 24px);
+  line-height: clamp(1.75rem, 3vw, 46px);
+  letter-spacing: -0.02em;
+  color: inherit;
 }
 
-.cell {
-  font-family: $font-mono; font-weight: $fw-mono;
-  font-size: 0.625rem;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  color: $color-text;
-  padding-right: $space-4;
+.closeMail {
+  align-self: flex-end;
+  text-decoration: none;
+  @include respond-to(md) { align-self: flex-start; overflow-wrap: anywhere; }
 }
-
-.right { text-align: right; padding-right: 0; }
-
-.before {
-  display: grid;
-  grid-template-columns: 1fr 11fr;
-  gap: $space-4;
-  margin-top: clamp(3rem, 4.3vw, 4rem);
-  margin-bottom: 32px;
-
-  span:last-child {
-    font-family: $font-body;
-    font-weight: $fw-light;
-    font-size: clamp(1.375rem, 1.8vw, 1.875rem);
-    line-height: 1.2;
-    letter-spacing: -0.02em;
-    color: $color-text-hi;
-    max-width: 30ch;
-  }
-
-  @include respond-to(md) { grid-template-columns: 1fr; span:first-child { display: none; } }
-}
-.before + .exp { border-top: 1px solid $color-line; }

@@ -18,6 +18,8 @@
   --c-text-muted: rgba(252, 252, 247, 0.35);
   --c-text-hi:    #ddedff;   // headings / hero tint (Figma v0)
   --c-text-dim:   #4d5257;   // second half of the About bio
+  --c-bio-hi:     #c7dbfa;   // About bio: first sentence (Figma about 6964:14926)
+  --c-bio-mid:    #6b7582;   // About bio: middle tint
   --c-line:       #3c3c3a;   // row and section rules (Figma v0)
   --c-line-hi:    #{$raw-pearl};
   --c-overlay:    rgba(16, 16, 14, 0.92); // chips inside images
@@ -43,6 +45,8 @@
   --c-text-muted: rgba(16, 16, 14, 0.45);
   --c-text-hi:    #{$raw-ink};
   --c-text-dim:   rgba(16, 16, 14, 0.4);
+  --c-bio-hi:     #{$raw-ink};
+  --c-bio-mid:    rgba(16, 16, 14, 0.6);
   --c-line:       rgba(16, 16, 14, 0.16);
   --c-line-hi:    #{$raw-ink};
   --c-overlay:    rgba(252, 252, 247, 0.92);
@@ -70,6 +74,8 @@
   --c-text-muted: #4a4d4b;       // text/tertiary
   --c-text-hi:    #141414;
   --c-text-dim:   #4a4d4b;
+  --c-bio-hi:     #141414;
+  --c-bio-mid:    #373737;
   --c-line:       #a9aea9;
   --c-line-hi:    #141414;       // border/strongest
   --c-overlay:    rgba(198, 219, 249, 0.92);

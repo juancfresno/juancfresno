@@ -262,6 +262,17 @@ export const SITE_EN = {
 
   // ─── About ────────────────────────────────────────────────────────────────────
   ABOUT: {
+    // About v2: Figma "about" (AXxkCCuckrXGKDUCk8lNyQ · 6964:14926). Figma copy is Spanish; EN is translated.
+    page: {
+      marker: 'A',
+      bio: [
+        { hi: 'Since 2012 I’ve worked independently on digital products, identities and interactive experiences, collaborating with brands, studios, agencies and teams on projects of every scale.', mid: ' My focus is defining clear visual lines and systems, caring for the interaction and building digital products and experiences that don’t just look good, ', dim: 'but work with sense and coherence.' },
+        { dim: 'Curiosity is an important part of how I work. I like exploring new tools, interactions and ways of doing things, learning along the way and carrying that knowledge into whatever comes next.' },
+        { dim: 'I’m especially interested in projects where product thinking and strong visual direction meet — clear enough to work and distinctive enough to be remembered. I work from Valencia, Spain, remotely, for the world, adapting to different contexts, paces and ways of working, with small clients and large organizations alike.' },
+      ],
+      close: { label: 'Let’s collaborate↘', line: 'For enquiries, collaborations or new projects' },
+      frame: 'Space reserved for the photo / 3D piece',
+    },
     role: 'Independent Art Director & Interactive Designer',
     professional: {
       label: '{ Professional ↘',
