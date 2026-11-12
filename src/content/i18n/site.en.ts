@@ -251,7 +251,7 @@ export const SITE_EN = {
         { dim: 'Curiosity is an important part of how I work. I like exploring new tools, interactions and ways of doing things, learning along the way and carrying that knowledge into whatever comes next.' },
         { dim: 'I’m especially interested in projects where product thinking and strong visual direction meet — clear enough to work and distinctive enough to be remembered. I work from Valencia, Spain, remotely, for the world, adapting to different contexts, paces and ways of working, with small clients and large organizations alike.' },
       ],
-      close: { label: 'Let´s collaborate↘', line: 'For enquiries, collaborations or new projects' },
+      close: { label: 'Let’s collaborate↘', line: 'For enquiries, collaborations or new projects' },
       frame: 'Space reserved for the photo / 3D piece',
     },
     role: 'Independent Art Director & Interactive Designer',
