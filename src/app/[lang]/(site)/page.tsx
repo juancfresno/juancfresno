@@ -57,7 +57,7 @@ export default async function HomePage({ params }: Props) {
           </p>
         </header>
       </section>
-      <LatestFeed locale={l} />
+      <LatestFeed locale={l} block />
       <HomeContact locale={l} />
     </>
   )

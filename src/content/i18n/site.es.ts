@@ -89,6 +89,8 @@ export const SITE_ES: SiteDict = {
     feedAria: 'Últimas publicaciones',
     feedMoreLabel: '{ Más del feed ↘',
     feedMoreAria: 'Más del feed',
+    feedBlockLabel: '{ Más del feed ↘ · 03',
+    feedBlockAria: 'Más del feed, galería 3',
   },
 
   // Hero de página (Figma 6964:15100 feed, 6964:15013 lab). ES de Figma (Lab) o traducido (Feed, cierre): pendiente de revisar por Copywriter.

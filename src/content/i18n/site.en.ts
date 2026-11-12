@@ -89,6 +89,8 @@ export const SITE_EN = {
     feedAria: 'Latest posts',
     feedMoreLabel: '{ More from the feed ↘',
     feedMoreAria: 'More from the feed',
+    feedBlockLabel: '{ More from the feed ↘ · 03',
+    feedBlockAria: 'More from the feed, gallery 3',
   },
 
   // ─── Page intros ──────────────────────────────────────────────────────────────
