@@ -1,6 +1,6 @@
 // ─── Gallery 2 · scroll rail (raw WebGL2, no deps) ───────────────────────────
-// A flat horizontal row of square-cornered cards driven by the page scroll
-// (FeedRail.tsx owns the physics). At rest it is a clean, flat row; with
+// An endless flat row of square-cornered cards (loop by mod) that moves in
+// hits and drags (FeedRail.tsx owns the motion; never the page scroll). At rest it is a clean, flat row; with
 // speed the picture goes through our fisheye language:
 //   1. a global barrel on the screen (centre swells, edges bend),
 //   2. a rubber "drag": every row of pixels shifts against the motion by
@@ -27,7 +27,7 @@ export type RailFx = {
   split: number    // signed RGB split, CSS px
 }
 
-export type RailLayout = { xs: number[]; ws: number[]; len: number }
+export type RailLayout = { xs: number[]; ws: number[]; len: number; period: number } // period = len + gap (loop)
 
 // Strength of each effect at amt = 1.
 export const FX = { barrel: 0.2, bulge: 0.42, stretch: 0.28, squash: 0.1 }
@@ -51,6 +51,7 @@ uniform float uAtlasH;
 uniform float uSplit;   // device px
 uniform vec3 uBg;
 uniform vec3 uStage;
+uniform float uLoop;    // loop period, strip px
 out vec4 o;
 
 vec4 rail(vec2 p){
@@ -67,7 +68,7 @@ vec4 rail(vec2 p){
   float ny = clamp(q.y / hy, -1.4, 1.4);
   q.x -= uBend * ny * ny;
   if (abs(q.y) > hy + 1.0) return vec4(0.0);
-  float s = q.x + W * 0.5 + uGeo.w;
+  float s = mod(q.x + W * 0.5 + uGeo.w, uLoop);
   int idx = -1; float x0 = 0.0, w = 1.0, ready = 0.0;
   for (int i = 0; i < ${MAX_CARDS}; i++) {
     if (i >= uN) break;
@@ -112,7 +113,8 @@ export function layoutRail(cards: StripCard[], hc: number, gap: number): RailLay
   const xs: number[] = [], ws: number[] = []
   let x = 0
   for (const c of cards) { xs.push(x); ws.push(hc * c.ratio); x += hc * c.ratio + gap }
-  return { xs, ws, len: Math.max(1, x - gap) }
+  const len = Math.max(1, x - gap)
+  return { xs, ws, len, period: len + gap }
 }
 
 /** Same sampling map as the shader → card index under a screen point, or −1. */
@@ -125,7 +127,7 @@ export function hitRail(g: RailGeo, L: RailLayout, f: RailFx, px: number, py: nu
   const ny = Math.max(-1.4, Math.min(1.4, qy / (g.hc / 2)))
   qx -= f.bend * ny * ny
   if (Math.abs(qy) > g.hc / 2) return -1
-  const s = qx + g.W / 2 + f.off
+  const s = (((qx + g.W / 2 + f.off) % L.period) + L.period) % L.period
   for (let i = 0; i < L.xs.length; i++) if (s >= L.xs[i] && s < L.xs[i] + L.ws[i]) return i
   return -1
 }
@@ -138,7 +140,7 @@ export function createRail(canvas: HTMLCanvasElement, cards: StripCard[], small:
   const u = (n: string) => gl.getUniformLocation(p, n)
   const U = {
     tex: u('uTex'), res: u('uRes'), dpr: u('uDpr'), geo: u('uGeo'), fx: u('uFx'), bend: u('uBend'), n: u('uN'),
-    card: u('uCard'), uv: u('uUV'), atlasH: u('uAtlasH'), split: u('uSplit'), bg: u('uBg'), stage: u('uStage'),
+    card: u('uCard'), uv: u('uUV'), atlasH: u('uAtlasH'), split: u('uSplit'), bg: u('uBg'), stage: u('uStage'), loop: u('uLoop'),
   }
   const list = cards.slice(0, MAX_CARDS)
   const quad = createQuad(gl)
@@ -170,6 +172,7 @@ export function createRail(canvas: HTMLCanvasElement, cards: StripCard[], small:
       gl.uniform1f(U.split, f.split * dpr)
       gl.uniform3fv(U.bg, bg)
       gl.uniform3fv(U.stage, stage)
+      gl.uniform1f(U.loop, L.period)
       gl.bindVertexArray(quad.vao)
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
     },

@@ -11,7 +11,8 @@ import s from './latestFeed.module.scss'
 // fallback). Home: between the hero and the contact module. Work: after the
 // archive (Figma "dribble + instagram ?" 7146:22505, before CloseArchivo).
 // Gallery 2 (feed-rail/FeedRail, `{ More from the feed ↘`) follows right
-// under it with the same items, driven by the page scroll.
+// under it with the same items; both move in hits and by drag, never by
+// the page scroll.
 export default async function LatestFeed({ locale }: { locale: Locale }) {
   const { LANDING } = getSite(locale)
   const items = await getLatestFeed()
