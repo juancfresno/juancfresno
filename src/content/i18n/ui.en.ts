@@ -195,6 +195,7 @@ export const UI_EN = {
     buttons: ['Magnetic', 'Columns', 'Roller', 'Scramble'],
     galleries: ['Arc', 'Canvas', 'Plates', 'Strip', 'Deck', 'Zoom grid', 'Bars', 'Runway'],
     pixels: ['Columns', 'Bitmap', 'Depixelate', '1-bit', 'Cursor', 'CRT'],
+    cursors: ['Ring', 'Pixel', 'Crosshair', 'Negative', 'Velocity', 'Label'],
   },
   journal: { h1: 'Journal' },
   shortcuts: {
