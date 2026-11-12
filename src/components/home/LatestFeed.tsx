@@ -15,11 +15,12 @@ import s from './latestFeed.module.scss'
 // under it with the same items; both move in hits and by drag, never by
 // the page scroll. Gallery 3 (feed-block/FeedBlock, `{ More from the feed ↘
 // · 03`, effect on the whole block) follows on the Home only (`block`),
-// while Juan compares the three.
-export default async function LatestFeed({ locale, block = false }: { locale: Locale; block?: boolean }) {
+// while Juan compares the three. `beforeBlock` is a slot right above gallery 3
+// (the Home puts the Lab floppy module there).
+export default async function LatestFeed({ locale, block = false, beforeBlock = null }: { locale: Locale; block?: boolean; beforeBlock?: React.ReactNode }) {
   const { LANDING } = getSite(locale)
   const items = await getLatestFeed()
-  if (!items.length) return null
+  if (!items.length) return beforeBlock
   return (
     <>
       <section className={s.band} aria-labelledby="latest-feed-label">
@@ -30,6 +31,7 @@ export default async function LatestFeed({ locale, block = false }: { locale: Lo
         <LatestStrip items={items} ariaLabel={LANDING.feedAria} />
       </section>
       <FeedRail items={items} ariaLabel={LANDING.feedMoreAria} label={LANDING.feedMoreLabel} />
+      {beforeBlock}
       {block && <FeedBlock items={items} ariaLabel={LANDING.feedBlockAria} label={LANDING.feedBlockLabel} />}
     </>
   )

@@ -58,8 +58,7 @@ export default async function HomePage({ params }: Props) {
           </p>
         </header>
       </section>
-      <LatestFeed locale={l} block />
-      <FloppyBand locale={l} />
+      <LatestFeed locale={l} block beforeBlock={<FloppyBand locale={l} />} />
       <HomeContact locale={l} />
     </>
   )
