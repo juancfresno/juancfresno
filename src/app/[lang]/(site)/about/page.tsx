@@ -1,15 +1,8 @@
 import type { Metadata } from 'next'
 import { pageMeta } from '@/lib/seo'
-import Image from 'next/image'
-import Link from 'next/link'
 import { getSite, getUi } from '@/content/site'
-import { localePath } from '@/i18n/config'
 import { localeOf, type LangParams } from '@/i18n/server'
-import V0Section from '@/components/blocks/V0Section'
-import ContactBlock from '@/components/blocks/ContactBlock'
-import Pending from '@/components/blocks/Pending'
-import AboutViews from '@/components/about/AboutViews'
-import v from '@/components/blocks/v0.module.scss'
+import ElasticLine from '@/components/ui/ElasticLine/ElasticLine'
 import a from '@/components/about/about.module.scss'
 
 type Props = { params: Promise<LangParams> }
@@ -20,114 +13,48 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return pageMeta({ locale: l, path: '/about', title: META.about.title, description: META.about.description })
 }
 
-const pad = (n: number) => String(n).padStart(2, '0')
-
-function ExpRows({ rows, numbered = true }: { rows: { name: string; role: string; how: string; years: string }[]; numbered?: boolean }) {
-  return (
-    <ol className={a.exp}>
-      {rows.map((x, i) => (
-        <li key={`${x.name}-${x.years}`} className={a.tr}>
-          <span className={a.n}>{numbered ? pad(i + 1) : ''}</span>
-          <span className={a.company}>{x.name}</span>
-          <span className={a.cell}>{x.role}</span>
-          <span className={a.cell}>{x.how}</span>
-          <span className={`${a.cell} ${a.right}`}>{x.years}</span>
-        </li>
-      ))}
-    </ol>
-  )
-}
-
-// About v1.0 — Figma "About · v1.0 · 1680" (6888:1117): "About" + View
-// selector, professional | personal side by side, services as rows with tag
-// chips, studios & brands, experience with figures, in-house years, dossier.
+// About — Figma "about" (AXxkCCuckrXGKDUCk8lNyQ · 6964:14926): hero row with
+// the ficha marker left and "/ About" right (Work / Contact pattern), the bio
+// in three tints, a brand-blue band reserved for the photo / 3D piece (empty
+// frame with crop marks) and the "collaborate" close (04 · Archivo).
 export default async function AboutPage({ params }: Props) {
   const l = await localeOf(params)
-  const { ABOUT } = getSite(l)
+  const { ABOUT, PERSON } = getSite(l)
   const ui = getUi(l)
-  const [setup, poster] = ABOUT.photos
-  const P = ABOUT.personal
-  const Pro = ABOUT.professional
+  const P = ABOUT.page
 
   return (
-    <div className={v.page}>
-      <section className={a.hero}>
-        <AboutViews
-          title={<h1 className={a.name}>{ui.about.h1}</h1>}
-          professional={
-            <>
-              <p className={a.paneLabel}><span>{Pro.label}</span><span>{Pro.caption}</span></p>
-              <div className={a.photo}><Image src={setup.src} width={setup.w} height={setup.h} alt={setup.alt} sizes="(max-width: 768px) 100vw, 25vw" unoptimized priority /></div>
-              <p className={a.bioLead}>{Pro.paragraphs[0]}</p>
-              <p className={a.bioRest}>{Pro.paragraphs[1]}</p>
-            </>
-          }
-          personal={
-            <>
-              <p className={a.paneLabel}><span>{P.label}</span><span>{P.caption}</span></p>
-              <div className={a.photo}><Image src={poster.src} width={poster.w} height={poster.h} alt={poster.alt} sizes="(max-width: 768px) 100vw, 25vw" unoptimized /></div>
-              <p className={a.bioLead}>{P.paragraph}</p>
-              <div className={a.hobbies}>
-                <p className={a.bioRest}>{P.offScreen.text}</p>
-                {P.offScreen.pending && <Pending>{ui.pending.hobbies}</Pending>}
-              </div>
-              <p className={a.footnote}>
-                ¹ {P.footnote.before}
-                <a href={P.footnote.href} target="_blank" rel="noopener noreferrer">{P.footnote.link}</a>
-                {P.footnote.after}
-              </p>
-            </>
-          }
-        />
+    <div className={a.page}>
+      <header className={a.hero} data-wf="hero">
+        <p className={a.marker} aria-hidden="true">{P.marker}</p>
+        <h1 className={a.name}>/ {ui.about.h1}</h1>
+      </header>
+
+      <section className={a.bio} data-wf="bio">
+        <div className={a.bioLead}>
+          {P.bio.slice(0, 2).map((p, i) => (
+            <p key={i}>
+              {'hi' in p && p.hi ? <span className={a.hi}>{p.hi}</span> : null}
+              {'mid' in p && p.mid ? <span className={a.mid}>{p.mid}</span> : null}
+              <span className={a.dim}>{p.dim}</span>
+            </p>
+          ))}
+        </div>
+        <p className={a.dim}>{P.bio[2].dim}</p>
       </section>
 
-      <V0Section label={ABOUT.servicesLabel} className={a.alt}>
-        <ol className={a.services}>
-          {ABOUT.services.map((x, i) => (
-            <li key={x.name}>
-              <span className={a.n}>{pad(i + 1)}</span>
-              <h2 className={a.serviceName}>{x.name}</h2>
-              <p className={a.serviceText}>{x.text}</p>
-              <ul className={a.tags}>{x.tags.split(' · ').map((t) => <li key={t}>{t}</li>)}</ul>
-            </li>
-          ))}
-        </ol>
-        <Link href={localePath(l, '/contact')} className={`${v.label} ${a.after}`}>{ABOUT.servicesLink}</Link>
-      </V0Section>
-
-      <V0Section label={ui.about.studiosBrands}>
-        <p className={a.sentence}>{ABOUT.studiosSentence}</p>
-        <div className={a.lists}>
-          <div>
-            <p className={v.label}>{ABOUT.studiosLabel}</p>
-            <p className={a.names}>{ABOUT.studios.join('\u00a0· ')}</p>
-          </div>
-          <div>
-            <p className={v.label}>{ABOUT.brandsLabel}</p>
-            <p className={a.names}>{ABOUT.brands.join('\u00a0· ')} <span className={a.namesTail}>{ABOUT.brandsTail}</span></p>
-          </div>
+      <section className={a.stage} data-wf="media" aria-label={P.frame}>
+        <div className={a.frame} aria-hidden="true">
+          <span /><span /><span /><span />
         </div>
-      </V0Section>
+      </section>
 
-      <V0Section label={ABOUT.experienceLabel} id="experience" className={a.alt}>
-        <ul className={a.figures}>
-          {ABOUT.figures.map((x) => (
-            <li key={x.value}>
-              <span className={a.figLabel}>{x.label}</span>
-              <span className={a.figValue}>{x.value}</span>
-            </li>
-          ))}
-        </ul>
-        <div className={`${a.tr} ${a.th}`} aria-hidden="true">
-          <span>{ui.about.th.n}</span><span>{ui.about.th.company}</span><span>{ui.about.th.role}</span><span>{ui.about.th.how}</span><span className={a.right}>{ui.about.th.years}</span>
-        </div>
-        <ExpRows rows={ABOUT.experience} />
-        <p className={a.before}><span /><span>{ABOUT.beforeLine}</span></p>
-        <ExpRows rows={ABOUT.before} numbered={false} />
-        <a href={ABOUT.dossier.href} className={`${v.label} ${a.after}`} data-no-transition>{ABOUT.dossier.text}</a>
-      </V0Section>
-
-      <ContactBlock locale={l} />
+      <section className={a.close} data-wf="close" aria-labelledby="about-close">
+        <ElasticLine className={a.rule} />
+        <p id="about-close" className={a.closeLabel}>{P.close.label}</p>
+        <p className={a.closeLine}>{P.close.line}</p>
+        <a className={a.closeMail} href={`mailto:${PERSON.email}`} data-no-transition>{PERSON.email}</a>
+      </section>
     </div>
   )
 }

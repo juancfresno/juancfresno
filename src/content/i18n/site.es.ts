@@ -236,6 +236,17 @@ export const SITE_ES: SiteDict = {
 
   // ─── Sobre mí ──────────────────────────────────────────────────────────────
   ABOUT: {
+    // About v2: Figma "about" (6964:14926). The ES copy is the Figma text, verbatim (typos included: "esta", "lineas").
+    page: {
+      marker: 'A',
+      bio: [
+        { hi: 'Desde 2012 trabajo de forma independiente en productos digitales, identidades y experiencias interactivas, colaborando con marcas, estudios, agencias y equipos en proyectos de distinta escala.', mid: ' Mi foco esta en definir lineas visuales claras, sistemas, cuidar la interacción y construir productos digitales/experiencias que no solo se vean bien, ', dim: 'sino que funcionen con sentido y coherencia.' },
+        { dim: 'La curiosidad es una parte importante de mi forma de trabajar. Me gusta explorar nuevas herramientas, interacciones y maneras de hacer las cosas, aprender durante el proceso y llevar ese conocimiento a lo que venga después.' },
+        { dim: 'Me interesan especialmente los proyectos donde el pensamiento de producto y una dirección visual sólida se encuentran — suficientemente claros para funcionar y suficientemente distintivos para ser recordados. Trabajo desde Valencia, España, en remoto, para el mundo, adaptándome a diferentes contextos, ritmos y formas de trabajo, tanto con clientes pequeños como con grandes organizaciones.' },
+      ],
+      close: { label: 'Colaboremos↘', line: 'Para consultas, colaboraciones o proyectos nuevos' },
+      frame: 'Espacio reservado para la foto / pieza 3D',
+    },
     role: 'Director de arte y diseñador interactivo independiente',
     professional: {
       label: '{ Profesional ↘',
