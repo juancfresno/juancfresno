@@ -37,6 +37,16 @@
   @include respond-to(md) { padding-right: 24px; }
 }
 
+// ─── FRESNO© wordmark, full content width (40 margins, 1600 at 1680). Figma: 256
+// between the logo and the bio = 144 here + the bio's own 112 top padding. ────
+.logo {
+  @include container;
+  padding-bottom: clamp(2rem, 8.571vw, 144px);
+  color: var(--c-text);
+
+  svg { display: block; width: 100%; height: auto; }
+}
+
 // ─── Bio: 28/34, scroll-lit word by word (BioReveal), 48 between lead and last ──
 .bio {
   @include container;
@@ -56,6 +66,21 @@
 .w {
   --k: 0;
   color: color-mix(in srgb, var(--c-text) calc(var(--k) * 100%), var(--c-reveal-off));
+}
+
+// "Based in Madrid Valencia": Madrid struck through; the two hover targets show
+// the shared preview (SocialPreview) and underline on hover / keyboard focus.
+.strike { text-decoration: line-through; text-decoration-skip-ink: none; }
+
+.tip {
+  text-decoration: underline transparent;
+  text-underline-offset: 0.18em;
+  text-decoration-thickness: 1px;
+  transition: text-decoration-color 0.15s;
+  cursor: default;
+
+  &:hover, &:focus-visible { text-decoration-color: currentColor; }
+  &:focus-visible { outline: 1px solid var(--c-text); outline-offset: 3px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

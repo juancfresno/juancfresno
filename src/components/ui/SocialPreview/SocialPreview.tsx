@@ -22,7 +22,7 @@ import s from './SocialPreview.module.scss'
 // - Label: a mono chip riding under the clip, "BEHANCE ↗ @juancfresno · 03/05",
 //   scrambles on every change.
 // - Size: each entry may bring its own display size (the footer location is a
-//   vertical 224 × 400 clip; the socials are 256 × 160). Moving between sizes
+//   vertical 224 × 400 clip, the About photo a still 320 × 180; the socials are 256 × 160). Moving between sizes
 //   the frame resizes smoothly while the clip dissolves.
 // Rules kept: hover-capable fine pointers only (touch gets nothing); no bytes
 // until the first hover (each network's video + poster load on its first
@@ -32,7 +32,7 @@ import s from './SocialPreview.module.scss'
 
 const W = 256 // default frame (css px)
 const H = 160
-const MAXW = 256 // canvas backing store: the largest frame any entry uses
+const MAXW = 320 // canvas backing store: the largest frame any entry uses
 const MAXH = 400
 const COLS = 12
 const LABEL = 24 // label band under the clip (chip 18 + 6 gap)

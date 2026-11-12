@@ -264,7 +264,15 @@ export const SITE_ES: SiteDict = {
       bio: [
         { hi: 'Desde 2012 trabajo de forma independiente en productos digitales, identidades y experiencias interactivas, colaborando con marcas, estudios, agencias y equipos en proyectos de distinta escala.', mid: ' Mi foco está en definir líneas visuales claras, sistemas, cuidar la interacción y construir productos digitales/experiencias que no solo se vean bien, ', dim: 'sino que funcionen con sentido y coherencia.' },
         { dim: 'La curiosidad es una parte importante de mi forma de trabajar. Me gusta explorar nuevas herramientas, interacciones y maneras de hacer las cosas, aprender durante el proceso y llevar ese conocimiento a lo que venga después.' },
-        { dim: 'Me interesan especialmente los proyectos donde el pensamiento de producto y una dirección visual sólida se encuentran — suficientemente claros para funcionar y suficientemente distintivos para ser recordados. Trabajo desde Valencia, España, en remoto, para el mundo, adaptándome a diferentes contextos, ritmos y formas de trabajo, tanto con clientes pequeños como con grandes organizaciones.' },
+      ],
+      based: [
+        { t: 'Con base en ' },
+        { t: 'Madrid', strike: true },
+        { t: ' ' },
+        { t: 'Valencia', tip: 'valencia', aria: 'Valencia, España. Vista previa de la ciudad' },
+        { t: ', España — ' },
+        { t: 'trabajando de forma independiente', tip: 'juan', aria: 'Juan C. Fresno, foto en su escritorio' },
+        { t: ' para todo el mundo.' },
       ],
       close: { label: 'Colaboremos↘', line: 'Para consultas, colaboraciones o proyectos nuevos' },
       frame: 'Espacio reservado para la foto / pieza 3D',

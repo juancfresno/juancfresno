@@ -274,8 +274,18 @@ export const SITE_EN = {
       bio: [
         { hi: 'Since 2012 I’ve worked independently on digital products, identities and interactive experiences, collaborating with brands, studios, agencies and teams on projects of every scale.', mid: ' My focus is defining clear visual lines and systems, caring for the interaction and building digital products and experiences that don’t just look good, ', dim: 'but work with sense and coherence.' },
         { dim: 'Curiosity is an important part of how I work. I like exploring new tools, interactions and ways of doing things, learning along the way and carrying that knowledge into whatever comes next.' },
-        { dim: 'I’m especially interested in projects where product thinking and strong visual direction meet — clear enough to work and distinctive enough to be remembered. I work from Valencia, Spain, remotely, for the world, adapting to different contexts, paces and ways of working, with small clients and large organizations alike.' },
       ],
+      // Last line of the hero (Figma "Based in Madrid Valencia"): `strike` = struck-through
+      // word; `tip` = hover preview id (components/ui/SocialPreview), keyboard focusable.
+      based: [
+        { t: 'Based in ' },
+        { t: 'Madrid', strike: true },
+        { t: ' ' },
+        { t: 'Valencia', tip: 'valencia', aria: 'Valencia, Spain. Preview of the city' },
+        { t: ', Spain — ' },
+        { t: 'working independently', tip: 'juan', aria: 'Juan C. Fresno, photo at his desk' },
+        { t: ' worldwide.' },
+      ] as { t: string; strike?: boolean; tip?: string; aria?: string }[],
       close: { label: 'Let’s collaborate↘', line: 'For enquiries, collaborations or new projects' },
       frame: 'Space reserved for the photo / 3D piece',
     },

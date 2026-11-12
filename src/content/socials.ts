@@ -11,8 +11,8 @@ export const SOCIALS = [
 export type SocialId = (typeof SOCIALS)[number]['id']
 
 // Anything with `data-social="<id>"` can show a preview: the social links plus
-// the footer location ("valencia", no link).
-export type PreviewId = SocialId | 'valencia'
+// the footer location ("valencia", no link) and the About photo ("juan").
+export type PreviewId = SocialId | 'valencia' | 'juan'
 
 export type PreviewMeta = {
   webm?: string
@@ -37,4 +37,6 @@ export const SOCIAL_PREVIEWS: Partial<Record<PreviewId, PreviewMeta>> = {
   x:         { webm: '/social/x.webm',         mp4: '/social/x.mp4',         poster: '/social/x.jpg' },
   // Footer location: vertical 9:16 clip (448 × 800 files, shown at 224 × 400).
   valencia:  { webm: '/social/valencia.webm',  mp4: '/social/valencia.mp4',  poster: '/social/valencia.jpg', w: 224, h: 400, label: 'VALENCIA · 39.6649° N, 0.2126° W' },
+  // About, "working independently": a still photo (poster only, 16:9, 640 × 360 file shown at 320 × 180).
+  juan:      { poster: '/social/juan.webp', w: 320, h: 180, label: 'JUAN C. FRESNO · VALENCIA' },
 }
