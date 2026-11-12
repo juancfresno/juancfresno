@@ -7,6 +7,7 @@ import { headlineCycle } from '@/content/headline'
 import HeadlineCycle from '@/components/home/HeadlineCycle'
 import LatestFeed from '@/components/home/LatestFeed'
 import HomeContact from '@/components/home/HomeContact'
+import FloppyBand from '@/components/floppy/FloppyBand'
 import Backdrop from '@/components/wip/Backdrop'
 import Grain from '@/components/wip/Grain'
 import Intro from '@/components/wip/Intro'
@@ -58,6 +59,7 @@ export default async function HomePage({ params }: Props) {
         </header>
       </section>
       <LatestFeed locale={l} block />
+      <FloppyBand locale={l} />
       <HomeContact locale={l} />
     </>
   )

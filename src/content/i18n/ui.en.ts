@@ -179,6 +179,7 @@ export const UI_EN = {
   },
   lab: {
     h1: 'Lab',
+    floppy: { region: 'Lab experiments', prev: 'Previous experiment', next: 'Next experiment' },
     onPage: 'On this page',
     products: 'Own products',
     resources: 'Resources',

@@ -178,6 +178,7 @@ export const UI_ES: UiDict = {
   },
   lab: {
     h1: 'Lab',
+    floppy: { region: 'Experimentos del Lab', prev: 'Experimento anterior', next: 'Experimento siguiente' },
     onPage: 'En esta página',
     products: 'Productos propios',
     resources: 'Recursos',

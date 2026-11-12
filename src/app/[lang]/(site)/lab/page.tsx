@@ -5,6 +5,7 @@ import { getSite, getUi } from '@/content/site'
 import { localePath } from '@/i18n/config'
 import { localeOf, type LangParams } from '@/i18n/server'
 import PageHero from '@/components/blocks/PageHero'
+import FloppyBand from '@/components/floppy/FloppyBand'
 import CloseArchivo from '@/components/blocks/CloseArchivo'
 import hs from '@/components/blocks/pageHero.module.scss'
 import Pending from '@/components/blocks/Pending'
@@ -48,6 +49,7 @@ export default async function LabPage({ params }: Props) {
   return (
     <div className={hs.shell}>
       <PageHero letter={HEROES.lab.letter} name={ui.lab.h1} intro={HEROES.lab.intro} note={HEROES.lab.note} />
+      <FloppyBand locale={loc} />
       <div className={`${l.mod} ${l.header}`}>
         <div className={l.headRow}>
           <ul className={l.index} aria-label={ui.lab.onPage}>
