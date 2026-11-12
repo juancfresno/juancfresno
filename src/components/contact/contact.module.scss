@@ -75,13 +75,14 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  font-family: $font-mono;
+  font-family: $font-mono; font-weight: $fw-mono;
   font-size: 0.6875rem;
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
 .doorN {
+  font-weight: $fw-regular;
   font-size: clamp(2.5rem, 3.8vw, 4rem);
   line-height: 1;
   letter-spacing: -0.04em;

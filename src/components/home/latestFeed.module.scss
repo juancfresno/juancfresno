@@ -26,7 +26,7 @@
 .label {
   margin: 0;
   padding-top: 16px;
-  font-family: $font-mono;
+  font-family: $font-mono; font-weight: $fw-mono;
   font-size: 11px;
   line-height: normal;
   text-transform: uppercase;
@@ -103,7 +103,7 @@
   align-items: center;
   gap: 6px;
   white-space: nowrap;
-  font-family: $font-mono;
+  font-family: $font-mono; font-weight: $fw-mono;
   font-size: 10px;
   line-height: 1;
   text-transform: uppercase;

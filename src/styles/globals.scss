@@ -179,7 +179,7 @@ main {
   border-radius: 2px;
   background: $color-text;
   color: $color-bg;
-  font-family: $font-mono;
+  font-family: $font-mono; font-weight: $fw-mono;
   font-size: 0.75rem;
   text-decoration: none;
   transform: translateY(-200%);

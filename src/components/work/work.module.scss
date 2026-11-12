@@ -39,7 +39,7 @@
   min-height: 0;
   padding-block: 0 $space-4;
   border-top: 0;
-  font-family: $font-mono;
+  font-family: $font-mono; font-weight: $fw-mono;
   font-size: 0.625rem;
   text-transform: uppercase;
   letter-spacing: 0.03em;
@@ -59,7 +59,7 @@
 .row:focus-visible { outline: 1px solid $color-text; outline-offset: 2px; }
 
 .n {
-  font-family: $font-mono;
+  font-family: $font-mono; font-weight: $fw-mono;
   font-size: 0.75rem;
   color: $color-text-mid;
 }
@@ -87,7 +87,7 @@
 }
 
 .cell {
-  font-family: $font-mono;
+  font-family: $font-mono; font-weight: $fw-mono;
   font-size: 0.625rem;
   letter-spacing: 0.03em;
   text-transform: uppercase;
@@ -113,7 +113,7 @@
   padding: 0.3rem 0.65rem;
   border: 1px solid $color-line;
   border-radius: 999px;
-  font-family: $font-mono;
+  font-family: $font-mono; font-weight: $fw-mono;
   font-size: 0.6875rem;
   line-height: 1.2;
   color: $color-text;
@@ -179,7 +179,7 @@
   border-radius: 2px;
   background: $color-overlay;
   color: $color-text;
-  font-family: $font-mono;
+  font-family: $font-mono; font-weight: $fw-mono;
   font-size: 0.6875rem;
   white-space: nowrap;
 }
@@ -337,7 +337,7 @@
   padding-top: 0;
   font-family: $font-mono;
   font-size: 0.5625rem;
-  font-weight: $fw-regular;
+  font-weight: $fw-mono;
   letter-spacing: 0.03em;
   text-transform: uppercase;
   color: $color-text-mid;
@@ -353,7 +353,7 @@
 }
 
 .tCell {
-  font-family: $font-mono;
+  font-family: $font-mono; font-weight: $fw-mono;
   font-size: 0.5625rem;
   line-height: 1.5;
   letter-spacing: 0.03em;
@@ -367,7 +367,7 @@
   width: 8.3%;
   padding-right: 0 !important;
   text-align: right !important;
-  font-family: $font-mono;
+  font-family: $font-mono; font-weight: $fw-mono;
   font-size: 0.5625rem;
   letter-spacing: 0.03em;
   color: $color-text;
@@ -380,7 +380,7 @@
   padding: 0.1rem 0.4rem;
   border: 1px solid $color-line;
   border-radius: 999px;
-  font-family: $font-mono;
+  font-family: $font-mono; font-weight: $fw-mono;
   font-size: 0.5625rem;
   color: $color-text-mid;
   vertical-align: 0.15em;
@@ -420,7 +420,7 @@
 
 .more {
   @include touch-target(15px, 8px);
-  font-family: $font-mono;
+  font-family: $font-mono; font-weight: $fw-mono;
   font-size: 0.625rem;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -432,7 +432,7 @@
 }
 
 .count {
-  font-family: $font-mono;
+  font-family: $font-mono; font-weight: $fw-mono;
   font-size: 0.5625rem;
   letter-spacing: 0.03em;
   text-transform: uppercase;

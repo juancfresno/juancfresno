@@ -10,7 +10,7 @@
   --fp-line: rgba(252, 252, 247, 0.12);
   --fp-frame: #3c3c3a;      /* 1 px line around the clip (as on the site) */
   --fp-accent: #003dff;     /* the site's G blue */
-  --fp-mono: var(--font-fragment-mono, 'Fragment Mono'), ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  --fp-mono: var(--font-mono, 'Sometype Mono'), ui-monospace, 'SFMono-Regular', Menlo, monospace;
   --fp-gutter: 16px;
   --fp-frame-h: 160px;
   width: 100%;

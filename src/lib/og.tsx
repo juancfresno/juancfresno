@@ -5,7 +5,7 @@ import type { Locale } from '@/i18n/config'
 import { getSite, getUi } from '@/content/site'
 
 // Open Graph cards (1200 × 630), rendered at build time with next/og.
-// Fresno style: ink background, pearl text, Fragment Mono only (no bold),
+// Fresno style: ink background, pearl text, Sometype Mono only (Medium 500),
 // thin rules, G blue as the single accent. Used by (site)/opengraph-image
 // (default card) and work/[slug]/opengraph-image (case cover card).
 
@@ -20,8 +20,8 @@ const LINE = '#3c3c3a'
 const G = '#003dff'
 
 async function mono() {
-  // Fragment Mono (OFL), latin subset in WOFF: satori can't read woff2.
-  return fs.readFile(path.join(process.cwd(), 'src/fonts/fragment-mono/fragment-mono-latin-400-normal.woff'))
+  // Sometype Mono Medium (OFL), latin subset in WOFF: satori can't read woff2.
+  return fs.readFile(path.join(process.cwd(), 'src/fonts/sometype-mono/sometype-mono-latin-500-normal.woff'))
 }
 
 // Case covers are WebP, which satori can't decode: convert to PNG with sharp.
@@ -34,7 +34,7 @@ async function coverPng(src: string, w: number, h: number) {
 
 function Frame({ top, children, foot }: { top: [string, string]; children: React.ReactNode; foot: [string, string] }) {
   return (
-    <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', background: INK, color: PEARL, fontFamily: 'Fragment Mono', padding: '48px 56px' }}>
+    <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', background: INK, color: PEARL, fontFamily: 'Sometype Mono', padding: '48px 56px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 18, letterSpacing: 2, textTransform: 'uppercase', color: MID }}>
         <span>{top[0]}</span>
         <span style={{ display: 'flex', alignItems: 'center' }}>
@@ -66,7 +66,7 @@ export async function defaultOg(l: Locale = 'en') {
         </div>
       </Frame>
     ),
-    { ...OG_SIZE, fonts: [{ name: 'Fragment Mono', data: await mono(), weight: 400, style: 'normal' }] }
+    { ...OG_SIZE, fonts: [{ name: 'Sometype Mono', data: await mono(), weight: 500, style: 'normal' }] }
   )
 }
 
@@ -96,6 +96,6 @@ export async function caseOg({ locale: l = 'en', n, total, title, chips, year, c
         </div>
       </Frame>
     ),
-    { ...OG_SIZE, fonts: [{ name: 'Fragment Mono', data: await mono(), weight: 400, style: 'normal' }] }
+    { ...OG_SIZE, fonts: [{ name: 'Sometype Mono', data: await mono(), weight: 500, style: 'normal' }] }
   )
 }

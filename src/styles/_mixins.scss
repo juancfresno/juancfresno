@@ -65,7 +65,7 @@
 }
 
 @mixin text-mono {
-  font-family: $font-mono;
+  font-family: $font-mono; font-weight: $fw-mono;
   font-size: $fs-xs;
   letter-spacing: $ls-wide;
   text-transform: uppercase;

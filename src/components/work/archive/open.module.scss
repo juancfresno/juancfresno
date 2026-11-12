@@ -18,7 +18,7 @@ $hdr: 72px;
   border-radius: 3px;
   background: none;
   color: $color-text;
-  font-family: $font-mono;
+  font-family: $font-mono; font-weight: $fw-mono;
   font-size: 10px;
   line-height: 12px;
   letter-spacing: 0.02em;
@@ -36,7 +36,7 @@ $hdr: 72px;
   margin: 0;
   div { min-width: 0; }
   dt {
-    font-family: $font-mono;
+    font-family: $font-mono; font-weight: $fw-mono;
     font-size: 10px;
     line-height: 12px;
     letter-spacing: 0.02em;
@@ -58,7 +58,7 @@ $hdr: 72px;
     padding: 3px 6px;
     border: 1px solid $color-line;
     border-radius: 3px;
-    font-family: $font-mono;
+    font-family: $font-mono; font-weight: $fw-mono;
     font-size: 10px;
     line-height: 12px;
     letter-spacing: 0.02em;
@@ -69,7 +69,7 @@ $hdr: 72px;
 
 .dKind {
   margin: 0;
-  font-family: $font-mono;
+  font-family: $font-mono; font-weight: $fw-mono;
   font-size: 10px;
   line-height: 12px;
   letter-spacing: 0.03em;
@@ -142,7 +142,7 @@ $hdr: 72px;
 }
 
 .dCount {
-  font-family: $font-mono;
+  font-family: $font-mono; font-weight: $fw-mono;
   font-size: 10px;
   letter-spacing: 0.02em;
   color: $color-text-mid;
@@ -153,7 +153,7 @@ $hdr: 72px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  font-family: $font-mono;
+  font-family: $font-mono; font-weight: $fw-mono;
   font-size: 10px;
   letter-spacing: 0.02em;
   text-transform: uppercase;
@@ -245,7 +245,7 @@ $hdr: 72px;
   &:focus-visible { outline: 1px solid var(--c-g); outline-offset: -4px; }
 }
 .dNextLabel {
-  font-family: $font-mono;
+  font-family: $font-mono; font-weight: $fw-mono;
   font-size: 10px;
   letter-spacing: 0.02em;
   text-transform: uppercase;
@@ -327,7 +327,7 @@ $hdr: 72px;
   align-items: center;
   gap: 16px;
   padding-top: 16px;
-  font-family: $font-mono;
+  font-family: $font-mono; font-weight: $fw-mono;
   font-size: 10px;
   letter-spacing: 0.02em;
   text-transform: uppercase;
@@ -439,7 +439,7 @@ $hdr: 72px;
 }
 .stMono {
   margin: 0;
-  font-family: $font-mono;
+  font-family: $font-mono; font-weight: $fw-mono;
   font-size: 10px;
   line-height: 12px;
   letter-spacing: 0.03em;
@@ -466,7 +466,7 @@ $hdr: 72px;
 }
 .stFicha {
   grid-template-columns: 1fr 1fr;
-  dd { font-family: $font-mono; font-size: 11px; text-transform: uppercase; letter-spacing: 0.02em; }
+  dd { font-family: $font-mono; font-weight: $fw-mono; font-size: 11px; text-transform: uppercase; letter-spacing: 0.02em; }
   @include respond-to(md) { display: none; }
 }
 .stInfo > .chips { @include respond-to(md) { display: none; } }
@@ -525,7 +525,7 @@ $hdr: 72px;
   position: absolute;
   left: 0;
   top: -18px;
-  font-family: $font-mono;
+  font-family: $font-mono; font-weight: $fw-mono;
   font-size: 9px;
   line-height: 11px;
   letter-spacing: 0.04em;

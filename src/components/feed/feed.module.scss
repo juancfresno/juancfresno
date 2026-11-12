@@ -18,7 +18,7 @@
   gap: $space-4;
   padding-bottom: $space-3;
   border-bottom: 1px solid $color-line;
-  font-family: $font-mono;
+  font-family: $font-mono; font-weight: $fw-mono;
   font-size: 0.75rem;
 }
 
@@ -106,7 +106,7 @@
   border-radius: 2px;
   background: $color-overlay;
   color: $color-text;
-  font-family: $font-mono;
+  font-family: $font-mono; font-weight: $fw-mono;
   font-size: 0.625rem;
   line-height: 1.2;
   white-space: nowrap;

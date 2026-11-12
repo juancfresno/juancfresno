@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { Fragment_Mono } from 'next/font/google'
+import { Sometype_Mono } from 'next/font/google'
 import localFont from 'next/font/local'
 import { Analytics } from '@vercel/analytics/next'
 import '@/styles/globals.scss'
@@ -19,10 +19,10 @@ import { LANG_SWITCH_SCRIPT } from '@/providers/langSwitch'
 import { PAGE_THEME_SCRIPT } from '@/lib/pageTheme'
 import { WIP_INTRO_SCRIPT } from '@/components/wip/introScript'
 
-// UI mono: Fragment Mono (one weight, 400 + italic). Body: Switzer.
-const fragmentMono = Fragment_Mono({
-  variable: '--font-fragment-mono',
-  weight: '400',
+// UI mono: Sometype Mono (400 + 500, 500 = default via $fw-mono; italic 400 kept). Body: Switzer.
+const sometypeMono = Sometype_Mono({
+  variable: '--font-mono',
+  weight: ['400', '500'],
   style: ['normal', 'italic'],
   subsets: ['latin', 'latin-ext'],
   display: 'swap',
@@ -80,7 +80,7 @@ export default async function RootLayout({ children, params }: Props) {
   const l = pick((await params).lang)
   const ui = getUi(l)
   return (
-    <html lang={HTML_LANG[l]} suppressHydrationWarning className={`${fragmentMono.variable} ${switzer.variable}`}>
+    <html lang={HTML_LANG[l]} suppressHydrationWarning className={`${sometypeMono.variable} ${switzer.variable}`}>
       <head>
         {/* Theme before paint: saved choice, else dark (brand default). */}
         <script

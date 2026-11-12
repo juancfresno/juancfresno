@@ -95,7 +95,7 @@
   border: 1px solid currentColor;
   border-radius: 999px;
   background: none;
-  font-family: $font-mono;
+  font-family: $font-mono; font-weight: $fw-mono;
   font-size: $fs-xs;
   letter-spacing: $ls-wide;
   text-transform: uppercase;
@@ -116,7 +116,7 @@
   overflow-x: auto;
   background: $color-bg-2;
   border: 1px solid $color-border;
-  font-family: $font-mono;
+  font-family: $font-mono; font-weight: $fw-mono;
   font-size: $fs-xs;
   line-height: 1.7;
   color: $color-text-mid;
@@ -139,7 +139,7 @@
   aspect-ratio: 16 / 9;
   background: $color-bg-2;
   border: 1px solid $color-border;
-  font-family: $font-mono;
+  font-family: $font-mono; font-weight: $fw-mono;
   font-size: $fs-xs;
   letter-spacing: $ls-wide;
   text-transform: uppercase;
@@ -147,7 +147,7 @@
 }
 
 .pieceMeta {
-  font-family: $font-mono;
+  font-family: $font-mono; font-weight: $fw-mono;
   font-size: $fs-xs;
   letter-spacing: $ls-wide;
   text-transform: uppercase;
@@ -251,7 +251,7 @@
   @include respond-to(md) { grid-column: 1 / -1; }
 }
 
-.featuredMeta { font-family: $font-mono; font-size: 0.6875rem; text-transform: uppercase; color: $color-text-mid; }
+.featuredMeta { font-family: $font-mono; font-weight: $fw-mono; font-size: 0.6875rem; text-transform: uppercase; color: $color-text-mid; }
 
 .featuredTitle {
   font-family: $font-body;
@@ -316,7 +316,7 @@
     position: absolute;
     left: 6px;
     top: 4px;
-    font-family: $font-mono;
+    font-family: $font-mono; font-weight: $fw-mono;
     font-size: 0.5625rem;
     font-style: normal;
     color: $color-text;
@@ -350,7 +350,7 @@
 }
 
 .n {
-  font-family: $font-mono;
+  font-family: $font-mono; font-weight: $fw-mono;
   font-size: 0.75rem;
   color: $color-text-mid;
 }
@@ -361,7 +361,7 @@
 }
 
 .spec {
-  font-family: $font-mono;
+  font-family: $font-mono; font-weight: $fw-mono;
   font-size: 0.625rem;
   letter-spacing: 0.03em;
   text-transform: uppercase;

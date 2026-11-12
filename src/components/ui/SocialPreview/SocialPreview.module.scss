@@ -48,7 +48,7 @@
   min-height: 18px;
   background: var(--c-text);
   color: var(--c-bg);
-  font-family: $font-mono;
+  font-family: $font-mono; font-weight: $fw-mono;
   font-size: 10px;
   line-height: 12px;
   letter-spacing: 0.04em;

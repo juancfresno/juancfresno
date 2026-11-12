@@ -21,7 +21,7 @@
   font-family: $font-mono;
   font-size: 0.5625rem;
   font-style: normal;
-  font-weight: 400;
+  font-weight: $fw-mono;
   line-height: 1.2;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -45,7 +45,7 @@
 }
 
 .label {
-  font-family: $font-mono;
+  font-family: $font-mono; font-weight: $fw-mono;
   font-size: $fs-xs;
   letter-spacing: $ls-wide;
   text-transform: uppercase;
@@ -68,7 +68,7 @@
 }
 
 .heroMeta {
-  font-family: $font-mono;
+  font-family: $font-mono; font-weight: $fw-mono;
   font-size: $fs-xs;
   letter-spacing: $ls-wide;
   text-transform: uppercase;
@@ -89,7 +89,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: $space-2 $space-4;
-  font-family: $font-mono;
+  font-family: $font-mono; font-weight: $fw-mono;
   font-size: $fs-sm;
   color: $color-text-mid;
 }
@@ -151,7 +151,7 @@
 }
 
 .caseTag {
-  font-family: $font-mono;
+  font-family: $font-mono; font-weight: $fw-mono;
   font-size: $fs-xs;
   letter-spacing: $ls-wide;
   text-transform: uppercase;
@@ -180,7 +180,7 @@
 
 .indexYear,
 .indexTag {
-  font-family: $font-mono;
+  font-family: $font-mono; font-weight: $fw-mono;
   font-size: $fs-xs;
   letter-spacing: $ls-wide;
   text-transform: uppercase;
@@ -262,7 +262,7 @@
 
 .rowTags {
   margin-top: $space-2;
-  font-family: $font-mono;
+  font-family: $font-mono; font-weight: $fw-mono;
   font-size: $fs-xs;
   color: $color-text-muted;
 }
@@ -280,7 +280,7 @@
   @include flex-center;
   aspect-ratio: 16 / 9;
   background: $color-surface;
-  font-family: $font-mono;
+  font-family: $font-mono; font-weight: $fw-mono;
   font-size: $fs-xs;
   letter-spacing: $ls-wide;
   text-transform: uppercase;
@@ -349,7 +349,7 @@
 }
 
 .availability {
-  font-family: $font-mono;
+  font-family: $font-mono; font-weight: $fw-mono;
   font-size: $fs-xs;
   letter-spacing: $ls-wide;
   text-transform: uppercase;
@@ -363,7 +363,7 @@
   list-style: none;
 
   a {
-    font-family: $font-mono;
+    font-family: $font-mono; font-weight: $fw-mono;
     font-size: $fs-sm;
     color: $color-text-mid;
     text-decoration: none;

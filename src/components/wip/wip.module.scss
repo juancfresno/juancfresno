@@ -66,10 +66,10 @@ $in-ease: cubic-bezier(0.22, 1, 0.36, 1); // one family for everything that ente
   > [data-in] { display: block; }
 }
 
-// Geist Mono 12 uppercase → Fragment Mono.
+// Geist Mono 12 uppercase → Sometype Mono.
 .disciplines {
   margin: 0;
-  font-family: $font-mono;
+  font-family: $font-mono; font-weight: $fw-mono;
   font-size: 12px;
   line-height: normal;
   text-transform: uppercase;
@@ -116,7 +116,7 @@ $in-ease: cubic-bezier(0.22, 1, 0.36, 1); // one family for everything that ente
   border-radius: 3px;
   background: $raw-chip;
   color: $raw-ink;
-  font-family: $font-mono;
+  font-family: $font-mono; font-weight: $fw-mono;
   font-size: 11px;
   line-height: 1.5;
   text-transform: uppercase;

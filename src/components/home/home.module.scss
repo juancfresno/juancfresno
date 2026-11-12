@@ -82,7 +82,7 @@ $sys: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans', sans-s
 
 .disciplines {
   margin-top: 44px;
-  font-family: $font-mono;
+  font-family: $font-mono; font-weight: $fw-mono;
   font-size: 0.6875rem;
   line-height: 1.6;
   letter-spacing: 0.03em;
@@ -106,7 +106,7 @@ $sys: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans', sans-s
   display: flex;
   flex-direction: column;
   gap: 8px;
-  font-family: $font-mono;
+  font-family: $font-mono; font-weight: $fw-mono;
   font-size: 0.625rem;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -168,7 +168,7 @@ $sys: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans', sans-s
 }
 
 .stripCap {
-  font-family: $font-mono;
+  font-family: $font-mono; font-weight: $fw-mono;
   font-size: 0.5625rem;
   letter-spacing: 0.02em;
   text-transform: uppercase;
@@ -201,7 +201,7 @@ $sys: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans', sans-s
 }
 
 .labTop { display: flex; justify-content: space-between; align-items: flex-start; gap: $space-4; }
-.labN { font-family: $font-mono; font-size: clamp(2.5rem, 3.3vw, 3.5rem); line-height: 1; letter-spacing: -0.02em; }
-.labMeta { font-family: $font-mono; font-size: 0.5625rem; letter-spacing: 0.03em; text-transform: uppercase; color: $color-text-mid; text-align: right; }
+.labN { font-family: $font-mono; font-weight: $fw-regular; font-size: clamp(2.5rem, 3.3vw, 3.5rem); line-height: 1; letter-spacing: -0.02em; }
+.labMeta { font-family: $font-mono; font-weight: $fw-mono; font-size: 0.5625rem; letter-spacing: 0.03em; text-transform: uppercase; color: $color-text-mid; text-align: right; }
 .labName { margin-top: 28px; font-family: $font-body; font-size: 1.75rem; letter-spacing: -0.015em; }
 .labWhat { margin-top: 10px; font-family: $font-body; font-size: 1rem; line-height: 1.45; letter-spacing: -0.01em; color: $color-text-mid; max-width: 24rem; }

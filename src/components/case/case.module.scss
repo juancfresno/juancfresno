@@ -52,7 +52,7 @@
   }
 
   dt {
-    font-family: $font-mono;
+    font-family: $font-mono; font-weight: $fw-mono;
     font-size: 0.625rem;
     letter-spacing: 0.04em;
     text-transform: uppercase;
@@ -70,7 +70,7 @@
 
 .live {
   margin-top: 20px;
-  font-family: $font-mono;
+  font-family: $font-mono; font-weight: $fw-mono;
   font-size: 0.625rem;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -95,7 +95,7 @@
 }
 
 .crumb {
-  font-family: $font-mono;
+  font-family: $font-mono; font-weight: $fw-mono;
   font-size: 0.6875rem;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -126,7 +126,7 @@
     padding: 5px 10px;
     border: 1px solid $color-text-mid;
     border-radius: 999px;
-    font-family: $font-mono;
+    font-family: $font-mono; font-weight: $fw-mono;
     font-size: 0.625rem;
     line-height: 1.2;
     letter-spacing: 0.03em;
@@ -206,7 +206,7 @@
 }
 
 .rowN {
-  font-family: $font-mono;
+  font-family: $font-mono; font-weight: $fw-mono;
   font-size: 0.625rem;
   letter-spacing: 0.02em;
   color: var(--c-faint);
@@ -257,7 +257,7 @@
   }
 }
 
-.decN { font-family: $font-mono; font-size: 0.625rem; letter-spacing: 0.02em; color: $color-text-mid; padding-top: 6px; }
+.decN { font-family: $font-mono; font-weight: $fw-mono; font-size: 0.625rem; letter-spacing: 0.02em; color: $color-text-mid; padding-top: 6px; }
 .decTitle { display: block; font-family: $font-body; font-size: 1.375rem; letter-spacing: -0.01em; color: $color-text; }
 .decText { display: block; margin-top: 6px; font-family: $font-body; font-size: 1rem; line-height: 1.5; color: $color-text-mid; }
 
@@ -284,7 +284,7 @@
 .headRow {
   display: flex;
   justify-content: space-between;
-  font-family: $font-mono;
+  font-family: $font-mono; font-weight: $fw-mono;
   font-size: 0.6875rem;
   letter-spacing: 0.03em;
   text-transform: uppercase;
@@ -305,7 +305,7 @@
 }
 
 .nextText { grid-column: 1 / span 8; display: flex; flex-direction: column; gap: 16px; min-width: 0; @include respond-to(md) { grid-column: 1; grid-row: 2; } }
-.nextLabel { font-family: $font-mono; font-size: 0.6875rem; letter-spacing: 0.04em; text-transform: uppercase; color: $color-text-mid; }
+.nextLabel { font-family: $font-mono; font-weight: $fw-mono; font-size: 0.6875rem; letter-spacing: 0.04em; text-transform: uppercase; color: $color-text-mid; }
 
 .nextTitle {
   font-family: $font-body;
@@ -417,7 +417,7 @@
   border-radius: 4px;
   background: $raw-chip;
   color: $raw-ink;
-  font-family: $font-mono;
+  font-family: $font-mono; font-weight: $fw-mono;
   font-size: 0.75rem;
   line-height: 1.35;
   pointer-events: auto;

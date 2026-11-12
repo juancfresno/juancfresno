@@ -19,7 +19,7 @@
   border-radius: 4px;
   background: $color-bg;
   color: $color-text;
-  font-family: $font-mono;
+  font-family: $font-mono; font-weight: $fw-mono;
   font-size: 0.75rem;
   outline: none;
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
@@ -98,7 +98,7 @@
   border-radius: 3px;
   background: $raw-chip;
   color: $raw-ink;
-  font-family: $font-mono;
+  font-family: $font-mono; font-weight: $fw-mono;
   font-size: 0.6875rem;
   text-transform: uppercase;
   opacity: 0;

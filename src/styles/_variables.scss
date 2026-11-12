@@ -28,7 +28,7 @@ $color-accent-2:    #ff3d00;
 // ─── Typography ───────────────────────────────────────────────────────────────
 $font-sans:         'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 $font-display:      'ClashDisplay', $font-sans;
-$font-mono:         var(--font-fragment-mono), ui-monospace, 'SFMono-Regular', Menlo, monospace;
+$font-mono:         var(--font-mono), ui-monospace, 'SFMono-Regular', Menlo, monospace;
 $font-body:         var(--font-switzer), $font-sans;
 
 $fs-xs:    clamp(0.625rem,  0.5vw + 0.5rem, 0.75rem);
@@ -46,6 +46,7 @@ $fw-regular:  400;
 $fw-medium:   500;
 $fw-semibold: 600;
 $fw-bold:     700;
+$fw-mono:     500;   // Sometype Mono Medium: default UI mono (labels, nav, chips)
 
 $lh-tight:    1.1;
 $lh-snug:     1.3;

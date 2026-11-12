@@ -17,11 +17,11 @@
 
 .rule { display: block; width: 100%; color: $color-line; }
 
-// Geist Mono 11 uppercase → Fragment Mono.
+// Geist Mono 11 uppercase → Sometype Mono.
 .label {
   margin: 0;
   padding-top: 16px;
-  font-family: $font-mono;
+  font-family: $font-mono; font-weight: $fw-mono;
   font-size: 11px;
   line-height: normal;
   text-transform: uppercase;

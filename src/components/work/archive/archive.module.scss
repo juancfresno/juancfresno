@@ -3,7 +3,7 @@
 
 // ─── /work list (Figma v1/archive-row 6878:98) ───────────────────────────────
 // 12-col grid, 4 · 3 · 2 · 2 · 1, rows 44 px with a 1 px rule. Project in
-// Switzer 15, the rest Fragment Mono 10 uppercase. Hover voice = the nav chip.
+// Switzer 15, the rest Sometype Mono 10 uppercase. Hover voice = the nav chip.
 
 .wrap {
   grid-column: 1 / -1;
@@ -24,7 +24,7 @@
   @include cols;
   padding-bottom: 12px;
   border-bottom: 1px solid $color-line;
-  font-family: $font-mono;
+  font-family: $font-mono; font-weight: $fw-mono;
   font-size: 10px;
   line-height: 12px;
   letter-spacing: 0.03em;
@@ -106,7 +106,7 @@
 .nameText { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 .via, .cat, .role, .year {
-  font-family: $font-mono;
+  font-family: $font-mono; font-weight: $fw-mono;
   font-size: 10px;
   line-height: 12px;
   letter-spacing: 0.02em;
@@ -259,7 +259,7 @@
   border-radius: 3px;
   background: $raw-chip;
   color: $raw-ink;
-  font-family: $font-mono;
+  font-family: $font-mono; font-weight: $fw-mono;
   font-size: 10px;
   line-height: 12px;
   letter-spacing: 0.02em;

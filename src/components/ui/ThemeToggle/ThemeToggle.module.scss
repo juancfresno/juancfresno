@@ -6,7 +6,7 @@
 .toggle {
   display: inline-flex;
   align-items: center;
-  font-family: $font-mono;
+  font-family: $font-mono; font-weight: $fw-mono;
   font-size: 11px;
   line-height: 13px;
   text-transform: uppercase;

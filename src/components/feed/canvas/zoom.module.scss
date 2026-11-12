@@ -11,7 +11,7 @@
   inset: 0;
   z-index: $z-modal;
   color: $color-text;
-  font-family: $font-mono;
+  font-family: $font-mono; font-weight: $fw-mono;
   overflow: hidden;
 }
 
