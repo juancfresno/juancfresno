@@ -1,0 +1,153 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+// Gallery 2 · "More from the feed" (FeedRail). Card height: 420 at 1680,
+// 200 minimum. The stage leaves room above/below the cards for the barrel
+// and the captions. Square corners everywhere.
+.band {
+  --rail-card: clamp(200px, 25vw, 420px);
+  position: relative;
+  background: $color-bg;
+  color: $color-text;
+  padding-bottom: 64px;
+}
+
+// Pinned (GL, > 768): the panel sticks under the 72 px header while the
+// section's extra height (set inline by FeedRail) scrolls by.
+.band[data-pin] {
+  padding-bottom: 0;
+  .pin {
+    position: sticky;
+    top: 72px;
+    height: calc(100vh - 72px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+}
+
+.head {
+  @include container;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.rule { display: block; width: 100%; color: $color-line; }
+
+.label {
+  margin: 0;
+  padding-top: 16px;
+  font-family: $font-mono; font-weight: $fw-mono;
+  font-size: 11px;
+  line-height: normal;
+  text-transform: uppercase;
+  color: $color-text-hi;
+}
+
+.stage {
+  position: relative;
+  width: 100%;
+  overflow: clip;  // focus can't scroll it sideways: FeedRail scrolls the page instead
+}
+
+.gl {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.row {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item { flex: none; }
+
+.card {
+  position: relative;
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+  &:focus-visible { outline: 1px solid $color-text-hi; outline-offset: 3px; }
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    user-select: none;
+  }
+}
+
+// Caption under the card: mono 10, `IG · MM/YYYY`, G dot.
+.cap {
+  position: absolute;
+  left: 0;
+  top: calc(100% + 10px);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  font-family: $font-mono; font-weight: $fw-mono;
+  font-size: 10px;
+  line-height: 1;
+  text-transform: uppercase;
+  color: $color-text-hi;
+  pointer-events: none;
+}
+
+.dot {
+  width: 5px;
+  height: 5px;
+  background: var(--c-g);
+  transform: scale(0.6);
+  transition: transform 0.2s ease;
+}
+
+.card:hover .dot, .card:focus-visible .dot { transform: scale(1); }
+
+// ── GL: the canvas draws the cards; links sit on top at the rest rect ──
+.probe { position: absolute; width: 0; height: var(--rail-card); visibility: hidden; pointer-events: none; }
+
+.band[data-mode='gl'] {
+  // Room around the cards for the barrel's swell and the captions.
+  .stage { height: calc(var(--rail-card) * 1.5 + 32px); }
+  .row { position: absolute; inset: 0; }
+  .card {
+    position: absolute;
+    left: 0;
+    top: 0;
+    will-change: transform;
+  }
+  .cap { opacity: var(--rail-cap, 1); }
+}
+
+// ── Row (reduced motion / no WebGL2 / before JS): native horizontal scroll ──
+.band[data-mode='row'] {
+  .row {
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    &::-webkit-scrollbar { display: none; }
+    @include container;
+    padding-bottom: 28px; // captions
+  }
+  .card {
+    height: var(--rail-card);
+    aspect-ratio: var(--r);
+    background: var(--c-stage, #{$color-line});
+  }
+}
+
+@include respond-to(md) {
+  .band { padding-bottom: 48px; }
+  .band[data-mode='gl'] .stage { height: calc(var(--rail-card) * 1.3 + 40px); }
+}

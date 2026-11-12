@@ -4,17 +4,21 @@
 // One WebGL2 canvas (feed-strip/strip.ts): the latest posts on a convex drum,
 // centre card largest, sides bending away (ref. mathiasadolfsson.dev), with
 // the home lens's RGB split while it moves. Used on Home and Work.
-//   · drag (mouse / pen / horizontal touch swipe) with inertia; horizontal
-//     wheel / trackpad moves it, vertical wheel keeps scrolling the page
+//   · moves in HITS, one card at a time: every HIT_EVERY ms the next card
+//     comes to the centre with a punchy ease (expo-out, ≈ 2.6 % overshoot,
+//     HIT_MS); the RGB split flashes with the hit's speed and settles clean;
+//   · drag (mouse / pen / horizontal touch swipe); the release SNAPS to the
+//     card nearest to where the throw would land; horizontal wheel / trackpad
+//     = one card per gesture, vertical wheel keeps scrolling the page
 //     (touch-action: pan-y, wheel only cancelled when |dx| > |dy|);
+//   · hover / drag / focus pause the hits; they resume RESUME_MS after;
 //   · click without drag opens the post (new tab); hover = mono caption
-//     `IG · MM/YYYY` under the card, the others dim;
-//   · drifts slowly when idle; any interaction stops it, it resumes 3 s after;
-//   · progress arc under the strip (track --c-text, position --c-g);
+//     `IG · MM/YYYY` under the card; every card keeps its brightness;
 //   · keyboard: the real links live in a visually hidden list; focusing one
 //     centres its card and draws a ring around it;
-//   · paused off-screen / hidden tab; dpr ≤ 2; reduced motion = no drift,
-//     inertia or split (still draggable); no WebGL2 = the CSS marquee.
+//   · paused off-screen / hidden tab; dpr ≤ 2; the loop sleeps between hits;
+//     reduced motion = no auto-advance, instant snaps, no split;
+//     no WebGL2 = the CSS marquee.
 import { useEffect, useRef, useState } from 'react'
 import type { LatestItem } from '@/content/latest-feed'
 import LatestMarquee from '@/components/home/LatestMarquee'
@@ -27,10 +31,14 @@ const mmyyyy = (d: string) => `${d.slice(5, 7)}/${d.slice(0, 4)}`
 const thumb = (src: string) => (src.startsWith('/feed/') ? src.replace('/feed/', '/feed/t/') : src)
 const tag = (it: LatestItem) => (it.source === 'instagram' ? 'IG' : 'DRB')
 
-const DRIFT = 0.42      // px per 60 Hz frame (≈ 25 px/s)
-const RESUME_MS = 3000  // drift comes back this long after the last interaction
+const HIT_EVERY = 2400 // auto-advance period, ms (start to start)
+const HIT_MS = 700      // one hit
+const RESUME_MS = 3000  // hits come back this long after the last interaction
 const MAXV = 1.8        // px/ms release cap (the feed's)
-const ARC_SEG = 18      // progress segment, % of the arc
+const THROW_MS = 260    // a release lands where its speed would carry it in this long
+// Punchy hit: expo-out (fast start, soft settle) with a tiny overshoot
+// (max ≈ 2.6 % of the step at t ≈ 0.4); exact 1 at t = 1.
+const hitEase = (t: number) => (t >= 1 ? 1 : 1 - Math.pow(2, -10 * t) * Math.cos(5 * t))
 
 export default function LatestStrip({ items, ariaLabel }: { items: LatestItem[]; ariaLabel: string }) {
   const [fallback, setFallback] = useState(false)
@@ -38,13 +46,12 @@ export default function LatestStrip({ items, ariaLabel }: { items: LatestItem[];
   const cvRef = useRef<HTMLCanvasElement>(null)
   const capRef = useRef<HTMLSpanElement>(null)
   const ringRef = useRef<HTMLSpanElement>(null)
-  const arcRef = useRef<SVGPathElement>(null)
   const api = useRef<{ focus: (i: number) => void; blur: () => void } | null>(null)
   const list = items.slice(0, MAX_CARDS)
 
   useEffect(() => {
     if (fallback || !list.length) return
-    const stage = stageRef.current!, cv = cvRef.current!, cap = capRef.current!, ring = ringRef.current!, arc = arcRef.current!
+    const stage = stageRef.current!, cv = cvRef.current!, cap = capRef.current!, ring = ringRef.current!
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const cards = list.map((it) => ({ src: thumb(it.src), ratio: ratio(it.w, it.h) }))
     let strip: Strip | null = null
@@ -66,12 +73,13 @@ export default function LatestStrip({ items, ariaLabel }: { items: LatestItem[];
     }
     readColors()
 
-    let cam = 0, pcam = 0, vel = 0
-    let target: number | null = null
+    let cam = 0, pcam = 0
+    // The one tween (hit, snap, focus): cam goes from → to over dur ms.
+    let tw: { from: number; to: number; t0: number; dur: number } | null = null
     let dragging = false, inside = false, focusIdx = -1, hover = -1
     let px = -1, py = -1
     let lastTouch = -Infinity // last interaction (ms)
-    let driftK = reduce ? 0 : 1
+    let nextHit = performance.now() + HIT_EVERY
     let sv = 0 // smoothed screen velocity, px/frame
     let last = performance.now()
     let onScreen = true
@@ -88,6 +96,7 @@ export default function LatestStrip({ items, ariaLabel }: { items: LatestItem[];
       g = { W, H, cy: H / 2, hc, gap: Math.round(Math.max(12, hc * 0.1)), R, Z0: R * 1.3, lens: phone ? 0.03 : 0.05 }
       L = layoutStrip(cards, hc, g.gap)
       cam = pcam = frac * L.len
+      if (tw) { cam = pcam = tw.to; tw = null }
       cv.style.width = `${W}px`; cv.style.height = `${H}px`
       st.resize(W, H, Math.min(2, window.devicePixelRatio || 1))
       frame(performance.now(), true)
@@ -108,27 +117,42 @@ export default function LatestStrip({ items, ariaLabel }: { items: LatestItem[];
       return { l: a.x, t: a.y, r: b.x, b: Math.max(b.y, c.y) }
     }
 
+    // Card centres (world u) around the loop: the one nearest x, or the first
+    // one strictly after / before x.
+    const centres = (x: number) => {
+      const base = x - (((x % L.len) + L.len) % L.len)
+      const out: number[] = []
+      for (let k = -1; k <= 1; k++) for (let i = 0; i < L.xs.length; i++) out.push(base + k * L.len + L.xs[i] + L.ws[i] / 2)
+      return out
+    }
+    const nearestCentre = (x: number) => centres(x).reduce((a, c) => (Math.abs(c - x) < Math.abs(a - x) ? c : a), Infinity)
+    const stepCentre = (x: number, dir: 1 | -1) => {
+      const ref = tw ? tw.to : nearestCentre(x)
+      const cs = centres(ref).filter((c) => (dir > 0 ? c > ref + 0.5 : c < ref - 0.5))
+      return dir > 0 ? Math.min(...cs) : Math.max(...cs)
+    }
+    const go = (to: number, dur = HIT_MS) => {
+      if (reduce || Math.abs(to - cam) < 0.5) { cam = to; tw = null; return }
+      tw = { from: cam, to, t0: performance.now(), dur }
+    }
+
     function frame(now: number, force = false) {
       const dt = Math.min(4, Math.max(0.25, (now - last) / 16.667))
       last = now
       const idle = !dragging && !inside && focusIdx < 0 && now - lastTouch > RESUME_MS
-      driftK = reduce ? 0 : idle ? Math.min(1, driftK + 0.02 * dt) : 0
-      let drift = 0
-      if (!dragging) {
-        if (target !== null) {
-          if (reduce) cam = target
-          else cam += (target - cam) * (1 - Math.pow(0.84, dt))
-          if (Math.abs(target - cam) < 0.3) { cam = target }
-        } else {
-          cam += vel * dt
-          vel *= Math.pow(0.94, dt)
-          if (Math.abs(vel) < 0.01) vel = 0
-        }
-        drift = DRIFT * driftK * dt
-        cam += drift
+      // Auto-advance: one hit every HIT_EVERY ms while idle (never with reduced motion).
+      if (!reduce && idle && !tw && now >= nextHit) {
+        go(stepCentre(cam, 1))
+        nextHit = now + HIT_EVERY
       }
-      // Screen speed without the drift → split (the feed curve).
-      const d = cam - pcam - drift
+      if (!idle) nextHit = Math.max(nextHit, lastTouch + RESUME_MS)
+      if (!dragging && tw) {
+        const t = Math.min(1, (now - tw.t0) / tw.dur)
+        cam = tw.from + (tw.to - tw.from) * hitEase(t)
+        if (t >= 1) { cam = tw.to; tw = null }
+      }
+      // Screen speed → split (the feed curve): it flashes during a hit.
+      const d = cam - pcam
       pcam = cam
       sv += (d / dt - sv) * (1 - Math.pow(0.65, dt))
       const mag = reduce ? 0 : splitMag(Math.abs(sv))
@@ -138,7 +162,7 @@ export default function LatestStrip({ items, ariaLabel }: { items: LatestItem[];
         const h = hitTest(g, L, cam, px, py)
         if (h) { hover = h.i; box = cardBox(h.u0, h.i) }
       }
-      st.draw(g, L, { cam, split: mag * Math.sign(sv), hover, focus: focusIdx, bg: colors.bg, stage: colors.stage })
+      st.draw(g, L, { cam, split: mag * Math.sign(sv), bg: colors.bg, stage: colors.stage })
 
       // Caption (hover) / focus ring (keyboard), both under the card.
       let capIdx = hover
@@ -159,11 +183,9 @@ export default function LatestStrip({ items, ariaLabel }: { items: LatestItem[];
       } else delete cap.dataset.on
       stage.style.cursor = dragging ? 'grabbing' : hover >= 0 ? 'pointer' : 'grab'
 
-      const prog = (((cam % L.len) + L.len) % L.len) / L.len
-      arc.style.strokeDashoffset = `${-prog * (100 - ARC_SEG)}`
-      ;(window as unknown as { __strip?: object }).__strip = { cam, vel, speed: Math.abs(sv), split: mag, hover, drift: driftK } // QA probe
+      ;(window as unknown as { __strip?: object }).__strip = { cam, speed: Math.abs(sv), split: mag, hover, hit: !!tw, nextHit } // QA probe
       if (force) return false
-      return dragging || target !== null || vel !== 0 || driftK > 0 || mag > 0 || Math.abs(sv) > 0.05 || st.pending()
+      return dragging || tw !== null || mag > 0 || Math.abs(sv) > 0.05 || st.pending()
     }
     // World u of card i's left edge, the repeat nearest the centre.
     const nearest = (i: number, x0: number) => {
@@ -177,10 +199,10 @@ export default function LatestStrip({ items, ariaLabel }: { items: LatestItem[];
       raf = 0
       if (document.hidden || !onScreen) return
       if (frame(now)) { raf = requestAnimationFrame(tick); return }
-      // Asleep: wake when the drift is due back.
+      // Asleep between hits: wake when the next one is due.
       if (!reduce) {
         clearTimeout(resumeT)
-        const wait = lastTouch + RESUME_MS - performance.now()
+        const wait = Math.max(nextHit, lastTouch + RESUME_MS) - performance.now()
         if (!inside && focusIdx < 0) resumeT = window.setTimeout(wake, Math.max(16, wait + 16))
       }
     }
@@ -194,7 +216,7 @@ export default function LatestStrip({ items, ariaLabel }: { items: LatestItem[];
       if (e.button > 0 || pid !== null) return
       pid = e.pointerId; x0 = lx = e.clientX; y0 = e.clientY; moved = false; suppress = false
       hist = [{ x: lx, t: e.timeStamp }]
-      vel = 0; target = null; touch(); wake()
+      touch(); wake()
     })
     on(window, 'pointermove', (e: PointerEvent) => {
       if (e.pointerId !== pid) return
@@ -203,7 +225,7 @@ export default function LatestStrip({ items, ariaLabel }: { items: LatestItem[];
       if (!moved) {
         const ax = Math.abs(lx - x0), ay = Math.abs(e.clientY - y0)
         if (ax > 6 && ax > ay) {
-          moved = true; dragging = true; suppress = true; dx = lx - x0
+          moved = true; dragging = true; suppress = true; dx = lx - x0; tw = null
           try { stage.setPointerCapture(e.pointerId) } catch {}
           document.documentElement.classList.add(s.dragging)
           window.getSelection()?.removeAllRanges()
@@ -220,8 +242,10 @@ export default function LatestStrip({ items, ariaLabel }: { items: LatestItem[];
       document.documentElement.classList.remove(s.dragging)
       if (!moved) return
       dragging = false
+      // Snap: to the card nearest to where the throw would land.
       const h0 = hist[0], h1 = hist[hist.length - 1], dt = Math.max(16, h1.t - h0.t)
-      if (!reduce && e.timeStamp - h1.t <= 120) vel = -Math.max(-MAXV, Math.min(MAXV, (h1.x - h0.x) / dt)) * 16.667
+      const v = e.timeStamp - h1.t <= 120 ? -Math.max(-MAXV, Math.min(MAXV, (h1.x - h0.x) / dt)) : 0
+      go(nearestCentre(cam + (reduce ? 0 : v * THROW_MS)))
       touch(); wake()
     }
     on(window, 'pointerup', up)
@@ -243,19 +267,29 @@ export default function LatestStrip({ items, ariaLabel }: { items: LatestItem[];
       px = e.clientX - r.left; py = e.clientY - r.top; inside = true
       wake()
     })
-    // Horizontal wheel / trackpad only; vertical stays the page's.
+    // Horizontal wheel / trackpad only (vertical stays the page's): one card
+    // per gesture. A gesture = wheel events with < 220 ms of silence between
+    // them (trackpad momentum included), so one flick never skips cards.
+    let wAcc = 0, wLocked = false, wT = 0
     on(stage, 'wheel', (e: WheelEvent) => {
       if (e.ctrlKey) return
       const f = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? g.W : 1
       if (Math.abs(e.deltaX) <= Math.abs(e.deltaY) || !e.deltaX) return
       e.preventDefault()
-      cam += Math.max(-160, Math.min(160, e.deltaX * f))
-      vel = 0; target = null; touch(); wake()
+      clearTimeout(wT)
+      wT = window.setTimeout(() => { wAcc = 0; wLocked = false }, 220)
+      touch()
+      if (wLocked) return
+      wAcc += e.deltaX * f
+      if (Math.abs(wAcc) < 24) return
+      wLocked = true
+      go(stepCentre(cam, wAcc > 0 ? 1 : -1))
+      wake()
     }, { passive: false })
 
     api.current = {
-      focus(i) { focusIdx = i; target = nearest(i, L.xs[i]) + L.ws[i] / 2; vel = 0; touch(); wake() },
-      blur() { focusIdx = -1; target = null; touch(); wake() },
+      focus(i) { focusIdx = i; go(nearest(i, L.xs[i]) + L.ws[i] / 2); touch(); wake() },
+      blur() { focusIdx = -1; touch(); wake() },
     }
 
     const mo = new MutationObserver(() => { readColors(); wake() })
@@ -267,11 +301,12 @@ export default function LatestStrip({ items, ariaLabel }: { items: LatestItem[];
     on(document, 'visibilitychange', () => { if (!document.hidden) wake() })
 
     resize()
-    // Start with the first card a little left of centre.
+    // Start with the first card centred; the first hit comes HIT_EVERY later.
     cam = pcam = L.ws[0] ? L.ws[0] / 2 : 0
+    nextHit = performance.now() + HIT_EVERY
     wake()
     return () => {
-      cancelAnimationFrame(raf); clearTimeout(resumeT)
+      cancelAnimationFrame(raf); clearTimeout(resumeT); clearTimeout(wT)
       offs.forEach((f) => f())
       mo.disconnect(); ro.disconnect(); io.disconnect()
       st.destroy()
@@ -293,10 +328,6 @@ export default function LatestStrip({ items, ariaLabel }: { items: LatestItem[];
           <span />
         </span>
       </div>
-      <svg className={s.arc} viewBox="0 0 120 16" aria-hidden="true">
-        <path className={s.track} d="M2 15 Q60 -7 118 15" pathLength={100} />
-        <path ref={arcRef} className={s.pos} d="M2 15 Q60 -7 118 15" pathLength={100} strokeDasharray={`${ARC_SEG} 200`} />
-      </svg>
       <ul className={s.links}>
         {list.map((it, i) => (
           <li key={it.id}>

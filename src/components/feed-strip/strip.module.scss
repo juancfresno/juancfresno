@@ -2,8 +2,7 @@
 @use '../../styles/mixins' as *;
 
 // Curved strip of the latest posts (LatestStrip). Full bleed; the canvas is
-// the card zone (centre card height = stage height − 24), the progress arc
-// sits under it. Card height: 380 at 1680, 200 minimum.
+// the card zone (centre card height = stage height − 24). Card height: 380 at 1680, 200 minimum.
 .wrap {
   position: relative;
   width: 100%;
@@ -67,18 +66,6 @@
   opacity: 0;
   &[data-on] { opacity: 1; }
 }
-
-// Progress arc (ref.): track in the text colour at low opacity, position in G blue.
-.arc {
-  display: block;
-  width: 120px;
-  height: 16px;
-  margin: 20px auto 0;
-  overflow: visible;
-  path { fill: none; stroke-width: 1; vector-effect: non-scaling-stroke; stroke-linecap: round; }
-}
-.track { stroke: $color-text; opacity: 0.22; }
-.pos { stroke: var(--c-g); stroke-width: 1.5; }
 
 // The real links, for keyboard and screen readers (focus centres the card).
 .links {

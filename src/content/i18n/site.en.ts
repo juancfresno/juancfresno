@@ -86,6 +86,8 @@ export const SITE_EN = {
     contactLine: 'For enquiries, collaborations or new projects',
     feedLabel: '{ Latest from Instagram & Dribbble ↘',
     feedAria: 'Latest posts',
+    feedMoreLabel: '{ More from the feed ↘',
+    feedMoreAria: 'More from the feed',
   },
 
   // ─── Page intros ──────────────────────────────────────────────────────────────

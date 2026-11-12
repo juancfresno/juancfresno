@@ -86,6 +86,8 @@ export const SITE_ES: SiteDict = {
     contactLine: 'Para consultas, colaboraciones o proyectos nuevos',
     feedLabel: '{ Lo último en Instagram y Dribbble ↘',
     feedAria: 'Últimas publicaciones',
+    feedMoreLabel: '{ Más del feed ↘',
+    feedMoreAria: 'Más del feed',
   },
 
   // Hero de página (Figma 6964:15100 feed, 6964:15013 lab). ES de Figma (Lab) o traducido (Feed, cierre): pendiente de revisar por Copywriter.
