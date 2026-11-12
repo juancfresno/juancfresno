@@ -70,7 +70,7 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
   const N = items.length, shared = {}, maxAnisotropy = renderer.capabilities.getMaxAnisotropy();
   const small = matchMedia('(max-width: 768px)');
   const disks = items.map((it, i) => {
-    const api = createFloppy({ n: it.n, title: it.title, en: it.en, kind: it.kind, year: it.year }, { shared, maxAnisotropy, labelScale: small.matches ? 0.5 : 0.75, shell: it.shell, accent: it.accent, label: { total: String(N).padStart(3, '0') } });
+    const api = createFloppy({ n: it.n, title: it.title, en: it.en, kind: it.kind, year: it.year }, { shared, maxAnisotropy, labelScale: small.matches ? 0.5 : 0.75, shell: it.shell, accent: it.accent, translucent: it.translucent, label: { total: String(N).padStart(3, '0') } });
     if (it.label) api.setLabelImage(it.label).catch(() => {});
     const roll = new THREE.Group(), tilt = new THREE.Group(), turn = new THREE.Group();
     scene.add(roll); roll.add(tilt); tilt.add(turn); turn.add(api.group);

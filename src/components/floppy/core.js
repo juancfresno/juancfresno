@@ -396,10 +396,13 @@ export function createFloppy(data, options = {}) {
     return mat;
   };
   const shellC = options.shell || INK, accentC = options.accent || BLUE, innerC = new THREE.Color(shellC).multiplyScalar(0.5);
+  // "90s translucent": tinted polycarbonate. The tint comes from attenuation through the wall,
+  // so the disk, the hub and the spring show through.
+  const glass = (roughness, extra = {}) => new THREE.MeshPhysicalMaterial({ color: '#ffffff', transmission: 0.94, thickness: 1.6, ior: 1.45, roughness, attenuationColor: new THREE.Color(shellC), attenuationDistance: 1.5, envMapIntensity: 1.15, ...extra });
   const M = {
-    absTex: fresnel(new THREE.MeshPhysicalMaterial({ color: shellC, roughness: 0.6, normalMap: grainN, normalScale: new THREE.Vector2(0.2, 0.2) }), 0.07),
-    absSmooth: fresnel(new THREE.MeshPhysicalMaterial({ color: shellC, roughness: 0.42 }), 0.07),
-    absInner: new THREE.MeshPhysicalMaterial({ color: innerC, roughness: 0.66, specularIntensity: 0.45, envMapIntensity: 0.3 }),
+    absTex: options.translucent ? glass(0.2, { normalMap: grainN, normalScale: new THREE.Vector2(0.08, 0.08) }) : fresnel(new THREE.MeshPhysicalMaterial({ color: shellC, roughness: 0.6, normalMap: grainN, normalScale: new THREE.Vector2(0.2, 0.2) }), 0.07),
+    absSmooth: options.translucent ? glass(0.1) : fresnel(new THREE.MeshPhysicalMaterial({ color: shellC, roughness: 0.42 }), 0.07),
+    absInner: options.translucent ? glass(0.16) : new THREE.MeshPhysicalMaterial({ color: innerC, roughness: 0.66, specularIntensity: 0.45, envMapIntensity: 0.3 }),
     metal: new THREE.MeshPhysicalMaterial({ color: '#dcdad3', metalness: 1, roughness: 0.36, roughnessMap: brushed, anisotropy: 0.6, anisotropyRotation: HALF }),
     steel: new THREE.MeshPhysicalMaterial({ color: '#c6c6c2', metalness: 1, roughness: 0.4, roughnessMap: ringsT }),
     mylar: new THREE.MeshPhysicalMaterial({ color: '#4a3526', map: mylarA, metalness: 0.7, roughness: 0.46, roughnessMap: mylarR, anisotropy: 0.85, anisotropyRotation: HALF, side: THREE.DoubleSide }),
@@ -510,6 +513,16 @@ export function createFloppy(data, options = {}) {
       mb.quad(0, V(SHUT.x0, a, len), V(SHUT.x1, a, len), V(SHUT.x1, b, len + l), V(SHUT.x0, b, len + l)); len += l;
     }
     add(shutter, mb.build(), [metalSide]);
+  }
+
+  // ── shutter spring: a small torsion spring in the corner, only seen through a translucent shell
+  if (options.translucent) {
+    class Coil extends THREE.Curve { getPoint(t, o = new THREE.Vector3()) { const a = t * TAU * 4.5; return o.set(Math.cos(a) * 1.5, Math.sin(a) * 1.5, (t - 0.5) * 1.5); } }
+    const sp = add(root, new THREE.TubeGeometry(new Coil(), 120, 0.13, 6, false), M.steel); sp.position.set(-38.2, 43.2, 0);
+    for (const [x1, y1, x2, y2] of [[-36.7, 43.2, -29, 45.6], [-38.2, 41.7, -38.6, 30]]) { // its two legs
+      const len = Math.hypot(x2 - x1, y2 - y1), leg = add(root, new THREE.CylinderGeometry(0.13, 0.13, len, 6), M.steel);
+      leg.position.set((x1 + x2) / 2, (y1 + y2) / 2, 0); leg.rotation.z = Math.atan2(y2 - y1, x2 - x1) - HALF;
+    }
   }
 
   // ── media: mylar disk + steel hub, spins around z

@@ -2,8 +2,12 @@ import { getSite, getUi } from '@/content/site'
 import { localePath, type Locale } from '@/i18n/config'
 import FloppyModule, { type FloppyItem } from './FloppyModule'
 
-// Shell colours per disk, in order, as in the Figma module (ink, light grey, blue).
-const SHELLS: { shell?: string; accent?: string }[] = [{}, { shell: '#8F8D87' }, { shell: '#003DFF', accent: '#FCFCF7' }]
+// Shell per disk, in order: ink, grey and blue (opaque, as in the Figma module), then two
+// "90s translucent" tints. translucent = tinted see-through polycarbonate.
+const SHELLS: { shell?: string; accent?: string; translucent?: boolean }[] = [
+  {}, { shell: '#8F8D87' }, { shell: '#003DFF', accent: '#FCFCF7' },
+  { shell: '#2F6BFF', translucent: true }, { shell: '#FF7A1A', translucent: true, accent: '#FCFCF7' },
+]
 
 // Label artwork per disk: PNG 2048 × 1700 exported from Figma (file AXxkCCuckrXGKDUCk8lNyQ,
 // page "↪ Floppy labels", frame "Floppy label / <n>") into public/lab/floppy/labels/<n>.png.

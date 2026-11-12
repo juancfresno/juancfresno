@@ -5,7 +5,7 @@ import Link from 'next/link'
 import ElasticLine from '@/components/ui/ElasticLine/ElasticLine'
 import s from './floppy.module.scss'
 
-export type FloppyItem = { n: string; name: string; kind: string; year: string; what: string; href: string; label?: string; shell?: string; accent?: string }
+export type FloppyItem = { n: string; name: string; kind: string; year: string; what: string; href: string; label?: string; shell?: string; accent?: string; translucent?: boolean }
 type Stage = { setActive(i: number): void; next(): void; prev(): void; dispose(): void }
 type Props = { items: FloppyItem[]; labName: string; labHref: string; strings: { region: string; prev: string; next: string } }
 
@@ -29,7 +29,7 @@ export default function FloppyModule({ items, labName, labHref, strings }: Props
       io.disconnect()
       import('./stage.js').then(({ createFloppyStage }) => {
         if (dead) return
-        const data = items.map((x) => ({ n: x.n, title: x.name, en: x.name, kind: x.kind, year: x.year, label: x.label, shell: x.shell, accent: x.accent }))
+        const data = items.map((x) => ({ n: x.n, title: x.name, en: x.name, kind: x.kind, year: x.year, label: x.label, shell: x.shell, accent: x.accent, translucent: x.translucent }))
         const run = () => {
           if (dead) return
           try {
