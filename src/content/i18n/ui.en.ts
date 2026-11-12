@@ -179,7 +179,7 @@ export const UI_EN = {
   },
   lab: {
     h1: 'Lab',
-    floppy: { region: 'Lab experiments', prev: 'Previous experiment', next: 'Next experiment' },
+    floppy: { region: 'Lab experiments', prev: 'Previous experiment', next: 'Next experiment', open: 'View experiment', close: 'Close', built: 'Built with', how: 'How it’s built', year: 'Year', viewField: 'Scattered view', viewRing: 'Wheel view' },
     onPage: 'On this page',
     products: 'Own products',
     resources: 'Resources',

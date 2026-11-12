@@ -25,7 +25,7 @@ export default function FloppyBand({ locale }: { locale: Locale }) {
   const { EXPERIMENTS } = getSite(locale)
   const ui = getUi(locale)
   const items: FloppyItem[] = EXPERIMENTS.map((e, i) => ({
-    n: e.n, name: e.name, kind: e.kind, year: e.year, what: e.card, href: localePath(locale, `/lab/${e.slug}`),
+    n: e.n, name: e.name, kind: e.kind, year: e.year, what: e.card, how: e.how, built: e.built, href: localePath(locale, `/lab/${e.slug}`),
     label: LABELS[e.n]?.src, ...SHELLS[i % SHELLS.length],
   }))
   return <FloppyModule items={items} labName={ui.lab.h1} labHref={localePath(locale, '/lab')} strings={ui.lab.floppy} />

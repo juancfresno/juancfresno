@@ -27,10 +27,27 @@ const SLOTS = {
     far: { x: 1.6, y: 0.6, s: 0.14, blur: 5, rx: 0.2, ry: 0.4, rz: 0.2 },
   },
 };
+// Second view: the disks on a tilted wheel, the active one at the front.
+function ring(mobile, n) {
+  const o = {};
+  for (const [key, r] of [['-1', -1], ['0', 0], ['1', 1], ['2', 2], ['far', 3]]) {
+    const a = (r * Math.PI * 2) / Math.max(5, n), c = Math.cos(a), sn = Math.sin(a), d = (c + 1) / 2;
+    o[key] = mobile
+      ? { x: 0.5 + 0.36 * sn, y: 0.36 + 0.07 * c, s: 0.2 + 0.32 * d, blur: (1 - c) * 2.6, rx: 0.08, ry: -a * 0.55, rz: sn * 0.12 }
+      : { x: 0.5 + 0.3 * sn, y: 0.43 + 0.08 * c, s: 0.1 + 0.14 * d, blur: (1 - c) * 3.2, rx: 0.08, ry: -a * 0.55, rz: sn * 0.12 };
+  }
+  o.exit = o.far;
+  return o;
+}
+// Ficha open: the active disk comes forward and rests over the card's left edge.
+const DETAIL = {
+  desktop: { x: 0.27, y: 0.5, s: 0.3, blur: 0, rx: 0.06, ry: -0.34, rz: -0.04 },
+  mobile: { x: 0.5, y: 0.2, s: 0.5, blur: 0, rx: 0.06, ry: -0.3, rz: -0.04 },
+};
 const KEYS = ['x', 'y', 's', 'blur', 'rx', 'ry', 'rz'];
 const FOV = 24, DIST = 600, TAN = Math.tan((FOV * Math.PI) / 360);
 
-export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, onEnter = () => {}, start = 0 }) {
+export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, onEnter = () => {}, onOpen = (_o) => {}, start = 0 }) {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
   renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -77,7 +94,18 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
     return { i, api, roll, tilt, turn, cur: {}, vel: {}, slot: 'far', exiting: 0, u: { yawT: 0, pitchT: 0, yaw: 0, pitch: 0, vy: 0, vp: 0, iy: 0, ip: 0 }, seed: i * 1.7 };
   });
   let active = ((start % N) + N) % N, lastInput = -1e9;
-  const slots = () => SLOTS[small.matches ? 'mobile' : 'desktop'];
+  const VIEWS = { field: SLOTS, ring: { desktop: ring(false, N), mobile: ring(true, N) } };
+  let view = 'field', open = false;
+  const slots = () => VIEWS[view][small.matches ? 'mobile' : 'desktop'];
+  const tmp = {};
+  const targetOf = (d) => { // where a disk wants to be right now
+    const base = slots()[d.slot];
+    if (!open) return base;
+    if (d.i === active && d.slot === '0') return DETAIL[small.matches ? 'mobile' : 'desktop'];
+    // the rest clear the card: those on its side leave the stage, the near one stays as a blurred foreground
+    const m = small.matches, out = m ? (base.x < 0.5 ? -0.7 : 0.7) : base.x > 0.3 ? 0.8 : -0.04;
+    return Object.assign(tmp, base, { x: base.x + out, blur: base.blur + 9, s: base.s * 0.84 });
+  };
   const rel = (i, a = active) => ((i - a + N + 1) % N) - 1; // −1 … N−2
   const slotKey = (r) => (r <= 2 ? String(r) : 'far');
   const snap = (d, key) => { d.slot = key; for (const k of KEYS) { d.cur[k] = slots()[key][k]; d.vel[k] = 0; } };
@@ -108,13 +136,15 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
     let delta = next - active; if (delta > N / 2) delta -= N; if (delta < -N / 2) delta += N;
     for (const d of disks) {
       const a = rel(d.i), b = rel(d.i, next);
-      if (delta > 0 && b > a) { d.slot = 'exit'; d.exiting = performance.now(); d.after = slotKey(b); } // leaves past the camera, comes back from afar
-      else if (delta < 0 && b < a) { snap(d, 'exit'); d.slot = slotKey(b); d.exiting = 0; }
+      if (view === 'field' && delta > 0 && b > a) { d.slot = 'exit'; d.exiting = performance.now(); d.after = slotKey(b); } // leaves past the camera, comes back from afar
+      else if (view === 'field' && delta < 0 && b < a) { snap(d, 'exit'); d.slot = slotKey(b); d.exiting = 0; }
       else { d.slot = slotKey(b); d.exiting = 0; }
       d.u.yawT = Math.round(d.u.yawT / (Math.PI * 2)) * Math.PI * 2; d.u.pitchT = 0; d.u.iy = d.u.ip = 0;
       d.api.setShutter(false);
     }
-    active = next; hover = null; manual = false;
+    if (!reduced.matches) disks[next].cur.ry += Math.PI * 2 * Math.sign(delta); // it turns once on its way to the front
+    active = next; hover = null; manual = open;
+    if (open) disks[next].api.setShutter(true);
     if (reduced.matches) for (const d of disks) { if (d.exiting) { d.exiting = 0; d.slot = d.after; } snap(d, d.slot); }
     if (!silent) onChange(active);
     wake();
@@ -122,8 +152,8 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
 
   // ── blur targets and the composite pass
   const half = renderer.capabilities.isWebGL2 && (renderer.extensions.has('EXT_color_buffer_float') || renderer.extensions.has('EXT_color_buffer_half_float'));
-  const mkRT = () => { const t = new THREE.WebGLRenderTarget(4, 4, { type: half ? THREE.HalfFloatType : THREE.UnsignedByteType, depthBuffer: true }); t.texture.generateMipmaps = false; return t; };
-  const rts = { 0.5: [mkRT(), mkRT()], 0.25: [mkRT(), mkRT()] };
+  const mkRT = (samples = 0) => { const t = new THREE.WebGLRenderTarget(4, 4, { type: half ? THREE.HalfFloatType : THREE.UnsignedByteType, depthBuffer: true, samples }); t.texture.generateMipmaps = false; return t; };
+  const rts = { 0.5: [mkRT(4), mkRT()], 0.25: [mkRT(), mkRT()] }; // light blurs keep clean edges (MSAA on the half-size target)
   const quadCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1), quadGeo = new THREE.PlaneGeometry(2, 2);
   const vs = 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4( position.xy, 0.0, 1.0 ); }';
   const blurMat = new THREE.ShaderMaterial({
@@ -164,8 +194,9 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
     // cursor: near disks slide more than far ones, and every disk leans towards the pointer
     const par = 0.02 * Math.pow(c.s / 0.235, 1.15) * f, px = c.x - mouse.x * par, py = c.y - mouse.y * par * (W / H);
     d.roll.position.set((px - 0.5) * 2 * hh * camera.aspect, (0.5 - py) * 2 * hh + Math.sin(t * 0.7 + d.seed) * 1.2 * f, z);
-    d.roll.rotation.z = c.rz + Math.sin(t * 0.31 + d.seed * 2) * 0.025 * f;
-    d.tilt.rotation.x = c.rx + u.pitch + Math.sin(t * 0.43 + d.seed) * 0.035 * f + mouse.y * 0.16 * f;
+    const lean = (v, k, m) => Math.max(-m, Math.min(m, v * k)) * f; // a moving disk banks into its path
+    d.roll.rotation.z = c.rz + Math.sin(t * 0.31 + d.seed * 2) * 0.025 * f - lean(d.vel.x, 0.55, 0.45);
+    d.tilt.rotation.x = c.rx + lean(d.vel.y, 0.6, 0.4) + u.pitch + Math.sin(t * 0.43 + d.seed) * 0.035 * f + mouse.y * 0.16 * f;
     d.turn.rotation.y = c.ry + u.yaw + Math.sin(t * 0.37 + d.seed * 3) * 0.06 * f + mouse.x * 0.24 * f;
   }
 
@@ -217,11 +248,28 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
     ptr.id = null; ptr.d = null; delete host.dataset.dragging;
     if (e.type === 'pointerup') {
       if (d !== focus()) { if (tap) setActive(d.i); }
-      else if (tap && e.pointerType !== 'mouse') { manual = !manual; d.api.setShutter(manual); }
+      else if (tap) setOpen(!open);
       else if (!tap && now - ptr.t < 90 && !reduced.matches) { d.u.iy = Math.max(-16, Math.min(16, ptr.vx)); if (e.pointerType === 'mouse') d.u.ip = Math.max(-6, Math.min(6, ptr.vy)); }
     }
     lastInput = now; wake();
   };
+  function setOpen(v, silent) {
+    v = !!v; if (v === open) return;
+    open = v; manual = v; focus().api.setShutter(v || hover === focus());
+    if (reduced.matches) for (const d of disks) for (const k of KEYS) { d.cur[k] = targetOf(d)[k]; d.vel[k] = 0; }
+    if (!silent) onOpen(open);
+    wake();
+  }
+  function setView(v) {
+    if (!VIEWS[v] || v === view) return;
+    view = v;
+    for (const d of disks) { d.exiting = 0; d.slot = slotKey(rel(d.i)); if (reduced.matches) snap(d, d.slot); }
+    wake();
+  }
+  const onClick = (e) => { // a click on nothing closes the ficha
+    if (open && !interactive(e) && !(e.target instanceof Element && e.target.closest('[data-floppy-card]')) && !pick(e)) setOpen(false);
+  };
+  host.addEventListener('click', onClick);
   const onLeave = () => { mouse.tx = mouse.ty = 0; if (ptr.id === null) applyHover(null); };
   host.addEventListener('pointerdown', onDown); host.addEventListener('pointermove', onMove);
   host.addEventListener('pointerup', onUp); host.addEventListener('pointercancel', onUp); host.addEventListener('pointerleave', onLeave);
@@ -232,7 +280,7 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
   const wake = () => { if (!raf && visible && onScreen && !dead) { last = 0; raf = requestAnimationFrame(tick); } };
   function settled() {
     return ptr.id === null && disks.every((d) => !d.exiting && !d.api.busy && Math.abs(d.u.vy) < 1e-3 && Math.abs(d.u.iy) < 1e-3 && Math.abs(d.u.yawT - d.u.yaw) < 1e-4
-      && KEYS.every((k) => Math.abs(d.vel[k]) < 1e-4 && Math.abs(slots()[d.slot][k] - d.cur[k]) < 1e-4));
+      && KEYS.every((k) => Math.abs(d.vel[k]) < 1e-4 && Math.abs(targetOf(d)[k] - d.cur[k]) < 1e-4));
   }
   function tick(now) {
     raf = 0;
@@ -246,7 +294,7 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
     { const k = 1 - Math.exp(-dt * 4); mouse.x += (mouse.tx - mouse.x) * k; mouse.y += (mouse.ty - mouse.y) * k; }
     for (const d of disks) {
       if (d.hold) { if (entered && now >= d.release) d.hold = false; else { place(d, clock); continue; } }
-      const T = S[d.slot], order = Math.abs(rel(d.i)), K = d.soft > now ? 7 : d.slot === 'exit' ? 26 : 34 - order * 3.5, C = 2 * 0.86 * Math.sqrt(K), h = dt / 2;
+      const T = targetOf(d), order = Math.abs(rel(d.i)), K = d.soft > now ? 7 : d.slot === 'exit' ? 26 : 30 - order * 3.2, C = 2 * (d.soft > now ? 0.86 : 0.7) * Math.sqrt(K), h = dt / 2;
       if (rm) for (const k of KEYS) { d.cur[k] = T[k]; d.vel[k] = 0; }
       else for (let n = 0; n < 2; n++) for (const k of KEYS) { d.vel[k] += (K * (T[k] - d.cur[k]) - C * d.vel[k]) * h; d.cur[k] += d.vel[k] * h; }
       d.cur.blur = Math.max(0, d.cur.blur); d.cur.s = Math.max(0.01, d.cur.s);
@@ -300,7 +348,8 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
   fit();
 
   return {
-    setActive, next: () => setActive(active + 1), prev: () => setActive(active - 1),
+    setActive, next: () => setActive(active + 1), prev: () => setActive(active - 1), setOpen, setView,
+    get open() { return open; }, get view() { return view; },
     get active() { return active; },
     get fps() { return frames.length ? Math.round(frames.length / frames.reduce((a, b) => a + b, 0)) : 0; },
     get quality() { return quality; },
@@ -311,7 +360,7 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
       dead = true; cancelAnimationFrame(raf); io.disconnect(); ioIn.disconnect(); ro.disconnect();
       document.removeEventListener('visibilitychange', onVis); small.removeEventListener?.('change', onMedia); reduced.removeEventListener?.('change', wake);
       host.removeEventListener('pointerdown', onDown); host.removeEventListener('pointermove', onMove);
-      host.removeEventListener('pointerup', onUp); host.removeEventListener('pointercancel', onUp); host.removeEventListener('pointerleave', onLeave);
+      host.removeEventListener('click', onClick); host.removeEventListener('pointerup', onUp); host.removeEventListener('pointercancel', onUp); host.removeEventListener('pointerleave', onLeave);
       delete host.dataset.cursor; delete host.dataset.dragging;
       disks.forEach((d) => d.api.dispose()); scene.environment?.dispose();
       for (const k of [0.5, 0.25]) rts[k].forEach((t) => t.dispose());
