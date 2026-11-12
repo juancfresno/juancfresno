@@ -81,7 +81,7 @@ const INK = '#10100E', PEARL = '#FCFCF7', BLUE = '#003DFF';
 const TAU = Math.PI * 2, HALF = Math.PI / 2;
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 
-let THREE, RoomEnvironment;
+let THREE, RoomEnvironment, SVGLoader;
 
 // ───────────────────────────────────────────── 2D polygon helpers
 const pt = (x, y, s = 1) => ({ x, y, s }); // s scales the bevel at that vertex
@@ -380,6 +380,32 @@ function drawLabel(data, opts = {}) {
   return c;
 }
 
+// ───────────────────────────────────────────── FRESNO© wordmark (234 × 28), from the brand SVG
+const LOGO = [
+  'M223.381 15.7711C217.072 15.7711 213.231 12.7787 213.231 7.86535C213.231 2.95204 217.072 0 223.381 0C229.71 0 233.511 2.95204 233.511 7.86535C233.511 12.7787 229.71 15.7711 223.381 15.7711ZM223.381 13.7492C228.638 13.7492 231.125 11.6059 231.125 7.84513C231.125 4.12476 228.638 1.9815 223.381 1.9815C218.164 1.9815 215.617 4.12476 215.617 7.84513C215.617 11.6059 218.164 13.7492 223.381 13.7492ZM223.442 12.7382C219.721 12.7382 216.992 11.1207 216.992 7.86535C216.992 4.65047 219.721 2.99247 223.442 2.99247C227.02 2.99247 229.427 4.42805 229.77 6.91504H226.899C226.414 5.88385 225.342 5.11551 223.462 5.11551C221.137 5.11551 219.903 6.3489 219.903 7.86535C219.903 9.42225 221.137 10.6354 223.462 10.6354C225.302 10.6354 226.434 9.90751 226.899 8.8561H229.77C229.447 11.2824 227.02 12.7382 223.442 12.7382Z',
+  'M189.041 28C176.979 28 169.836 23.0462 169.836 14V13.9641C169.836 4.88205 176.979 0 189.041 0C201.102 0 208.246 4.88205 208.246 13.9641V14C208.246 23.0462 201.102 28 189.041 28ZM189.041 21.359C194.677 21.359 198.482 18.6308 198.482 14V13.9641C198.482 9.29744 194.677 6.60513 189.041 6.60513C183.405 6.60513 179.6 9.15385 179.6 13.9641V14C179.6 18.7744 183.405 21.359 189.041 21.359Z',
+  'M139.809 27.282H130.906V0.610229H140.922L158.153 17.0154L158.44 17.3384V0.610229H167.342V27.282H157.363L140.024 10.841L139.809 10.6256V27.282Z',
+  'M112.67 28C101.183 28 96.6241 23.4051 96.4087 18.1282H105.598C105.742 20.5333 107.465 21.7897 112.742 21.7897C117.229 21.7897 118.845 20.9282 118.845 19.4564C118.845 18.2359 118.342 17.6615 111.557 16.9436C99.5318 15.7949 97.4497 12.4564 97.4497 8.07692C97.4497 3.94872 100.896 0 111.988 0C122.829 0 127.137 4.2 127.604 9.8H118.773C118.45 7.89744 117.122 6.17436 112.347 6.17436C108.327 6.17436 106.963 6.9641 106.963 8.25641C106.963 9.26154 107.25 10.1949 112.491 10.6974C126.886 12.0615 128.357 15.5795 128.357 19.2051C128.357 25.1641 122.973 28 112.67 28Z',
+  'M95.7789 27.282H66.5225V0.610229H95.4199V7.14356H76.1789V10.7692H93.8763V16.5128H76.1789V20.7487H95.7789V27.282Z',
+  'M40.3936 27.282H30.7372V0.610229H50.05C60.1013 0.610229 63.691 4.09228 63.691 8.75895C63.691 12.4923 61.25 15.0051 57.05 15.8307V15.8666C60.1372 16.6564 61.3936 17.6615 62.291 21.682L62.65 23.1538C63.0808 25.0923 63.4398 26.0256 63.9782 27.282H54.1064C53.7474 26.6 53.5321 25.882 53.0295 23.5846L52.6705 22.0051C52.3115 20.3179 50.9115 19.5282 46.9987 19.5282H40.3936V27.282ZM40.3936 7.14356V13.3538H49.4756C52.4551 13.3538 54.0705 12.1333 54.0705 10.0513C54.0705 8.11279 52.4551 7.14356 49.4756 7.14356H40.3936Z',
+  'M9.65641 27.282H0V0.610229H28.6821V7.17946H9.65641V11.4872H26.959V17.8769H9.65641V27.282Z',
+];
+function logoShapes(width, cx, cy) { // outlines in mm, for moulding the wordmark into the shell
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 234 28">${LOGO.map(d => `<path d="${d}"/>`).join('')}</svg>`;
+  const k = width / 234, map = v => pt(cx + (v.x - 117) * k, cy - (v.y - 14) * k, 0), out = [];
+  for (const p of new SVGLoader().parse(svg).paths) for (const sh of SVGLoader.createShapes(p)) {
+    const e = sh.extractPoints(5); out.push({ outer: e.shape.map(map), holes: e.holes.map(h => h.map(map)) });
+  }
+  return out;
+}
+function logoCanvas(color) { // for printing it in ink
+  const c = makeCanvas(1024, 160), x = c.getContext('2d'), k = (1024 - 40) / 234;
+  x.translate(20, (160 - 28 * k) / 2); x.scale(k, k); x.fillStyle = color;
+  for (const d of LOGO) x.fill(new Path2D(d));
+  return c;
+}
+const inPoly = (p, poly) => { let r = false; for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) { const a = poly[i], b = poly[j]; if ((a.y > p.y) !== (b.y > p.y) && p.x < (b.x - a.x) * (p.y - a.y) / (b.y - a.y) + a.x) r = !r; } return r; };
+
 // ───────────────────────────────────────────── the object
 /* Layout, front view, shutter up (x right, y up, z towards the label side):
    shell 90 × 94 × 3.3, chamfer top right, head window on the centre line, label on the lower part.
@@ -480,16 +506,17 @@ export function createFloppy(data, options = {}) {
     const wp = () => sq(TAB.x, TAB.yOn, 3.5, 4), hd = () => sq(-TAB.x, TAB.yOn, 3.5, 4);
     const ax = -36.5, ay = 36.5; // moulded insertion arrow
     const arrow = () => [pt(ax - 1.05, ay - 4.3, 0), pt(ax + 1.05, ay - 4.3, 0), pt(ax + 1.05, ay - 0.2, 0), pt(ax + 3.1, ay - 0.2, 0), pt(ax, ay + 4.3, 0), pt(ax - 3.1, ay - 0.2, 0), pt(ax - 1.05, ay - 0.2, 0)];
-    const hx = 34.6, hy = 28.2, lw = 2.5, lh = 3.5, lt = 0.72; // moulded "HD"
-    const letterH = () => [[0, 0], [lt, 0], [lt, (lh - lt) / 2], [lw - lt, (lh - lt) / 2], [lw - lt, 0], [lw, 0], [lw, lh], [lw - lt, lh], [lw - lt, (lh + lt) / 2], [lt, (lh + lt) / 2], [lt, lh], [0, lh]].map(([x, y]) => pt(hx + x, hy + y, 0));
-    const dx = hx + lw + 0.9;
-    const letterD = (i = 0) => [pt(dx + i, hy + i, 0), ...arcPts(dx + lw - 1.25, hy + 1.25, 1.25 - i, -HALF, 0, 4, 0), ...arcPts(dx + lw - 1.25, hy + lh - 1.25, 1.25 - i, 0, HALF, 4, 0), pt(dx + i, hy + lh - i, 0)];
-    const marks = () => [arrow(), letterH(), letterD()];
+    // FRESNO© moulded into the shell, top right. Counters stay up as islands
+    const logo = logoShapes(10.6, 38.15, 30.2);
+    const nested = l => logo.some(o => o !== l && o.holes.some(h => inPoly(l.outer[0], h)));
+    const marks = () => [arrow(), ...logo.filter(l => !nested(l)).map(l => l.outer.map(q => pt(q.x, q.y, 0)))];
     L(0, Z.cav, 'core', [CAV, wp(), hd()], M.absSmooth, false);
     L(Z.cav, Z.floor, 'core', [WIN(), wp(), hd()], M.absSmooth);
     L(Z.floor, Z.rec, 'skin', [wp(), hd(), ...marks()], M.absSmooth);
     L(Z.rec, T, 'skin', [{ pts: rrect(LABEL.x0 - 0.3, LABEL.y0 - 0.3, LABEL.x1 + 0.3, LABEL.y1 + 0.3, 1.4), bevel: 0.05 }, { pts: wp(), bevel: 0.08 }, { pts: hd(), bevel: 0.08 }, ...marks()], M.absTex);
-    add(front, slab({ outline: letterD(lt), z0: Z.floor, z1: T }), shellMats(M.absTex)); // counter of the D
+    for (const l of logo) if (!nested(l)) for (const h of l.holes) {
+      add(front, slab({ outline: h, holes: logo.filter(o => nested(o) && inPoly(o.outer[0], h)).map(o => o.outer), z0: Z.floor, z1: T }), shellMats(M.absTex));
+    }
     // label
     const lw2 = LABEL.x1 - LABEL.x0, lh2 = LABEL.y1 - LABEL.y0;
     add(front, slab({
@@ -540,6 +567,10 @@ export function createFloppy(data, options = {}) {
     add(shutter, plate(SHUT.x0, SHUT.x1, 7.8, 17.2), metalAll);
     const bp = new THREE.Group(); bp.rotation.y = Math.PI; shutter.add(bp);
     add(bp, plate(-SHUT.x1, -SHUT.x0, -17.2, -7.8), metalAll);
+    // wordmark printed in ink on the front plate
+    const inkT = keep(new THREE.CanvasTexture(logoCanvas(INK))); inkT.colorSpace = THREE.SRGBColorSpace; inkT.anisotropy = maxAniso;
+    const ink = add(shutter, new THREE.PlaneGeometry(16.5, 16.5 * 160 / 1024), keep(new THREE.MeshStandardMaterial({ map: inkT, transparent: true, opacity: 0.94, roughness: 0.8, metalness: 0, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 })));
+    ink.position.set(-3.1, 41.4, zt + 0.004);
     // bridge over the shutter edge, with two small bends
     const prof = [], zi = zt - br;
     for (let i = 0; i <= 6; i++) { const a = i / 6 * HALF; prof.push({ y: yTop + br * Math.sin(a), z: zi + br * Math.cos(a), ny: Math.sin(a), nz: Math.cos(a) }); }
@@ -625,6 +656,7 @@ async function main() {
     .then(() => { timing.fonts = Math.round(performance.now() - t0); return true; }).catch(() => false);
   THREE = await import('three');
   ({ RoomEnvironment } = await import('three/addons/environments/RoomEnvironment.js'));
+  ({ SVGLoader } = await import('three/addons/loaders/SVGLoader.js'));
 
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
   renderer.outputColorSpace = THREE.SRGBColorSpace;
