@@ -9,16 +9,13 @@ import s from './SocialPreview.module.scss'
 // One global instance (root layout) for every link with `data-social="<id>"`
 // (footer wordmarks, ContactBlock text links). ONE preview, shared by all the
 // links, drawn on a canvas:
-// - Entry: "Despixelado" (Lab 004 · 02). Blocks of 32 css px pop in at random
-//   (hash threshold), then the block size halves per step, 32 → 16 → 8 → 4 → 2
-//   → 1, until the clip is sharp. Each block is the mean colour of its area
-//   (mip chain of the cover-fitted frame, upscaled with smoothing off). 520 ms,
-//   linear; the exit is the same timeline mirrored (338 ms = 520 × 0.65), and
-//   reversing mid-way continues from the current step.
+// - Entry: the clip drops in through 12 columns (the site grid), staggered
+//   outwards from the column under the cursor; a blue scan line rides the
+//   bottom edge of each column. Exit: the columns retract.
 // - Travel: moving to another network, the same preview flies there on a
 //   spring (slight overshoot) and skews with its own velocity, then settles.
-//   The clip changes with a quick re-pixelate: the old clip pixelates 1 → 2 → 4
-//   → 8, the new one depixelates 8 → 4 → 2 → 1 (240 ms, same mosaic as the entry).
+//   The clip changes with a Bayer-ordered pixel dissolve (transition 05's
+//   pattern) whose front flashes in --c-text.
 // - Zone: over a link it follows the cursor horizontally (damped, biased to
 //   the link's centre) and stays anchored above the link row, so it never
 //   covers the links. Keyboard focus anchors it centred above the link.
@@ -30,30 +27,36 @@ import s from './SocialPreview.module.scss'
 // Rules kept: hover-capable fine pointers only (touch gets nothing); no bytes
 // until the first hover (each network's video + poster load on its first
 // activation, then stay); prefers-reduced-motion = poster only, no spring,
-// skew, mosaic or scramble; Esc, blur, leave or scroll hides.
+// skew, wipe, dissolve or scramble; Esc, blur, leave or scroll hides.
 // transform/opacity on the DOM, everything else on the canvas, one rAF loop.
 
 const W = 256 // default frame (css px)
 const H = 160
 const MAXW = 256 // canvas backing store: the largest frame any entry uses
 const MAXH = 400
+const COLS = 12
 const LABEL = 24 // label band under the clip (chip 18 + 6 gap)
 const LIFT = 12 // space between the label band and the link
 const EDGE = 16
-const START = 32 // entry: first block size, css px (halves per step down to 1 device px)
+const BLOCK = 8 // dissolve cell, css px
 
 const SIZE_RATE = 14 // 1/s, exponential ease of the frame towards its target size
 const T = {
-  in: 520, outRatio: 0.65, // exit = entry mirrored, 520 × 0.65 = 338 ms (Lab 004 · 02, linear)
-  swap: 240, // network → network: re-pixelate 1 → 8 (old clip) then 8 → 1 (new clip)
+  wipeIn: 210, wipeInStagger: 16,
+  wipeOut: 140, wipeOutStagger: 9,
+  dissolve: 240, front: 0.14,
   scramble: 260,
   graceOut: 110, // leaving a link: wait this long for the next one before hiding
   follow: 0.65, // 0 = locked to the link centre, 1 = locked to the cursor
 }
 const SPRING = { k: 380, zeta: 0.62 }
 const SKEW_MAX = 9 // deg
+const BAYER = [[0, 8, 2, 10], [12, 4, 14, 6], [3, 11, 1, 9], [15, 7, 13, 5]]
 const GLYPHS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#%&*+=/'
+const ACCENT = 'rgb(0, 61, 255)' // GridOverlay blue (G blue)
 
+const expoOut = (t: number) => (t >= 1 ? 1 : 1 - Math.pow(2, -10 * t))
+const quadInOut = (t: number) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2)
 const clamp = (v: number, a: number, b: number) => Math.max(a, Math.min(b, v))
 
 const isPreviewId = (v: string | undefined): v is PreviewId => !!v && v in SOCIAL_PREVIEWS
@@ -131,7 +134,8 @@ export default function SocialPreview() {
     // ── State ──
     type Phase = 'hidden' | 'in' | 'shown' | 'out'
     let phase: Phase = 'hidden'
-    let phaseAt = 0 // start time of the current timeline (shifted when reversing mid-way)
+    let phaseAt = 0
+    let origin = COLS / 2 // column the wipe starts from
     let cur: PreviewId | null = null
     let prev: PreviewId | null = null
     const sz = { w: W, h: H } // frame being drawn (eases to the target)
@@ -146,24 +150,6 @@ export default function SocialPreview() {
     let labelFrom = ''
     let labelTo = ''
     let labelAt = -1
-
-    // Timeline (Lab 004 · 02): raw 0…1 over 520 ms in / 338 ms out; visible
-    // amount p = raw in, 1 − raw out. Reversing mid-way continues from here.
-    const durOf = (ph: Phase) => (ph === 'out' ? T.in * T.outRatio : T.in)
-    const rawOf = (now: number) => clamp((now - phaseAt) / durOf(phase), 0, 1)
-    const pOf = (now: number) => {
-      if (phase === 'shown') return 1
-      if (phase === 'hidden') return 0
-      if (reduce) return phase === 'in' ? 1 : 0
-      const r = rawOf(now)
-      return phase === 'in' ? r : 1 - r
-    }
-    const go = (to: 'in' | 'out', now: number) => {
-      const from = phase === 'in' || phase === 'out' ? rawOf(now) : 1
-      phase = to
-      phaseAt = now - (from < 1 ? (1 - from) * durOf(to) : 0)
-      if (reduce) phaseAt = now - durOf(to)
-    }
 
     const groupOf = (a: HTMLElement) => {
       const root = a.closest('nav, ul, footer, section') ?? document.body
@@ -219,18 +205,20 @@ export default function SocialPreview() {
       aim(viaCursor)
       const text = labelFor(a, id)
       if (phase === 'hidden' || phase === 'out') {
-        // Fresh entry (or re-entering mid-exit: the mosaic continues from its step).
-        if (phase === 'hidden') { snap(); sz.w = tgt.w; sz.h = tgt.h; labelFrom = '' }
+        // Fresh entry: appear in place, columns drop in from the cursor's column.
+        if (phase === 'hidden') { snap(); sz.w = tgt.w; sz.h = tgt.h }
         rest(prev)
         prev = null
         switchAt = -1
-        const fresh = phase === 'hidden' || cur !== id
         if (cur && cur !== id) rest(cur)
         cur = id
-        if (fresh) play(id)
-        go('in', now)
+        play(id)
+        origin = viaCursor ? clamp(((cursorX - pos.x) / tgt.w) * COLS, 0, COLS - 1) : (COLS - 1) / 2
+        phase = 'in'
+        phaseAt = now
+        labelFrom = ''
       } else if (id !== cur) {
-        // Travel: re-pixelate from the old clip to the new one.
+        // Travel: dissolve from the old clip to the new one.
         rest(prev)
         prev = cur
         cur = id
@@ -250,7 +238,8 @@ export default function SocialPreview() {
     const hide = (now = performance.now()) => {
       clearTimeout(hideTimer)
       if (phase === 'hidden' || phase === 'out') return
-      go('out', now)
+      phase = 'out'
+      phaseAt = now
       run()
     }
 
@@ -260,119 +249,90 @@ export default function SocialPreview() {
     const line = () => getComputedStyle(float).getPropertyValue('--sp-line').trim() || '#3c3c3a'
     let colors = { surface: '#1a1a18', ink: '#fcfcf7', line: '#3c3c3a' }
 
-    // ── Mosaic (2D canvas, device px) ──
-    // Cover-fit the source into a base canvas, build a mip chain by halving
-    // (each step is an exact box average = the block's mean colour), draw the
-    // level that matches the block size into a tiny canvas (size / block) and
-    // scale it up with smoothing off. No shader, one drawImage per frame.
-    const mk = () => document.createElement('canvas')
-    const base = mk()
-    const mips: HTMLCanvasElement[] = []
-    const tiny = mk()
-    const fit = (c: HTMLCanvasElement, w: number, h: number) => {
-      if (c.width !== w) c.width = w
-      if (c.height !== h) c.height = h
+    // Cover-fit a source into the current frame (the ratios match except while
+    // the frame is resizing between two entries).
+    const cover = (img: CanvasImageSource, iw: number, ih: number) => {
+      if (!iw || !ih) return
+      const k = Math.max(sz.w / iw, sz.h / ih)
+      const sw = sz.w / k, sh = sz.h / k
+      g.drawImage(img, (iw - sw) / 2, (ih - sh) / 2, sw, sh, 0, 0, sz.w, sz.h)
     }
-    const source = (id: PreviewId | null): { el: CanvasImageSource; w: number; h: number } | null => {
-      if (!id) return null
+    const paint = (id: PreviewId | null) => {
+      if (!id) return
       const src = sources[id]
       const v = src?.video
-      if (v && v.readyState >= 2 && v.videoWidth) return { el: v, w: v.videoWidth, h: v.videoHeight }
-      const im = src?.poster
-      if (im && im.complete && im.naturalWidth) return { el: im, w: im.naturalWidth, h: im.naturalHeight }
-      return null
+      if (v && v.readyState >= 2) { cover(v, v.videoWidth, v.videoHeight); return }
+      const p = src?.poster
+      if (p && p.complete && p.naturalWidth) { cover(p, p.naturalWidth, p.naturalHeight); return }
+      g.fillStyle = colors.surface
+      g.fillRect(0, 0, sz.w, sz.h)
     }
-    // Cover-fit the clip into a w × h canvas context.
-    const coverTo = (ctx: CanvasRenderingContext2D, src: { el: CanvasImageSource; w: number; h: number }, w: number, h: number) => {
-      const k = Math.max(w / src.w, h / src.h)
-      const sw = w / k, sh = h / k
-      ctx.drawImage(src.el, (src.w - sw) / 2, (src.h - sh) / 2, sw, sh, 0, 0, w, h)
+
+    // Column heights 0…1 for the current phase.
+    const heights = (now: number) => {
+      const t = now - phaseAt
+      const h: number[] = []
+      for (let i = 0; i < COLS; i++) {
+        if (phase === 'shown') { h.push(1); continue }
+        if (reduce) { h.push(phase === 'in' ? 1 : 0); continue }
+        const d = Math.abs(i - origin)
+        if (phase === 'in') h.push(expoOut(clamp((t - d * T.wipeInStagger) / T.wipeIn, 0, 1)))
+        else h.push(1 - quadInOut(clamp((t - d * T.wipeOutStagger) / T.wipeOut, 0, 1)))
+      }
+      return h
     }
-    // Draw clip `id` at block size `bs` (device px) into the main canvas, over
-    // the Wd × Hd frame; `keep` (optional) limits it to the listed blocks.
-    const mosaic = (id: PreviewId | null, bs: number, Wd: number, Hd: number, keep?: (cx: number, cy: number) => boolean) => {
-      const src = source(id)
+
+    const draw = (now: number) => {
+      const h = heights(now)
+      const { w: W, h: H } = sz
+      const colW = W / COLS
+      g.setTransform(dpr, 0, 0, dpr, 0, 0)
+      g.clearRect(0, 0, MAXW, MAXH)
       g.save()
       g.beginPath()
-      if (keep) {
-        for (let y = 0; y * bs < Hd; y++) for (let x = 0; x * bs < Wd; x++) if (keep(x, y)) g.rect(x * bs, y * bs, bs, bs)
-      } else g.rect(0, 0, Wd, Hd)
+      for (let i = 0; i < COLS; i++) {
+        const x0 = Math.round(i * colW), x1 = Math.round((i + 1) * colW)
+        if (h[i] > 0) g.rect(x0, 0, x1 - x0, H * h[i])
+      }
       g.clip()
-      if (!src) {
-        // Clip not loaded yet: the surface colour stands in (same blocks).
-        g.fillStyle = colors.surface
-        g.fillRect(0, 0, Wd, Hd)
-      } else if (bs <= 1) {
-        coverTo(g, src, Wd, Hd)
+
+      const ps = switchAt < 0 || reduce ? 1 : clamp((now - switchAt) / T.dissolve, 0, 1)
+      if (ps >= 1) {
+        paint(cur)
       } else {
-        fit(base, Wd, Hd)
-        const bg = base.getContext('2d')!
-        bg.imageSmoothingEnabled = true
-        coverTo(bg, src, Wd, Hd)
-        const lvl = Math.floor(Math.log2(bs))
-        let prev: HTMLCanvasElement = base
-        for (let i = 1; i <= lvl; i++) {
-          const m = (mips[i] ??= mk())
-          fit(m, Math.max(1, Math.ceil(prev.width / 2)), Math.max(1, Math.ceil(prev.height / 2)))
-          const mg = m.getContext('2d')!
-          mg.imageSmoothingEnabled = true
-          mg.drawImage(prev, 0, 0, m.width, m.height)
-          prev = m
+        paint(prev)
+        // Bayer dissolve: cells below the threshold show the new clip, the
+        // front band flashes in ink.
+        const cols = Math.ceil(W / BLOCK), rows = Math.ceil(H / BLOCK)
+        g.save()
+        g.beginPath()
+        const front: [number, number][] = []
+        for (let y = 0; y < rows; y++) {
+          for (let x = 0; x < cols; x++) {
+            const th = (BAYER[y % 4][x % 4] + 0.5) / 16 * (1 - T.front)
+            if (ps >= th + T.front) g.rect(x * BLOCK, y * BLOCK, BLOCK, BLOCK)
+            else if (ps >= th) front.push([x * BLOCK, y * BLOCK])
+          }
         }
-        const tw = Math.ceil(Wd / bs), th = Math.ceil(Hd / bs)
-        fit(tiny, tw, th)
-        const tg = tiny.getContext('2d')!
-        tg.imageSmoothingEnabled = true
-        tg.drawImage(prev, 0, 0, tw, th)
-        g.imageSmoothingEnabled = false
-        g.drawImage(tiny, 0, 0, tw, th, 0, 0, tw * bs, th * bs)
-        g.imageSmoothingEnabled = true
+        g.clip()
+        paint(cur)
+        g.restore()
+        g.fillStyle = colors.ink
+        for (const [x, y] of front) g.fillRect(x, y, BLOCK, BLOCK)
       }
-      g.restore()
-    }
-    const hash = (x: number, y: number) => {
-      const v = Math.sin(x * 12.9898 + y * 78.233) * 43758.5453
-      return v - Math.floor(v)
-    }
 
-    // p = visible amount 0…1 (linear). Steps: pop-in at START, then halving to 1.
-    const draw = (now: number, p: number) => {
-      g.setTransform(1, 0, 0, 1, 0, 0)
-      g.clearRect(0, 0, canvas.width, canvas.height)
-      if (p <= 0) return
-      const Wd = Math.round(sz.w * dpr), Hd = Math.round(sz.h * dpr)
-      const start = Math.max(1, Math.round(START * dpr))
-      const n = Math.floor(Math.log2(start)) + 1
-      const seg = p * (n + 1)
-      let bs = 1
-      let pop = false
-      if (seg < 1) { pop = true; bs = start }
-      else {
-        const lv = Math.min(Math.floor(seg - 1), n - 1)
-        bs = Math.max(1, Math.floor(start / Math.pow(2, lv) + 0.5))
-      }
-      // Network swap: old clip pixelates 1→2→4→8, new one depixelates 8→4→2→1.
-      let id = cur
-      if (switchAt >= 0 && !reduce) {
-        const ps = clamp((now - switchAt) / T.swap, 0, 1)
-        if (ps < 1) {
-          const steps = [2, 4, 8]
-          const half = ps < 0.5
-          const k = Math.min(2, Math.floor(((half ? ps : ps - 0.5) / 0.5) * 3))
-          const sb = Math.round(steps[half ? k : 2 - k] * dpr)
-          id = half ? prev : cur
-          if (sb > bs) bs = sb
-        }
-      }
-      mosaic(id, bs, Wd, Hd, pop ? (x, y) => hash(x, y) < seg : undefined)
-
-      // 1 css px frame line, only over drawn pixels.
-      const lw = Math.max(1, Math.round(dpr))
-      g.globalCompositeOperation = 'source-atop'
+      // Frame + scan lines on the growing columns.
       g.strokeStyle = colors.line
-      g.lineWidth = lw
-      g.strokeRect(lw / 2, lw / 2, Wd - lw, Hd - lw)
-      g.globalCompositeOperation = 'source-over'
+      g.lineWidth = 1
+      g.strokeRect(0.5, 0.5, W - 1, H - 1)
+      g.restore()
+      g.fillStyle = ACCENT
+      for (let i = 0; i < COLS; i++) {
+        if (h[i] <= 0 || h[i] >= 1) continue
+        const x0 = Math.round(i * colW), x1 = Math.round((i + 1) * colW)
+        g.fillRect(x0, Math.max(0, H * h[i] - 1), x1 - x0, 1)
+      }
+      return h
     }
 
     const scramble = (now: number) => {
@@ -417,20 +377,19 @@ export default function SocialPreview() {
       const skew = reduce ? 0 : clamp(-pos.vx / 110, -SKEW_MAX, SKEW_MAX)
       float.style.transform = `translate3d(${pos.x.toFixed(2)}px, ${pos.y.toFixed(2)}px, 0) skewX(${skew.toFixed(2)}deg) rotate(${(skew * 0.12).toFixed(3)}deg)`
 
-      const p = pOf(now)
-      draw(now, p)
-      const shown = p
+      const h = draw(now)
+      const shown = h.reduce((a, b) => a + b, 0) / COLS
       labelEl.style.opacity = String(shown)
       labelEl.style.transform = `translate3d(0, ${((1 - shown) * -6).toFixed(2)}px, 0)`
       scramble(now)
 
-      if (switchAt >= 0 && now - switchAt >= T.swap) {
+      if (switchAt >= 0 && now - switchAt >= T.dissolve) {
         rest(prev)
         prev = null
         switchAt = -1
       }
-      if (phase === 'in' && p >= 1) phase = 'shown'
-      if (phase === 'out' && p <= 0) {
+      if (phase === 'in' && h.every((v) => v >= 1)) phase = 'shown'
+      if (phase === 'out' && h.every((v) => v <= 0)) {
         phase = 'hidden'
         rest(cur)
         rest(prev)
