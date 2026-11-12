@@ -83,6 +83,22 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
   const snap = (d, key) => { d.slot = key; for (const k of KEYS) { d.cur[k] = slots()[key][k]; d.vel[k] = 0; } };
   disks.forEach((d) => snap(d, slotKey(rel(d.i))));
 
+  // entrance: the disks wait far below, small and out of focus, and tumble up into
+  // their slots (a focus pull) the first time a third of the module is on screen
+  let entered = reduced.matches;
+  const introPose = (d) => {
+    const T = slots()[d.slot];
+    Object.assign(d.cur, { x: T.x + (T.x - 0.5) * 0.7, y: T.y + 0.85, s: T.s * 0.3, blur: T.blur + 18, rx: T.rx - 1.3, ry: T.ry + Math.PI * 2, rz: T.rz + 1.0 });
+    for (const k of KEYS) d.vel[k] = 0; d.hold = true;
+  };
+  if (!entered) disks.forEach(introPose);
+  function enter() {
+    if (entered) return; entered = true;
+    const now = performance.now();
+    [...disks].sort((a, b) => Math.abs(rel(a.i)) - Math.abs(rel(b.i))).forEach((d, n) => { d.release = now + n * 110; d.soft = now + n * 110 + 2200; });
+    wake();
+  }
+
   function setActive(next, silent) {
     next = ((next % N) + N) % N;
     if (next === active) return;
@@ -136,16 +152,18 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
     renderer.setPixelRatio(pr); renderer.setSize(W, H, false);
     camera.aspect = W / H; camera.updateProjectionMatrix();
     for (const k of [0.5, 0.25]) for (const t of rts[k]) t.setSize(Math.max(2, Math.round(W * pr * k)), Math.max(2, Math.round(H * pr * k)));
-    for (const d of disks) if (!d.exiting) snap(d, slotKey(rel(d.i)));
+    for (const d of disks) { if (d.hold) introPose(d); else if (!d.exiting && !(d.soft > performance.now())) snap(d, slotKey(rel(d.i))); }
     wake();
   }
   function place(d, t) { // slot space → world
     const c = d.cur, k0 = (90 * H) / (2 * DIST * TAN), z = DIST * (1 - k0 / Math.max(8, c.s * W)), hh = (DIST - z) * TAN;
     const f = reduced.matches ? 0 : 1, u = d.u;
-    d.roll.position.set((c.x - 0.5) * 2 * hh * camera.aspect, (0.5 - c.y) * 2 * hh + Math.sin(t * 0.7 + d.seed) * 1.2 * f, z);
+    // cursor: near disks slide more than far ones, and every disk leans towards the pointer
+    const par = 0.02 * Math.pow(c.s / 0.235, 1.15) * f, px = c.x - mouse.x * par, py = c.y - mouse.y * par * (W / H);
+    d.roll.position.set((px - 0.5) * 2 * hh * camera.aspect, (0.5 - py) * 2 * hh + Math.sin(t * 0.7 + d.seed) * 1.2 * f, z);
     d.roll.rotation.z = c.rz + Math.sin(t * 0.31 + d.seed * 2) * 0.025 * f;
-    d.tilt.rotation.x = c.rx + u.pitch + Math.sin(t * 0.43 + d.seed) * 0.035 * f;
-    d.turn.rotation.y = c.ry + u.yaw + Math.sin(t * 0.37 + d.seed * 3) * 0.06 * f;
+    d.tilt.rotation.x = c.rx + u.pitch + Math.sin(t * 0.43 + d.seed) * 0.035 * f + mouse.y * 0.16 * f;
+    d.turn.rotation.y = c.ry + u.yaw + Math.sin(t * 0.37 + d.seed * 3) * 0.06 * f + mouse.x * 0.24 * f;
   }
 
   // ── pointer: the focused disk turns under the hand, the others come to focus on click
@@ -161,6 +179,7 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
     return null;
   }
   let hover = null, manual = false;
+  const mouse = { x: 0, y: 0, tx: 0, ty: 0 };
   const ptr = { id: null, d: null, x: 0, y: 0, t: 0, st: 0, vx: 0, vy: 0, travel: 0 };
   const focus = () => disks[active];
   const applyHover = (d) => {
@@ -177,6 +196,7 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
     lastInput = ptr.t; wake();
   };
   const onMove = (e) => {
+    if (e.pointerType === 'mouse') { const r = canvas.getBoundingClientRect(); mouse.tx = ((e.clientX - r.left) / r.width) * 2 - 1; mouse.ty = ((e.clientY - r.top) / r.height) * 2 - 1; }
     if (ptr.id === null && e.pointerType === 'mouse') applyHover(interactive(e) ? null : pick(e));
     if (e.pointerId !== ptr.id) return;
     const now = performance.now(), dt = Math.max(1, now - ptr.t) / 1000, S = e.pointerType === 'mouse' ? 0.0062 : 0.0082;
@@ -199,7 +219,7 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
     }
     lastInput = now; wake();
   };
-  const onLeave = () => { if (ptr.id === null) applyHover(null); };
+  const onLeave = () => { mouse.tx = mouse.ty = 0; if (ptr.id === null) applyHover(null); };
   host.addEventListener('pointerdown', onDown); host.addEventListener('pointermove', onMove);
   host.addEventListener('pointerup', onUp); host.addEventListener('pointercancel', onUp); host.addEventListener('pointerleave', onLeave);
 
@@ -220,8 +240,10 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
     // quality steps down once if the device cannot hold the frame rate
     if (clock > 3 && frames.length === 60 && quality > 1) { const avg = frames.reduce((a, b) => a + b, 0) / 60; slow = avg > 1 / 34 ? slow + 1 : 0; if (slow > 45) { quality = Math.max(1, quality - 0.5); slow = 0; frames.length = 0; fit(); } }
 
+    { const k = 1 - Math.exp(-dt * 4); mouse.x += (mouse.tx - mouse.x) * k; mouse.y += (mouse.ty - mouse.y) * k; }
     for (const d of disks) {
-      const T = S[d.slot], order = Math.abs(rel(d.i)), K = d.slot === 'exit' ? 26 : 34 - order * 3.5, C = 2 * 0.86 * Math.sqrt(K), h = dt / 2;
+      if (d.hold) { if (entered && now >= d.release) d.hold = false; else { place(d, clock); continue; } }
+      const T = S[d.slot], order = Math.abs(rel(d.i)), K = d.soft > now ? 9 : d.slot === 'exit' ? 26 : 34 - order * 3.5, C = 2 * 0.86 * Math.sqrt(K), h = dt / 2;
       if (rm) for (const k of KEYS) { d.cur[k] = T[k]; d.vel[k] = 0; }
       else for (let n = 0; n < 2; n++) for (const k of KEYS) { d.vel[k] += (K * (T[k] - d.cur[k]) - C * d.vel[k]) * h; d.cur[k] += d.vel[k] * h; }
       d.cur.blur = Math.max(0, d.cur.blur); d.cur.s = Math.max(0.01, d.cur.s);
@@ -267,6 +289,8 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
   document.addEventListener('visibilitychange', onVis);
   const io = new IntersectionObserver(([e]) => { onScreen = e.isIntersecting; if (onScreen) wake(); else { cancelAnimationFrame(raf); raf = 0; } }, { rootMargin: '120px' });
   io.observe(host);
+  const ioIn = new IntersectionObserver(([e]) => { if (e.isIntersecting) { ioIn.disconnect(); enter(); } }, { threshold: 0.35 });
+  ioIn.observe(host);
   const ro = new ResizeObserver(fit); ro.observe(host);
   const onMedia = () => fit();
   small.addEventListener?.('change', onMedia); reduced.addEventListener?.('change', wake);
@@ -278,9 +302,10 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
     get fps() { return frames.length ? Math.round(frames.length / frames.reduce((a, b) => a + b, 0)) : 0; },
     get quality() { return quality; },
     disks, renderer,
+    enter, replay() { entered = false; disks.forEach((d) => { d.soft = 0; snap(d, slotKey(rel(d.i))); introPose(d); }); enter(); },
     renderNow() { onScreen = true; cancelAnimationFrame(raf); raf = 0; tick(performance.now()); },
     dispose() {
-      dead = true; cancelAnimationFrame(raf); io.disconnect(); ro.disconnect();
+      dead = true; cancelAnimationFrame(raf); io.disconnect(); ioIn.disconnect(); ro.disconnect();
       document.removeEventListener('visibilitychange', onVis); small.removeEventListener?.('change', onMedia); reduced.removeEventListener?.('change', wake);
       host.removeEventListener('pointerdown', onDown); host.removeEventListener('pointermove', onMove);
       host.removeEventListener('pointerup', onUp); host.removeEventListener('pointercancel', onUp); host.removeEventListener('pointerleave', onLeave);

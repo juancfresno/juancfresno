@@ -390,9 +390,9 @@ const LOGO = [
   'M40.3936 27.282H30.7372V0.610229H50.05C60.1013 0.610229 63.691 4.09228 63.691 8.75895C63.691 12.4923 61.25 15.0051 57.05 15.8307V15.8666C60.1372 16.6564 61.3936 17.6615 62.291 21.682L62.65 23.1538C63.0808 25.0923 63.4398 26.0256 63.9782 27.282H54.1064C53.7474 26.6 53.5321 25.882 53.0295 23.5846L52.6705 22.0051C52.3115 20.3179 50.9115 19.5282 46.9987 19.5282H40.3936V27.282ZM40.3936 7.14356V13.3538H49.4756C52.4551 13.3538 54.0705 12.1333 54.0705 10.0513C54.0705 8.11279 52.4551 7.14356 49.4756 7.14356H40.3936Z',
   'M9.65641 27.282H0V0.610229H28.6821V7.17946H9.65641V11.4872H26.959V17.8769H9.65641V27.282Z',
 ];
-function logoShapes(width, cx, cy) { // outlines in mm, for moulding the wordmark into the shell
+function logoShapes(width, cx, cy) { // outlines in mm (width = its length), for moulding the wordmark into the shell
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 234 28">${LOGO.map(d => `<path d="${d}"/>`).join('')}</svg>`;
-  const k = width / 234, map = v => pt(cx + (v.x - 117) * k, cy - (v.y - 14) * k, 0), out = [];
+  const k = width / 234, map = v => pt(cx + (v.y - 14) * k, cy + (v.x - 117) * k, 0), out = []; // vertical, reads bottom to top
   for (const p of new SVGLoader().parse(svg).paths) for (const sh of SVGLoader.createShapes(p)) {
     const e = sh.extractPoints(5); out.push({ outer: e.shape.map(map), holes: e.holes.map(h => h.map(map)) });
   }
@@ -506,8 +506,8 @@ export function createFloppy(data, options = {}) {
     const wp = () => sq(TAB.x, TAB.yOn, 3.5, 4), hd = () => sq(-TAB.x, TAB.yOn, 3.5, 4);
     const ax = -36.5, ay = 36.5; // moulded insertion arrow
     const arrow = () => [pt(ax - 1.05, ay - 4.3, 0), pt(ax + 1.05, ay - 4.3, 0), pt(ax + 1.05, ay - 0.2, 0), pt(ax + 3.1, ay - 0.2, 0), pt(ax, ay + 4.3, 0), pt(ax - 3.1, ay - 0.2, 0), pt(ax - 1.05, ay - 0.2, 0)];
-    // FRESNO© moulded into the shell, top right. Counters stay up as islands
-    const logo = logoShapes(10.6, 38.15, 30.2);
+    // FRESNO© moulded into the shell, vertical, right of the shutter. Counters stay up as islands
+    const logo = logoShapes(22, 38.2, 30.4);
     const nested = l => logo.some(o => o !== l && o.holes.some(h => inPoly(l.outer[0], h)));
     const marks = () => [arrow(), ...logo.filter(l => !nested(l)).map(l => l.outer.map(q => pt(q.x, q.y, 0)))];
     L(0, Z.cav, 'core', [CAV, wp(), hd()], M.absSmooth, false);
