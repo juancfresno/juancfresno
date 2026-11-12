@@ -33,11 +33,12 @@ export default function FloppyModule({ items, labName, labHref, strings }: Props
         const run = () => {
           if (dead) return
           try {
-            const st = createFloppyStage(el, cv, { items: data, onChange: (i: number) => setActive(i) })
+            if (!matchMedia('(prefers-reduced-motion: reduce)').matches) el.dataset.intro = 'pending'
+            const st = createFloppyStage(el, cv, { items: data, onChange: (i: number) => setActive(i), onEnter: () => { el.dataset.intro = 'in' } })
             stage.current = st
             ;(window as unknown as { __floppyStage?: unknown }).__floppyStage = st // QA probe
             setReady(true)
-          } catch (err) { console.warn('[floppy]', err) }
+          } catch (err) { delete el.dataset.intro; console.warn('[floppy]', err) }
         }
         // the generated labels need the page fonts
         Promise.race([document.fonts.ready, new Promise((r) => setTimeout(r, 2500))]).then(run)

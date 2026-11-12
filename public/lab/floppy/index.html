@@ -695,7 +695,7 @@ async function main() {
 
   const floppy = createFloppy(PROJECT, { maxAnisotropy: renderer.capabilities.getMaxAnisotropy() });
   // label artwork: ?label=labels/001.png, or drop an image file on the page
-  const labelUrl = new URLSearchParams(location.search).get('label');
+  const labelUrl = new URLSearchParams(location.search).get('label') || 'labels/001.png'; // Figma export; the drawn label is the fallback
   if (labelUrl) floppy.setLabelImage(labelUrl).then(() => wake()).catch(() => console.warn('[floppy] label image not found:', labelUrl));
   stage.addEventListener('dragover', e => e.preventDefault());
   stage.addEventListener('drop', e => {

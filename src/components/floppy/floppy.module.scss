@@ -100,3 +100,15 @@
     &:focus-visible { outline: 1px solid var(--c-g, #003dff); outline-offset: 2px; }
   }
 }
+
+// Entrance: the text comes in with the disks (the stage sets data-intro on the section).
+.mod[data-intro] {
+  .top, .info, .what, .nav { transition: opacity 0.9s ease, transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1); }
+  .rule { transform-origin: left center; transition: transform 1.2s cubic-bezier(0.76, 0, 0.24, 1); }
+  .rule { transition-delay: 0.1s; } .info { transition-delay: 0.45s; } .what { transition-delay: 0.65s; } .nav { transition-delay: 0.8s; }
+}
+.mod[data-intro='pending'] {
+  .top, .info, .what, .nav { opacity: 0; transform: translateY(14px); transition: none; }
+  .what { animation: none; }
+  .rule { transform: scaleX(0); transition: none; }
+}
