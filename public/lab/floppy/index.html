@@ -478,8 +478,8 @@ export function createFloppy(data, options = {}) {
   {
     const L = half({ mirror: false, parent: front });
     const wp = () => sq(TAB.x, TAB.yOn, 3.5, 4), hd = () => sq(-TAB.x, TAB.yOn, 3.5, 4);
-    const ax = -36.5, ay = 37.5; // moulded insertion arrow
-    const arrow = () => [pt(ax - 0.55, ay - 2.6, 0), pt(ax + 0.55, ay - 2.6, 0), pt(ax + 0.55, ay + 0.2, 0), pt(ax + 1.7, ay + 0.2, 0), pt(ax, ay + 2.6, 0), pt(ax - 1.7, ay + 0.2, 0), pt(ax - 0.55, ay + 0.2, 0)];
+    const ax = -36.5, ay = 36.5; // moulded insertion arrow
+    const arrow = () => [pt(ax - 1.05, ay - 4.3, 0), pt(ax + 1.05, ay - 4.3, 0), pt(ax + 1.05, ay - 0.2, 0), pt(ax + 3.1, ay - 0.2, 0), pt(ax, ay + 4.3, 0), pt(ax - 3.1, ay - 0.2, 0), pt(ax - 1.05, ay - 0.2, 0)];
     const hx = 34.6, hy = 28.2, lw = 2.5, lh = 3.5, lt = 0.72; // moulded "HD"
     const letterH = () => [[0, 0], [lt, 0], [lt, (lh - lt) / 2], [lw - lt, (lh - lt) / 2], [lw - lt, 0], [lw, 0], [lw, lh], [lw - lt, lh], [lw - lt, (lh + lt) / 2], [lt, (lh + lt) / 2], [lt, lh], [0, lh]].map(([x, y]) => pt(hx + x, hy + y, 0));
     const dx = hx + lw + 0.9;
@@ -582,6 +582,17 @@ export function createFloppy(data, options = {}) {
     setData(next, labelOpts) { // swap the label from data (dissolve / peel come in a later phase)
       api.data = next; labelT.image = drawLabel(next, labelOpts); labelT.needsUpdate = true;
     },
+    setLabelImage(src) { // artwork made elsewhere (Figma export). Any size; cover-fitted to 2048 × 1700
+      return new Promise((resolve, reject) => {
+        const img = new Image(); img.crossOrigin = 'anonymous';
+        img.onload = () => {
+          const c = makeCanvas(2048, 1700), x = c.getContext('2d'), k = Math.max(2048 / img.width, 1700 / img.height), w = img.width * k, h = img.height * k;
+          x.imageSmoothingQuality = 'high'; x.drawImage(img, (2048 - w) / 2, (1700 - h) / 2, w, h);
+          labelT.image = c; labelT.needsUpdate = true; resolve();
+        };
+        img.onerror = reject; img.src = src;
+      });
+    },
     update(dt, instant = false) {
       if (instant) { s.open = s.openTarget; s.openV = 0; s.protect = s.protectTarget; } else {
         // shutter: an underdamped spring, stiffer on the way back (that is the real spring closing it)
@@ -651,6 +662,14 @@ async function main() {
   const rim = new THREE.DirectionalLight('#b9ccff', 1.6); rim.position.set(170, 130, -240); scene.add(rim);
 
   const floppy = createFloppy(PROJECT, { maxAnisotropy: renderer.capabilities.getMaxAnisotropy() });
+  // label artwork: ?label=labels/001.png, or drop an image file on the page
+  const labelUrl = new URLSearchParams(location.search).get('label');
+  if (labelUrl) floppy.setLabelImage(labelUrl).then(() => wake()).catch(() => console.warn('[floppy] label image not found:', labelUrl));
+  stage.addEventListener('dragover', e => e.preventDefault());
+  stage.addEventListener('drop', e => {
+    e.preventDefault(); const f = e.dataTransfer.files[0];
+    if (f && f.type.startsWith('image/')) { const u = URL.createObjectURL(f); floppy.setLabelImage(u).then(() => { URL.revokeObjectURL(u); wake(); }); }
+  });
   const tilt = new THREE.Group(), turn = new THREE.Group();
   scene.add(tilt); tilt.add(turn); turn.add(floppy.group);
 
