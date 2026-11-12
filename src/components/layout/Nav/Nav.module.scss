@@ -140,6 +140,9 @@
   align-self: stretch;
 }
 
+// Keeps the header row exactly as it was now that the wordmark is fixed.
+.logoSlot { display: block; flex-shrink: 0; width: 12px; height: 32px; }
+
 .clock {
   font-family: $font-mono; font-weight: $fw-mono;
   font-size: 0.6875rem;
@@ -178,8 +181,16 @@
   @include touch-target(6px, 16px);
   display: block;
   flex-shrink: 0;
-  color: $color-text;
-  mix-blend-mode: difference; // visible when overlapping images
+  // Fixed to the viewport at the header's own spot (top = the row's 1.25rem
+  // padding, right = page margin + safe area), above page content, drawers and
+  // zoom ($z-modal 300), under toasts and the transition canvas (450).
+  // White + difference = it inverts whatever passes beneath it.
+  position: fixed;
+  top: 1.25rem;
+  right: max($m, env(safe-area-inset-right, 0px));
+  z-index: 350;
+  color: #fff;
+  mix-blend-mode: difference;
 
   &:hover {
     .glMain {
@@ -199,12 +210,9 @@
   // the header keeps equal space above and below the menu and the wordmark
   // hangs over the line instead of pushing the content down.
   & {
-    align-self: flex-start;
     width: 12px;
     height: 32px;
     overflow: visible;
-    position: relative;
-    z-index: 2;
 
     .glitchWrap {
       width: 101px;                 // keep natural size inside the 12px box
@@ -231,7 +239,7 @@
 .glMain {
   position: relative;
   z-index: 3;
-  color: $color-text;
+  color: inherit;
   will-change: transform;
 }
 
@@ -323,7 +331,7 @@
 
 // Blue chrome (Contact): ink logos without the difference blend (web/nav Theme=Blue).
 :global(html[data-chrome="blue"]) {
-  .face, .logo { mix-blend-mode: normal; }
+  .face { mix-blend-mode: normal; }
   .faceGlitchWrap { filter: brightness(0.08); }
 }
 

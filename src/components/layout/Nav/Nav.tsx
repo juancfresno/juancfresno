@@ -174,13 +174,19 @@ export default function Nav() {
           {/* ── Right: local time, then the wordmark (ES / EN and "?" live in the footer) ── */}
           <div className={s.right}>
             <NavClock className={s.clock} />
-            {logoLink}
+            {/* Empty slot: the wordmark itself is fixed at root level (below). */}
+            <span className={s.logoSlot} aria-hidden="true" />
           </div>
         </div>
         <div className={s.lineWrap} data-in="line" style={{ '--in-d': '0ms' } as CSSProperties}>
           <ElasticLine className={s.line} />
         </div>
       </header>
+
+      {/* ── Fixed wordmark: root-level sibling (not inside the header) so
+          mix-blend-mode: difference blends against the page, and it stays put
+          while the header hides on scroll. ── */}
+      {logoLink}
 
       {/* ── Mobile bottom tab bar ── */}
       <nav data-site-tabbar className={s.bottomBar} aria-label={ui.nav.mainMobile}>
