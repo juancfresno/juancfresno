@@ -63,6 +63,7 @@ export const SITE_ES: SiteDict = {
       transiciones: '22 transiciones de página, una al lado de otra. La 11a es la que usa esta web.',
       galerias: 'Ocho formas de enseñar 200 imágenes, montadas sobre el feed real.',
       'entradas-pixel': 'Seis entradas de píxel para el preview de redes, con los clips reales.',
+      cursores: 'Seis cursores propios que cambian según lo que tienen debajo.',
     },
     labels: {
       featured: '{ Proyectos destacados ↘',
@@ -253,6 +254,18 @@ export const SITE_ES: SiteDict = {
       note: '★ 00 Doce columnas (se mantiene)',
       card: 'Seis formas de que aparezca el preview de redes, con los clips reales: bitmap fino, despixelado, 1-bit a color, desde el cursor, barrido CRT y las doce columnas de ahora.',
       how: 'Un solo contexto WebGL2 para todas las tarjetas y un fragment shader con una rama por variante; cada tarjeta copia su fotograma a su propio canvas. El clip es una textura que se actualiza en cada fotograma, con mipmaps para que los bloques grandes den el color medio. Las celdas encajan en píxeles del dispositivo y los umbrales salen de una matriz Bayer 8×8. La salida es la entrada al revés y cambiar a mitad no da saltos. Con «reducir movimiento» es instantáneo y el clip queda quieto; sin WebGL2, una vista 2D simple.',
+    },
+    {
+      slug: 'cursores',
+      n: '005',
+      name: 'Cursores',
+      kind: 'Interacción',
+      year: '2026',
+      what: 'Seis cursores propios que cambian según lo que tienen debajo: flecha en los enlaces, «Ver más» en las imágenes, «Arrastra» en una tira, «Play» en el vídeo, «Copiar» en el email y un caret en el texto. Punto y anillo, píxel, retícula, negativo, velocidad y solo etiqueta, cada uno sobre la misma página de prueba.',
+      built: 'Un bucle rAF · solo transform · sin librerías',
+      note: null,
+      card: 'Seis cursores propios que cambian según lo que tienen debajo: punto y anillo, píxel, retícula, negativo, velocidad y solo etiqueta.',
+      how: 'Cada estado se declara en el marcado con data-cursor (link, view, drag, play, copy, text) y un data-cursor-label opcional; el cursor lo lee con closest() desde el elemento bajo el puntero. Un solo bucle de requestAnimationFrame mueve los seis y duerme en reposo; en cada fotograma solo cambian transform y opacity. Un muelle marca el retraso, el de píxel se disuelve con una matriz Bayer 4×4 y el de etiqueta se reescribe con el scramble de la web. En táctil el cursor nativo nunca se oculta (un toque enseña el estado); con «reducir movimiento» todo va pegado, sin retraso ni estelas.',
     },
   ],
 

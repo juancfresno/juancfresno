@@ -64,6 +64,7 @@ export const SITE_EN = {
       transiciones: '22 page transitions, side by side. 11a is the one this site uses.',
       galerias: 'Eight ways to show 200 images, built on the real feed.',
       'entradas-pixel': 'Six pixel entrances for the social hover preview, with the real clips.',
+      cursores: 'Six custom cursors that change with what they are over.',
     } as Record<string, string>,
     labels: {
       featured: '{ Featured work ↘',
@@ -263,6 +264,18 @@ export const SITE_EN = {
       note: '★ 00 Twelve columns (kept)' as string | null,
       card: 'Six ways for the social hover preview to appear, with the real clips: fine bitmap, depixelate, 1-bit to colour, from the cursor, CRT sweep, and the twelve columns it uses today.',
       how: 'One WebGL2 context for every card and one fragment shader with a branch per variant; each card copies its frame into its own canvas. The clip is a texture updated every frame, with mipmaps so the big blocks show the mean colour. Cells snap to device pixels and the thresholds are an 8×8 Bayer matrix. The exit is the entry played backwards, and switching halfway stays continuous. With reduced motion it is instant and the clip stays still; without WebGL2, a plain 2D preview.',
+    },
+    {
+      slug: 'cursores',
+      n: '005',
+      name: 'Cursors',
+      kind: 'Interaction',
+      year: '2026',
+      what: 'Six custom cursors that change with what they are over: an arrow on links, “View more” on images, “Drag” on a strip, “Play” on video, “Copy” on the email, a caret on text. Dot and ring, pixel, crosshair, negative, velocity and label only, each on the same mock page.',
+      built: 'One rAF loop · transform only · no libraries',
+      note: null as string | null,
+      card: 'Six custom cursors that change with what they are over: dot and ring, pixel, crosshair, negative, velocity and label only.',
+      how: 'Every state is declared in the markup with data-cursor (link, view, drag, play, copy, text) and an optional data-cursor-label; the cursor reads it with closest() on the pointer target. One requestAnimationFrame loop drives all six and sleeps at rest; per frame only transform and opacity change. A spring sets the lag, the pixel one dissolves through a 4×4 Bayer matrix and the label one retypes with the site’s scramble. On touch the native cursor is never hidden (a tap previews the state); with reduced motion everything snaps, with no lag or trails.',
     },
   ],
 
