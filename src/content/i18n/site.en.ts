@@ -199,7 +199,7 @@ export const SITE_EN = {
       year: '2026',
       what: 'Four buttons with a point of view: magnetic, columns, roller and scramble. No libraries, keyboard-friendly, respect reduced motion. Copy them, or hand the prompt to an AI agent.',
       built: 'CSS + ~80 lines of vanilla JS',
-      note: '★ 00 Twelve columns (kept)' as string | null,
+      note: null as string | null,
       card: 'Four buttons with a point of view: magnetic, columns, roller and scramble. No libraries, keyboard-friendly, respect reduced motion. Copy them, or hand the prompt to an AI agent.',
       how: 'CSS and about 80 lines of JavaScript, no libraries. They work with the keyboard, respect reduced motion and follow the theme through two variables.',
     },
