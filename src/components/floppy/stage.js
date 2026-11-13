@@ -8,10 +8,9 @@ import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 import { createFloppy } from './core.js';
 
-/* The disk box (the finale on the Home): an ink ABS tray with a smoked lid hinged at the back,
-   a key lock and a paper label. Local frame: origin at the centre of the base, y up, front = +z.
-   `fillers` disks already stand at the back (plain stand-ins: only their top edges show);
-   the real ones drop into the front slots. Units: mm. */
+/* The disk box (Home): an ink ABS tray with a smoked lid hinged at the back, a key lock and a
+   paper label. Local frame: origin at the centre of the base, y up, front = +z. `fillers` disks
+   already stand at the back (plain stand-ins); the real ones drop into the front slots. Units: mm. */
 const BOX = { w: 100, pitch: 8, base: 44, lid: 58, wall: 2.4 };
 function buildBox(slots, fillers) {
   const { w: Wb, pitch, base: Hb, lid: Hl, wall: t } = BOX, D = slots * pitch + 12;
@@ -158,11 +157,14 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
   // Scroll mode (Home): the page scroll is the timeline. q = how many disks have gone by (a float);
   // each disk sits at its distance to q along the same path the conveyor uses, so they file past.
   const scroll = { on: false, q: 0, eff: 0, t: -1e9 };
-  // Finale: after the last disk, the scroll runs FIN more units while the box comes in, every disk
-  // stands up and drops into its slot, and the lid closes. f = 0 … 1 along it.
-  const FIN = boxOpt ? 1.7 : 0, finale = { f: 0, shown: false };
+  // Box (Home): it stands bottom right from the start, holding the disks the Home does not show.
+  // Each disk, as the scroll takes it out of focus, flies over its slot and drops in (one scroll
+  // unit per disk); after the last one the lid closes over TAIL more units. finale.f = 0 … 1 = the lid.
+  const TAIL = boxOpt ? 0.5 : 0, END = boxOpt ? N + TAIL : N - 1, finale = { f: 0, shown: false };
+  let boxIn = 0; // the box's own entrance, 0 … 1
   const box = boxOpt ? buildBox(Math.max(N, boxOpt.total || N), Math.max(0, (boxOpt.total || N) - N)) : null;
   if (box) { box.g.visible = false; scene.add(box.g); }
+  const inBoxOf = (d) => (box && scroll.on ? Math.max(0, Math.min(1, scroll.eff - d.i)) : 0); // 0 = on stage, 1 = in its slot
   const sm = (x) => { x = Math.max(0, Math.min(1, x)); return x * x * (3 - 2 * x); };
   const PATH = ['exit', '-1', '0', '1', '2', 'far']; // distances −2 … 3
   const poseAt = (r) => {
@@ -172,7 +174,7 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
     return poseTmp;
   };
   const targetOf = (d) => { // where a disk wants to be right now
-    const base = scroll.on ? poseAt(d.i - Math.min(scroll.eff, N - 1)) : slots()[d.slot];
+    const base = scroll.on ? poseAt(box ? Math.max(0, d.i - scroll.eff) : d.i - scroll.eff) : slots()[d.slot];
     if (!open) return base;
     if (d.i === active && (scroll.on || d.slot === '0')) return DETAIL[small.matches ? 'mobile' : 'desktop'];
     // the rest clear the card: those on its side leave the stage, the near one stays as a blurred foreground
@@ -274,20 +276,22 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
       c.ry + u.yaw + Math.sin(t * 0.37 + d.seed * 3) * 0.06 * f + mouse.x * 0.24 * f,
       c.rz + Math.sin(t * 0.31 + d.seed * 2) * 0.025 * f - lean(d.vel.x, 0.55, 0.45), 'ZXY'));
     d.fin = 0;
-    if (box && finale.f > 0) { // towards the box: first above its slot, upright, then down into it
-      const ff = finale.f, w = sm((ff - 0.1 - d.i * 0.06) / 0.34), drop = sm((ff - 0.46 - d.i * 0.07) / 0.2);
-      _pb.set(0, box.yIn + (1 - drop) * 118, box.slotZ(box.first + d.i)).applyMatrix4(box.g.matrixWorld);
-      _pa.lerp(_pb, w); _qa.slerp(box.g.quaternion, w); d.fin = w;
+    const p = inBoxOf(d);
+    if (p > 0) { // towards the box: first above its slot, upright, then down into it
+      const w = sm(p / 0.62), drop = sm((p - 0.56) / 0.44);
+      _pb.set(0, box.yIn + (1 - drop) * 112, box.slotZ(box.first + d.i)).applyMatrix4(box.g.matrixWorld);
+      _pa.lerp(_pb, w); _pa.y += Math.sin(Math.PI * w) * 14; _qa.slerp(box.g.quaternion, w); d.fin = w;
     }
     d.roll.position.copy(_pa); d.roll.quaternion.copy(_qa);
   }
   const _pa = new THREE.Vector3(), _pb = new THREE.Vector3(), _qa = new THREE.Quaternion(), _eu = new THREE.Euler();
   if (box) box.first = Math.max(0, ((boxOpt.total || N) - N));
-  function placeBox() { // the box rises from below the stage and settles a little left of centre
-    const m = small.matches, f = finale.f, z = m ? -420 : 120, hh = (DIST - z) * TAN, e = sm(f / 0.3);
-    box.g.position.set(((m ? 0.5 : 0.42) - 0.5) * 2 * hh * camera.aspect, (0.5 - (m ? 0.46 : 0.68)) * 2 * hh - (1 - e) * hh * 2.4, z);
-    box.g.rotation.set(0.5, -0.5 + (1 - e) * 0.9 + mouse.x * 0.06, 0, 'YXZ');
-    box.lid.rotation.x = -1.9 * (1 - sm((f - 0.8) / 0.2));
+  function placeBox() { // bottom right, small; it comes up from below with the entrance
+    const m = small.matches, k0 = (90 * H) / (2 * DIST * TAN), z = DIST * (1 - k0 / Math.max(8, (m ? 0.25 : 0.13) * W)), hh = (DIST - z) * TAN;
+    const e = 1 - Math.pow(1 - boxIn, 3), f = reduced.matches ? 0 : 1;
+    box.g.position.set(((m ? 0.74 : 0.79) - 0.5 - mouse.x * 0.006 * f) * 2 * hh * camera.aspect, (0.5 - (m ? 0.875 : 0.885)) * 2 * hh - (1 - e) * hh * 0.9, z);
+    box.g.rotation.set(0.5, -0.5 + (1 - e) * 1.1 + mouse.x * 0.06 * f, 0, 'YXZ');
+    box.lid.rotation.x = -1.9 * sm(scroll.eff / 0.3) * (1 - sm(finale.f)); // shut at rest, open while the disks go in
     box.g.updateMatrixWorld(true);
   }
 
@@ -338,7 +342,8 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
     const d = ptr.d, now = performance.now(), tap = ptr.travel < 6 && now - ptr.st < 450;
     ptr.id = null; ptr.d = null; delete host.dataset.dragging;
     if (e.type === 'pointerup') {
-      if (d !== focus()) { if (tap) { const to = active + (scroll.on ? Math.sign(d.i - active) : rel(d.i) < 0 ? -1 : 1); if (scroll.on) onRequest(to); else setActive(to); } } // any other disk moves the row one step its way
+      if (tap && inBoxOf(d) > 0.5) onRequest(d.i); // a disk in the box: take it out again
+      else if (d !== focus()) { if (tap) { const to = active + (scroll.on ? Math.sign(d.i - active) : rel(d.i) < 0 ? -1 : 1); if (scroll.on) onRequest(to); else setActive(to); } } // any other disk moves the row one step its way
       else if (tap) setOpen(!open);
       else if (!tap && !scroll.on && now - ptr.t < 90 && !reduced.matches) { d.u.iy = Math.max(-16, Math.min(16, ptr.vx)); if (e.pointerType === 'mouse') d.u.ip = Math.max(-6, Math.min(6, ptr.vy)); }
     }
@@ -384,7 +389,7 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
 
     { const k = 1 - Math.exp(-dt * 4); mouse.x += (mouse.tx - mouse.x) * k; mouse.y += (mouse.ty - mouse.y) * k; }
     if (scroll.on) {
-      const rest = scroll.q <= N - 1 ? Math.round(scroll.q) : scroll.q > N - 1 + FIN * 0.4 ? N - 1 + FIN : N - 1; // at rest the nearest disk arrives, or the finale completes
+      const rest = box && scroll.q > N - 0.5 ? END : Math.min(N - 1, Math.round(scroll.q)); // at rest the nearest disk arrives, or the last one goes in and the lid shuts
       const goal = !scroll.hold && now - scroll.t > 200 ? rest : scroll.q; // scroll.hold: QA, stay exactly on the scroll
       scroll.eff = rm ? goal : scroll.eff + (goal - scroll.eff) * (1 - Math.exp(-dt * 9));
       const idx = Math.max(0, Math.min(N - 1, Math.round(scroll.eff)));
@@ -394,9 +399,11 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
         onChange(active);
       }
       if (box) {
-        finale.f = Math.max(0, Math.min(1, (scroll.eff - (N - 1)) / FIN));
-        if (finale.f > 0) { placeBox(); if (open) setOpen(false); }
-        const on = finale.f > 0.42; if (on !== finale.shown) { finale.shown = on; onFinale(on); }
+        if (entered && boxIn < 1) boxIn = Math.min(1, boxIn + dt / 1.5);
+        finale.f = Math.max(0, Math.min(1, (scroll.eff - N) / TAIL));
+        if (open && scroll.eff - active > 0.08) setOpen(false);
+        const on = scroll.eff > N - 0.45; if (on !== finale.shown) { finale.shown = on; onFinale(on); }
+        placeBox();
       }
     }
     for (const d of disks) {
@@ -421,7 +428,7 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
 
     // composite, far to near
     renderer.setRenderTarget(null); renderer.clear();
-    const order = [...disks].sort((a, b) => a.cur.s - b.cur.s), inBox = !!box && finale.f > 0.001, group = [];
+    const order = [...disks].sort((a, b) => a.cur.s - b.cur.s), inBox = !!box && scroll.on, group = [];
     for (const d of disks) d.roll.visible = false;
     if (box) box.g.visible = false;
     for (const d of order) {
@@ -463,14 +470,14 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
 
   return {
     setActive, next: () => setActive(active + 1), prev: () => setActive(active - 1), setOpen, setView,
-    // q = disks gone by (0 … N−1, a float), from the page scroll
+    // q = disks gone by (a float, 0 … span), from the page scroll
     setScroll(q) {
-      q = Math.max(0, Math.min(N - 1 + FIN, q));
+      q = q >= 0 ? Math.min(END, q) : 0; // also catches NaN
       if (!scroll.on) { scroll.on = true; scroll.eff = q; view = 'field'; for (const d of disks) { d.exiting = 0; d.u.yawT = d.u.pitchT = 0; } }
       if (Math.abs(q - scroll.q) > 1e-4) scroll.t = performance.now();
       scroll.q = q; wake();
     },
-    get scroll() { return scroll; }, get finale() { return finale; }, span: N - 1 + FIN,
+    get scroll() { return scroll; }, get finale() { return finale; }, span: END,
     get open() { return open; }, get view() { return view; },
     get active() { return active; },
     get fps() { return frames.length ? Math.round(frames.length / frames.reduce((a, b) => a + b, 0)) : 0; },

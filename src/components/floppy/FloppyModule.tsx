@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import ElasticLine from '@/components/ui/ElasticLine/ElasticLine'
+import { useScramble } from '@/lib/useScramble'
 import s from './floppy.module.scss'
 
 export type FloppyItem = {
@@ -36,6 +37,19 @@ function Typed({ text }: { text: string }) {
   return <span className={s.typed} aria-hidden="true">{shown || '\u200b'}<span className={s.caret} data-on={busy || undefined} /></span>
 }
 
+// Closing link: same behaviour as the landing email (letters decode on hover, the underline draws).
+function BoxLink({ href, text, on }: { href: string; text: string; on: boolean }) {
+  const [hot, setHot] = useState(false)
+  const live = useScramble(text, hot, true)
+  return (
+    <Link className={s.finaleCta} href={href} tabIndex={on ? 0 : -1} aria-label={text}
+      onMouseEnter={() => setHot(true)} onMouseLeave={() => setHot(false)} onFocus={() => setHot(true)} onBlur={() => setHot(false)}>
+      <span className={s.ghost} aria-hidden="true">{text}</span>
+      <span className={s.live} aria-hidden="true">{live}</span>
+    </Link>
+  )
+}
+
 // Lab module (Figma 7025:21805): the text is plain HTML; the disks are one WebGL
 // canvas over it (pointer-events: none, the section handles the pointer), loaded
 // only when the module comes near the viewport. No WebGL = the text alone.
@@ -53,7 +67,7 @@ export default function FloppyModule({ items, labName, labHref, strings, mode = 
   const [open, setOpen] = useState(false)
   const [view, setView] = useState<View>('field')
   const [finale, setFinale] = useState(false)
-  const it = items[Math.min(active, items.length - 1)]
+  const it = items[Math.min(active, items.length - 1)] ?? items[0]
 
   useEffect(() => {
     const el = host.current, cv = canvas.current
@@ -78,7 +92,7 @@ export default function FloppyModule({ items, labName, labHref, strings, mode = 
               onEnter: () => { el.dataset.intro = 'in' },
               onRequest: (i: number) => scrollTo.current(i),
               onFinale: (f: boolean) => setFinale(f),
-              // the Home ends with every disk going into the box (the ones not shown stand in it already)
+              // the Home files every disk into the box (the ones not shown stand in it already)
               box: mode === 'scroll' && !matchMedia('(prefers-reduced-motion: reduce)').matches ? { total } : null,
             })
             stage.current = st
@@ -90,7 +104,7 @@ export default function FloppyModule({ items, labName, labHref, strings, mode = 
               const span = () => Math.max(1, rw.offsetHeight - window.innerHeight)
               const onScroll = () => st.setScroll((Math.min(1, Math.max(0, -rw.getBoundingClientRect().top / span()))) * st.span)
               scrollTo.current = (i) => {
-                const k = Math.min(n - 1, Math.max(0, i))
+                const k = i >= n ? st.span : Math.max(0, i) // past the last disk = the end: it goes into the box
                 window.scrollTo({ top: rw.getBoundingClientRect().top + window.scrollY + (span() * k) / st.span, behavior: 'smooth' })
               }
               window.addEventListener('scroll', onScroll, { passive: true })
@@ -174,7 +188,7 @@ export default function FloppyModule({ items, labName, labHref, strings, mode = 
 
       <div className={s.finale} aria-hidden={!finale}>
         <p className={s.finaleLine}>{strings.boxLine}</p>
-        <Link className={s.finaleCta} href={labHref} tabIndex={finale ? 0 : -1}>{strings.boxCta} <span aria-hidden="true">→</span></Link>
+        <BoxLink href={labHref} text={`${strings.boxCta} →`} on={finale} />
       </div>
       <div className={s.nav}>
         <button type="button" onClick={() => go(-1)} aria-label={strings.prev}>‹</button>

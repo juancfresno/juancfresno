@@ -206,31 +206,34 @@
 .close { appearance: none; border: 0; background: none; padding: 13px 4px; color: $color-text-mid; &:hover { color: $color-text-hi; } }
 @media (prefers-reduced-motion: reduce) { .card, .mod[data-open] .card { transition: none; transform: none; > * { animation: none; } } }
 
-// Scroll mode (Home): a tall runway with the module pinned in it; the page scroll files the
-// disks past (60 svh per disk after the first screen). Only once the stage is running
-// ([data-scroll]): no JS, no WebGL or reduced motion = the normal module in the flow.
+// Scroll mode (Home, Figma 7025:21805 as of 13 Nov 2026): a tall runway with the module pinned in
+// it; the page scroll files the disks past and into the box, bottom right (60 svh per unit).
+// Header line at the top, the description right-aligned over the box. Only once the stage is
+// running ([data-scroll]): no JS, no WebGL or reduced motion = the normal module in the flow.
 .runway[data-scroll] {
   position: relative;
   height: calc(100svh + var(--steps, 5) * 60svh);
   .mod { position: sticky; top: 0; height: 100svh; }
   .views { display: none; }
+  .head { top: max(96px, 9.2svh); }
+  .what { left: auto; right: max(#{$m}, env(safe-area-inset-right, 0px)); top: 51.5%; width: min(21.85vw, 367px); text-align: right; font-size: 14px; line-height: 20px; }
   @include respond-to(md) {
     .head { top: 84px; }
-    .info { top: calc(62svh - 84px); }
-    .what { top: calc(62svh + 78px); }
+    .info { top: calc(58svh - 84px); }
+    .what { left: max(#{$m}, env(safe-area-inset-left, 0px)); right: 46%; top: calc(58svh + 78px); width: auto; text-align: left; font-size: 15px; line-height: 21px; }
     .nav { top: 136px; }
   }
 }
 
-// Finale (Home): once the disks are going into the box the project texts step back and one
-// closing line with the link to the Lab comes in.
+// End of the parade (Home): the last disk is in the box and the lid shuts; the description gives
+// way, in the same place, to one closing line and the link to the Lab.
 .finale {
   position: absolute; z-index: 2;
-  right: max(#{$m}, env(safe-area-inset-right, 0px)); top: 52%;
-  display: flex; flex-direction: column; align-items: flex-end; gap: 14px;
-  opacity: 0; transform: translateY(14px); pointer-events: none;
+  right: max(#{$m}, env(safe-area-inset-right, 0px)); top: 51.5%;
+  display: flex; flex-direction: column; align-items: flex-end; gap: 10px;
+  opacity: 0; transform: translateY(8px); pointer-events: none;
   transition: opacity 0.35s ease, transform 0.35s ease;
-  @include respond-to(md) { top: auto; bottom: 96px; }
+  @include respond-to(md) { right: auto; left: max(#{$m}, env(safe-area-inset-left, 0px)); top: calc(58svh + 78px); align-items: flex-start; }
 }
 .finaleLine {
   margin: 0;
@@ -238,14 +241,19 @@
   color: $color-text-mid;
 }
 .finaleCta {
-  font-family: $font-body; font-weight: $fw-light;
-  font-size: clamp(2rem, 3.81vw, 64px); line-height: 1; letter-spacing: -0.03em;
+  position: relative; display: inline-block;
+  font-family: $font-body; font-weight: $fw-regular;
+  font-size: 24px; line-height: 32px; letter-spacing: -0.02em;
   color: $color-text-hi; text-decoration: none;
-  span { display: inline-block; transition: transform 0.3s cubic-bezier(0.2, 0.7, 0.2, 1); }
-  &:hover span, &:focus-visible span { transform: translateX(8px); }
+  background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat;
+  transition: background-size 420ms cubic-bezier(0.22, 1, 0.36, 1);
+  &:hover, &:focus-visible { background-size: 100% 1px; }
   &:focus-visible { outline: 1px solid var(--c-g, #003dff); outline-offset: 6px; }
+  @media (prefers-reduced-motion: reduce) { transition: none; }
 }
+.ghost { visibility: hidden; }
+.live { position: absolute; left: 0; top: 0; white-space: nowrap; }
 .mod[data-finale] {
-  .info, .what, .nav { opacity: 0; pointer-events: none; animation: none; transition: opacity 0.3s ease; }
-  .finale { opacity: 1; transform: none; pointer-events: auto; transition: opacity 0.7s ease 0.25s, transform 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) 0.25s; }
+  .info, .what { opacity: 0; pointer-events: none; animation: none; transition: opacity 0.3s ease; }
+  .finale { opacity: 1; transform: none; pointer-events: auto; transition: opacity 0.6s ease 0.2s, transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) 0.2s; }
 }
