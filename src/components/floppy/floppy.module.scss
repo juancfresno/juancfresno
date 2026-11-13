@@ -211,7 +211,7 @@
 // ([data-scroll]): no JS, no WebGL or reduced motion = the normal module in the flow.
 .runway[data-scroll] {
   position: relative;
-  height: calc(100svh + (var(--n, 6) - 1) * 60svh);
+  height: calc(100svh + var(--steps, 5) * 60svh);
   .mod { position: sticky; top: 0; height: 100svh; }
   .views { display: none; }
   @include respond-to(md) {
@@ -220,4 +220,32 @@
     .what { top: calc(62svh + 78px); }
     .nav { top: 136px; }
   }
+}
+
+// Finale (Home): once the disks are going into the box the project texts step back and one
+// closing line with the link to the Lab comes in.
+.finale {
+  position: absolute; z-index: 2;
+  right: max(#{$m}, env(safe-area-inset-right, 0px)); top: 52%;
+  display: flex; flex-direction: column; align-items: flex-end; gap: 14px;
+  opacity: 0; transform: translateY(14px); pointer-events: none;
+  transition: opacity 0.35s ease, transform 0.35s ease;
+  @include respond-to(md) { top: auto; bottom: 96px; }
+}
+.finaleLine {
+  margin: 0;
+  font-family: $font-mono; font-weight: $fw-mono; font-size: 11px; line-height: 14px; text-transform: uppercase; letter-spacing: 0.04em;
+  color: $color-text-mid;
+}
+.finaleCta {
+  font-family: $font-body; font-weight: $fw-light;
+  font-size: clamp(2rem, 3.81vw, 64px); line-height: 1; letter-spacing: -0.03em;
+  color: $color-text-hi; text-decoration: none;
+  span { display: inline-block; transition: transform 0.3s cubic-bezier(0.2, 0.7, 0.2, 1); }
+  &:hover span, &:focus-visible span { transform: translateX(8px); }
+  &:focus-visible { outline: 1px solid var(--c-g, #003dff); outline-offset: 6px; }
+}
+.mod[data-finale] {
+  .info, .what, .nav { opacity: 0; pointer-events: none; animation: none; transition: opacity 0.3s ease; }
+  .finale { opacity: 1; transform: none; pointer-events: auto; transition: opacity 0.7s ease 0.25s, transform 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) 0.25s; }
 }

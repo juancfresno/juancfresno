@@ -10,8 +10,8 @@ export type FloppyItem = {
   label?: string; shell?: string; accent?: string; translucent?: boolean
 }
 type View = 'field' | 'ring'
-type Stage = { setActive(i: number): void; next(): void; prev(): void; setOpen(o: boolean, silent?: boolean): void; setView(v: View): void; setScroll(q: number): void; dispose(): void }
-type Strings = { region: string; prev: string; next: string; open: string; close: string; built: string; how: string; year: string; viewField: string; viewRing: string }
+type Stage = { setActive(i: number): void; next(): void; prev(): void; setOpen(o: boolean, silent?: boolean): void; setView(v: View): void; setScroll(q: number): void; span: number; dispose(): void }
+type Strings = { region: string; prev: string; next: string; open: string; close: string; built: string; how: string; year: string; viewField: string; viewRing: string; boxLine: string; boxCta: string }
 type Props = { items: FloppyItem[]; labName: string; labHref: string; strings: Strings; mode?: 'free' | 'scroll'; total?: number }
 
 // Text that changes like an old terminal: the block cursor eats the old string and types the new one.
@@ -52,6 +52,7 @@ export default function FloppyModule({ items, labName, labHref, strings, mode = 
   const [ready, setReady] = useState(false)
   const [open, setOpen] = useState(false)
   const [view, setView] = useState<View>('field')
+  const [finale, setFinale] = useState(false)
   const it = items[Math.min(active, items.length - 1)]
 
   useEffect(() => {
@@ -69,12 +70,16 @@ export default function FloppyModule({ items, labName, labHref, strings, mode = 
           if (dead) return
           try {
             if (!matchMedia('(prefers-reduced-motion: reduce)').matches) el.dataset.intro = 'pending'
-            const st = createFloppyStage(el, cv, {
+            // stage.js is untyped JS: its option types are inferred from defaults, so call it loosely
+            const st = (createFloppyStage as unknown as (h: HTMLElement, c: HTMLCanvasElement, o: object) => Stage)(el, cv, {
               items: data,
               onChange: (i: number) => setActive(i),
               onOpen: (o: boolean) => setOpen(o),
               onEnter: () => { el.dataset.intro = 'in' },
               onRequest: (i: number) => scrollTo.current(i),
+              onFinale: (f: boolean) => setFinale(f),
+              // the Home ends with every disk going into the box (the ones not shown stand in it already)
+              box: mode === 'scroll' && !matchMedia('(prefers-reduced-motion: reduce)').matches ? { total } : null,
             })
             stage.current = st
             // Scroll mode (Home): the module is pinned inside a tall runway and the page scroll
@@ -83,14 +88,15 @@ export default function FloppyModule({ items, labName, labHref, strings, mode = 
             if (mode === 'scroll' && rw && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
               const n = items.length
               const span = () => Math.max(1, rw.offsetHeight - window.innerHeight)
-              const onScroll = () => st.setScroll((Math.min(1, Math.max(0, -rw.getBoundingClientRect().top / span()))) * (n - 1))
+              const onScroll = () => st.setScroll((Math.min(1, Math.max(0, -rw.getBoundingClientRect().top / span()))) * st.span)
               scrollTo.current = (i) => {
                 const k = Math.min(n - 1, Math.max(0, i))
-                window.scrollTo({ top: rw.getBoundingClientRect().top + window.scrollY + (span() * k) / (n - 1), behavior: 'smooth' })
+                window.scrollTo({ top: rw.getBoundingClientRect().top + window.scrollY + (span() * k) / st.span, behavior: 'smooth' })
               }
               window.addEventListener('scroll', onScroll, { passive: true })
               window.addEventListener('resize', onScroll)
               unscroll = () => { window.removeEventListener('scroll', onScroll); window.removeEventListener('resize', onScroll) }
+              rw.style.setProperty('--steps', String(st.span))
               rw.dataset.scroll = ''
               onScroll()
             }
@@ -104,7 +110,7 @@ export default function FloppyModule({ items, labName, labHref, strings, mode = 
     }, { rootMargin: '600px' })
     io.observe(el)
     return () => { dead = true; io.disconnect(); unscroll(); scrollTo.current = () => {}; stage.current?.dispose(); stage.current = null }
-  }, [items, mode])
+  }, [items, mode, total])
 
   useEffect(() => { if (open) closeBtn.current?.focus({ preventScroll: true }) }, [open])
 
@@ -125,6 +131,7 @@ export default function FloppyModule({ items, labName, labHref, strings, mode = 
       data-wf="media"
       data-view={view}
       data-open={open || undefined}
+      data-finale={finale || undefined}
       onKeyDown={(e) => {
         if (e.key === 'ArrowRight') { go(1); e.preventDefault() }
         else if (e.key === 'ArrowLeft') { go(-1); e.preventDefault() }
@@ -165,6 +172,10 @@ export default function FloppyModule({ items, labName, labHref, strings, mode = 
         </div>
       </article>
 
+      <div className={s.finale} aria-hidden={!finale}>
+        <p className={s.finaleLine}>{strings.boxLine}</p>
+        <Link className={s.finaleCta} href={labHref} tabIndex={finale ? 0 : -1}>{strings.boxCta} <span aria-hidden="true">→</span></Link>
+      </div>
       <div className={s.nav}>
         <button type="button" onClick={() => go(-1)} aria-label={strings.prev}>‹</button>
         <span aria-hidden="true">{it.n} / {String(total).padStart(3, '0')}</span>

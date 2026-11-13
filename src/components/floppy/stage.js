@@ -5,7 +5,63 @@
    target, blurred there and composited back to front. */
 import * as THREE from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
+import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 import { createFloppy } from './core.js';
+
+/* The disk box (the finale on the Home): an ink ABS tray with a smoked lid hinged at the back,
+   a key lock and a paper label. Local frame: origin at the centre of the base, y up, front = +z.
+   `fillers` disks already stand at the back (plain stand-ins: only their top edges show);
+   the real ones drop into the front slots. Units: mm. */
+const BOX = { w: 100, pitch: 8, base: 44, lid: 58, wall: 2.4 };
+function buildBox(slots, fillers) {
+  const { w: Wb, pitch, base: Hb, lid: Hl, wall: t } = BOX, D = slots * pitch + 12;
+  const g = new THREE.Group(), keep = [];
+  const mat = (m) => (keep.push(m), m);
+  const abs = mat(new THREE.MeshPhysicalMaterial({ color: '#2b2b27', roughness: 0.44 }));
+  const smoke = mat(new THREE.MeshPhysicalMaterial({ color: '#3a322b', roughness: 0.06, transparent: true, opacity: 0.3, depthWrite: false, side: THREE.DoubleSide, envMapIntensity: 1.6, clearcoat: 1, clearcoatRoughness: 0.08 }));
+  const steel = mat(new THREE.MeshPhysicalMaterial({ color: '#c6c6c2', metalness: 1, roughness: 0.32 }));
+  const paper = mat(new THREE.MeshStandardMaterial({ color: '#FCFCF7', roughness: 0.92 }));
+  const part = (w, h, d, x, y, z, m, parent = g) => {
+    const geo = new RoundedBoxGeometry(w, h, d, 2, Math.min(0.9, Math.min(w, h, d) / 2.4)); keep.push(geo);
+    const mesh = new THREE.Mesh(geo, m); mesh.position.set(x, y, z); parent.add(mesh); return mesh;
+  };
+  // tray
+  part(Wb + 2 * t, t, D + 2 * t, 0, t / 2, 0, abs);
+  part(Wb + 2 * t, Hb, t, 0, Hb / 2, D / 2 + t / 2, abs);
+  part(Wb + 2 * t, Hb, t, 0, Hb / 2, -D / 2 - t / 2, abs);
+  part(t, Hb, D + 2 * t, -Wb / 2 - t / 2, Hb / 2, 0, abs);
+  part(t, Hb, D + 2 * t, Wb / 2 + t / 2, Hb / 2, 0, abs);
+  // front: paper label and key lock
+  const lc = document.createElement('canvas'); lc.width = 640; lc.height = 176;
+  const x = lc.getContext('2d'); x.fillStyle = '#FCFCF7'; x.fillRect(0, 0, 640, 176); x.fillStyle = '#10100E';
+  x.font = '500 30px "Sometype Mono", ui-monospace, Menlo, monospace'; x.textBaseline = 'alphabetic';
+  x.fillText('FRESNO© LAB', 28, 58); x.fillText(`${String(slots).padStart(3, '0')} DISKS`, 28, 146);
+  x.fillRect(28, 84, 584, 3); x.fillStyle = '#003DFF'; x.fillRect(560, 112, 52, 36);
+  const lt = new THREE.CanvasTexture(lc); lt.colorSpace = THREE.SRGBColorSpace; lt.anisotropy = 8; keep.push(lt);
+  const label = part(46, 12.6, 0.3, -18, Hb * 0.5, D / 2 + t + 0.12, mat(new THREE.MeshStandardMaterial({ map: lt, roughness: 0.9 })));
+  label.geometry.dispose(); label.geometry = new THREE.BoxGeometry(46, 12.6, 0.3); keep.push(label.geometry);
+  const lockG = new THREE.CylinderGeometry(3.4, 3.4, 1.4, 28); keep.push(lockG);
+  const lock = new THREE.Mesh(lockG, steel); lock.rotation.x = Math.PI / 2; lock.position.set(32, Hb * 0.5, D / 2 + t + 0.5); g.add(lock);
+  part(0.9, 3.4, 0.5, 32, Hb * 0.5, D / 2 + t + 1.2, abs); // keyhole
+  // lid, hinged along the back top edge; closed = 0, open = leaning back
+  const lid = new THREE.Group(); lid.position.set(0, Hb, -D / 2 - t); g.add(lid);
+  const L = D + 2 * t;
+  part(Wb + 2 * t, t, L, 0, Hl, L / 2, smoke, lid);
+  part(Wb + 2 * t, Hl, t, 0, Hl / 2, L - t / 2, smoke, lid);
+  part(Wb + 2 * t, Hl, t, 0, Hl / 2, t / 2, smoke, lid);
+  part(t, Hl, L, -Wb / 2 - t / 2, Hl / 2, L / 2, smoke, lid);
+  part(t, Hl, L, Wb / 2 + t / 2, Hl / 2, L / 2, smoke, lid);
+  // stand-in disks at the back
+  const slotZ = (k) => (k - (slots - 1) / 2) * pitch, yIn = t + 47.4;
+  const tints = ['#10100E', '#2F6BFF', '#8F8D87', '#10100E'];
+  for (let k = 0; k < fillers; k++) {
+    part(90, 94, 3.3, 0, yIn, slotZ(k), mat(new THREE.MeshPhysicalMaterial({ color: tints[k % tints.length], roughness: 0.55 })));
+    part(44, 0.4, 3.5, 8, yIn + 47, slotZ(k), steel);
+    const face = (w, h, x, y, m) => { const geo = new THREE.BoxGeometry(w, h, 0.12); keep.push(geo); const f = new THREE.Mesh(geo, m); f.position.set(x, yIn + y, slotZ(k) + 1.7); g.add(f); };
+    face(70, 58, 0, -16, paper); face(44, 29, 8, 32.2, steel); // a blank label and the shutter, so the face is not bare
+  }
+  return { g, lid, slotZ, yIn, dispose: () => keep.forEach((o) => o.dispose()) };
+}
 
 // x, y = centre as a fraction of the stage; s = disk width as a fraction of the stage width;
 // blur in css px at a 1680 stage; rx, ry, rz = pitch, yaw, screen roll.
@@ -48,7 +104,7 @@ const DETAIL = {
 const KEYS = ['x', 'y', 's', 'blur', 'rx', 'ry', 'rz'];
 const FOV = 24, DIST = 600, TAN = Math.tan((FOV * Math.PI) / 360);
 
-export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, onEnter = () => {}, onOpen = (_o) => {}, onRequest = (_i) => {}, start = 0 }) {
+export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, onEnter = () => {}, onOpen = (_o) => {}, onRequest = (_i) => {}, onFinale = (_f) => {}, box: boxOpt = null, start = 0 }) {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
   renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -102,6 +158,12 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
   // Scroll mode (Home): the page scroll is the timeline. q = how many disks have gone by (a float);
   // each disk sits at its distance to q along the same path the conveyor uses, so they file past.
   const scroll = { on: false, q: 0, eff: 0, t: -1e9 };
+  // Finale: after the last disk, the scroll runs FIN more units while the box comes in, every disk
+  // stands up and drops into its slot, and the lid closes. f = 0 … 1 along it.
+  const FIN = boxOpt ? 1.7 : 0, finale = { f: 0, shown: false };
+  const box = boxOpt ? buildBox(Math.max(N, boxOpt.total || N), Math.max(0, (boxOpt.total || N) - N)) : null;
+  if (box) { box.g.visible = false; scene.add(box.g); }
+  const sm = (x) => { x = Math.max(0, Math.min(1, x)); return x * x * (3 - 2 * x); };
   const PATH = ['exit', '-1', '0', '1', '2', 'far']; // distances −2 … 3
   const poseAt = (r) => {
     const S = slots(), x = Math.max(-2, Math.min(3, r)) + 2, i0 = Math.min(4, Math.floor(x)), u = x - i0, e = u * u * (3 - 2 * u); // ease: it lingers at each stop
@@ -110,7 +172,7 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
     return poseTmp;
   };
   const targetOf = (d) => { // where a disk wants to be right now
-    const base = scroll.on ? poseAt(d.i - scroll.eff) : slots()[d.slot];
+    const base = scroll.on ? poseAt(d.i - Math.min(scroll.eff, N - 1)) : slots()[d.slot];
     if (!open) return base;
     if (d.i === active && (scroll.on || d.slot === '0')) return DETAIL[small.matches ? 'mobile' : 'desktop'];
     // the rest clear the card: those on its side leave the stage, the near one stays as a blurred foreground
@@ -205,11 +267,28 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
     const f = reduced.matches ? 0 : 1, u = d.u;
     // cursor: near disks slide more than far ones, and every disk leans towards the pointer
     const par = 0.02 * Math.pow(c.s / 0.235, 1.15) * f, px = c.x - mouse.x * par, py = c.y - mouse.y * par * (W / H);
-    d.roll.position.set((px - 0.5) * 2 * hh * camera.aspect, (0.5 - py) * 2 * hh + Math.sin(t * 0.7 + d.seed) * 1.2 * f, z);
+    _pa.set((px - 0.5) * 2 * hh * camera.aspect, (0.5 - py) * 2 * hh + Math.sin(t * 0.7 + d.seed) * 1.2 * f, z);
     const lean = (v, k, m) => Math.max(-m, Math.min(m, v * k)) * f; // a moving disk banks into its path
-    d.roll.rotation.z = c.rz + Math.sin(t * 0.31 + d.seed * 2) * 0.025 * f - lean(d.vel.x, 0.55, 0.45);
-    d.tilt.rotation.x = c.rx + lean(d.vel.y, 0.6, 0.4) + u.pitch + Math.sin(t * 0.43 + d.seed) * 0.035 * f + mouse.y * 0.16 * f;
-    d.turn.rotation.y = c.ry + u.yaw + Math.sin(t * 0.37 + d.seed * 3) * 0.06 * f + mouse.x * 0.24 * f;
+    _qa.setFromEuler(_eu.set( // screen roll · pitch · yaw
+      c.rx + lean(d.vel.y, 0.6, 0.4) + u.pitch + Math.sin(t * 0.43 + d.seed) * 0.035 * f + mouse.y * 0.16 * f,
+      c.ry + u.yaw + Math.sin(t * 0.37 + d.seed * 3) * 0.06 * f + mouse.x * 0.24 * f,
+      c.rz + Math.sin(t * 0.31 + d.seed * 2) * 0.025 * f - lean(d.vel.x, 0.55, 0.45), 'ZXY'));
+    d.fin = 0;
+    if (box && finale.f > 0) { // towards the box: first above its slot, upright, then down into it
+      const ff = finale.f, w = sm((ff - 0.1 - d.i * 0.06) / 0.34), drop = sm((ff - 0.46 - d.i * 0.07) / 0.2);
+      _pb.set(0, box.yIn + (1 - drop) * 118, box.slotZ(box.first + d.i)).applyMatrix4(box.g.matrixWorld);
+      _pa.lerp(_pb, w); _qa.slerp(box.g.quaternion, w); d.fin = w;
+    }
+    d.roll.position.copy(_pa); d.roll.quaternion.copy(_qa);
+  }
+  const _pa = new THREE.Vector3(), _pb = new THREE.Vector3(), _qa = new THREE.Quaternion(), _eu = new THREE.Euler();
+  if (box) box.first = Math.max(0, ((boxOpt.total || N) - N));
+  function placeBox() { // the box rises from below the stage and settles a little left of centre
+    const m = small.matches, f = finale.f, z = m ? -420 : 120, hh = (DIST - z) * TAN, e = sm(f / 0.3);
+    box.g.position.set(((m ? 0.5 : 0.42) - 0.5) * 2 * hh * camera.aspect, (0.5 - (m ? 0.46 : 0.68)) * 2 * hh - (1 - e) * hh * 2.4, z);
+    box.g.rotation.set(0.5, -0.5 + (1 - e) * 0.9 + mouse.x * 0.06, 0, 'YXZ');
+    box.lid.rotation.x = -1.9 * (1 - sm((f - 0.8) / 0.2));
+    box.g.updateMatrixWorld(true);
   }
 
   // ── pointer: the focused disk turns under the hand, the others come to focus on click
@@ -291,7 +370,7 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
   const frames = [];
   const wake = () => { if (!raf && visible && onScreen && !dead) { last = 0; raf = requestAnimationFrame(tick); } };
   function settled() {
-    return (!scroll.on || Math.abs(scroll.eff - Math.round(scroll.q)) < 1e-3) && ptr.id === null && disks.every((d) => !d.exiting && !d.api.busy && Math.abs(d.u.vy) < 1e-3 && Math.abs(d.u.iy) < 1e-3 && Math.abs(d.u.yawT - d.u.yaw) < 1e-4
+    return !scroll.on && ptr.id === null && disks.every((d) => !d.exiting && !d.api.busy && Math.abs(d.u.vy) < 1e-3 && Math.abs(d.u.iy) < 1e-3 && Math.abs(d.u.yawT - d.u.yaw) < 1e-4
       && KEYS.every((k) => Math.abs(d.vel[k]) < 1e-4 && Math.abs(targetOf(d)[k] - d.cur[k]) < 1e-4));
   }
   function tick(now) {
@@ -305,13 +384,19 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
 
     { const k = 1 - Math.exp(-dt * 4); mouse.x += (mouse.tx - mouse.x) * k; mouse.y += (mouse.ty - mouse.y) * k; }
     if (scroll.on) {
-      const goal = now - scroll.t > 200 ? Math.round(scroll.q) : scroll.q; // scroll at rest: the nearest disk finishes arriving
+      const rest = scroll.q <= N - 1 ? Math.round(scroll.q) : scroll.q > N - 1 + FIN * 0.4 ? N - 1 + FIN : N - 1; // at rest the nearest disk arrives, or the finale completes
+      const goal = !scroll.hold && now - scroll.t > 200 ? rest : scroll.q; // scroll.hold: QA, stay exactly on the scroll
       scroll.eff = rm ? goal : scroll.eff + (goal - scroll.eff) * (1 - Math.exp(-dt * 9));
       const idx = Math.max(0, Math.min(N - 1, Math.round(scroll.eff)));
       if (idx !== active) {
         disks[active].api.setShutter(false); active = idx; hover = null; manual = open;
         if (open) disks[active].api.setShutter(true);
         onChange(active);
+      }
+      if (box) {
+        finale.f = Math.max(0, Math.min(1, (scroll.eff - (N - 1)) / FIN));
+        if (finale.f > 0) { placeBox(); if (open) setOpen(false); }
+        const on = finale.f > 0.42; if (on !== finale.shown) { finale.shown = on; onFinale(on); }
       }
     }
     for (const d of disks) {
@@ -336,13 +421,15 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
 
     // composite, far to near
     renderer.setRenderTarget(null); renderer.clear();
-    const order = [...disks].sort((a, b) => a.cur.s - b.cur.s);
+    const order = [...disks].sort((a, b) => a.cur.s - b.cur.s), inBox = !!box && finale.f > 0.001, group = [];
     for (const d of disks) d.roll.visible = false;
+    if (box) box.g.visible = false;
     for (const d of order) {
       const c = d.cur, m = c.s * 0.9;
-      if (c.x < -m || c.x > 1 + m || c.y * H < -m * W || c.y * H > H + m * W) continue; // off stage
+      if (d.fin < 0.01 && (c.x < -m || c.x > 1 + m || c.y * H < -m * W || c.y * H > H + m * W)) continue; // off stage
+      const b = c.blur * (W / 1680) * pr * (small.matches ? 2.2 : 1) * (1 - d.fin);
+      if (inBox && b < 0.6) { group.push(d); continue; } // sharp ones share one depth pass with the box
       d.roll.visible = true;
-      const b = c.blur * (W / 1680) * pr * (small.matches ? 2.2 : 1);
       if (b < 0.6) { renderer.clearDepth(); renderer.render(scene, camera); }
       else {
         const k = b > 14 ? 0.25 : 0.5, [A, B] = rts[k], step = (b * k) / 2.6;
@@ -355,6 +442,11 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
         renderer.setRenderTarget(null); quad.material = blitMat; blitMat.uniforms.tD.value = A.texture; renderer.render(quad, quadCam);
       }
       d.roll.visible = false;
+    }
+    if (inBox) { // the box, its stand-ins and every sharp disk together, so they hide each other properly
+      box.g.visible = true; for (const d of group) d.roll.visible = true;
+      renderer.clearDepth(); renderer.render(scene, camera);
+      box.g.visible = false; for (const d of group) d.roll.visible = false;
     }
     if (!(rm && settled())) raf = requestAnimationFrame(tick);
   }
@@ -373,12 +465,12 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
     setActive, next: () => setActive(active + 1), prev: () => setActive(active - 1), setOpen, setView,
     // q = disks gone by (0 … N−1, a float), from the page scroll
     setScroll(q) {
-      q = Math.max(0, Math.min(N - 1, q));
+      q = Math.max(0, Math.min(N - 1 + FIN, q));
       if (!scroll.on) { scroll.on = true; scroll.eff = q; view = 'field'; for (const d of disks) { d.exiting = 0; d.u.yawT = d.u.pitchT = 0; } }
       if (Math.abs(q - scroll.q) > 1e-4) scroll.t = performance.now();
       scroll.q = q; wake();
     },
-    get scroll() { return scroll; },
+    get scroll() { return scroll; }, get finale() { return finale; }, span: N - 1 + FIN,
     get open() { return open; }, get view() { return view; },
     get active() { return active; },
     get fps() { return frames.length ? Math.round(frames.length / frames.reduce((a, b) => a + b, 0)) : 0; },
@@ -392,7 +484,7 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
       host.removeEventListener('pointerdown', onDown); host.removeEventListener('pointermove', onMove);
       host.removeEventListener('click', onClick); host.removeEventListener('pointerup', onUp); host.removeEventListener('pointercancel', onUp); host.removeEventListener('pointerleave', onLeave);
       delete host.dataset.cursor; delete host.dataset.dragging;
-      disks.forEach((d) => d.api.dispose()); scene.environment?.dispose();
+      disks.forEach((d) => d.api.dispose()); box?.dispose(); scene.environment?.dispose();
       for (const k of [0.5, 0.25]) rts[k].forEach((t) => t.dispose());
       quadGeo.dispose(); blurMat.dispose(); blitMat.dispose(); renderer.dispose();
     },
