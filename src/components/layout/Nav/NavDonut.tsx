@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 import { startLogoDonut, type LogoDonutHandle } from '@/components/about/donutGl'
-import { DOCK_W, DOCK_Y, pageMargin } from '@/components/about/dock'
+import { DOCK_W, DOCK_W_SMALL, DOCK_Y, pageMargin } from '@/components/about/dock'
 import s from './Nav.module.scss'
 
 // The nav wordmark becomes the 3D donut while the header is hidden (scrolling
@@ -13,8 +13,8 @@ import s from './Nav.module.scss'
 // One small canvas fixed to the top-right corner, in `difference` like the
 // wordmark, never taking the pointer (the real link stays underneath, at
 // opacity 0, so it is still the way home). WebGL starts on the first morph and
-// sleeps whenever the flat wordmark is showing. Desktop only: the phone header
-// never hides. Off with reduced motion, without WebGL2, and on About, whose own
+// sleeps whenever the flat wordmark is showing. Phones too (their top bar stays,
+// the wordmark still turns into a smaller ring). Off with reduced motion, without WebGL2, and on About, whose own
 // donut docks in this corner (LogoDonut, [data-logo-dock]).
 const BOX = 280                   // canvas side, css px
 const WORD_W = 12, WORD_LEN = 101 // the vertical wordmark's glyph box
@@ -31,14 +31,13 @@ export default function NavDonut({ active }: { active: boolean }) {
     if (!c) return
     const root = document.documentElement
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)')
-    const wide = window.matchMedia('(min-width: 769px)')
     let h: LogoDonutHandle | null = null
     let failed = false
     let raf = 0, last = 0
     let m = 0, mv = 0 // 0 wordmark → 1 ring, on a spring
     let ring: [number, number, number] = [0.84, 0.92, 1]
 
-    const allowed = () => !failed && !reduced.matches && wide.matches && !document.querySelector('[data-logo-dock]')
+    const allowed = () => !failed && !reduced.matches && !document.querySelector('[data-logo-dock]')
     const show = (on: boolean) => {
       c.style.visibility = on ? 'visible' : 'hidden'
       if (on) root.setAttribute('data-nav-donut', '')
@@ -68,7 +67,8 @@ export default function NavDonut({ active }: { active: boolean }) {
       const k = Math.min(1, Math.max(0, m))
       h.setMorph(k, w.left + WORD_W / 2 - b.left, w.top - b.top, WORD_W, WORD_LEN)
       // The ring closes a little lower, tipped towards the viewer until it settles.
-      h.setPlace(W - pageMargin(W) - DOCK_W / 2 - b.left, DOCK_Y - b.top, DOCK_W, (1 - k) * 0.9, (1 - k) * 0.5, 1)
+      const d = W <= 768 ? DOCK_W_SMALL : DOCK_W
+      h.setPlace(W - pageMargin(W) - d / 2 - b.left, DOCK_Y - b.top, d, (1 - k) * 0.9, (1 - k) * 0.5, 1)
       h.setInk([WHITE[0] + (ring[0] - 1) * k, WHITE[1] + (ring[1] - 1) * k, WHITE[2] + (ring[2] - 1) * k], k)
       show(true)
       raf = requestAnimationFrame(frame)
@@ -87,11 +87,9 @@ export default function NavDonut({ active }: { active: boolean }) {
       raf = requestAnimationFrame(frame)
     }
     const onChange = () => wake.current()
-    wide.addEventListener('change', onChange)
     reduced.addEventListener('change', onChange)
     return () => {
       cancelAnimationFrame(raf)
-      wide.removeEventListener('change', onChange)
       reduced.removeEventListener('change', onChange)
       root.removeAttribute('data-nav-donut')
       h?.stop()
