@@ -53,18 +53,12 @@ $ease: cubic-bezier(0.22, 1, 0.36, 1);
 
   &[data-held='1'] { cursor: grabbing; }
   // While the cloth is live the canvas draws the image.
-  &[data-cloth='1'] .img { visibility: hidden; }
-}
-
-.img {
+  &[data-cloth='1'] .img {
   display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transform: scale(1.08);
-  transform-origin: 50% 0;
-  transition: transform 1100ms $ease;
-  .piece[data-in] & { transform: none; }
+}
 }
 
 .cloth {
@@ -77,48 +71,141 @@ $ease: cubic-bezier(0.22, 1, 0.36, 1);
   .media[data-cloth='1'] & { visibility: visible; }
 }
 
-// ── Entrance: 12 columns covering the image retract downwards, staggered
-// left → right; an orange scan line rides each column's leading edge.
-.cols {
+// ── Entrance variants (entrance.ts), all left → right. The module carries
+// [data-fx]; a piece gets [data-in] when its turn comes.
+$in: cubic-bezier(0.77, 0, 0.18, 1); // slow start, fast middle, soft landing
+$dur: 1000ms;
+
+.fx, .edge {
   position: absolute;
   inset: 0;
-  display: flex;
-  overflow: hidden;
   pointer-events: none;
+  display: none;
+}
+.fx > span { background: $color-bg; }
+// Replay snaps everything back to hidden without animating.
+.module[data-reset] :is(.img, .fx > span, .edge) { transition: none !important; animation: none !important; }
 
-  > span {
-    position: relative;
-    flex: 1 1 0;
-    margin-right: -1px; // no hairlines between columns
-    background: $color-bg;
-    transform: translateY(0);
-    transition: transform 640ms $ease;
-    transition-delay: calc(var(--c) * 42ms);
-
+// 01 Wipe: clip from the left, a G line on the edge.
+// 02 Push: same clip, the image slides in behind it.
+.module[data-fx='wipe'], .module[data-fx='push'] {
+  .img {
+    clip-path: inset(0 100% 0 0);
+    transition: clip-path $dur $in, transform ($dur + 200ms) $in;
+  }
+  .piece[data-in] .img { clip-path: inset(0 0 0 0); }
+  .edge {
+    display: block;
+    z-index: 2;
+    transform: translateX(0);
+    opacity: 0;
     &::before {
       content: '';
       position: absolute;
-      left: 0;
-      right: 0;
       top: 0;
-      height: 2px;
+      bottom: 0;
+      left: -1px;
+      width: 2px;
       background: var(--c-g);
-      opacity: 0;
-      transition: opacity 160ms linear;
-      transition-delay: calc(var(--c) * 42ms);
     }
   }
-
-  .piece[data-in] & > span {
-    transform: translateY(101%);
-    &::before { opacity: 1; }
+  .piece[data-in] .edge {
+    transform: translateX(100%);
+    animation: edgeLife $dur $in both;
+    transition: transform $dur $in;
   }
+}
+.module[data-fx='push'] {
+  .img { transform: translateX(-14%) scale(1.06); transform-origin: 0 50%; }
+  .piece[data-in] .img { transform: none; }
+}
+@keyframes edgeLife {
+  0% { opacity: 0; }
+  8%, 82% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+// 03 Slats: 12 horizontal bands open from the left, top band first.
+.module[data-fx='slats'] {
+  .fx { display: flex; flex-direction: column; }
+  .fx > span {
+    flex: 1 1 0;
+    margin-bottom: -1px;
+    transform-origin: 100% 50%;
+    transition: transform 620ms $in;
+    transition-delay: calc(var(--c) * 38ms);
+  }
+  .piece[data-in] .fx > span { transform: scaleX(0); }
+}
+
+// 04 Steps: 12 columns pop in one after another, left first.
+.module[data-fx='steps'] {
+  .fx { display: flex; }
+  .fx > span {
+    flex: 1 1 0;
+    margin-right: -1px;
+    transform-origin: 100% 50%;
+    transition: transform 260ms $in;
+    transition-delay: calc(var(--c) * 55ms);
+  }
+  .piece[data-in] .fx > span { transform: scaleX(0); }
+}
+
+// 05 Pixels: hidden until the dither canvas (pixelReveal) covers it.
+.module[data-fx='pixel'] .piece:not([data-in]) .img { visibility: hidden; }
+
+// 06 Stretch: unrolls from its left edge, slight overshoot.
+.module[data-fx='stretch'] {
+  .img {
+    transform: scaleX(0);
+    transform-origin: 0 50%;
+    transition: transform 1100ms cubic-bezier(0.3, 1.32, 0.4, 1);
+  }
+  .piece[data-in] .img { transform: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cols { display: none; }
-  .img { transform: none; transition: none; }
+  .module[data-fx] .img { clip-path: none !important; transform: none !important; visibility: visible !important; transition: none !important; }
+  .fx, .edge { display: none !important; }
   .media { cursor: default; }
+}
+
+// ── Picker (FEATURED_PICKER): compare the entrances. Sticks to the bottom
+// of the viewport while the module is on screen.
+.picker {
+  position: sticky;
+  bottom: calc(16px + var(--tabbar-h, 0px));
+  z-index: 30;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  width: max-content;
+  max-width: calc(100% - 2 * #{$m});
+  margin: 0 0 24px $m;
+  padding: 6px;
+  background: var(--c-bg);
+  border: 1px solid var(--c-line);
+  font-family: $font-mono;
+  font-weight: $fw-mono;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+.pickerLabel { padding: 0 8px 0 4px; color: var(--c-text-dim); }
+.pickerBtn {
+  appearance: none;
+  border: 1px solid var(--c-line);
+  background: transparent;
+  color: var(--c-text);
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  padding: 5px 8px;
+  cursor: pointer;
+  &:hover { border-color: var(--c-text); }
+  &[aria-pressed='true'] { background: var(--c-chip, var(--c-text)); color: var(--c-chip-ink, var(--c-bg)); border-color: transparent; }
+  &:focus-visible { outline: 1px solid var(--c-g); outline-offset: 2px; }
 }
 
 // ── Mobile: the frame becomes a column; pieces alternate sides.

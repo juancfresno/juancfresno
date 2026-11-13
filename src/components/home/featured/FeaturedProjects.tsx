@@ -1,28 +1,48 @@
 'use client'
 
-import { useEffect, useRef, type CSSProperties } from 'react'
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react'
 import ElasticLine from '@/components/ui/ElasticLine/ElasticLine'
-import { FEATURED_FRAME as F, FEATURED_LABEL, type FeaturedPiece } from '@/content/featured-preview'
+import { FEATURED_FRAME as F, FEATURED_LABEL, FEATURED_PICKER, type FeaturedPiece } from '@/content/featured-preview'
+import { DEFAULT_FX, FX, FX_LABEL, FX_STORE, isFx, pixelReveal, type Fx } from './entrance'
 import { createCloth, type Cloth } from './cloth'
 import s from './featured.module.scss'
 
 // Home · featured projects — Figma "04 · Archivo" (7173:7118). Free layout
 // on the 1680 frame (percentages, liquid), stacked on mobile.
-//  · Entrance: each piece drops in through 12 columns, staggered left → right
-//    (the social-clip wipe from SocialPreview), one piece after another as
-//    they reach the viewport.
+//  · Entrance: each piece comes in from the left (variants in entrance.ts,
+//    compared with the on-page picker), one piece after another as they
+//    reach the viewport.
 //  · Scroll: every piece has its own speed (parallax) and follows the page
 //    with a little lag (lerp), plus a slight skew from the scroll velocity.
 //  · Press: the piece turns into cloth (cloth.ts) and settles when let go.
 // Reduced motion: no wipe, no parallax, no cloth.
 
-const COLS = 12
-const GAP = 170 // ms between two pieces starting their wipe
+const BANDS = 12 // slats / steps
+const GAP = 170 // ms between two pieces starting their entrance
 
 const pct = (v: number, of: number) => `${((v / of) * 100).toFixed(4)}%`
 
 export default function FeaturedProjects({ pieces, label }: { pieces: FeaturedPiece[]; label: string }) {
   const root = useRef<HTMLElement>(null)
+  const [fx, setFx] = useState<Fx>(DEFAULT_FX)
+  const picker = FEATURED_PICKER
+
+  // Variant: ?in= wins, then the last pick (localStorage), then DEFAULT_FX.
+  useEffect(() => {
+    let v: string | null = new URLSearchParams(location.search).get('in')
+    if (!isFx(v)) { try { v = localStorage.getItem(FX_STORE) } catch { v = null } }
+    if (isFx(v) && v !== DEFAULT_FX) setFx(v)
+  }, [])
+
+  const pick = useCallback((f: Fx) => {
+    setFx(f)
+    try { localStorage.setItem(FX_STORE, f) } catch { /* private mode */ }
+    const u = new URL(location.href)
+    u.searchParams.set('in', f)
+    history.replaceState(history.state, '', u)
+    // Let React write data-fx first, then replay.
+    requestAnimationFrame(() => root.current?.dispatchEvent(new Event('featured:replay')))
+  }, [])
 
   useEffect(() => {
     const el = root.current
@@ -34,23 +54,58 @@ export default function FeaturedProjects({ pieces, label }: { pieces: FeaturedPi
       return
     }
 
-    // ── Entrance queue ──
+    // ── Entrance queue (variant = el.dataset.fx, see entrance.ts) ──
     let nextAt = 0
+    let gen = 0 // bumps on replay so pending timers from a previous run are ignored
+    const timers: number[] = []
+    const show = (c: HTMLElement) => {
+      if (el.dataset.fx === 'pixel') {
+        const media = c.querySelector<HTMLElement>('[data-media]')!
+        void pixelReveal(media)
+      }
+      c.dataset.in = '1'
+    }
+    const queue = (c: HTMLElement) => {
+      const now = performance.now()
+      const at = Math.max(now, nextAt)
+      nextAt = at + GAP
+      const g = gen
+      timers.push(window.setTimeout(() => { if (g === gen) show(c) }, at - now))
+    }
+    const order = (a: DOMRect, b: DOMRect) => a.top - b.top || a.left - b.left
     const io = new IntersectionObserver(
       (entries) => {
-        const hits = entries.filter((e) => e.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top || a.boundingClientRect.left - b.boundingClientRect.left)
+        const hits = entries.filter((e) => e.isIntersecting).sort((a, b) => order(a.boundingClientRect, b.boundingClientRect))
         for (const e of hits) {
-          const c = e.target as HTMLElement
-          io.unobserve(c)
-          const now = performance.now()
-          const at = Math.max(now, nextAt)
-          nextAt = at + GAP
-          window.setTimeout(() => (c.dataset.in = '1'), at - now)
+          io.unobserve(e.target)
+          queue(e.target as HTMLElement)
         }
       },
       { rootMargin: '0px 0px -12% 0px', threshold: 0.12 },
     )
     cards.forEach((c) => io.observe(c))
+
+    // Replay (picker): hide everything, then bring back what is on screen in
+    // order; the rest waits for the viewport again.
+    const replay = () => {
+      gen++
+      timers.forEach(clearTimeout)
+      timers.length = 0
+      nextAt = performance.now() + 120
+      el.querySelectorAll('[data-media] > canvas:not([class])').forEach((n) => n.remove())
+      // Back to the hidden state instantly (no reverse transition), then on.
+      el.dataset.reset = ''
+      cards.forEach((c) => { delete c.dataset.in; io.unobserve(c) })
+      void el.offsetWidth
+      delete el.dataset.reset
+      const vis = cards
+        .map((c) => ({ c, r: c.getBoundingClientRect() }))
+        .filter(({ r }) => r.bottom > 0 && r.top < window.innerHeight * 0.88)
+        .sort((a, b) => order(a.r, b.r))
+      vis.forEach(({ c }) => queue(c))
+      cards.filter((c) => !vis.some((v) => v.c === c)).forEach((c) => io.observe(c))
+    }
+    el.addEventListener('featured:replay', replay)
 
     // ── Parallax with lag ──
     const mobile = window.matchMedia('(max-width: 768px)')
@@ -164,6 +219,9 @@ export default function FeaturedProjects({ pieces, label }: { pieces: FeaturedPi
     }
 
     return () => {
+      gen++
+      timers.forEach(clearTimeout)
+      el.removeEventListener('featured:replay', replay)
       io.disconnect()
       ro.disconnect()
       cancelAnimationFrame(raf)
@@ -175,7 +233,7 @@ export default function FeaturedProjects({ pieces, label }: { pieces: FeaturedPi
   }, [])
 
   return (
-    <section ref={root} className={s.module} aria-label={label.replace(/^\/\s*/, '')} style={{ '--fh': F.h, '--fw': F.w } as CSSProperties}>
+    <section ref={root} className={s.module} data-fx={fx} aria-label={label.replace(/^\/\s*/, '')} style={{ '--fh': F.h, '--fw': F.w } as CSSProperties}>
       <div className={s.frame}>
         <div className={s.label} style={{ left: pct(FEATURED_LABEL.x, F.w), width: pct(FEATURED_LABEL.w, F.w), top: pct(FEATURED_LABEL.y, F.h) }}>
           <ElasticLine className={s.rule} />
@@ -193,16 +251,32 @@ export default function FeaturedProjects({ pieces, label }: { pieces: FeaturedPi
               <div className={s.media} data-media="">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={p.src} alt="" width={p.w * 2} height={p.h * 2} className={s.img} loading="lazy" decoding="async" draggable={false} />
-                <span className={s.cols} aria-hidden="true">
-                  {Array.from({ length: COLS }, (_, c) => (
+                <span className={s.fx} aria-hidden="true">
+                  {Array.from({ length: BANDS }, (_, c) => (
                     <span key={c} style={{ '--c': c } as CSSProperties} />
                   ))}
                 </span>
+                <span className={s.edge} aria-hidden="true" />
               </div>
             </li>
           ))}
         </ul>
       </div>
+      {picker && <EntrancePicker fx={fx} onPick={pick} onReplay={() => root.current?.dispatchEvent(new Event('featured:replay'))} />}
     </section>
+  )
+}
+
+function EntrancePicker({ fx, onPick, onReplay }: { fx: Fx; onPick: (f: Fx) => void; onReplay: () => void }) {
+  return (
+    <div className={s.picker} role="group" aria-label="Entrance">
+      <span className={s.pickerLabel}>Entrance</span>
+      {FX.map((f, i) => (
+        <button key={f} type="button" className={s.pickerBtn} aria-pressed={f === fx} onClick={() => onPick(f)}>
+          {String(i + 1).padStart(2, '0')} {FX_LABEL[f]}
+        </button>
+      ))}
+      <button type="button" className={s.pickerBtn} onClick={onReplay}>↺ Replay</button>
+    </div>
   )
 }

@@ -16,6 +16,10 @@ export type FeaturedPiece = {
   slug?: string
 }
 
+// On-page picker to compare the entrance variants (components/home/featured/
+// entrance.ts). Temporary while Juan chooses; false = no picker, DEFAULT_FX.
+export const FEATURED_PICKER = true
+
 export const FEATURED_FRAME = { w: 1680, h: 2575 }
 
 // The label block ("/ Selected projects" + rule): x 1387, y 58, w 253.
