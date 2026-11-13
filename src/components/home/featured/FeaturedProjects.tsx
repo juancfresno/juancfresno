@@ -3,21 +3,26 @@
 import { useEffect, useRef, type CSSProperties } from 'react'
 import ElasticLine from '@/components/ui/ElasticLine/ElasticLine'
 import { FEATURED_FRAME as F, FEATURED_LABEL, type FeaturedPiece } from '@/content/featured-preview'
-import { pixelReveal } from './entrance'
+import { PixelCover } from './entrance'
 import { createCloth, type Cloth } from './cloth'
 import s from './featured.module.scss'
 
 // Home · featured projects — Figma "04 · Archivo" (7173:7118). Free layout
 // on the 1680 frame (percentages, liquid), stacked on mobile.
-//  · Entrance: each piece clears in Bayer-dithered pixels sweeping left →
-//    right (entrance.ts, Juan's pick of 13 Nov 2026), one piece after
-//    another as they reach the viewport.
+//  · Entrance: a trigger line at LINE × the viewport height. When a piece's
+//    top crosses it going down, the piece clears in Bayer-dithered pixels
+//    sweeping left → right (entrance.ts); scrolling back above the line it
+//    covers again the same way, played backwards. Pieces that cross in the
+//    same moment (load, fast scroll) go one after another, GAP apart.
 //  · Scroll: every piece has its own speed (parallax) and follows the page
 //    with a little lag (lerp), plus a slight skew from the scroll velocity.
 //  · Press: the piece turns into cloth (cloth.ts) and settles when let go.
 // Reduced motion: no pixels, no parallax, no cloth.
 
-const GAP = 170 // ms between two pieces starting their entrance
+const GAP = 260 // ms between two pieces starting their entrance (or exit)
+const DUR = 760 // ms for a full pixel sweep
+const LINE = 0.8 // trigger line, fraction of the viewport height
+const HYST = 24 // px below the line before a piece leaves again (no flicker)
 
 const pct = (v: number, of: number) => `${((v / of) * 100).toFixed(4)}%`
 
@@ -29,37 +34,45 @@ export default function FeaturedProjects({ pieces, label }: { pieces: FeaturedPi
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const cards = Array.from(el.querySelectorAll<HTMLElement>('[data-piece]'))
     if (reduced) {
-      cards.forEach((c) => (c.dataset.in = '1'))
+      cards.forEach((c) => { c.dataset.in = '1'; c.dataset.shown = '1' })
       return
     }
 
-    // ── Entrance queue: pixels, one piece at a time ──
-    let nextAt = 0
-    let alive = true
-    const timers: number[] = []
-    const show = (c: HTMLElement) => {
-      // The dither canvas covers the piece before it is marked in (= visible).
-      void pixelReveal(c.querySelector<HTMLElement>('[data-media]')!)
-      c.dataset.in = '1'
-    }
-    const queue = (c: HTMLElement) => {
+    // ── Entrance on a screen line (reversible pixels) ──
+    const ent = cards.map((c) => ({ c, cover: new PixelCover(c.querySelector<HTMLElement>('[data-media]')!), p: 0, target: 0, startAt: 0 }))
+    let lastIn = 0, lastOut = 0
+    let araf = 0, alast = 0
+    const animate = (t: number) => {
+      araf = 0
+      const dt = alast ? Math.min(64, t - alast) : 16.7
+      alast = t
       const now = performance.now()
-      const at = Math.max(now, nextAt)
-      nextAt = at + GAP
-      timers.push(window.setTimeout(() => { if (alive) show(c) }, at - now))
+      let busy = false
+      for (const e of ent) {
+        if (e.p === e.target) continue
+        busy = true
+        if (now < e.startAt) continue
+        const step = dt / DUR
+        e.p = e.target > e.p ? Math.min(e.target, e.p + step) : Math.max(e.target, e.p - step)
+        e.cover.draw(e.p)
+        const isIn = e.p > 0, isShown = e.p >= 1
+        if (isIn !== ('in' in e.c.dataset)) { if (isIn) e.c.dataset.in = '1'; else delete e.c.dataset.in }
+        if (isShown !== ('shown' in e.c.dataset)) { if (isShown) e.c.dataset.shown = '1'; else delete e.c.dataset.shown }
+      }
+      if (busy) araf = requestAnimationFrame(animate)
+      else alast = 0
     }
-    const order = (a: DOMRect, b: DOMRect) => a.top - b.top || a.left - b.left
-    const io = new IntersectionObserver(
-      (entries) => {
-        const hits = entries.filter((e) => e.isIntersecting).sort((a, b) => order(a.boundingClientRect, b.boundingClientRect))
-        for (const e of hits) {
-          io.unobserve(e.target)
-          queue(e.target as HTMLElement)
-        }
-      },
-      { rootMargin: '0px 0px -12% 0px', threshold: 0.12 },
-    )
-    cards.forEach((c) => io.observe(c))
+    const check = () => {
+      const now = performance.now()
+      const line = window.innerHeight * LINE
+      const rs = ent.map((e) => ({ e, top: e.c.getBoundingClientRect().top }))
+      const ins = rs.filter(({ e, top }) => e.target === 0 && top < line).sort((a, b) => a.top - b.top)
+      const outs = rs.filter(({ e, top }) => e.target === 1 && top > line + HYST).sort((a, b) => b.top - a.top)
+      for (const { e } of ins) { e.target = 1; e.startAt = Math.max(now, lastIn + GAP); lastIn = e.startAt }
+      for (const { e } of outs) { e.target = 0; e.startAt = Math.max(now, lastOut + GAP); lastOut = e.startAt }
+      if ((ins.length || outs.length) && !araf) araf = requestAnimationFrame(animate)
+    }
+    ent.forEach((e) => e.cover.draw(0))
 
     // ── Parallax with lag ──
     const mobile = window.matchMedia('(max-width: 768px)')
@@ -97,6 +110,7 @@ export default function FeaturedProjects({ pieces, label }: { pieces: FeaturedPi
         if (Math.abs(target - p.y) > 0.1) moving = true
         p.c.style.transform = `translate3d(0, ${p.y.toFixed(2)}px, 0) skewY(${(skew * (p.speed - 0.8)).toFixed(3)}deg)`
       }
+      check()
       if (moving) raf = requestAnimationFrame(tick)
       else last = 0
     }
@@ -122,7 +136,7 @@ export default function FeaturedProjects({ pieces, label }: { pieces: FeaturedPi
         return [((e.clientX - r.left) / r.width) * media.offsetWidth, ((e.clientY - r.top) / r.height) * media.offsetHeight] as const
       }
       const down = (e: PointerEvent) => {
-        if (e.button !== 0 || !img.complete || !c.dataset.in) return
+        if (e.button !== 0 || !img.complete || !c.dataset.shown) return
         if (cloth === undefined || (canvas && (canvas.dataset.w !== String(media.offsetWidth)))) {
           cloths.get(c)?.destroy()
           canvas?.remove()
@@ -173,9 +187,8 @@ export default function FeaturedProjects({ pieces, label }: { pieces: FeaturedPi
     }
 
     return () => {
-      alive = false
-      timers.forEach(clearTimeout)
-      io.disconnect()
+      cancelAnimationFrame(araf)
+      ent.forEach((e) => e.cover.destroy())
       ro.disconnect()
       cancelAnimationFrame(raf)
       window.removeEventListener('scroll', kick)
