@@ -30,13 +30,14 @@ const SLOTS = {
 // Second view: the disks on a tilted wheel, the active one at the front.
 function ring(mobile, n) {
   const o = {};
-  for (const [key, r] of [['-1', -1], ['0', 0], ['1', 1], ['2', 2], ['far', 3]]) {
-    const a = (r * Math.PI * 2) / Math.max(5, n), c = Math.cos(a), sn = Math.sin(a), d = (c + 1) / 2;
-    o[key] = mobile
+  for (let r = -1; r <= n - 2; r++) { // one place per disk, by its distance to the active one
+    let a = (r * Math.PI * 2) / n; if (a > Math.PI) a -= Math.PI * 2;
+    const c = Math.cos(a), sn = Math.sin(a), d = (c + 1) / 2;
+    o[String(r)] = mobile
       ? { x: 0.5 + 0.36 * sn, y: 0.36 + 0.07 * c, s: 0.2 + 0.32 * d, blur: (1 - c) * 2.6, rx: 0.08, ry: -a * 0.55, rz: sn * 0.12 }
       : { x: 0.5 + 0.3 * sn, y: 0.43 + 0.08 * c, s: 0.1 + 0.14 * d, blur: (1 - c) * 3.2, rx: 0.08, ry: -a * 0.55, rz: sn * 0.12 };
   }
-  o.exit = o.far;
+  o.far = o[String(Math.round(n / 2))] || o['0']; o.exit = o.far;
   return o;
 }
 // Ficha open: the active disk comes forward and rests over the card's left edge.
@@ -107,7 +108,7 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
     return Object.assign(tmp, base, { x: base.x + out, blur: base.blur + 9, s: base.s * 0.84 });
   };
   const rel = (i, a = active) => ((i - a + N + 1) % N) - 1; // −1 … N−2
-  const slotKey = (r) => (r <= 2 ? String(r) : 'far');
+  const slotKey = (r) => { const k = String(r); return k in slots() ? k : 'far'; };
   const snap = (d, key) => { d.slot = key; for (const k of KEYS) { d.cur[k] = slots()[key][k]; d.vel[k] = 0; } };
   disks.forEach((d) => snap(d, slotKey(rel(d.i))));
 

@@ -210,6 +210,15 @@ export const SITE_ES: SiteDict = {
     { name: 'GLYF', what: null, status: '—', dot: 'off' },
   ],
 
+  LAB_FLOPPY: {
+    n: '006',
+    name: 'Floppy',
+    kind: 'Objeto 3D',
+    year: '2026',
+    what: 'Un disquete de 3,5 pulgadas modelado con código: proporciones reales, shutter con muelle y el disco magnético dentro. Arrástralo, gíralo, ábrelo. Lleva dentro cada experimento del Lab.',
+    how: 'three.js con geometría y texturas procedurales: sin modelos ni imágenes. La carcasa sale de contornos extruidos con perfiles de bisel; las etiquetas se diseñan en Figma y se aplican encima.',
+    built: 'three.js · geometría procedural · sin modelos',
+  },
   EXPERIMENTS: [
     {
       slug: 'botones',
