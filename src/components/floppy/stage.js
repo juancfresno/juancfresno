@@ -248,7 +248,7 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
     const d = ptr.d, now = performance.now(), tap = ptr.travel < 6 && now - ptr.st < 450;
     ptr.id = null; ptr.d = null; delete host.dataset.dragging;
     if (e.type === 'pointerup') {
-      if (d !== focus()) { if (tap) setActive(d.i); }
+      if (d !== focus()) { if (tap) setActive(active + (rel(d.i) < 0 ? -1 : 1)); } // any other disk moves the row one step its way
       else if (tap) setOpen(!open);
       else if (!tap && now - ptr.t < 90 && !reduced.matches) { d.u.iy = Math.max(-16, Math.min(16, ptr.vx)); if (e.pointerType === 'mouse') d.u.ip = Math.max(-6, Math.min(6, ptr.vy)); }
     }
