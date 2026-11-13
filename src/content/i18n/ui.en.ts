@@ -164,6 +164,7 @@ export const UI_EN = {
   },
   about: {
     h1: 'About',
+    logo: { group: 'Logo material', ink: 'Ink', glass: 'Glass' },
     studiosBrands: '{ Studios & brands ↘',
     th: { n: 'Nº', company: 'Studio or company', role: 'Role', how: 'How', years: 'Years' },
   },
@@ -199,6 +200,7 @@ export const UI_EN = {
     galleries: ['Arc', 'Canvas', 'Plates', 'Strip', 'Deck', 'Zoom grid', 'Bars', 'Runway'],
     pixels: ['Columns', 'Bitmap', 'Depixelate', '1-bit', 'Cursor', 'CRT'],
     cursors: ['Ring', 'Pixel', 'Crosshair', 'Negative', 'Velocity', 'Label', 'Label negative'],
+    carousels: ['Curved strip', 'Rail', 'Block'],
   },
   journal: { h1: 'Journal' },
   shortcuts: {

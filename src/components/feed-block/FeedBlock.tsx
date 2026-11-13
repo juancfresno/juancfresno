@@ -14,6 +14,10 @@
 //     pause them, they come back RESUME_MS after.
 //   · velocity → fisheye on the block, rubber bend, stretch, RGB split and a
 //     short smear; rest = clean, flat, 1:1.
+//   · elastic depth: a spring on the block's scale. Grabbing / moving brings
+//     it closer (up to ZOOM); releasing lets it go, and the underdamped
+//     spring carries it a touch past rest, away from you, before it settles
+//     (no sudden return). Hits get the same push and give.
 //   · cards are real <a> links (new tab) over the canvas at the rest rect;
 //     captions `IG · MM/YYYY` fade while moving; focus brings a card in;
 //     ← → on a focused card step the row.
@@ -42,6 +46,12 @@ const RESUME_MS = 2400  // hits come back this long after the last interaction
 const SNAP_MS = 720     // release / focus settle
 const THROW = 14        // frames of release velocity projected before snapping
 const AMT_V = 16        // px/frame where the effect reaches ≈ 63 %
+// Elastic depth (spring per 60 Hz frame). ZOOM = how much closer at full
+// push; K / DAMP set the bounce (ζ ≈ 0.15: about +12 % held, −3 % on the
+// recede, a second small bounce, settled in ≈ 1.2 s). Juan, 13 Nov 2026: more.
+const ZOOM = 0.09
+const ZOOM_K = 0.07
+const ZOOM_DAMP = 0.08
 const inOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2)
 const outCubic = (t: number) => 1 - Math.pow(1 - t, 3)
 
@@ -95,7 +105,9 @@ export default function FeedBlock({ items, ariaLabel, label }: { items: LatestIt
     let lastTouch = -1e9, nextHit = 0
     let last = performance.now()
     let onScreen = false
-    const fx: BlockFx = { off: 0, amt: 0, dir: 1, bend: 0, split: 0 }
+    const fx: BlockFx = { off: 0, amt: 0, dir: 1, bend: 0, split: 0, zoom: 1 }
+    let z = 0, zv = 0 // depth spring: offset from 1 and its velocity
+    let letGo = false // after a release: depth target 0 until the settle ends
 
     // Snap: card i's left edge on the margin. Nearest copy of i to `near`.
     const snapOf = (i: number, near: number) => {
@@ -157,6 +169,18 @@ export default function FeedBlock({ items, ariaLabel, label }: { items: LatestIt
       fx.dir = sv >= 0 ? 1 : -1
       fx.bend = Math.max(-g.hc * 0.3, Math.min(g.hc * 0.3, sv * 2.6 * (g.hc / 420) * (g.W < 769 ? 0.65 : 1)))
       fx.split = splitMag(sp) * fx.dir
+      // Depth: held = already closer, speed adds; released = target 0 at
+      // once (the settle's speed still drives the lens, not the depth), so
+      // the spring overshoots below 1 (recedes) and settles.
+      if (letGo && !tw) letGo = false
+      const push = dragging ? 0.6 + 0.4 * fx.amt : letGo ? 0 : fx.amt
+      const zt = push * ZOOM * (g.W < 769 ? 0.65 : 1)
+      zv += (zt - z) * ZOOM_K * dt
+      zv *= Math.pow(1 - ZOOM_DAMP, dt)
+      z += zv * dt
+      const springing = Math.abs(z - zt) > 1e-4 || Math.abs(zv) > 1e-5
+      if (!springing && zt === 0) { z = 0; zv = 0 }
+      fx.zoom = 1 + z
       bl.draw(g, L, fx, colors.bg, colors.stage)
       // Links at the rest rect (copy of each card nearest the view).
       const top = g.cy - g.hc / 2
@@ -165,9 +189,9 @@ export default function FeedBlock({ items, ariaLabel, label }: { items: LatestIt
         links[i].style.transform = `translate3d(${x.toFixed(1)}px, ${top}px, 0)`
       }
       row.style.setProperty('--blk-cap', (1 - Math.min(1, fx.amt * 1.8)).toFixed(3))
-      ;(window as unknown as { __block?: object }).__block = { off, v: sv, amt: fx.amt, bend: fx.bend, split: fx.split, idx, hit: !!tw, dragging, idle, onScreen, nextHit: Math.round(nextHit) } // QA probe
+      ;(window as unknown as { __block?: object }).__block = { off, v: sv, amt: fx.amt, zoom: fx.zoom, bend: fx.bend, split: fx.split, idx, hit: !!tw, dragging, idle, onScreen, nextHit: Math.round(nextHit) } // QA probe
       if (force) return false
-      return dragging || tw !== null || sp > 0 || bl.pending()
+      return dragging || tw !== null || sp > 0 || springing || bl.pending()
     }
 
     let raf = 0, timer = 0, inTick = false
@@ -224,6 +248,7 @@ export default function FeedBlock({ items, ariaLabel, label }: { items: LatestIt
       const vel = performance.now() - lt > 80 ? 0 : pv
       idx = nearestIdx(off + vel * THROW)
       go(snapOf(idx, off + vel * THROW), SNAP_MS, outCubic)
+      letGo = true
       touch()
     }
     on(window, 'pointerup', end)

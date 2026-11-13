@@ -134,6 +134,9 @@ $chrome: '[data-site-header], [data-site-tabbar]';
 :root[data-chrome="blue"] [data-site-footer] { @include theme-dark; }
 // Work: the footer continues the subtle "{ Lab ↘" band (Figma 6951:13221).
 :root:has([data-foot="subtle"]) [data-site-footer] { @include theme-subtle; }
+// About: the 3D donut docks in the header corner on scroll, so the nav
+// wordmark steps aside while that page's donut is alive (LogoDonut).
+:root:has([data-logo-dock]) [data-site-wordmark] { visibility: hidden; }
 // Leaving Contact: the chrome goes back to the site theme before the page does.
 :root[data-page-theme="blue"]:not([data-chrome="blue"]) :is(#{$chrome}, [data-site-footer]) { @include theme-dark; }
 :root[data-theme="light"][data-page-theme="blue"]:not([data-chrome="blue"]) :is(#{$chrome}, [data-site-footer]) { @include theme-light; }

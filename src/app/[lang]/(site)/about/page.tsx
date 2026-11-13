@@ -3,9 +3,11 @@ import { pageMeta } from '@/lib/seo'
 import { getSite, getUi } from '@/content/site'
 import { localeOf, type LangParams } from '@/i18n/server'
 import ElasticLine from '@/components/ui/ElasticLine/ElasticLine'
+import v from '@/components/blocks/v0.module.scss'
 import a from '@/components/about/about.module.scss'
 import BioReveal from '@/components/about/BioReveal'
-import FresnoLogo from '@/components/about/FresnoLogo'
+import LogoDonut from '@/components/about/LogoDonut'
+import Grain from '@/components/wip/Grain'
 
 type Props = { params: Promise<LangParams> }
 
@@ -17,7 +19,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 // About — Figma "about" (AXxkCCuckrXGKDUCk8lNyQ · 6964:14926): hero row with
 // the ficha marker left and "/ About" right (Work / Contact pattern), the big
-// FRESNO© wordmark (7151:22515), the bio
+// FRESNO© wordmark (7151:22515) as a turning 3D donut (LogoDonut) under the
+// home's film grain (Grain), the bio
 // lit word by word on scroll (BioReveal), a brand-blue band reserved for the photo / 3D piece (empty
 // frame with crop marks) and the "collaborate" close (04 · Archivo).
 export default async function AboutPage({ params }: Props) {
@@ -28,13 +31,12 @@ export default async function AboutPage({ params }: Props) {
 
   return (
     <div className={a.page}>
-      <header className={a.hero} data-wf="hero">
-        <p className={a.marker} aria-hidden="true">{P.marker}</p>
-        <h1 className={a.name}>/ {ui.about.h1}</h1>
-      </header>
+      <Grain />
+      {/* No visible hero row (Figma 6964:14926): the title stays for screen readers. */}
+      <h1 className={v.srOnly}>{ui.about.h1}</h1>
 
-      <div className={a.logo} data-wf="logo">
-        <FresnoLogo />
+      <div className={a.logoDonut} data-wf="logo">
+        <LogoDonut />
       </div>
 
       <BioReveal

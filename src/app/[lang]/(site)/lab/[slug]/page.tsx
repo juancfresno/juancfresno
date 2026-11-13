@@ -11,6 +11,7 @@ import ContactBlock from '@/components/blocks/ContactBlock'
 import Pending from '@/components/blocks/Pending'
 import LabDemo from '@/components/lab/LabDemo'
 import CopyButton from '@/components/lab/CopyButton'
+import LatestFeed from '@/components/home/LatestFeed'
 import s from '@/components/blocks/blocks.module.scss'
 import l from '@/components/lab/lab.module.scss'
 
@@ -37,6 +38,35 @@ export default async function ExperimentPage({ params }: { params: Promise<Param
   const e = getSite(loc).EXPERIMENTS.find((x) => x.slug === slug)
   if (!e) notFound()
 
+  const hero = (
+    <header className={s.hero}>
+      <p className={s.heroMeta}>{ui.lab.crumb} / {e.n} · {e.kind} · {e.year}</p>
+      <h1 className={s.heroTitle}>{e.name}</h1>
+      <p className={s.text}>{e.what}</p>
+    </header>
+  )
+  const how = (
+    <Section label={ui.lab.howBuilt}>
+      <p className={s.text}>{e.how}</p>
+      <p className={s.rowTags}>{e.built}</p>
+    </Section>
+  )
+
+  // Pieces built from this site's own components (no public files to copy).
+  // 006 Carruseles: the three feed galleries the Home tried, full bleed.
+  if (e.demo === 'react') {
+    const C = ui.lab.carousels
+    const n = (i: number) => `{ ${String(i + 1).padStart(2, '0')} · ${C[i]} ↘`
+    return (
+      <>
+      <div className={s.page}>{hero}</div>
+      <LatestFeed locale={loc} show={['strip', 'rail', 'block']} labels={{ strip: n(0), rail: n(1), block: `${n(2)} · ★` }} />
+      <div className={`${s.page} ${l.after}`}>{how}</div>
+      <ContactBlock locale={loc} />
+      </>
+    )
+  }
+
   const html = read(slug, 'snippet.html')
   const code = `<!-- HTML -->\n${html}\n<link rel="stylesheet" href="${e.css}">\n<script src="${e.js}"></script>\n\n/* ${e.css} */\n${read(slug, e.css)}\n\n// ${e.js}\n${read(slug, e.js)}`
   const prompt = read(slug, 'prompt.md')
@@ -44,11 +74,7 @@ export default async function ExperimentPage({ params }: { params: Promise<Param
   return (
     <>
     <div className={s.page}>
-      <header className={s.hero}>
-        <p className={s.heroMeta}>{ui.lab.crumb} / {e.n} · {e.kind} · {e.year}</p>
-        <h1 className={s.heroTitle}>{e.name}</h1>
-        <p className={s.text}>{e.what}</p>
-      </header>
+      {hero}
 
       <LabDemo slug={slug} html={html} css={e.css} js={e.js} init={e.init} />
 
@@ -65,10 +91,7 @@ export default async function ExperimentPage({ params }: { params: Promise<Param
         <pre className={l.code} tabIndex={0} aria-label={ui.lab.source}><code>{html}</code></pre>
       </Section>
 
-      <Section label={ui.lab.howBuilt}>
-        <p className={s.text}>{e.how}</p>
-        <p className={s.rowTags}>{e.built}</p>
-      </Section>
+      {how}
 
     </div>
     <ContactBlock locale={loc} />

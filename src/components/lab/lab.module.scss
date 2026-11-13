@@ -82,6 +82,9 @@
   }
 }
 
+// A page block after a full-bleed demo (006 Carruseles): no nav offset.
+.after { padding-top: $space-16; }
+
 .actions {
   display: flex;
   flex-wrap: wrap;

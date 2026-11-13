@@ -163,6 +163,7 @@ export const UI_ES: UiDict = {
   },
   about: {
     h1: 'Sobre mí',
+    logo: { group: 'Material del logo', ink: 'Tinta', glass: 'Cristal' },
     studiosBrands: '{ Estudios y marcas ↘',
     th: { n: 'Nº', company: 'Estudio o empresa', role: 'Rol', how: 'Cómo', years: 'Años' },
   },
@@ -198,6 +199,7 @@ export const UI_ES: UiDict = {
     galleries: ['Arco', 'Canvas', 'Láminas', 'Tira', 'Mazo', 'Rejilla con zoom', 'Barras', 'Pasarela'],
     pixels: ['Columnas', 'Bitmap', 'Despixelado', '1-bit', 'Cursor', 'CRT'],
     cursors: ['Anillo', 'Píxel', 'Retícula', 'Negativo', 'Velocidad', 'Etiqueta', 'Etiqueta negativa'],
+    carousels: ['Tira curva', 'Raíl', 'Bloque'],
   },
   journal: { h1: 'Notas' },
   shortcuts: {

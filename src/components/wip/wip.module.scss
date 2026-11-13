@@ -14,18 +14,18 @@ $in-ease: cubic-bezier(0.22, 1, 0.36, 1); // one family for everything that ente
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  min-height: 100svh;
+  // Figma "home" 02 · Hero: 580 under the 72 px header at 1680 (liquid), no
+  // background since 13 Nov; the featured projects module follows.
+  min-height: calc(72px + 34.524vw);
   padding-top: calc(72px + 83px);
   padding-bottom: 6rem;
   overflow: hidden;
   isolation: isolate;
-  // Horizontal drags pan the lens; vertical gestures keep scrolling the page.
-  touch-action: pan-y;
-  @media (pointer: fine) { cursor: grab; }
 
   @include respond-to(md) {
+    min-height: 0;
     padding-top: calc(72px + 40px);
-    padding-bottom: 9rem;
+    padding-bottom: 4rem;
   }
 }
 
