@@ -711,3 +711,39 @@ $px-on: color-mix(in srgb, $color-text 70%, transparent);
   i { left: 14%; top: 18%; width: 52%; height: 64%; background: color-mix(in srgb, $color-text 55%, transparent); }
   b { left: 40%; top: 42%; padding: 3px 5px; background: #fff; color: #000; mix-blend-mode: difference; }
 }
+
+// Carousels stage (006): three rows
+.stageCa {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 7%;
+  padding: 0 8%;
+}
+
+.caRow { display: flex; flex-direction: column; gap: 8px; }
+
+.caTrack {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: clamp(2.6rem, 4.4vw, 4rem);
+  overflow: hidden;
+
+  i { flex: none; display: block; height: 100%; aspect-ratio: 4 / 5; background: color-mix(in srgb, $color-text-mid 45%, transparent); }
+
+  // 01 · curved drum: centre card largest, sides shrink and bend away.
+  &[data-kind='strip'] {
+    justify-content: center;
+    perspective: 300px;
+    i { height: calc(100% - var(--d) * 14%); transform: rotateY(calc((var(--d)) * 12deg)); }
+    i:nth-child(-n + 3) { transform: rotateY(calc(var(--d) * -12deg)); }
+    i:nth-child(4) { background: var(--c-g); }
+  }
+  // 02 · rail: flat row, one card mid-bend.
+  &[data-kind='rail'] i:nth-child(2) { transform: skewX(-8deg) scaleX(1.12); background: $color-text-mid; }
+  // 03 · block: the whole row bulges as one surface.
+  &[data-kind='block'] {
+    i { height: calc(100% - var(--d) * 8%); background: color-mix(in srgb, var(--c-g) calc(85% - var(--d) * 15%), transparent); }
+  }
+}

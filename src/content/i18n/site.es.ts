@@ -64,6 +64,7 @@ export const SITE_ES: SiteDict = {
       galerias: 'Ocho formas de enseñar 200 imágenes, montadas sobre el feed real.',
       'entradas-pixel': 'Seis entradas de píxel para el preview de redes, con los clips reales.',
       cursores: 'Siete cursores propios que cambian según lo que tienen debajo.',
+      carruseles: 'Tres carruseles para lo último publicado: una tira curva, un raíl y un bloque.',
     },
     labels: {
       featured: '{ Proyectos destacados ↘',
@@ -270,6 +271,18 @@ export const SITE_ES: SiteDict = {
       note: null,
       card: 'Siete cursores propios que cambian según lo que tienen debajo: punto y anillo, píxel, retícula, negativo, velocidad, solo etiqueta y etiqueta en negativo.',
       how: 'Cada estado se declara en el marcado con data-cursor (link, view, drag, play, copy, text) y un data-cursor-label opcional; el cursor lo lee con closest() desde el elemento bajo el puntero. Un solo bucle de requestAnimationFrame mueve los siete y duerme en reposo; en cada fotograma solo cambian transform y opacity. Un muelle marca el retraso, el de píxel se disuelve con una matriz Bayer 4×4 y el de etiqueta se reescribe con el scramble de la web; el de etiqueta en negativo es una caja blanca en difference con el texto recortado. En táctil el cursor nativo nunca se oculta (un toque enseña el estado); con «reducir movimiento» todo va pegado, sin retraso ni estelas.',
+    },
+    {
+      slug: 'carruseles',
+      n: '006',
+      name: 'Carruseles',
+      kind: 'Galería',
+      year: '2026',
+      what: 'Tres carruseles para lo último de Instagram y Dribbble, los tres que probó la Home: 01 una tira curva (un tambor, la tarjeta central más grande), 02 un raíl plano que se deforma tarjeta a tarjeta y 03 un bloque que se deforma como una sola superficie. Avanzan de una en una con un golpe suavizado y siguen el arrastre, nunca el scroll de la página; el color se separa con la velocidad. La 03 se queda en la Home.',
+      built: 'WebGL2 · un canvas cada uno · sin librerías',
+      note: '★ 03 Bloque (Home)',
+      card: 'Tres carruseles para lo último publicado: una tira curva, un raíl que se deforma tarjeta a tarjeta y un bloque que se deforma como una sola superficie.',
+      how: 'Un canvas WebGL2 por carrusel y sin librerías. Comparten el movimiento: un golpe trae la siguiente tarjeta con un ease-in-out marcado (acelera y frena) y luego reposa; el hover, el foco y el arrastre lo pausan. El arrastre sigue al puntero 1:1 y al soltar se ajusta a la tarjeta más cercana a donde caería el lanzamiento. La velocidad mueve la deformación (la curva del tambor; ojo de pez, curva elástica y estiramiento por tarjeta en el raíl; lo mismo sobre todo el bloque, dibujado en un framebuffer y pasado por la lente de una vez) y la separación de rojo y azul; en reposo todo queda plano y limpio. Las tarjetas son enlaces reales sobre el canvas, el bucle duerme entre golpes y fuera de pantalla, y con «reducir movimiento» o sin WebGL2 cada uno es una fila normal con scroll.',
     },
   ],
 

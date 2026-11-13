@@ -28,7 +28,8 @@ const d = (ms: number) => ({ '--in-d': `${ms}ms` }) as CSSProperties
 
 // Home v1 — Figma "home" (6949:12453): the landing hero (greeting that decodes
 // through other languages, fixed role, mono disciplines, two-line intro) over
-// the feed lens, then the contact module and the global footer. Entrance =
+// the feed lens, then the Lab floppy module, the feed block (gallery 3; the
+// other two moved to Lab 006 Carruseles), the contact module and the footer. Entrance =
 // wireframe grid (Intro) → page ([data-in] delays). The earlier home (Arco,
 // index, strip, Lab teaser) stays in the codebase, not rendered.
 export default async function HomePage({ params }: Props) {
@@ -58,7 +59,7 @@ export default async function HomePage({ params }: Props) {
           </p>
         </header>
       </section>
-      <LatestFeed locale={l} block beforeBlock={<FloppyBand locale={l} />} />
+      <LatestFeed locale={l} show={['block']} labels={{ block: LANDING.feedLabel }} beforeBlock={<FloppyBand locale={l} />} />
       <HomeContact locale={l} />
     </>
   )

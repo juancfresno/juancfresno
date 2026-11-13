@@ -198,6 +198,7 @@ export const UI_ES: UiDict = {
     galleries: ['Arco', 'Canvas', 'Láminas', 'Tira', 'Mazo', 'Rejilla con zoom', 'Barras', 'Pasarela'],
     pixels: ['Columnas', 'Bitmap', 'Despixelado', '1-bit', 'Cursor', 'CRT'],
     cursors: ['Anillo', 'Píxel', 'Retícula', 'Negativo', 'Velocidad', 'Etiqueta', 'Etiqueta negativa'],
+    carousels: ['Tira curva', 'Raíl', 'Bloque'],
   },
   journal: { h1: 'Notas' },
   shortcuts: {

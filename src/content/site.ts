@@ -16,12 +16,18 @@ export { SOCIALS, SOCIAL_PREVIEWS, type SocialId, type PreviewId } from './socia
 // Lab experiment files (public/lab/<slug>/): css, js, snippet.html, prompt.md.
 // `init` = global init fn: window[init](root) → cleanup. `repo` = public
 // GitHub folder, once the repo exists.
-export const EXPERIMENT_FILES: Record<string, { css: string; js: string; init: string; files: string[]; repo: string | null }> = {
+// `demo: 'react'` = the piece is built from this site's own components (no
+// public files, no copy-code block): 006 Carruseles = home/LatestFeed, all three.
+export type ExperimentFiles =
+  | { demo?: 'static'; css: string; js: string; init: string; files: string[]; repo: string | null }
+  | { demo: 'react'; repo: string | null }
+export const EXPERIMENT_FILES: Record<string, ExperimentFiles> = {
   botones: { css: 'buttons.css', js: 'buttons.js', init: 'fresnoButtons', files: ['buttons.css', 'buttons.js', 'snippet.html'], repo: null },
   transiciones: { css: 'transitions.css', js: 'transitions.js', init: 'fresnoTransitions', files: ['transitions.css', 'transitions.js', 'snippet.html'], repo: null },
   galerias: { css: 'galleries.css', js: 'galleries.js', init: 'fresnoGalleries', files: ['galleries.css', 'galleries.js', 'snippet.html'], repo: null },
   'entradas-pixel': { css: 'pixels.css', js: 'pixels.js', init: 'fresnoPixels', files: ['pixels.css', 'pixels.js', 'snippet.html'], repo: null },
   cursores: { css: 'cursors.css', js: 'cursors.js', init: 'fresnoCursors', files: ['cursors.css', 'cursors.js', 'snippet.html'], repo: null },
+  carruseles: { demo: 'react', repo: null },
 }
 
 const SITES: Record<Locale, SiteDict> = { en: SITE_EN, es: SITE_ES }

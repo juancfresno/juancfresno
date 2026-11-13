@@ -145,3 +145,20 @@ export function CursorsStage({ labels: L }: { labels: string[] }) {
     </div>
   )
 }
+
+// 006 · Carousels: three rows of cards (curved drum, rail, block), ★ 03 = Home.
+const CA_KINDS = ['strip', 'rail', 'block'] as const
+export function CarouselsStage({ labels: L }: { labels: string[] }) {
+  return (
+    <div className={`${s.stage} ${s.stageCa}`} aria-hidden="true">
+      {CA_KINDS.map((k, i) => (
+        <div key={k} className={s.caRow}>
+          <span className={s.caTrack} data-kind={k}>
+            {Array.from({ length: 7 }, (_, j) => <i key={j} style={{ ['--d' as string]: Math.abs(j - 3) }} />)}
+          </span>
+          <p className={`${s.cap} ${i === 2 ? s.capStar : ''}`}>{String(i + 1).padStart(2, '0')} {L[i]}{i === 2 ? ' ★' : ''}</p>
+        </div>
+      ))}
+    </div>
+  )
+}
