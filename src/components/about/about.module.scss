@@ -47,6 +47,26 @@
   svg { display: block; width: 100%; height: auto; }
 }
 
+// The FRESNO© donut (LogoDonut): a wide ring across the page, in the brand blue
+// (#C6DBF9) on dark and the text ink on light. The canvas is full-bleed (no
+// container) and taller than the ring so its rocking never clips.
+.logoDonut {
+  padding-bottom: clamp(1rem, 3vw, 48px);
+  overflow: hidden;
+
+  // No WebGL2: the flat logo, as before.
+  svg { display: block; width: calc(100% - 2 * #{$m}); height: auto; margin-inline: auto; color: var(--c-text); }
+}
+
+.donut {
+  display: block;
+  width: 100%;
+  height: 44vw;
+  color: var(--c-brand-blue); // #C6DBF9
+
+  :global(:root[data-theme="light"]) & { color: var(--c-text); }
+}
+
 // ─── Bio: 28/34, scroll-lit word by word (BioReveal), 48 between lead and last ──
 .bio {
   @include container;
