@@ -47,10 +47,11 @@ const SNAP_MS = 720     // release / focus settle
 const THROW = 14        // frames of release velocity projected before snapping
 const AMT_V = 16        // px/frame where the effect reaches ≈ 63 %
 // Elastic depth (spring per 60 Hz frame). ZOOM = how much closer at full
-// push; K / DAMP set the bounce (ζ ≈ 0.25: one soft recede, ~0.4 of the push).
-const ZOOM = 0.05
-const ZOOM_K = 0.09
-const ZOOM_DAMP = 0.14
+// push; K / DAMP set the bounce (ζ ≈ 0.15: about +12 % held, −3 % on the
+// recede, a second small bounce, settled in ≈ 1.2 s). Juan, 13 Nov 2026: more.
+const ZOOM = 0.09
+const ZOOM_K = 0.07
+const ZOOM_DAMP = 0.08
 const inOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2)
 const outCubic = (t: number) => 1 - Math.pow(1 - t, 3)
 
