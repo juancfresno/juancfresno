@@ -14,7 +14,10 @@
 //          every gutter bows the same way, continuously across the block,
 //        · horizontal velocity stretch,
 //        · RGB split weighted by the lens radius (stronger at the sides),
-//        · a short directional smear along the motion (7 taps, tent).
+//        · a short directional smear along the motion (7 taps, tent),
+//        · depth: the whole block scales about the lens centre (fx.zoom,
+//          FeedBlock's spring: > 1 = closer while it moves, < 1 = it recedes
+//          a touch past rest when released, then settles at 1).
 //      Distortion is therefore continuous across photo boundaries and gutters.
 // At rest every effect is 0 and pass 2 is an exact 1:1 copy (texel-aligned).
 import { buildProgram, createAtlas, createQuad, MAX_CARDS, type StripCard } from '@/components/feed-strip/strip'
@@ -31,6 +34,7 @@ export type BlockFx = {
   dir: number    // −1 / 1, direction of the motion on screen
   bend: number   // signed rubber bend, CSS px at the block's top/bottom
   split: number  // signed RGB split, CSS px
+  zoom: number   // depth scale about the lens centre (1 = rest)
 }
 
 export type BlockLayout = { xs: number[]; ws: number[]; len: number }
@@ -94,12 +98,13 @@ uniform float uE;       // margin, device px (integer)
 uniform vec2 uC;        // lens centre, CSS px (W/2, cy)
 uniform vec4 uFx;       // lens, stretch, bend (CSS px), smear (CSS px)  (× amt, signed)
 uniform float uSplit;   // CSS px, signed
+uniform float uZoom;    // depth scale (1 = rest)
 uniform vec3 uBg;
 out vec4 o;
 
 // Where the block is sampled for screen point p (CSS px).
 vec2 lensMap(vec2 p){
-  vec2 q = p - uC;
+  vec2 q = (p - uC) / uZoom;
   float hw = uC.x;
   // Fisheye on the block: r² against the half width (y counts a bit more,
   // so the row's top/bottom edges bow). Centre samples nearer (swells),
@@ -160,7 +165,7 @@ const wrap = (v: number, n: number) => ((v % n) + n) % n
 /** Same map as the lens shader → card index under a screen point, or −1. */
 export function hitBlock(g: BlockGeo, L: BlockLayout, f: BlockFx, px: number, py: number) {
   const hw = g.W / 2
-  let qx = px - hw, qy = py - g.cy
+  let qx = (px - hw) / f.zoom, qy = (py - g.cy) / f.zoom
   const nx = qx / hw, nyy = qy / (hw * 0.62)
   const k = 1 - FX.lens * f.amt * (1 - Math.min(nx * nx + nyy * nyy, 2.2))
   qx *= k; qy *= k
@@ -186,7 +191,7 @@ export function createBlock(canvas: HTMLCanvasElement, cards: StripCard[], small
   }
   const UL = {
     fbo: ul('uFbo'), res: ul('uRes'), fboRes: ul('uFboRes'), dpr: ul('uDpr'), e: ul('uE'), c: ul('uC'),
-    fx: ul('uFx'), split: ul('uSplit'), bg: ul('uBg'),
+    fx: ul('uFx'), split: ul('uSplit'), zoom: ul('uZoom'), bg: ul('uBg'),
   }
   const list = cards.slice(0, MAX_CARDS)
   const quad = createQuad(gl)
@@ -253,6 +258,7 @@ export function createBlock(canvas: HTMLCanvasElement, cards: StripCard[], small
       const a = f.amt
       gl.uniform4f(UL.fx, FX.lens * a, FX.stretch * a, f.bend, FX.smear * a * a * f.dir)
       gl.uniform1f(UL.split, f.split)
+      gl.uniform1f(UL.zoom, f.zoom)
       gl.uniform3fv(UL.bg, bg)
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
     },
