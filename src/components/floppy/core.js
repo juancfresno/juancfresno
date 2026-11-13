@@ -324,12 +324,6 @@ function logoShapes(width, cx, cy) { // outlines in mm (width = its length), for
   }
   return out;
 }
-function logoCanvas(color) { // for printing it in ink
-  const c = makeCanvas(1024, 160), x = c.getContext('2d'), k = (1024 - 40) / 234;
-  x.translate(20, (160 - 28 * k) / 2); x.scale(k, k); x.fillStyle = color;
-  for (const d of LOGO) x.fill(new Path2D(d));
-  return c;
-}
 const inPoly = (p, poly) => { let r = false; for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) { const a = poly[i], b = poly[j]; if ((a.y > p.y) !== (b.y > p.y) && p.x < (b.x - a.x) * (p.y - a.y) / (b.y - a.y) + a.x) r = !r; } return r; };
 
 // ───────────────────────────────────────────── the object
@@ -498,10 +492,6 @@ export function createFloppy(data, options = {}) {
     add(shutter, plate(SHUT.x0, SHUT.x1, 7.8, 17.2), metalAll);
     const bp = new THREE.Group(); bp.rotation.y = Math.PI; shutter.add(bp);
     add(bp, plate(-SHUT.x1, -SHUT.x0, -17.2, -7.8), metalAll);
-    // wordmark printed in ink on the front plate
-    const inkT = sh.inkT || (sh.inkT = keep(new THREE.CanvasTexture(logoCanvas(INK)))); inkT.colorSpace = THREE.SRGBColorSpace; inkT.anisotropy = maxAniso;
-    const ink = add(shutter, new THREE.PlaneGeometry(16.5, 16.5 * 160 / 1024), keep(new THREE.MeshStandardMaterial({ map: inkT, transparent: true, opacity: 0.94, roughness: 0.8, metalness: 0, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 })));
-    ink.position.set(-3.1, 41.4, zt + 0.004);
     // bridge over the shutter edge, with two small bends
     const prof = [], zi = zt - br;
     for (let i = 0; i <= 6; i++) { const a = i / 6 * HALF; prof.push({ y: yTop + br * Math.sin(a), z: zi + br * Math.cos(a), ny: Math.sin(a), nz: Math.cos(a) }); }
