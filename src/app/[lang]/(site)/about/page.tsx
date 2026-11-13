@@ -37,7 +37,7 @@ export default async function AboutPage({ params }: Props) {
       </header>
 
       <div className={a.logoDonut} data-wf="logo">
-        <LogoDonut className={a.donut} />
+        <LogoDonut />
       </div>
 
       <BioReveal

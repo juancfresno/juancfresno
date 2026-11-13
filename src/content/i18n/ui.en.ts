@@ -164,6 +164,7 @@ export const UI_EN = {
   },
   about: {
     h1: 'About',
+    logo: { group: 'Logo material', ink: 'Ink', glass: 'Glass' },
     studiosBrands: '{ Studios & brands ↘',
     th: { n: 'Nº', company: 'Studio or company', role: 'Role', how: 'How', years: 'Years' },
   },

@@ -163,6 +163,7 @@ export const UI_ES: UiDict = {
   },
   about: {
     h1: 'Sobre mí',
+    logo: { group: 'Material del logo', ink: 'Tinta', glass: 'Cristal' },
     studiosBrands: '{ Estudios y marcas ↘',
     th: { n: 'Nº', company: 'Estudio o empresa', role: 'Rol', how: 'Cómo', years: 'Años' },
   },

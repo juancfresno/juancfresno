@@ -51,6 +51,7 @@
 // (#C6DBF9) on dark and the text ink on light. The canvas is full-bleed (no
 // container) and taller than the ring so its rocking never clips.
 .logoDonut {
+  position: relative;
   padding-bottom: clamp(1rem, 3vw, 48px);
   overflow: hidden;
 
@@ -63,8 +64,20 @@
   width: 100%;
   height: 48vw;
   color: var(--c-brand-blue); // #C6DBF9
+  cursor: pointer;
+  touch-action: pan-y;
 
   :global(:root[data-theme="light"]) & { color: var(--c-text); }
+}
+
+// Ink / Glass chips: bottom right of the ring, on the page margin.
+.donutMode {
+  position: absolute;
+  right: #{$m};
+  bottom: clamp(1rem, 3vw, 48px);
+
+  // Phones: under the ring instead of over its corner.
+  @include respond-to(md) { position: static; float: right; margin-right: #{$m}; }
 }
 
 // ─── Bio: 28/34, scroll-lit word by word (BioReveal), 48 between lead and last ──
