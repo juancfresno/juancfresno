@@ -61,7 +61,7 @@
 .donut {
   display: block;
   width: 100%;
-  height: 44vw;
+  height: 48vw;
   color: var(--c-brand-blue); // #C6DBF9
 
   :global(:root[data-theme="light"]) & { color: var(--c-text); }
@@ -79,6 +79,9 @@
   line-height: 1.2143; // 34 / 28
   letter-spacing: -0.02em;
 
+  // Lines never grow past 1600 (the content width at 1680): on wider screens
+  // the text keeps to the left margin instead of running the full width.
+  > * { max-width: 1600px; }
   p { margin: 0; }
 }
 

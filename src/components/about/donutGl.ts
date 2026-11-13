@@ -12,7 +12,7 @@ import { FRESNO_H, FRESNO_PATHS, FRESNO_W } from './fresnoPaths'
 export const DONUT = {
   // Shape
   ratio: 6,          // ring radius / tube radius: lower = fatter donut
-  size: 0.93,        // outer diameter as a fraction of the canvas width
+  size: 0.8,         // outer diameter as a fraction of the canvas width
   // Text
   repeat: 2,         // wordmarks around the ring (2 = one whole FRESNO© on the front half)
   rows: 1,           // lines of text around the tube
@@ -23,7 +23,8 @@ export const DONUT = {
   spin: 0.22,        // the ring turns on its own axis: text travels around
   roll: 0.03,        // how far the text sways around the tube (fraction of a turn)
   rollSpeed: 0.6,
-  tilt: 0.2,         // resting tilt towards the viewer (0 = edge-on, π/2 = flat)
+  tilt: 0.3,         // resting tilt towards the viewer (0 = edge-on, π/2 = flat)
+  lean: -0.3,        // the whole ring leans on screen (negative = left side up, right side down)
   wobble: 0.05,      // how far it rocks around the resting tilt
   wobbleSpeed: 0.45,
   float: 0.012,      // vertical bob, fraction of the donut
@@ -191,13 +192,13 @@ export function startLogoDonut(canvas: HTMLCanvasElement): (() => void) | null {
     // Distance at which a radius-1 donut spans `size` of the canvas width.
     const dist = 1 / (DONUT.size * Math.tan(fov / 2) * aspect)
     const wob = reduced.matches ? 0 : DONUT.wobble
-    const model = mul(
+    const model = mul(rotZ(DONUT.lean), mul(
       translate(0, Math.sin(t * DONUT.floatSpeed) * DONUT.float, 0),
       mul(
         rotX(DONUT.tilt + Math.sin(t * DONUT.wobbleSpeed) * wob + py * DONUT.pointer),
         mul(rotZ(Math.cos(t * DONUT.wobbleSpeed * 0.7) * wob + px * DONUT.pointer), rotY(t * DONUT.spin)),
       ),
-    )
+    ))
     const mvp = mul(perspective(fov, aspect, 0.1, 200), mul(translate(0, 0, -dist), model))
     gl.viewport(0, 0, canvas.width, canvas.height)
     gl.clear(gl.COLOR_BUFFER_BIT)
