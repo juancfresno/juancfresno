@@ -118,7 +118,7 @@ export default function FeaturedProjects({ pieces, label }: { pieces: FeaturedPi
           cloths.get(c)?.destroy()
           canvas?.remove()
           const w = media.offsetWidth, h = media.offsetHeight
-          const pad = Math.round(Math.min(w, h) * 0.18)
+          const pad = Math.round(Math.min(w, h) * 0.45) // room for the drag + cast shadow
           canvas = document.createElement('canvas')
           canvas.className = s.cloth
           canvas.dataset.w = String(w)

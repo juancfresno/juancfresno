@@ -70,7 +70,11 @@ $ease: cubic-bezier(0.22, 1, 0.36, 1);
 .cloth {
   position: absolute;
   z-index: 3;
+  max-width: none; // globals cap canvas at 100%: it is bigger than the card on purpose
+  max-height: none;
   pointer-events: none; // position and size set inline (card + spill pad)
+  visibility: hidden;
+  .media[data-cloth='1'] & { visibility: visible; }
 }
 
 // ── Entrance: 12 columns covering the image retract downwards, staggered
