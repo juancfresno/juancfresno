@@ -1,30 +1,7 @@
-// Entrance variants for the featured pieces — an exercise to compare ways of
-// bringing each image in, all travelling LEFT → RIGHT (Juan, 13 Nov 2026).
-// Pick one with the on-page picker (FEATURED_PICKER in featured-preview.ts),
-// `?in=<id>` or localStorage['featured:in']; DEFAULT_FX is what ships.
-//   wipe     a clean reveal from the left edge, a G line rides the edge
-//   push     the same reveal while the image slides in behind it (12 % → 0)
-//   slats    12 horizontal slats open left → right, top to bottom
-//   steps    12 columns pop in one after another, left → right
-//   pixel    Bayer-dithered pixels clear with a left → right bias (Lab 05)
-//   stretch  the image unrolls from its left edge with a small overshoot
-// Most are CSS (featured.module.scss, keyed on [data-fx]); pixel draws on a
-// throwaway canvas (pixelReveal).
-
-export const FX = ['wipe', 'push', 'slats', 'steps', 'pixel', 'stretch'] as const
-export type Fx = (typeof FX)[number]
-export const DEFAULT_FX: Fx = 'wipe'
-export const FX_LABEL: Record<Fx, string> = {
-  wipe: 'Wipe',
-  push: 'Push',
-  slats: 'Slats',
-  steps: 'Steps',
-  pixel: 'Pixels',
-  stretch: 'Stretch',
-}
-export const FX_STORE = 'featured:in'
-
-export const isFx = (x: unknown): x is Fx => typeof x === 'string' && (FX as readonly string[]).includes(x)
+// Entrance of the featured pieces: Bayer-dithered pixels clear with a
+// left → right bias (Lab 05 / the Work archive fill). Chosen by Juan on
+// 13 Nov 2026 out of six variants (wipe, push, slats, steps, pixels,
+// stretch; see git history of this file to bring the others back).
 
 const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5]
 
