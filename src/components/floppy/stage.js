@@ -103,7 +103,7 @@ const DETAIL = {
 const KEYS = ['x', 'y', 's', 'blur', 'rx', 'ry', 'rz'];
 const FOV = 24, DIST = 600, TAN = Math.tan((FOV * Math.PI) / 360);
 
-export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, onEnter = () => {}, onOpen = (_o) => {}, onRequest = (_i) => {}, onFinale = (_f) => {}, box: boxOpt = null, start = 0 }) {
+export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, onEnter = () => {}, onOpen = (_o) => {}, onRequest = (_i) => {}, onFinale = (_f) => {}, onPick = (_i) => {}, box: boxOpt = null, flow: flowOpt = null, start = 0 }) {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
   renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -154,6 +154,36 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
   let view = 'field', open = false;
   const slots = () => VIEWS[view][small.matches ? 'mobile' : 'desktop'];
   const tmp = {}, poseTmp = {};
+  // Flow mode (Home): nothing pinned. The module is a normal section of the page and the canvas a
+  // viewport-sized sticky layer inside it. The first `main` disks sit on the DOM spots
+  // ([data-floppy-spot]) and cross from one side to the other as the page scrolls; the rest are
+  // depth: small blurred ones far away that move slower than the page, and big out-of-focus ones
+  // in the foreground, at the sides, that move faster. c = the section y at the viewport centre.
+  const flow = flowOpt ? { main: flowOpt.main, c: null, spots: [], h: 1 } : null;
+  const DEPTH = [ // x, y (fraction of the section height), s, blur, speed vs the page, drift, rotations
+    { x: 0.87, y: 0.1, s: 0.085, blur: 5, v: 0.55, dx: 0.03, rx: 0.25, ry: 0.45, rz: 0.3 },
+    { x: -0.03, y: 0.33, s: 0.5, blur: 30, v: 1.7, dx: -0.1, rx: 0.2, ry: 0.9, rz: -0.9 },
+    { x: 0.1, y: 0.5, s: 0.07, blur: 6, v: 0.5, dx: -0.03, rx: -0.1, ry: -0.5, rz: -0.35 },
+    { x: 1.05, y: 0.7, s: 0.46, blur: 28, v: 1.6, dx: 0.1, rx: 0.12, ry: -0.7, rz: 0.6 },
+    { x: 0.72, y: 0.88, s: 0.09, blur: 4.5, v: 0.6, dx: 0.03, rx: 0.2, ry: 0.4, rz: 0.2 },
+  ];
+  function measure() { // where the spots are inside the section
+    const hr = host.getBoundingClientRect(); flow.h = Math.max(1, hr.height);
+    flow.spots = [...host.querySelectorAll('[data-floppy-spot]')].map((el) => { const r = el.getBoundingClientRect(); return { x: (r.left - hr.left + r.width / 2) / hr.width, y: r.top - hr.top + r.height / 2, s: r.width / hr.width }; });
+  }
+  function flowPose(d, vh, top) { // top = the canvas top on screen
+    const c = d.cur, m = small.matches;
+    if (d.i < flow.main) {
+      const a = flow.spots[d.i]; if (!a) return;
+      const u = (a.y - flow.c) / vh, dir = d.i % 2 ? -1 : 1, e = Math.max(-1.4, Math.min(1.4, u)); // u: 0 = at the viewport centre, + = still below
+      c.x = a.x + dir * e * (m ? 0.2 : 0.15); c.y = (vh / 2 + u * vh * 1.08 - top) / H; c.s = a.s;
+      c.blur = Math.max(0, Math.abs(e) - 0.42) * 9; c.rx = 0.08 + e * 0.4; c.ry = dir * (-0.3 + e * 1.15); c.rz = dir * (0.06 - e * 0.42);
+    } else {
+      const g = DEPTH[(d.i - flow.main) % DEPTH.length], near = g.v > 1, u = (g.y * flow.h - flow.c) / vh, e = Math.max(-2, Math.min(2, u));
+      c.x = g.x + g.dx * e; c.y = (vh / 2 + u * vh * g.v - top) / H; c.s = g.s * (m ? (near ? 1.1 : 1.8) : 1);
+      c.blur = g.blur; c.rx = g.rx + e * 0.3; c.ry = g.ry + e * (near ? 0.5 : 0.9); c.rz = g.rz + e * 0.3;
+    }
+  }
   // Scroll mode (Home): the page scroll is the timeline. q = how many disks have gone by (a float);
   // each disk sits at its distance to q along the same path the conveyor uses, so they file past.
   const scroll = { on: false, q: 0, eff: 0, t: -1e9 };
@@ -188,7 +218,7 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
 
   // entrance: the disks wait far below, small and out of focus, and tumble up into
   // their slots (a focus pull) the first time a third of the module is on screen
-  let entered = reduced.matches;
+  let entered = reduced.matches || !!flow;
   const introPose = (d) => {
     const T = targetOf(d);
     Object.assign(d.cur, { x: T.x + (T.x - 0.5) * 0.9, y: T.y + 1.05, s: T.s * 0.22, blur: T.blur + 26, rx: T.rx - 1.6, ry: T.ry + Math.PI * 3, rz: T.rz + 1.4 });
@@ -257,7 +287,9 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
   // ── layout
   let W = 1, H = 1, pr = 1, quality = Math.min(window.devicePixelRatio || 1, 2);
   function fit() {
-    W = Math.max(1, host.clientWidth); H = Math.max(1, host.clientHeight); pr = quality;
+    const el = flow ? canvas : host; // flow: the canvas is the sticky viewport layer, not the whole section
+    W = Math.max(1, el.clientWidth); H = Math.max(1, el.clientHeight); pr = quality;
+    if (flow) measure();
     renderer.setPixelRatio(pr); renderer.setSize(W, H, false);
     camera.aspect = W / H; camera.updateProjectionMatrix();
     for (const k of [0.5, 0.25]) for (const t of rts[k]) t.setSize(Math.max(2, Math.round(W * pr * k)), Math.max(2, Math.round(H * pr * k)));
@@ -313,6 +345,7 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
   const focus = () => disks[active];
   const applyHover = (d) => {
     if (d === hover) return; hover = d;
+    if (flow) { const was = hover; hover = d && d.i < flow.main ? d : null; if (was && was !== hover) was.api.setShutter(false); if (hover) { hover.api.setShutter(true); host.dataset.cursor = 'view'; } else delete host.dataset.cursor; wake(); return; }
     if (d) host.dataset.cursor = d === focus() && !scroll.on ? 'drag' : 'view'; else delete host.dataset.cursor;
     focus().api.setShutter(manual || d === focus()); wake();
   };
@@ -321,7 +354,7 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
     if (ptr.id !== null || interactive(e) || (e.pointerType === 'mouse' && e.button !== 0)) return;
     const d = pick(e); if (!d) return;
     ptr.id = e.pointerId; ptr.d = d; ptr.x = e.clientX; ptr.y = e.clientY; ptr.t = ptr.st = performance.now(); ptr.vx = ptr.vy = 0; ptr.travel = 0;
-    if (d === focus() && !scroll.on) { try { host.setPointerCapture(e.pointerId); } catch {} d.u.iy = d.u.ip = 0; host.dataset.dragging = ''; }
+    if (d === focus() && !scroll.on && !flow) { try { host.setPointerCapture(e.pointerId); } catch {} d.u.iy = d.u.ip = 0; host.dataset.dragging = ''; }
     lastInput = ptr.t; wake();
   };
   const onMove = (e) => {
@@ -331,7 +364,7 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
     const now = performance.now(), dt = Math.max(1, now - ptr.t) / 1000, S = e.pointerType === 'mouse' ? 0.0062 : 0.0082;
     const dx = (e.clientX - ptr.x) * S, dy = (e.clientY - ptr.y) * S, u = ptr.d.u;
     ptr.travel += Math.hypot(e.clientX - ptr.x, e.clientY - ptr.y);
-    if (ptr.d === focus() && !scroll.on) {
+    if (ptr.d === focus() && !scroll.on && !flow) {
       u.yawT += dx; if (e.pointerType === 'mouse') u.pitchT = Math.max(-0.95, Math.min(0.95, u.pitchT + dy));
       const a = Math.min(1, dt * 22); ptr.vx += (dx / dt - ptr.vx) * a; ptr.vy += (dy / dt - ptr.vy) * a;
     }
@@ -341,7 +374,8 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
     if (e.pointerId !== ptr.id) return;
     const d = ptr.d, now = performance.now(), tap = ptr.travel < 6 && now - ptr.st < 450;
     ptr.id = null; ptr.d = null; delete host.dataset.dragging;
-    if (e.type === 'pointerup') {
+    if (flow) { if (e.type === 'pointerup' && tap && d.i < flow.main) onPick(d.i); } // a tap on a disk opens its experiment
+    else if (e.type === 'pointerup') {
       if (tap && inBoxOf(d) > 0.5) onRequest(d.i); // a disk in the box: take it out again
       else if (d !== focus()) { if (tap) { const to = active + (scroll.on ? Math.sign(d.i - active) : rel(d.i) < 0 ? -1 : 1); if (scroll.on) onRequest(to); else setActive(to); } } // any other disk moves the row one step its way
       else if (tap) setOpen(!open);
@@ -375,6 +409,7 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
   const frames = [];
   const wake = () => { if (!raf && visible && onScreen && !dead) { last = 0; raf = requestAnimationFrame(tick); } };
   function settled() {
+    if (flow) return true;
     return !scroll.on && ptr.id === null && disks.every((d) => !d.exiting && !d.api.busy && Math.abs(d.u.vy) < 1e-3 && Math.abs(d.u.iy) < 1e-3 && Math.abs(d.u.yawT - d.u.yaw) < 1e-4
       && KEYS.every((k) => Math.abs(d.vel[k]) < 1e-4 && Math.abs(targetOf(d)[k] - d.cur[k]) < 1e-4));
   }
@@ -406,7 +441,15 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
         placeBox();
       }
     }
+    if (flow) {
+      const vh = window.innerHeight, top = canvas.getBoundingClientRect().top, C = vh / 2 - host.getBoundingClientRect().top;
+      flow.c = rm || flow.c === null || Math.abs(C - flow.c) > vh * 1.5 ? C : flow.c + (C - flow.c) * (1 - Math.exp(-dt * 11)); // a short lag: the disks float after the page
+      let best = active, bd = 1e9;
+      for (const d of disks) { flowPose(d, vh, top); if (d.i < flow.main && flow.spots[d.i]) { const k = Math.abs(flow.spots[d.i].y - flow.c); if (k < bd) { bd = k; best = d.i; } } }
+      if (best !== active) { active = best; onChange(active); }
+    }
     for (const d of disks) {
+      if (flow) { place(d, clock); d.api.update(dt, rm); continue; }
       if (d.hold) { if (entered && now >= d.release) d.hold = false; else { place(d, clock); continue; } }
       const T = targetOf(d), order = Math.abs(rel(d.i)), K = d.soft > now ? 7 : d.slot === 'exit' ? 26 : 30 - order * 3.2, C = 2 * (d.soft > now ? 0.86 : 0.7) * Math.sqrt(K), h = dt / 2;
       if (rm) for (const k of KEYS) { d.cur[k] = T[k]; d.vel[k] = 0; }
@@ -463,7 +506,7 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
   io.observe(host);
   const ioIn = new IntersectionObserver(([e]) => { if (e.isIntersecting) { ioIn.disconnect(); enter(); } }, { threshold: 0.35 });
   ioIn.observe(host);
-  const ro = new ResizeObserver(fit); ro.observe(host);
+  const ro = new ResizeObserver(fit); ro.observe(host); if (flow) { ro.observe(canvas); window.addEventListener('scroll', wake, { passive: true }); }
   const onMedia = () => fit();
   small.addEventListener?.('change', onMedia); reduced.addEventListener?.('change', wake);
   fit();
@@ -487,7 +530,7 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
     renderNow() { onScreen = true; cancelAnimationFrame(raf); raf = 0; tick(performance.now()); },
     dispose() {
       dead = true; cancelAnimationFrame(raf); io.disconnect(); ioIn.disconnect(); ro.disconnect();
-      document.removeEventListener('visibilitychange', onVis); small.removeEventListener?.('change', onMedia); reduced.removeEventListener?.('change', wake);
+      document.removeEventListener('visibilitychange', onVis); window.removeEventListener('scroll', wake); small.removeEventListener?.('change', onMedia); reduced.removeEventListener?.('change', wake);
       host.removeEventListener('pointerdown', onDown); host.removeEventListener('pointermove', onMove);
       host.removeEventListener('click', onClick); host.removeEventListener('pointerup', onUp); host.removeEventListener('pointercancel', onUp); host.removeEventListener('pointerleave', onLeave);
       delete host.dataset.cursor; delete host.dataset.dragging;

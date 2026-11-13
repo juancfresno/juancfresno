@@ -257,3 +257,52 @@
   .info, .what { opacity: 0; pointer-events: none; animation: none; transition: opacity 0.3s ease; }
   .finale { opacity: 1; transform: none; pointer-events: auto; transition: opacity 0.6s ease 0.2s, transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) 0.2s; }
 }
+
+// Flow (Home, since 13 Nov 2026): a normal section of the page, nothing pinned and no runway.
+// The canvas is a viewport-sized sticky layer (.sky); every disk has a spot and its text in the
+// flow, alternating sides, and the stage moves the disks across as the page scrolls.
+.mod.flow {
+  height: auto; overflow: clip;
+  padding-bottom: 6vw;
+  .head { position: relative; top: auto; left: auto; right: auto; margin: 0 max(#{$m}, env(safe-area-inset-right, 0px)) 0 max(#{$m}, env(safe-area-inset-left, 0px)); padding-top: max(96px, 9.5vw); }
+  .title { margin-top: 10px; display: inline-block; }
+  @include respond-to(md) { .head { padding-top: 72px; } }
+}
+.sky {
+  position: sticky; top: 0; z-index: 1;
+  height: 100vh; height: 100lvh; margin-bottom: -100vh; margin-bottom: -100lvh;
+  pointer-events: none;
+}
+.stations { list-style: none; margin: 0; padding: 0; }
+.station {
+  position: relative; height: 44vw;
+  @include respond-to(md) { height: auto; padding: 26vw 0 18vw; }
+}
+.spot {
+  position: absolute; top: calc(50% - 11.75vw); width: 23.5vw; aspect-ratio: 1;
+  [data-side='l'] > & { left: 24.5%; }
+  [data-side='r'] > & { left: 52%; }
+  @include respond-to(md) {
+    position: relative; top: auto; width: 56vw;
+    [data-side='l'] > & { left: 12%; }
+    [data-side='r'] > & { left: 32%; }
+  }
+}
+.note {
+  position: absolute; top: 56%; width: min(21.85vw, 367px);
+  display: flex; flex-direction: column;
+  [data-side='l'] > & { right: max(#{$m}, env(safe-area-inset-right, 0px)); align-items: flex-end; text-align: right; }
+  [data-side='r'] > & { left: max(#{$m}, env(safe-area-inset-left, 0px)); align-items: flex-start; text-align: left; }
+  .row { gap: 16px; }
+  @include respond-to(md) {
+    position: relative; top: auto; width: auto; margin: 10vw max(#{$m}, env(safe-area-inset-right, 0px)) 0 max(#{$m}, env(safe-area-inset-left, 0px));
+    [data-side] > & { left: auto; right: auto; align-items: flex-start; text-align: left; }
+  }
+}
+.noteWhat {
+  margin: 12px 0 0;
+  font-family: $font-body; font-weight: $fw-light; font-size: 14px; line-height: 20px;
+  color: $color-text-mid;
+  -webkit-user-select: text; user-select: text;
+  @include respond-to(md) { font-size: 15px; line-height: 21px; }
+}

@@ -32,7 +32,7 @@ function labelSrc(n: string) {
 // Lab module with the 3D floppies (Figma 7025:21805), for Home and Lab.
 // `only` = which experiments to show, by number and in that order (the Home shows a few;
 // the counter still counts the whole Lab).
-export default function FloppyBand({ locale, mode, only }: { locale: Locale; mode?: 'free' | 'scroll'; only?: string[] }) {
+export default function FloppyBand({ locale, mode, only }: { locale: Locale; mode?: 'free' | 'scroll' | 'flow'; only?: string[] }) {
   const { EXPERIMENTS } = getSite(locale)
   const ui = getUi(locale)
   const all: FloppyItem[] = EXPERIMENTS.map((e, i) => ({
@@ -40,5 +40,7 @@ export default function FloppyBand({ locale, mode, only }: { locale: Locale; mod
     label: labelSrc(e.n), ...SHELLS[i % SHELLS.length],
   }))
   const items = only ? only.map((n) => all.find((x) => x.n === n)).filter((x): x is FloppyItem => !!x) : all
-  return <FloppyModule items={items} labName={ui.lab.h1} labHref={localePath(locale, '/lab')} strings={ui.lab.floppy} mode={mode} total={all.length} />
+  // flow: the experiments not shown still fly by, out of focus, as depth
+  const rest = all.filter((x) => !items.includes(x)), depth = mode === 'flow' ? [...rest, ...rest].slice(0, 5) : undefined
+  return <FloppyModule depth={depth} items={items} labName={ui.lab.h1} labHref={localePath(locale, '/lab')} strings={ui.lab.floppy} mode={mode} total={all.length} />
 }

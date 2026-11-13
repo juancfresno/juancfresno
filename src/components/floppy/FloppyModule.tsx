@@ -13,7 +13,7 @@ export type FloppyItem = {
 type View = 'field' | 'ring'
 type Stage = { setActive(i: number): void; next(): void; prev(): void; setOpen(o: boolean, silent?: boolean): void; setView(v: View): void; setScroll(q: number): void; span: number; dispose(): void }
 type Strings = { region: string; prev: string; next: string; open: string; close: string; built: string; how: string; year: string; viewField: string; viewRing: string; boxLine: string; boxCta: string }
-type Props = { items: FloppyItem[]; labName: string; labHref: string; strings: Strings; mode?: 'free' | 'scroll'; total?: number }
+type Props = { items: FloppyItem[]; labName: string; labHref: string; strings: Strings; mode?: 'free' | 'scroll' | 'flow'; total?: number; depth?: FloppyItem[] }
 
 // Text that changes like an old terminal: the block cursor eats the old string and types the new one.
 function Typed({ text }: { text: string }) {
@@ -55,13 +55,15 @@ function BoxLink({ href, text, on }: { href: string; text: string; on: boolean }
 // only when the module comes near the viewport. No WebGL = the text alone.
 // Two views (scattered field / wheel) and a ficha: a click on the active disk
 // brings it forward over a card with the long description and the link.
-export default function FloppyModule({ items, labName, labHref, strings, mode = 'free', total = items.length }: Props) {
+export default function FloppyModule({ items, labName, labHref, strings, mode = 'free', total = items.length, depth = [] }: Props) {
   const host = useRef<HTMLElement>(null)
   const runway = useRef<HTMLDivElement>(null)
   const scrollTo = useRef<(i: number) => void>(() => {})
   const canvas = useRef<HTMLCanvasElement>(null)
   const stage = useRef<Stage | null>(null)
   const closeBtn = useRef<HTMLButtonElement>(null)
+  const links = useRef<(HTMLAnchorElement | null)[]>([])
+  const flow = mode === 'flow'
   const [active, setActive] = useState(0)
   const [ready, setReady] = useState(false)
   const [open, setOpen] = useState(false)
@@ -79,11 +81,12 @@ export default function FloppyModule({ items, labName, labHref, strings, mode = 
       io.disconnect()
       import('./stage.js').then(({ createFloppyStage }) => {
         if (dead) return
-        const data = items.map((x) => ({ n: x.n, title: x.name, en: x.name, kind: x.kind, year: x.year, label: x.label, shell: x.shell, accent: x.accent, translucent: x.translucent }))
+        // flow: the disks shown plus the ones that only give depth (blurred, far away or in the foreground)
+        const data = (flow ? [...items, ...depth] : items).map((x) => ({ n: x.n, title: x.name, en: x.name, kind: x.kind, year: x.year, label: x.label, shell: x.shell, accent: x.accent, translucent: x.translucent }))
         const run = () => {
           if (dead) return
           try {
-            if (!matchMedia('(prefers-reduced-motion: reduce)').matches) el.dataset.intro = 'pending'
+            if (!flow && !matchMedia('(prefers-reduced-motion: reduce)').matches) el.dataset.intro = 'pending'
             // stage.js is untyped JS: its option types are inferred from defaults, so call it loosely
             const st = (createFloppyStage as unknown as (h: HTMLElement, c: HTMLCanvasElement, o: object) => Stage)(el, cv, {
               items: data,
@@ -92,6 +95,8 @@ export default function FloppyModule({ items, labName, labHref, strings, mode = 
               onEnter: () => { el.dataset.intro = 'in' },
               onRequest: (i: number) => scrollTo.current(i),
               onFinale: (f: boolean) => setFinale(f),
+              onPick: (i: number) => links.current[i]?.click(),
+              flow: flow ? { main: items.length } : null,
               // the Home files every disk into the box (the ones not shown stand in it already)
               box: mode === 'scroll' && !matchMedia('(prefers-reduced-motion: reduce)').matches ? { total } : null,
             })
@@ -124,7 +129,7 @@ export default function FloppyModule({ items, labName, labHref, strings, mode = 
     }, { rootMargin: '600px' })
     io.observe(el)
     return () => { dead = true; io.disconnect(); unscroll(); scrollTo.current = () => {}; stage.current?.dispose(); stage.current = null }
-  }, [items, mode, total])
+  }, [items, mode, total, depth, flow])
 
   useEffect(() => { if (open) closeBtn.current?.focus({ preventScroll: true }) }, [open])
 
@@ -135,6 +140,33 @@ export default function FloppyModule({ items, labName, labHref, strings, mode = 
   }
   const toggle = (o: boolean) => { setOpen(o); stage.current?.setOpen(o, true) }
   const pick = (v: View) => { setView(v); stage.current?.setView(v) }
+
+  // Flow (Home): a normal section of the page, nothing pinned. Each disk has its spot and its
+  // text in the document; the canvas is a sticky viewport layer over them.
+  if (flow) return (
+    <section ref={host} className={`${s.mod} ${s.flow}`} aria-label={strings.region} data-wf="media">
+      <div className={s.sky}><canvas ref={canvas} className={s.canvas} data-ready={ready || undefined} aria-hidden="true" /></div>
+      <div className={s.head}>
+        <div className={s.top}>
+          <p className={s.mark} aria-hidden="true">L — <Typed text={it.name.charAt(0).toUpperCase()} /></p>
+          <Link className={s.lab} href={labHref}>/ {labName}</Link>
+        </div>
+        <ElasticLine className={s.rule} />
+      </div>
+      <ol className={s.stations}>
+        {items.map((x, i) => (
+          <li key={x.n} className={s.station} data-side={i % 2 ? 'r' : 'l'}>
+            <div className={s.spot} data-floppy-spot="" />
+            <div className={s.note}>
+              <div className={s.row}><span className={s.num}>#{x.n}</span><span className={s.kind}>{x.kind}</span></div>
+              <Link ref={(el) => { links.current[i] = el }} className={s.title} href={x.href}>{x.name}</Link>
+              <p className={s.noteWhat}>{x.what}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </section>
+  )
 
   return (
     <div ref={runway} className={mode === 'scroll' ? s.runway : undefined} style={{ ['--n' as string]: items.length }}>
