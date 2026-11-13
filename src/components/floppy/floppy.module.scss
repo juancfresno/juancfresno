@@ -205,3 +205,19 @@
 }
 .close { appearance: none; border: 0; background: none; padding: 13px 4px; color: $color-text-mid; &:hover { color: $color-text-hi; } }
 @media (prefers-reduced-motion: reduce) { .card, .mod[data-open] .card { transition: none; transform: none; > * { animation: none; } } }
+
+// Scroll mode (Home): a tall runway with the module pinned in it; the page scroll files the
+// disks past (60 svh per disk after the first screen). Only once the stage is running
+// ([data-scroll]): no JS, no WebGL or reduced motion = the normal module in the flow.
+.runway[data-scroll] {
+  position: relative;
+  height: calc(100svh + (var(--n, 6) - 1) * 60svh);
+  .mod { position: sticky; top: 0; height: 100svh; }
+  .views { display: none; }
+  @include respond-to(md) {
+    .head { top: 84px; }
+    .info { top: calc(62svh - 84px); }
+    .what { top: calc(62svh + 78px); }
+    .nav { top: 136px; }
+  }
+}

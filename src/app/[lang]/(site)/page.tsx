@@ -61,7 +61,7 @@ export default async function HomePage({ params }: Props) {
       </section>
       {/* Featured projects (Figma 04 · Archivo 7173:7118): preview pieces, not linked to cases yet. */}
       <FeaturedProjects pieces={FEATURED_PREVIEW} label={LANDING.featuredLabel} />
-      <LatestFeed locale={l} show={['block']} labels={{ block: LANDING.feedLabel }} beforeBlock={<FloppyBand locale={l} />} />
+      <LatestFeed locale={l} show={['block']} labels={{ block: LANDING.feedLabel }} beforeBlock={<FloppyBand locale={l} mode="scroll" />} />
       <HomeContact locale={l} />
     </>
   )

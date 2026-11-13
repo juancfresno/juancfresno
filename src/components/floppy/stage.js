@@ -48,7 +48,7 @@ const DETAIL = {
 const KEYS = ['x', 'y', 's', 'blur', 'rx', 'ry', 'rz'];
 const FOV = 24, DIST = 600, TAN = Math.tan((FOV * Math.PI) / 360);
 
-export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, onEnter = () => {}, onOpen = (_o) => {}, start = 0 }) {
+export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, onEnter = () => {}, onOpen = (_o) => {}, onRequest = (_i) => {}, start = 0 }) {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
   renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -98,11 +98,21 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
   const VIEWS = { field: SLOTS, ring: { desktop: ring(false, N), mobile: ring(true, N) } };
   let view = 'field', open = false;
   const slots = () => VIEWS[view][small.matches ? 'mobile' : 'desktop'];
-  const tmp = {};
+  const tmp = {}, poseTmp = {};
+  // Scroll mode (Home): the page scroll is the timeline. q = how many disks have gone by (a float);
+  // each disk sits at its distance to q along the same path the conveyor uses, so they file past.
+  const scroll = { on: false, q: 0, eff: 0, t: -1e9 };
+  const PATH = ['exit', '-1', '0', '1', '2', 'far']; // distances −2 … 3
+  const poseAt = (r) => {
+    const S = slots(), x = Math.max(-2, Math.min(3, r)) + 2, i0 = Math.min(4, Math.floor(x)), u = x - i0, e = u * u * (3 - 2 * u); // ease: it lingers at each stop
+    const a = S[PATH[i0]], b = S[PATH[i0 + 1]];
+    for (const k of KEYS) poseTmp[k] = a[k] + (b[k] - a[k]) * e;
+    return poseTmp;
+  };
   const targetOf = (d) => { // where a disk wants to be right now
-    const base = slots()[d.slot];
+    const base = scroll.on ? poseAt(d.i - scroll.eff) : slots()[d.slot];
     if (!open) return base;
-    if (d.i === active && d.slot === '0') return DETAIL[small.matches ? 'mobile' : 'desktop'];
+    if (d.i === active && (scroll.on || d.slot === '0')) return DETAIL[small.matches ? 'mobile' : 'desktop'];
     // the rest clear the card: those on its side leave the stage, the near one stays as a blurred foreground
     const m = small.matches, out = m ? (base.x < 0.5 ? -0.7 : 0.7) : base.x > 0.3 ? 0.8 : -0.04;
     return Object.assign(tmp, base, { x: base.x + out, blur: base.blur + 9, s: base.s * 0.84 });
@@ -116,7 +126,7 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
   // their slots (a focus pull) the first time a third of the module is on screen
   let entered = reduced.matches;
   const introPose = (d) => {
-    const T = slots()[d.slot];
+    const T = targetOf(d);
     Object.assign(d.cur, { x: T.x + (T.x - 0.5) * 0.9, y: T.y + 1.05, s: T.s * 0.22, blur: T.blur + 26, rx: T.rx - 1.6, ry: T.ry + Math.PI * 3, rz: T.rz + 1.4 });
     for (const k of KEYS) d.vel[k] = 0; d.hold = true;
   };
@@ -220,7 +230,7 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
   const focus = () => disks[active];
   const applyHover = (d) => {
     if (d === hover) return; hover = d;
-    if (d) host.dataset.cursor = d === focus() ? 'drag' : 'view'; else delete host.dataset.cursor;
+    if (d) host.dataset.cursor = d === focus() && !scroll.on ? 'drag' : 'view'; else delete host.dataset.cursor;
     focus().api.setShutter(manual || d === focus()); wake();
   };
   const interactive = (e) => e.target instanceof Element && e.target.closest('a, button');
@@ -228,7 +238,7 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
     if (ptr.id !== null || interactive(e) || (e.pointerType === 'mouse' && e.button !== 0)) return;
     const d = pick(e); if (!d) return;
     ptr.id = e.pointerId; ptr.d = d; ptr.x = e.clientX; ptr.y = e.clientY; ptr.t = ptr.st = performance.now(); ptr.vx = ptr.vy = 0; ptr.travel = 0;
-    if (d === focus()) { try { host.setPointerCapture(e.pointerId); } catch {} d.u.iy = d.u.ip = 0; host.dataset.dragging = ''; }
+    if (d === focus() && !scroll.on) { try { host.setPointerCapture(e.pointerId); } catch {} d.u.iy = d.u.ip = 0; host.dataset.dragging = ''; }
     lastInput = ptr.t; wake();
   };
   const onMove = (e) => {
@@ -238,7 +248,7 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
     const now = performance.now(), dt = Math.max(1, now - ptr.t) / 1000, S = e.pointerType === 'mouse' ? 0.0062 : 0.0082;
     const dx = (e.clientX - ptr.x) * S, dy = (e.clientY - ptr.y) * S, u = ptr.d.u;
     ptr.travel += Math.hypot(e.clientX - ptr.x, e.clientY - ptr.y);
-    if (ptr.d === focus()) {
+    if (ptr.d === focus() && !scroll.on) {
       u.yawT += dx; if (e.pointerType === 'mouse') u.pitchT = Math.max(-0.95, Math.min(0.95, u.pitchT + dy));
       const a = Math.min(1, dt * 22); ptr.vx += (dx / dt - ptr.vx) * a; ptr.vy += (dy / dt - ptr.vy) * a;
     }
@@ -249,9 +259,9 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
     const d = ptr.d, now = performance.now(), tap = ptr.travel < 6 && now - ptr.st < 450;
     ptr.id = null; ptr.d = null; delete host.dataset.dragging;
     if (e.type === 'pointerup') {
-      if (d !== focus()) { if (tap) setActive(active + (rel(d.i) < 0 ? -1 : 1)); } // any other disk moves the row one step its way
+      if (d !== focus()) { if (tap) { const to = active + (scroll.on ? Math.sign(d.i - active) : rel(d.i) < 0 ? -1 : 1); if (scroll.on) onRequest(to); else setActive(to); } } // any other disk moves the row one step its way
       else if (tap) setOpen(!open);
-      else if (!tap && now - ptr.t < 90 && !reduced.matches) { d.u.iy = Math.max(-16, Math.min(16, ptr.vx)); if (e.pointerType === 'mouse') d.u.ip = Math.max(-6, Math.min(6, ptr.vy)); }
+      else if (!tap && !scroll.on && now - ptr.t < 90 && !reduced.matches) { d.u.iy = Math.max(-16, Math.min(16, ptr.vx)); if (e.pointerType === 'mouse') d.u.ip = Math.max(-6, Math.min(6, ptr.vy)); }
     }
     lastInput = now; wake();
   };
@@ -281,7 +291,7 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
   const frames = [];
   const wake = () => { if (!raf && visible && onScreen && !dead) { last = 0; raf = requestAnimationFrame(tick); } };
   function settled() {
-    return ptr.id === null && disks.every((d) => !d.exiting && !d.api.busy && Math.abs(d.u.vy) < 1e-3 && Math.abs(d.u.iy) < 1e-3 && Math.abs(d.u.yawT - d.u.yaw) < 1e-4
+    return (!scroll.on || Math.abs(scroll.eff - Math.round(scroll.q)) < 1e-3) && ptr.id === null && disks.every((d) => !d.exiting && !d.api.busy && Math.abs(d.u.vy) < 1e-3 && Math.abs(d.u.iy) < 1e-3 && Math.abs(d.u.yawT - d.u.yaw) < 1e-4
       && KEYS.every((k) => Math.abs(d.vel[k]) < 1e-4 && Math.abs(targetOf(d)[k] - d.cur[k]) < 1e-4));
   }
   function tick(now) {
@@ -294,6 +304,16 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
     if (clock > 3 && frames.length === 60 && quality > 1) { const avg = frames.reduce((a, b) => a + b, 0) / 60; slow = avg > 1 / 34 ? slow + 1 : 0; if (slow > 45) { quality = Math.max(1, quality - 0.5); slow = 0; frames.length = 0; fit(); } }
 
     { const k = 1 - Math.exp(-dt * 4); mouse.x += (mouse.tx - mouse.x) * k; mouse.y += (mouse.ty - mouse.y) * k; }
+    if (scroll.on) {
+      const goal = now - scroll.t > 200 ? Math.round(scroll.q) : scroll.q; // scroll at rest: the nearest disk finishes arriving
+      scroll.eff = rm ? goal : scroll.eff + (goal - scroll.eff) * (1 - Math.exp(-dt * 9));
+      const idx = Math.max(0, Math.min(N - 1, Math.round(scroll.eff)));
+      if (idx !== active) {
+        disks[active].api.setShutter(false); active = idx; hover = null; manual = open;
+        if (open) disks[active].api.setShutter(true);
+        onChange(active);
+      }
+    }
     for (const d of disks) {
       if (d.hold) { if (entered && now >= d.release) d.hold = false; else { place(d, clock); continue; } }
       const T = targetOf(d), order = Math.abs(rel(d.i)), K = d.soft > now ? 7 : d.slot === 'exit' ? 26 : 30 - order * 3.2, C = 2 * (d.soft > now ? 0.86 : 0.7) * Math.sqrt(K), h = dt / 2;
@@ -351,6 +371,14 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
 
   return {
     setActive, next: () => setActive(active + 1), prev: () => setActive(active - 1), setOpen, setView,
+    // q = disks gone by (0 … N−1, a float), from the page scroll
+    setScroll(q) {
+      q = Math.max(0, Math.min(N - 1, q));
+      if (!scroll.on) { scroll.on = true; scroll.eff = q; view = 'field'; for (const d of disks) { d.exiting = 0; d.u.yawT = d.u.pitchT = 0; } }
+      if (Math.abs(q - scroll.q) > 1e-4) scroll.t = performance.now();
+      scroll.q = q; wake();
+    },
+    get scroll() { return scroll; },
     get open() { return open; }, get view() { return view; },
     get active() { return active; },
     get fps() { return frames.length ? Math.round(frames.length / frames.reduce((a, b) => a + b, 0)) : 0; },

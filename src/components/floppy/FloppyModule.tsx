@@ -10,9 +10,9 @@ export type FloppyItem = {
   label?: string; shell?: string; accent?: string; translucent?: boolean
 }
 type View = 'field' | 'ring'
-type Stage = { setActive(i: number): void; next(): void; prev(): void; setOpen(o: boolean, silent?: boolean): void; setView(v: View): void; dispose(): void }
+type Stage = { setActive(i: number): void; next(): void; prev(): void; setOpen(o: boolean, silent?: boolean): void; setView(v: View): void; setScroll(q: number): void; dispose(): void }
 type Strings = { region: string; prev: string; next: string; open: string; close: string; built: string; how: string; year: string; viewField: string; viewRing: string }
-type Props = { items: FloppyItem[]; labName: string; labHref: string; strings: Strings }
+type Props = { items: FloppyItem[]; labName: string; labHref: string; strings: Strings; mode?: 'free' | 'scroll' }
 
 // Text that changes like an old terminal: the block cursor eats the old string and types the new one.
 function Typed({ text }: { text: string }) {
@@ -41,8 +41,10 @@ function Typed({ text }: { text: string }) {
 // only when the module comes near the viewport. No WebGL = the text alone.
 // Two views (scattered field / wheel) and a ficha: a click on the active disk
 // brings it forward over a card with the long description and the link.
-export default function FloppyModule({ items, labName, labHref, strings }: Props) {
+export default function FloppyModule({ items, labName, labHref, strings, mode = 'free' }: Props) {
   const host = useRef<HTMLElement>(null)
+  const runway = useRef<HTMLDivElement>(null)
+  const scrollTo = useRef<(i: number) => void>(() => {})
   const canvas = useRef<HTMLCanvasElement>(null)
   const stage = useRef<Stage | null>(null)
   const closeBtn = useRef<HTMLButtonElement>(null)
@@ -56,6 +58,7 @@ export default function FloppyModule({ items, labName, labHref, strings }: Props
     const el = host.current, cv = canvas.current
     if (!el || !cv) return
     let dead = false
+    let unscroll = () => {}
     const io = new IntersectionObserver(([e]) => {
       if (!e.isIntersecting) return
       io.disconnect()
@@ -71,8 +74,26 @@ export default function FloppyModule({ items, labName, labHref, strings }: Props
               onChange: (i: number) => setActive(i),
               onOpen: (o: boolean) => setOpen(o),
               onEnter: () => { el.dataset.intro = 'in' },
+              onRequest: (i: number) => scrollTo.current(i),
             })
             stage.current = st
+            // Scroll mode (Home): the module is pinned inside a tall runway and the page scroll
+            // is the timeline. Native scroll, nothing hijacked; reduced motion keeps the free module.
+            const rw = runway.current
+            if (mode === 'scroll' && rw && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+              const n = items.length
+              const span = () => Math.max(1, rw.offsetHeight - window.innerHeight)
+              const onScroll = () => st.setScroll((Math.min(1, Math.max(0, -rw.getBoundingClientRect().top / span()))) * (n - 1))
+              scrollTo.current = (i) => {
+                const k = Math.min(n - 1, Math.max(0, i))
+                window.scrollTo({ top: rw.getBoundingClientRect().top + window.scrollY + (span() * k) / (n - 1), behavior: 'smooth' })
+              }
+              window.addEventListener('scroll', onScroll, { passive: true })
+              window.addEventListener('resize', onScroll)
+              unscroll = () => { window.removeEventListener('scroll', onScroll); window.removeEventListener('resize', onScroll) }
+              rw.dataset.scroll = ''
+              onScroll()
+            }
             ;(window as unknown as { __floppyStage?: unknown }).__floppyStage = st // QA probe
             setReady(true)
           } catch (err) { delete el.dataset.intro; console.warn('[floppy]', err) }
@@ -82,16 +103,21 @@ export default function FloppyModule({ items, labName, labHref, strings }: Props
       }).catch((err) => console.warn('[floppy]', err))
     }, { rootMargin: '600px' })
     io.observe(el)
-    return () => { dead = true; io.disconnect(); stage.current?.dispose(); stage.current = null }
-  }, [items])
+    return () => { dead = true; io.disconnect(); unscroll(); scrollTo.current = () => {}; stage.current?.dispose(); stage.current = null }
+  }, [items, mode])
 
   useEffect(() => { if (open) closeBtn.current?.focus({ preventScroll: true }) }, [open])
 
-  const go = (d: number) => { if (stage.current) (d > 0 ? stage.current.next() : stage.current.prev()); else setActive((a) => (a + d + items.length) % items.length) }
+  const go = (d: number) => {
+    if (runway.current?.dataset.scroll !== undefined) scrollTo.current(active + d)
+    else if (stage.current) (d > 0 ? stage.current.next() : stage.current.prev())
+    else setActive((a) => (a + d + items.length) % items.length)
+  }
   const toggle = (o: boolean) => { setOpen(o); stage.current?.setOpen(o, true) }
   const pick = (v: View) => { setView(v); stage.current?.setView(v) }
 
   return (
+    <div ref={runway} className={mode === 'scroll' ? s.runway : undefined} style={{ ['--n' as string]: items.length }}>
     <section
       ref={host}
       className={s.mod}
@@ -154,5 +180,6 @@ export default function FloppyModule({ items, labName, labHref, strings }: Props
       </div>
       <canvas ref={canvas} className={s.canvas} data-ready={ready || undefined} aria-hidden="true" />
     </section>
+    </div>
   )
 }
