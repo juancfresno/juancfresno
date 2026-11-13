@@ -91,6 +91,8 @@ export default function Nav() {
   const [hidden,   setHidden]   = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const lastY    = useRef(0)
+  const turnY    = useRef(0)
+  const dir      = useRef(0)
   const ui       = useUi()
   const href     = useHref()
   // Internal path (no /es, no rewritten /en) for the active state.
@@ -103,8 +105,12 @@ export default function Nav() {
       const y  = window.scrollY
       const dy = y - lastY.current
 
-      if (dy > 8 && y > 120) setHidden(true)
-      if (dy < -8)           setHidden(false)
+      // Distance travelled since the last change of direction, so slow touch
+      // scrolling (a few px per event) hides and shows it too.
+      if (dy !== 0 && Math.sign(dy) !== dir.current) { dir.current = Math.sign(dy); turnY.current = lastY.current }
+      const run = y - turnY.current
+      if (run > 8 && y > 120) setHidden(true)
+      if (run < -8 || y <= 0) setHidden(false)
 
       setScrolled(y > 20)
       lastY.current = y

@@ -4,7 +4,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { DONUT, startLogoDonut, type LogoDonutHandle } from './donutGl'
 import FresnoLogo from './FresnoLogo'
-import { DOCK_W, DOCK_W_SMALL, DOCK_Y, pageMargin } from './dock'
+import { DOCK_W, DOCK_W_SMALL, dockY, pageMargin } from './dock'
 import a from './about.module.scss'
 
 // Docked ring: its width in the header corner (the place of the nav wordmark,
@@ -60,7 +60,7 @@ export default function LogoDonut() {
       const d0 = DONUT.size * r.width
       const d1 = W <= 768 ? DOCK_W_SMALL : DOCK_W
       const x1 = W - pageMargin(W) - d1 / 2
-      const y1 = DOCK_Y
+      const y1 = dockY(W)
       // The trip lasts well past its slot (half a screen more), so the ring is
       // still on screen, growing over the bio and the blue band, while they go
       // by. Never longer than the page can scroll, or it would not reach the corner.
