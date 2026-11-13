@@ -2,7 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useRef, type ReactNode } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
-import { EFFECTS, SITE_TRANSITION, type TransitionEffect } from '@/components/transition/effects'
+import { EFFECTS, gridProbe, siteTransitionId, type TransitionEffect } from '@/components/transition/effects'
 import s from '@/components/transition/SiteTransition.module.scss'
 import { parsePath } from '@/i18n/config'
 import { LANG_SWITCH_KEY } from './langSwitch'
@@ -37,6 +37,22 @@ function hudLine(pathname: string): string {
   return `→ ${(home || 'Home').toUpperCase()}`
 }
 
+// Images of the new page that are on screen but not decoded yet: the cover
+// holds for them (never longer than `cap` ms), so nothing pops in after it.
+function imagesReady(cap: number) {
+  const vh = window.innerHeight
+  const waiting = Array.from(document.querySelectorAll<HTMLImageElement>('main img')).filter((im) => {
+    if (im.complete && im.naturalWidth) return false
+    const r = im.getBoundingClientRect()
+    return r.width > 0 && r.bottom > 0 && r.top < vh
+  })
+  if (!waiting.length) return Promise.resolve()
+  return Promise.race([
+    Promise.all(waiting.map((im) => im.decode().catch(() => {}))).then(() => {}),
+    new Promise<void>((r) => window.setTimeout(r, cap)),
+  ])
+}
+
 // After a navigation, focus the new page's h1 (or <main>) without scrolling.
 function focusPage() {
   const main = document.querySelector<HTMLElement>('main')
@@ -68,8 +84,9 @@ function linkTarget(e: MouseEvent): URL | null {
 
 // ─── Provider ─────────────────────────────────────────────────────────────────
 // Owns the `navigate` seam and the site transition (SITE_TRANSITION in
-// components/transition/effects.ts): cover → router.push → wait for the new
-// pathname + 2 frames → reveal (the effect measures the new page here) → focus.
+// components/transition/effects.ts; `?tr=b` previews Propuesta B): prefetch +
+// cover → router.push → wait for the new pathname + 2 frames + the images on
+// screen (≤ 250 ms) → reveal (the effect measures the new page here) → focus.
 // Back/forward covers at once and runs the effect mirrored. Reduced motion =
 // the effect's veil-only fade. Internal <a>/<Link> clicks are caught
 // here, so pages and links don't need to know about it.
@@ -87,7 +104,12 @@ export default function PageTransitionProvider({ children }: { children: ReactNo
   const lastClick = useRef<{ x: number; t: number } | null>(null)
 
   useEffect(() => {
-    if (canvasRef.current) effect.current = EFFECTS[SITE_TRANSITION](canvasRef.current)
+    if (canvasRef.current) effect.current = EFFECTS[siteTransitionId()](canvasRef.current)
+    // Build the grid probe while the browser is idle, so the first click
+    // doesn't pay for it in the middle of the animation.
+    const warm = () => { try { gridProbe() } catch {} }
+    const ric = typeof window.requestIdleCallback === 'function' // not in Safari
+    const idle = ric ? window.requestIdleCallback(warm, { timeout: 2000 }) : window.setTimeout(warm, 600)
     // Arriving from a language switch (full load): reveal this page with the effect.
     let flagged = false
     try { flagged = !!sessionStorage.getItem(LANG_SWITCH_KEY); sessionStorage.removeItem(LANG_SWITCH_KEY) } catch {}
@@ -110,7 +132,11 @@ export default function PageTransitionProvider({ children }: { children: ReactNo
     // Back to this page from the bfcache after a language switch: drop the cover.
     const onShow = (e: PageTransitionEvent) => { if (e.persisted) { effect.current?.cancel(); busy.current = false } }
     window.addEventListener('pageshow', onShow)
-    return () => { window.removeEventListener('pageshow', onShow); effect.current?.cancel() }
+    return () => {
+      window.removeEventListener('pageshow', onShow)
+      if (ric) window.cancelIdleCallback(idle); else window.clearTimeout(idle)
+      effect.current?.cancel()
+    }
   }, [])
 
   // The committed route decides the page theme (before paint): direct loads,
@@ -139,6 +165,7 @@ export default function PageTransitionProvider({ children }: { children: ReactNo
     await routeChanged(from)
     await frame()
     await frame()
+    if (animate) await imagesReady(250)
     if (animate) await effect.current?.reveal()
     focusPage()
     busy.current = false
@@ -168,6 +195,8 @@ export default function PageTransitionProvider({ children }: { children: ReactNo
     }
     stack.current = stack.current.slice(0, at.current + 1).concat(url.pathname)
     at.current = stack.current.length - 1
+    // Fetch the new page while the cover plays, not after it.
+    try { router.prefetch(to) } catch {}
     if (animate) await effect.current!.cover(opts)
     // Covered: the page theme (blue Contact), the nav chip (pathname) and the
     // scroll all change under the cover.

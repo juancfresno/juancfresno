@@ -77,7 +77,15 @@ export default function FeaturedProjects({ pieces, label }: { pieces: FeaturedPi
       if (busy) araf = requestAnimationFrame(animate)
       else alast = 0
     }
+    // The home entrance (wip/Intro.tsx) goes first: no piece comes in while the
+    // wireframe is still up; the first ones follow the copy once it hands over.
+    const html = document.documentElement
+    const held = () => (html.dataset.intro === 'full' || html.dataset.intro === 'fast') && !('introGo' in html.dataset)
+    let goTimer = 0
+    const onGo = () => { goTimer = window.setTimeout(check, html.dataset.intro === 'fast' ? 200 : 400) }
+    window.addEventListener('wip:intro-go', onGo)
     const check = () => {
+      if (held()) return
       const now = performance.now()
       const line = window.innerHeight * LINE
       const rs = ent.map((e) => ({ e, top: e.c.getBoundingClientRect().top }))
@@ -202,6 +210,8 @@ export default function FeaturedProjects({ pieces, label }: { pieces: FeaturedPi
     }
 
     return () => {
+      window.removeEventListener('wip:intro-go', onGo)
+      window.clearTimeout(goTimer)
       vio.disconnect()
       cancelAnimationFrame(araf)
       ent.forEach((e) => e.cover.destroy())
@@ -217,7 +227,7 @@ export default function FeaturedProjects({ pieces, label }: { pieces: FeaturedPi
   return (
     <section ref={root} className={s.module} aria-label={label.replace(/^\/\s*/, '')} style={{ '--fh': F.h, '--fw': F.w } as CSSProperties}>
       <div className={s.frame}>
-        <div className={s.label} style={{ left: pct(FEATURED_LABEL.x, F.w), width: pct(FEATURED_LABEL.w, F.w), top: pct(FEATURED_LABEL.y, F.h) }}>
+        <div className={s.label} data-in="fade" data-wire="LABEL" style={{ left: pct(FEATURED_LABEL.x, F.w), width: pct(FEATURED_LABEL.w, F.w), top: pct(FEATURED_LABEL.y, F.h), '--in-d': '460ms' } as CSSProperties}>
           <ElasticLine className={s.rule} />
           <p className={s.labelText}>{label}</p>
         </div>

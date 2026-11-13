@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type CSSProperties } from 'react'
 import clsx from 'clsx'
 import s from './ThemeToggle.module.scss'
 import { useUi } from '@/i18n/client'
@@ -48,7 +48,7 @@ export default function ThemeToggle({ className }: { className?: string }) {
   }, [])
 
   return (
-    <div className={clsx(s.toggle, className)} role="group" aria-label={ui.theme.group}>
+    <div className={clsx(s.toggle, className)} role="group" aria-label={ui.theme.group} data-in="fade" data-wire="THEME" style={{ '--in-d': '90ms' } as CSSProperties}>
       {THEMES.map((t, i) => (
         <span key={t} className={s.item}>
           {i > 0 && <span className={s.sep} aria-hidden="true">/</span>}

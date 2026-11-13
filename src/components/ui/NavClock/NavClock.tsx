@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type CSSProperties } from 'react'
 
 // ─── Local time in Valencia — "VLC 18:42 CET" (CEST in summer) ───────────────
 // Europe/Madrid, ticks on the minute. Decorative: aria-hidden, the footer
@@ -36,7 +36,7 @@ export default function NavClock({ className }: { className?: string }) {
   }, [])
 
   return (
-    <span className={className} aria-hidden="true" suppressHydrationWarning>
+    <span className={className} aria-hidden="true" suppressHydrationWarning data-in="fade" data-wire="CLOCK" style={{ '--in-d': '120ms' } as CSSProperties}>
       {text}
     </span>
   )

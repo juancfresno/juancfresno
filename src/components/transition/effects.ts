@@ -10,10 +10,23 @@ import grid from '@/components/ui/GridOverlay/GridOverlay.module.scss'
 import { GRID_COLS } from '@/components/ui/GridOverlay/config'
 import { currentPageTheme } from '@/lib/pageTheme'
 
-export type SiteTransitionId = 'wireframe-grid' | 'pixels' | 'instant'
+export type SiteTransitionId = 'wireframe-grid' | 'wireframe-build' | 'pixels' | 'instant'
 
 /** The one switch: which Lab 002 option the real site uses. */
 export const SITE_TRANSITION: SiteTransitionId = 'wireframe-grid'
+
+// Preview switch: `?tr=b` plays Propuesta B ('wireframe-build') for the rest of
+// the session (sessionStorage 'tr'), `?tr=a` goes back to SITE_TRANSITION.
+const TR_PREVIEW: Record<string, SiteTransitionId> = { a: SITE_TRANSITION, b: 'wireframe-build' }
+export function siteTransitionId(): SiteTransitionId {
+  try {
+    const q = new URLSearchParams(location.search).get('tr')
+    if (q && q in TR_PREVIEW) sessionStorage.setItem('tr', q)
+    const v = sessionStorage.getItem('tr')
+    if (v && v in TR_PREVIEW) return TR_PREVIEW[v]
+  } catch {}
+  return SITE_TRANSITION
+}
 
 export type CoverOptions = {
   /** Browser back (or a pop we can't place): the effect runs mirrored. */
@@ -703,4 +716,330 @@ const wireframeGrid: Factory = (canvas) => {
   }
 }
 
-export const EFFECTS: Record<SiteTransitionId, Factory> = { 'wireframe-grid': wireframeGrid, pixels, instant }
+// ─── 'wireframe-build' · La retícula construye la página (Propuesta B) ────────
+// Same plan as «Plano total» (same grid, boxes, bands, HUD and colours), but
+// nothing is switched on or off: the grid sweeps the old page away and the new
+// page is built inside its boxes. Layers, bottom → top: real page → --c-bg
+// curtain (per column) → windows cut into it → grid lines → boxes → HUD.
+// Cover (ms from the click, ≈ 420–480):
+//   0–300   each of the 25 lines falls (ease-out, a brighter head that dims as
+//           it lands), staggered from the clicked column outwards (≤ 130 ms).
+//  50–350   behind every line its column of curtain comes down: the old page
+//           is wiped top → bottom, column by column, never faded as a whole.
+//           Chrome bands and section boxes draw themselves as the curtain
+//           passes over them.
+//   ≈ 480   covered → route change (theme, nav chip, scroll under the cover);
+//           the HUD types the destination if the route takes > 120 ms.
+// Reveal (ms from the new page being ready, ≈ 640):
+//   0–400   boxes travel to the new page's blocks (FLIP by kind, ≤ 60 ms
+//           stagger); leftovers fold into a gutter line, new ones grow out.
+//  60–320   the header / tab bar / footer bands open (wipe, top → bottom).
+// 180–640   each box opens top → bottom onto the real content, in reading
+//           order (≤ 160 ms stagger), a 1 px line on the wipe's edge; its
+//           outline fades as it fills.
+// 260–640   the lines fall on out of the bottom (same order as they came);
+// 320–560   what is left of the curtain (the gaps between boxes) dissolves.
+// Back/forward: covered at once, the reveal runs mirrored (last box first,
+// lines leave upwards). Reduced motion: the same 120 ms veil as «Plano total».
+const WB = {
+  drop: 300, spread: 130, maxStep: 8, lag: 50, head: 72, headOut: 200,
+  hudAfter: 120, hudChar: 16, tint: 200,
+  move: 400, moveStagger: 60,
+  bandsAt: 60, bands: 260,
+  openAt: 180, open: 300, openStagger: 160,
+  linesOutAt: 260, linesOut: 280, linesOutSpread: 100,
+  restAt: 320, rest: 240,
+  still: 120,
+}
+
+const wireframeBuild: Factory = (canvas) => {
+  const g = canvas.getContext('2d')
+  let raf = 0
+  let W = 0, H = 0, dpr = 1
+  let cols: { x: number; w: number }[] = []
+  let lines: number[] = []
+  let origin = 0, spread = 0, step = 0
+  let font = 'monospace'
+  let P0: Palette | null = null, P1: Palette | null = null
+  let bands: Box[] = []
+  let A: Box[] = []
+  let pairs: Pair[] = []
+  let back = false, pop = false, still = false
+  let hud = ''
+  let t0 = 0, t1 = -1, tCovered = -1
+  let onCovered: (() => void) | null = null
+  let onRevealed: (() => void) | null = null
+  let covered: Promise<void> = Promise.resolve()
+
+  const px = (v: number) => Math.round(v * dpr) / dpr // device-pixel edges: no seams
+
+  const layout = () => {
+    const r = canvas.getBoundingClientRect()
+    W = r.width || document.documentElement.clientWidth
+    H = r.height || window.innerHeight
+    dpr = Math.min(2, window.devicePixelRatio || 1)
+    canvas.width = Math.round(W * dpr)
+    canvas.height = Math.round(H * dpr)
+    const p = gridProbe()
+    cols = p.cols
+    font = p.font || 'monospace'
+    lines = []
+    if (cols.length) {
+      lines.push(cols[0].x)
+      for (let i = 1; i < cols.length; i++) lines.push((cols[i - 1].x + cols[i - 1].w + cols[i].x) / 2)
+      lines.push(cols[cols.length - 1].x + cols[cols.length - 1].w - 1)
+    }
+  }
+
+  const nearestLine = (x: number) => {
+    let best = 0
+    for (let i = 1; i < lines.length; i++) if (Math.abs(lines[i] - x) < Math.abs(lines[best] - x)) best = i
+    return best
+  }
+  const lineX = (x: number) => (lines.length ? lines[nearestLine(x)] : x)
+
+  const contentSpan = () => {
+    let top = 0, bottom = H
+    for (const b of bands) {
+      if (b.y <= 1) top = Math.max(top, b.y + b.h)
+      else if (b.y + b.h >= H - 1 && b.h < H * 0.2) bottom = Math.min(bottom, b.y)
+    }
+    return { top, bottom }
+  }
+
+  // Progress of line i falling, and of the curtain that follows it.
+  const lineP = (i: number, tc: number) => (pop ? 1 : EASE_DROP(prog(tc, Math.abs(i - origin) * step, WB.drop)))
+  const curtP = (i: number, tc: number) => (pop ? 1 : EASE_DROP(prog(tc, Math.abs(i - origin) * step + WB.lag, WB.drop)))
+  // How much of a rect the curtain has passed (0 → 1), read at its centre.
+  const sweptAt = (r: Rect, tc: number) => {
+    if (pop) return 1
+    const y = H * curtP(nearestLine(r.x + r.w / 2), tc)
+    return Math.max(0, Math.min(1, (y - r.y) / Math.max(1, Math.min(r.h, 160))))
+  }
+
+  const outline = (r: Rect, color: string) => {
+    if (!g || r.h < 1) return
+    g.fillStyle = color
+    g.strokeStyle = color
+    if (r.w < 2) { g.fillRect(px(r.x), r.y, 1, r.h); return }
+    g.lineWidth = 1
+    g.strokeRect(Math.round(r.x) + 0.5, Math.round(r.y) + 0.5, Math.round(r.w) - 1, Math.round(r.h) - 1)
+  }
+  // A window in the curtain: the real page shows through, wiped top → bottom.
+  const open = (r: Rect, p: number, edge: string) => {
+    if (!g || p <= 0 || r.w < 2) return
+    const x0 = px(r.x), x1 = px(r.x + r.w), y0 = px(r.y), y1 = px(r.y + r.h * p)
+    if (y1 <= y0) return
+    g.clearRect(x0, y0, x1 - x0, y1 - y0)
+    if (p < 1) { g.fillStyle = edge; g.fillRect(x0, y1 - 1 / dpr, x1 - x0, 1) }
+  }
+
+  // Reveal: box j on its way from the old block to the new one (reading order,
+  // mirrored on back), and the stagger between one box opening and the next.
+  const os = () => (pairs.length > 1 ? WB.openStagger / (pairs.length - 1) : 0)
+  const moved = (j: number, tr: number) => {
+    const m = pairs.length
+    return EASE_ENTER(prog(tr, (back ? m - 1 - j : j) * (m > 1 ? WB.moveStagger / (m - 1) : 0), WB.move))
+  }
+  const travel = (j: number, tr: number): Rect => {
+    const x = pairs[j], p = moved(j, tr)
+    return { x: lerp(x.a.x, x.b.x, p), y: lerp(x.a.y, x.b.y, p), w: lerp(x.a.w, x.b.w, p), h: lerp(x.a.h, x.b.h, p) }
+  }
+
+  const draw = (now: number) => {
+    if (!g || !P0) return
+    const tc = now - t0
+    const tr = t1 >= 0 ? now - t1 : -1
+    g.setTransform(dpr, 0, 0, dpr, 0, 0)
+    g.globalAlpha = 1
+    g.clearRect(0, 0, W, H)
+    const P = tr >= 0 && P1 ? (() => {
+      const p = EASE_SOFT(prog(tr, 0, WB.tint))
+      return { bg: mix(P0.bg, P1.bg, p), ink: mix(P0.ink, P1.ink, p), dim: mix(P0.dim, P1.dim, p), line: mix(P0.line, P1.line, p) }
+    })() : P0
+
+    if (still) {
+      const a = (pop ? 1 : EASE_OUT(prog(tc, 0, WB.still))) * (tr < 0 ? 1 : 1 - EASE_OUT(prog(tr, 0, WB.still)))
+      if (a > 0) { g.fillStyle = css(P.bg, a); g.fillRect(0, 0, W, H) }
+      return
+    }
+
+    const n = lines.length
+    const rest = tr < 0 ? 0 : EASE_SOFT(prog(tr, WB.restAt, WB.rest))
+    const m = pairs.length
+
+    // Curtain. Cover: one strip per grid column, each following its line down.
+    // Reveal: the whole plane, with windows cut where the page comes through.
+    if (tr < 0) {
+      g.fillStyle = css(P.bg)
+      for (let k = 0; k <= n; k++) {
+        // Strip k sits between line k-1 and line k; it follows the earlier one.
+        const p = Math.max(k > 0 ? curtP(k - 1, tc) : 0, k < n ? curtP(k, tc) : 0)
+        if (p <= 0) continue
+        const x0 = k === 0 ? 0 : px(lines[k - 1]), x1 = k === n ? W : px(lines[k])
+        g.fillRect(x0, 0, x1 - x0, px(H * p))
+      }
+    } else {
+      if (rest < 1) { g.fillStyle = css(P.bg, 1 - rest); g.fillRect(0, 0, W, H) }
+      const edge = css(P.line, 1 - rest)
+      const pb = EASE_SOFT(prog(tr, WB.bandsAt, WB.bands))
+      for (const b of bands) open(b, pb, edge)
+      for (let j = 0; j < m; j++) {
+        if (pairs[j].dies) continue
+        const o = back ? m - 1 - j : j
+        open(travel(j, tr), EASE_SOFT(prog(tr, WB.openAt + o * os(), WB.open)), edge)
+      }
+    }
+
+    // Grid lines: fall in from the clicked column outwards, fall on out.
+    const outStep = spread ? WB.linesOutSpread / spread : 0
+    const bright = mix(P.line, P.ink, 0.7)
+    for (let i = 0; i < n; i++) {
+      const d = Math.abs(i - origin)
+      const pd = lineP(i, tc)
+      if (pd <= 0) continue
+      const pu = tr < 0 ? 0 : EASE_SOFT(prog(tr, WB.linesOutAt + d * outStep, WB.linesOut))
+      if (pu >= 1) continue
+      const x = px(lines[i])
+      // Forward: the top end follows the line down and out. Back: it retracts upwards.
+      const y0 = back ? 0 : H * pu, y1 = back ? H * pd * (1 - pu) : H * pd
+      if (y1 <= y0) continue
+      g.fillStyle = css(P.line)
+      g.fillRect(x, y0, 1, y1 - y0)
+      const head = pop ? 0 : 1 - EASE_OUT(prog(tc, d * step + WB.drop * 0.8, WB.headOut))
+      if (head > 0 && tr < 0) {
+        const h0 = Math.max(y0, y1 - WB.head)
+        const grd = g.createLinearGradient(0, h0, 0, y1)
+        grd.addColorStop(0, css(bright, 0))
+        grd.addColorStop(1, css(bright, head))
+        g.fillStyle = grd
+        g.fillRect(x, h0, 1, y1 - h0)
+      }
+    }
+
+    // Chrome bands: fixed anchors, drawn as the curtain passes, gone as they open.
+    const bandOut = tr < 0 ? 0 : EASE_SOFT(prog(tr, WB.bandsAt, WB.bands))
+    for (const b of bands) outline(b, css(P.ink, 0.5 * sweptAt(b, tc) * (1 - bandOut)))
+
+    // Section boxes.
+    if (tr < 0) {
+      for (const b of A) outline(b, css(P.ink, 0.55 * sweptAt(b, tc)))
+    } else {
+      for (let j = 0; j < m; j++) {
+        const x = pairs[j]
+        const o = back ? m - 1 - j : j
+        const filled = prog(tr, WB.openAt + o * os() + WB.open * 0.4, WB.open * 0.6)
+        const a = 0.55 * (x.born ? Math.min(1, moved(j, tr) * 2) : 1) * (1 - EASE_OUT(filled))
+        if (a > 0.003) outline(travel(j, tr), css(P.ink, a))
+      }
+    }
+
+    // HUD: one mono line, typed once, only when the route is slow.
+    if (hud && tCovered >= 0) {
+      const since = (tr >= 0 ? t1 : now) - tCovered - WB.hudAfter
+      if (since > 0) {
+        const typed = hud.slice(0, Math.min(hud.length, Math.ceil((tr >= 0 ? Infinity : since) / WB.hudChar)))
+        const foot = bands.filter((b) => b.y > H * 0.5).sort((p, q) => p.y - q.y)[0]
+        const y = foot ? Math.min(H - 10, foot.y + 20) : H - 16
+        g.font = `10px ${font}`
+        g.fillStyle = css(P.dim, tr < 0 ? 1 : 1 - EASE_OUT(prog(tr, 0, WB.bands)))
+        g.fillText(typed, Math.round(cols[0]?.x ?? 16), Math.round(y))
+      }
+    }
+  }
+
+  const stop = () => {
+    cancelAnimationFrame(raf)
+    raf = 0
+  }
+
+  const settle = () => {
+    stop()
+    g?.setTransform(1, 0, 0, 1, 0, 0)
+    g?.clearRect(0, 0, canvas.width, canvas.height)
+    show(canvas, false)
+    if (t1 >= 0) debug({ ev: 'end', t: performance.now() - t1 })
+    t1 = -1
+    tCovered = -1
+    A = []
+    bands = []
+    pairs = []
+    onCovered?.()
+    onCovered = null
+    const done = onRevealed
+    onRevealed = null
+    done?.()
+  }
+
+  const coverEnd = () => (pop ? 0 : still ? WB.still : spread * step + WB.lag + WB.drop)
+  const revealEnd = () => (still ? WB.still : Math.max(WB.openAt + WB.openStagger + WB.open, WB.linesOutAt + WB.linesOutSpread + WB.linesOut, WB.restAt + WB.rest))
+
+  const loop = (now: number) => {
+    raf = 0
+    draw(now)
+    if (onCovered && now - t0 >= coverEnd()) {
+      debug({ ev: 'covered', t: now - t0 })
+      tCovered = now
+      onCovered()
+      onCovered = null
+    }
+    if (t1 >= 0 && now - t1 >= revealEnd()) {
+      settle()
+      return
+    }
+    raf = requestAnimationFrame(loop)
+  }
+
+  const start = (o: CoverOptions | undefined, isPop: boolean) => {
+    stop()
+    back = !!o?.back
+    pop = isPop
+    still = !!o?.still
+    hud = o?.hud ?? ''
+    layout()
+    P0 = palette()
+    P1 = null
+    bands = still ? [] : chromeBands(W, H)
+    const { top, bottom } = contentSpan()
+    A = still ? [] : collectSections(W, H, cols, top, bottom)
+    origin = o?.originX != null ? nearestLine(o.originX) : back ? lines.length - 1 : 0
+    spread = Math.max(origin, lines.length - 1 - origin)
+    step = spread ? Math.min(WB.maxStep, WB.spread / spread) : 0
+    pairs = []
+    t1 = -1
+    tCovered = -1
+    t0 = performance.now()
+    covered = new Promise<void>((r) => { onCovered = r })
+    debug({ ev: 'start', t: t0, A, bands, lines, cols })
+    show(canvas, true)
+    draw(t0)
+    raf = requestAnimationFrame(loop)
+    return covered
+  }
+
+  return {
+    cover: (o) => start(o, false),
+    coverNow: (o) => { start(o ?? { back: true }, true) },
+    reveal: async () => {
+      await covered
+      if (canvas.style.visibility !== 'visible') return
+      P1 = palette()
+      if (!still) {
+        // The chrome may have changed under the cover (footer in or out of view).
+        bands = chromeBands(W, H)
+        const { top, bottom } = contentSpan()
+        const B = collectSections(W, H, cols, top, bottom)
+        pairs = match(A, B, W, lineX)
+        debug({ ev: 'reveal', t: performance.now() - t0, B })
+      }
+      return new Promise<void>((r) => {
+        onRevealed = r
+        t1 = performance.now()
+        if (!raf) raf = requestAnimationFrame(loop)
+      })
+    },
+    cancel: settle,
+  }
+}
+
+export const EFFECTS: Record<SiteTransitionId, Factory> = { 'wireframe-grid': wireframeGrid, 'wireframe-build': wireframeBuild, pixels, instant }
