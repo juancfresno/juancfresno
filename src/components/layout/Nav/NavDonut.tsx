@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 import { startLogoDonut, type LogoDonutHandle } from '@/components/about/donutGl'
-import { DOCK_W, DOCK_W_SMALL, DOCK_Y, pageMargin } from '@/components/about/dock'
+import { DOCK_W, DOCK_W_SMALL, dockY, pageMargin } from '@/components/about/dock'
 import s from './Nav.module.scss'
 
 // The nav wordmark becomes the 3D donut while the header is hidden (scrolling
@@ -68,7 +68,7 @@ export default function NavDonut({ active }: { active: boolean }) {
       h.setMorph(k, w.left + WORD_W / 2 - b.left, w.top - b.top, WORD_W, WORD_LEN)
       // The ring closes a little lower, tipped towards the viewer until it settles.
       const d = W <= 768 ? DOCK_W_SMALL : DOCK_W
-      h.setPlace(W - pageMargin(W) - d / 2 - b.left, DOCK_Y - b.top, d, (1 - k) * 0.9, (1 - k) * 0.5, 1)
+      h.setPlace(W - pageMargin(W) - d / 2 - b.left, dockY(W) - b.top, d, (1 - k) * 0.9, (1 - k) * 0.5, 1)
       h.setInk([WHITE[0] + (ring[0] - 1) * k, WHITE[1] + (ring[1] - 1) * k, WHITE[2] + (ring[2] - 1) * k], k)
       show(true)
       raf = requestAnimationFrame(frame)

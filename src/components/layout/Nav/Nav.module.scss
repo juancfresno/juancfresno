@@ -19,11 +19,6 @@
 
   &.hidden {
     transform: translateY(-110%);
-
-    // On mobile, top bar NEVER hides — only face + logo visible
-    @include respond-to(md) {
-      transform: translateY(0);
-    }
   }
 }
 
