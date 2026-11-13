@@ -50,7 +50,7 @@ export default function FloppyModule({ items, labName, labHref, strings }: Props
   const [ready, setReady] = useState(false)
   const [open, setOpen] = useState(false)
   const [view, setView] = useState<View>('field')
-  const it = items[active]
+  const it = items[Math.min(active, items.length - 1)]
 
   useEffect(() => {
     const el = host.current, cv = canvas.current

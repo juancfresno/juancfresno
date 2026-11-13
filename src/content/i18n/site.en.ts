@@ -222,17 +222,6 @@ export const SITE_EN = {
 
   // Lab experiments: each one is a live demo here plus its source in the public repo.
   // Files live in public/lab/<slug>/ (css, js, snippet.html, prompt.md).
-  // The sixth disk of the Lab floppy module: the floppy itself (not an EXPERIMENTS row yet:
-  // it has no /lab/[slug] page, it links to the standalone demo). Draft copy, to review.
-  LAB_FLOPPY: {
-    n: '006',
-    name: 'Floppy',
-    kind: '3D object',
-    year: '2026',
-    what: 'A 3.5-inch floppy disk modelled in code: real proportions, a spring shutter and the magnetic disk inside. Drag it, flip it, open it. It carries every experiment in this Lab.',
-    how: 'three.js with procedural geometry and textures: no models, no images. The shell is built from extruded outlines with bevel profiles; the labels are designed in Figma and mapped on.',
-    built: 'three.js · procedural geometry · no models',
-  },
   EXPERIMENTS: [
     {
       slug: 'botones',

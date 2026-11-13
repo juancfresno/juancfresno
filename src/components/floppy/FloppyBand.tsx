@@ -31,13 +31,11 @@ function labelSrc(n: string) {
 
 // Lab module with the 3D floppies (Figma 7025:21805), for Home and Lab.
 export default function FloppyBand({ locale }: { locale: Locale }) {
-  const { EXPERIMENTS, LAB_FLOPPY } = getSite(locale)
+  const { EXPERIMENTS } = getSite(locale)
   const ui = getUi(locale)
   const items: FloppyItem[] = EXPERIMENTS.map((e, i) => ({
     n: e.n, name: e.name, kind: e.kind, year: e.year, what: e.card, how: e.how, built: e.built, href: localePath(locale, `/lab/${e.slug}`),
     label: labelSrc(e.n), ...SHELLS[i % SHELLS.length],
   }))
-  // 006 · the floppy itself: links to its standalone demo (a static file, no locale prefix)
-  items.push({ ...LAB_FLOPPY, href: '/lab/floppy/index.html', label: labelSrc(LAB_FLOPPY.n), ...SHELLS[items.length % SHELLS.length] })
   return <FloppyModule items={items} labName={ui.lab.h1} labHref={localePath(locale, '/lab')} strings={ui.lab.floppy} />
 }
