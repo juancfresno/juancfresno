@@ -84,6 +84,7 @@ export const SITE_EN = {
     title: 'Independent Art Director & Interactive Designer',
     disciplines: 'Art direction — Digital products — Interaction — Brand identity',
     intro: ['Working with studios and brands since 2012.', 'Art direction and design for digital products, identities and interactive experiences — built with clarity, detail and intent.'],
+    featuredLabel: '/ Selected projects',
     contactLabel: 'Let’s collaborate↘',
     contactLine: 'For enquiries, collaborations or new projects',
     feedLabel: '{ Latest from Instagram & Dribbble ↘',

@@ -84,6 +84,7 @@ export const SITE_ES: SiteDict = {
     title: 'Director de arte y\u00a0diseñador interactivo independiente',
     disciplines: 'Dirección de arte — Productos digitales — Interacción — Identidad de marca',
     intro: ['Trabajo con estudios y marcas desde 2012.', 'Dirección de arte y diseño de productos digitales, identidades y experiencias interactivas — con claridad, detalle e intención.'],
+    featuredLabel: '/ Proyectos seleccionados',
     contactLabel: 'Colaboremos↘',
     contactLine: 'Para consultas, colaboraciones o proyectos nuevos',
     feedLabel: '{ Lo último en Instagram y Dribbble ↘',

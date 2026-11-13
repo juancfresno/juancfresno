@@ -1,14 +1,14 @@
 import type { Metadata } from 'next'
 import { pageMeta } from '@/lib/seo'
 import { getSite } from '@/content/site'
-import { FEED_SELECTED } from '@/content/feed'
 import { localeOf, type LangParams } from '@/i18n/server'
 import { headlineCycle } from '@/content/headline'
 import HeadlineCycle from '@/components/home/HeadlineCycle'
 import LatestFeed from '@/components/home/LatestFeed'
 import HomeContact from '@/components/home/HomeContact'
 import FloppyBand from '@/components/floppy/FloppyBand'
-import Backdrop from '@/components/wip/Backdrop'
+import FeaturedProjects from '@/components/home/featured/FeaturedProjects'
+import { FEATURED_PREVIEW } from '@/content/featured-preview'
 import Grain from '@/components/wip/Grain'
 import Intro from '@/components/wip/Intro'
 import type { CSSProperties } from 'react'
@@ -28,7 +28,8 @@ const d = (ms: number) => ({ '--in-d': `${ms}ms` }) as CSSProperties
 
 // Home v1 — Figma "home" (6949:12453): the landing hero (greeting that decodes
 // through other languages, fixed role, mono disciplines, two-line intro) over
-// the feed lens, then the Lab floppy module, the feed block (gallery 3; the
+// the page background (no feed lens since 13 Nov), then the featured
+// projects module (FeaturedProjects), the Lab floppy module, the feed block (gallery 3; the
 // other two moved to Lab 006 Carruseles), the contact module and the footer. Entrance =
 // wireframe grid (Intro) → page ([data-in] delays). The earlier home (Arco,
 // index, strip, Lab teaser) stays in the codebase, not rendered.
@@ -41,7 +42,6 @@ export default async function HomePage({ params }: Props) {
       <Intro />
       <Grain />
       <section className={w.hero}>
-        <Backdrop feed={FEED_SELECTED} />
         <header className={w.copy}>
           <h1 className={w.head}>
             <HeadlineCycle lines={headlineCycle({ lang: l, a: LANDING.line1 })} className={w.name} />
@@ -59,6 +59,8 @@ export default async function HomePage({ params }: Props) {
           </p>
         </header>
       </section>
+      {/* Featured projects (Figma 04 · Archivo 7173:7118): preview pieces, not linked to cases yet. */}
+      <FeaturedProjects pieces={FEATURED_PREVIEW} label={LANDING.featuredLabel} />
       <LatestFeed locale={l} show={['block']} labels={{ block: LANDING.feedLabel }} beforeBlock={<FloppyBand locale={l} />} />
       <HomeContact locale={l} />
     </>

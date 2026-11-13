@@ -1,0 +1,147 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+$ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+// Figma "04 · Archivo" (7173:7118): 1680 × 2575 frame on the page background.
+.module {
+  position: relative;
+  z-index: 2; // over the WIP feed plane (fixed, z 1)
+  background: $color-bg;
+  overflow: clip;
+}
+
+// The frame keeps its proportions; children are placed in % of it.
+.frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: var(--fw) / var(--fh);
+}
+
+.label {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  color: var(--c-line);
+}
+.rule { display: block; width: 100%; }
+.labelText {
+  margin: 0;
+  font-family: $font-body;
+  font-size: 14px;
+  line-height: 1.4;
+  text-align: right;
+  color: var(--c-text-hi);
+}
+
+.list { margin: 0; padding: 0; list-style: none; }
+
+.piece {
+  position: absolute;
+  will-change: transform;
+}
+
+.media {
+  position: relative;
+  aspect-ratio: var(--ar);
+  cursor: grab;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+
+  &[data-held='1'] { cursor: grabbing; }
+  // While the cloth is live the canvas draws the image.
+  &[data-cloth='1'] .img { visibility: hidden; }
+}
+
+.img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.08);
+  transform-origin: 50% 0;
+  transition: transform 1100ms $ease;
+  .piece[data-in] & { transform: none; }
+}
+
+.cloth {
+  position: absolute;
+  z-index: 3;
+  pointer-events: none; // position and size set inline (card + spill pad)
+}
+
+// ── Entrance: 12 columns covering the image retract downwards, staggered
+// left → right; an orange scan line rides each column's leading edge.
+.cols {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  overflow: hidden;
+  pointer-events: none;
+
+  > span {
+    position: relative;
+    flex: 1 1 0;
+    margin-right: -1px; // no hairlines between columns
+    background: $color-bg;
+    transform: translateY(0);
+    transition: transform 640ms $ease;
+    transition-delay: calc(var(--c) * 42ms);
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      height: 2px;
+      background: var(--c-g);
+      opacity: 0;
+      transition: opacity 160ms linear;
+      transition-delay: calc(var(--c) * 42ms);
+    }
+  }
+
+  .piece[data-in] & > span {
+    transform: translateY(101%);
+    &::before { opacity: 1; }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cols { display: none; }
+  .img { transform: none; transition: none; }
+  .media { cursor: default; }
+}
+
+// ── Mobile: the frame becomes a column; pieces alternate sides.
+@include respond-to(md) {
+  .frame {
+    aspect-ratio: auto;
+    @include container;
+    padding-block: 32px 64px;
+  }
+  .label {
+    position: static;
+    width: 60% !important;
+    margin-left: auto;
+    margin-bottom: 40px;
+  }
+  .list {
+    display: flex;
+    flex-direction: column;
+    gap: 56px;
+  }
+  .piece {
+    position: relative;
+    left: auto !important;
+    top: auto !important;
+  }
+  .wide { width: 100% !important; }
+  .tall { width: 64% !important; }
+  .tall.odd { margin-left: auto; }
+  .tall.even { margin-left: 8%; }
+}
