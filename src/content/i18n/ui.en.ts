@@ -134,7 +134,15 @@ export const UI_EN = {
     ogAlt: 'Case study by Juan C. Fresno',
   },
   home: { featuredStar: ' · ★ Featured' },
-  wip: { copiedPill: 'Copied ✓' }, // email link on the home (components/wip/EmailLink)
+  wip: { copiedPill: 'Copied ✓' },
+  // Home featured projects: side tab that switches the card material (components/home/featured/MaterialMenu)
+  featured: {
+    tab: 'Material',
+    aria: 'Card material',
+    title: 'Material · press a card',
+    close: 'Close',
+    materials: { cloth: 'Cloth', silk: 'Silk', liquid: 'Liquid', paper: 'Paper' },
+  }, // email link on the home (components/wip/EmailLink)
   arco: {
     open: 'open the case',
     aria: (label: string) => `${label}: drag, scroll or use ← →. Enter opens the case in the centre.`,

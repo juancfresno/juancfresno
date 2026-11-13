@@ -23,6 +23,10 @@ const FS = `#version 300 es
 precision highp float;
 in vec2 v_uv; in vec3 v_n; in float v_ao;
 uniform sampler2D u_tex;
+uniform vec2 u_spec; // tight, broad highlight weights
+uniform float u_wall; // how dark steep fold walls go
+uniform float u_sheen; // light caught on the walls (silk)
+uniform float u_irid; // thin-film colour in the highlight (silk)
 out vec4 o;
 const vec3 L = normalize(vec3(-0.42, -0.62, -0.66)); // towards the light (y down, -z = towards the viewer)
 const vec3 H = normalize(L + vec3(0.0, 0.0, -1.0));
@@ -33,11 +37,13 @@ void main(){
   float d = max(dot(n, L), 0.0);
   float lambert = mix(1.0, d / d0, 0.9);
   float wall = mix(0.12, 1.0, smoothstep(0.05, 0.95, -n.z)); // steep sides go dark
-  float shade = clamp(lambert, 0.0, 1.3) * mix(1.0, wall, 0.8) * v_ao;
+  float shade = clamp(lambert, 0.0, 1.3) * mix(1.0, wall, u_wall) * v_ao;
   float h = max(dot(n, H), 0.0), h0 = -H.z;
-  float spec = max(pow(h, 80.0) - pow(h0, 80.0), 0.0) * 0.45
-             + max(pow(h, 12.0) - pow(h0, 12.0), 0.0) * 0.1;
-  vec3 col = c * shade + vec3(spec);
+  float spec = max(pow(h, 80.0) - pow(h0, 80.0), 0.0) * u_spec.x
+             + max(pow(h, 12.0) - pow(h0, 12.0), 0.0) * u_spec.y;
+  vec3 tint = mix(vec3(1.0), 0.55 + 0.45 * cos(6.2832 * (vec3(0.0, 0.33, 0.67) + h * 2.2)), u_irid * 0.7);
+  float rim = pow(clamp(1.0 + n.z, 0.0, 1.0), 2.0) * u_sheen; // walls catch a soft sheen
+  vec3 col = c * shade + (c * 0.6 + 0.4) * rim + tint * spec;
   o = vec4(col, 1.0);
 }`
 
@@ -59,7 +65,18 @@ export type Cloth = {
   destroy: () => void
 }
 
+// Two presets of the same simulation. Cloth = the satin we had (broad folds,
+// stiff body). Silk = finer and livelier: soft bend so it ripples into many
+// folds, a wider grab that lifts higher, slower springs so it flutters back,
+// a sharper iridescent highlight and sheen on the fold walls.
+const PRESETS = {
+  cloth: { cell: 8, maxCols: 54, bend: 0.85, core: 0.07, rad: 0.15, cap: 0.38, lift0: 0.035, liftK: 0.07, heldDamp: 0.982, relDamp: 0.955, kx: [0.004, 0.03], kz: [0.02, 0.08], spec: [0.45, 0.1], wall: 0.8, sheen: 0, irid: 0 },
+  silk: { cell: 6, maxCols: 66, bend: 0.4, core: 0.05, rad: 0.24, cap: 0.6, lift0: 0.06, liftK: 0.13, heldDamp: 0.988, relDamp: 0.972, kx: [0.002, 0.014], kz: [0.012, 0.045], spec: [0.8, 0.22], wall: 0.5, sheen: 0.32, irid: 1 },
+} as const
+export type ClothPreset = keyof typeof PRESETS
+
 type Opts = {
+  preset?: ClothPreset
   canvas: HTMLCanvasElement
   img: HTMLImageElement
   w: number // card css px
@@ -68,7 +85,8 @@ type Opts = {
   onSleep: () => void
 }
 
-export function createCloth({ canvas, img, w, h, pad, onSleep }: Opts): Cloth | null {
+export function createCloth({ canvas, img, w, h, pad, onSleep, preset = 'cloth' }: Opts): Cloth | null {
+  const K = PRESETS[preset]
   const gl = canvas.getContext('webgl2', { antialias: true, premultipliedAlpha: false, alpha: true, depth: true })
   if (!gl) return null
 
@@ -80,8 +98,8 @@ export function createCloth({ canvas, img, w, h, pad, onSleep }: Opts): Cloth | 
   const m = Math.min(w, h)
 
   // ── Grid ──────────────────────────────────────────────────────────────────
-  const cols = Math.max(26, Math.min(54, Math.round(w / 8)))
-  const rows = Math.max(16, Math.min(70, Math.round((cols * h) / w)))
+  const cols = Math.max(26, Math.min(K.maxCols, Math.round(w / K.cell)))
+  const rows = Math.max(16, Math.min(80, Math.round((cols * h) / w)))
   const W1 = cols + 1
   const n = W1 * (rows + 1)
   const P = new Float32Array(n * 3) // position (x, y, z; z < 0 = lifted towards the viewer)
@@ -204,6 +222,11 @@ export function createCloth({ canvas, img, w, h, pad, onSleep }: Opts): Cloth | 
   const aniso = gl.getExtension('EXT_texture_filter_anisotropic')
   if (aniso) gl.texParameterf(gl.TEXTURE_2D, aniso.TEXTURE_MAX_ANISOTROPY_EXT, 8)
 
+  gl.useProgram(prog)
+  gl.uniform2f(gl.getUniformLocation(prog, 'u_spec'), K.spec[0], K.spec[1])
+  gl.uniform1f(gl.getUniformLocation(prog, 'u_wall'), K.wall)
+  gl.uniform1f(gl.getUniformLocation(prog, 'u_sheen'), K.sheen)
+  gl.uniform1f(gl.getUniformLocation(prog, 'u_irid'), K.irid)
   gl.viewport(0, 0, canvas.width, canvas.height)
   gl.clearColor(0, 0, 0, 0)
   gl.enable(gl.BLEND)
@@ -216,8 +239,8 @@ export function createCloth({ canvas, img, w, h, pad, onSleep }: Opts): Cloth | 
   let lift = 0 // eases in while held
   let tx = 0, ty = 0 // smoothed drag
   let since = 0 // frames since release
-  const grabCore = m * 0.07 // pinned hard
-const grabR = m * 0.15 // eases out to here
+  const grabCore = m * K.core // pinned hard
+  const grabR = m * K.rad // eases out to here
   const grab = new Float32Array(n)
   let raf = 0
   let quiet = 0
@@ -228,19 +251,19 @@ const grabR = m * 0.15 // eases out to here
 
   function step() {
     // Drag, capped and smoothed so a fast flick doesn't tear the mesh.
-    const cap = m * 0.38
+    const cap = m * K.cap
     let dx = mx - gx, dy = my - gy
     const dl = Math.hypot(dx, dy)
     if (dl > cap) { const f = cap / dl; dx *= f; dy *= f }
     tx += (dx - tx) * 0.35
     ty += (dy - ty) * 0.35
-    lift += ((held ? m * 0.035 + dl * 0.07 : 0) - lift) * 0.12
+    lift += ((held ? m * K.lift0 + dl * K.liftK : 0) - lift) * 0.12
 
     // Springs to the rest pose: barely there while held, firmer after release.
-    const ramp = held ? 0 : Math.min(1, since / 40)
-    const kx = held ? 0.0012 : 0.004 + 0.03 * ramp
-    const kz = held ? 0 : 0.02 + 0.08 * ramp
-    const damp = held ? 0.982 : 0.955
+    const ramp = held ? 0 : Math.min(1, since / (preset === 'silk' ? 70 : 40))
+    const kx = held ? 0.0012 : K.kx[0] + K.kx[1] * ramp
+    const kz = held ? 0 : K.kz[0] + K.kz[1] * ramp
+    const damp = held ? K.heldDamp : K.relDamp
 
     for (let i = 0; i < n; i++) {
       const j = i * 3
@@ -269,7 +292,7 @@ const grabR = m * 0.15 // eases out to here
         }
       }
       relax(S.L, S.D, 1)
-      relax(B.L, B.D, 0.85)
+      relax(B.L, B.D, K.bend)
       // Floor: the page. Never behind it; some friction while resting on it.
       for (let i = 0; i < n; i++) {
         const j = i * 3
