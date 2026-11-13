@@ -17,6 +17,9 @@ import s from './featured.module.scss'
 //  · Scroll: every piece has its own speed (parallax) and follows the page
 //    with a little lag (lerp), plus a slight skew from the scroll velocity.
 //  · Press: the piece turns into cloth (cloth.ts) and settles when let go.
+//  · Video (optional, per piece): a muted loop over the screen inside the
+//    frame; plays only while near the viewport, shows once the first frame
+//    is playing (the image underneath is the poster). The cloth uses the image.
 // Reduced motion: no pixels, no parallax, no cloth.
 
 const GAP = 260 // ms between two pieces starting their entrance (or exit)
@@ -37,6 +40,18 @@ export default function FeaturedProjects({ pieces, label }: { pieces: FeaturedPi
       cards.forEach((c) => { c.dataset.in = '1'; c.dataset.shown = '1' })
       return
     }
+
+    // ── Videos: loop while on screen, paused (and not downloaded) otherwise ──
+    const videos = Array.from(el.querySelectorAll<HTMLVideoElement>('[data-video]'))
+    const vio = new IntersectionObserver((entries) => {
+      for (const en of entries) {
+        const v = en.target as HTMLVideoElement
+        if (en.isIntersecting) {
+          v.play().then(() => { v.dataset.playing = '1' }).catch(() => { /* autoplay blocked: the image stays */ })
+        } else v.pause()
+      }
+    }, { rootMargin: '200px 0px' })
+    videos.forEach((v) => vio.observe(v))
 
     // ── Entrance on a screen line (reversible pixels) ──
     const ent = cards.map((c) => ({ c, cover: new PixelCover(c.querySelector<HTMLElement>('[data-media]')!), p: 0, target: 0, startAt: 0 }))
@@ -187,6 +202,7 @@ export default function FeaturedProjects({ pieces, label }: { pieces: FeaturedPi
     }
 
     return () => {
+      vio.disconnect()
       cancelAnimationFrame(araf)
       ent.forEach((e) => e.cover.destroy())
       ro.disconnect()
@@ -217,6 +233,20 @@ export default function FeaturedProjects({ pieces, label }: { pieces: FeaturedPi
               <div className={s.media} data-media="">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={p.src} alt="" width={p.w * 2} height={p.h * 2} className={s.img} loading="lazy" decoding="async" draggable={false} />
+                {p.video && (
+                  <video
+                    className={s.video}
+                    data-video=""
+                    src={p.video.src}
+                    muted
+                    loop
+                    playsInline
+                    preload="none"
+                    aria-hidden="true"
+                    tabIndex={-1}
+                    style={{ left: pct(p.video.box.x, p.w), top: pct(p.video.box.y, p.h), width: pct(p.video.box.w, p.w), height: pct(p.video.box.h, p.h) }}
+                  />
+                )}
               </div>
             </li>
           ))}
