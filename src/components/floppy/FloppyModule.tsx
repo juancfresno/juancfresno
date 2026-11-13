@@ -12,7 +12,7 @@ export type FloppyItem = {
 type View = 'field' | 'ring'
 type Stage = { setActive(i: number): void; next(): void; prev(): void; setOpen(o: boolean, silent?: boolean): void; setView(v: View): void; setScroll(q: number): void; dispose(): void }
 type Strings = { region: string; prev: string; next: string; open: string; close: string; built: string; how: string; year: string; viewField: string; viewRing: string }
-type Props = { items: FloppyItem[]; labName: string; labHref: string; strings: Strings; mode?: 'free' | 'scroll' }
+type Props = { items: FloppyItem[]; labName: string; labHref: string; strings: Strings; mode?: 'free' | 'scroll'; total?: number }
 
 // Text that changes like an old terminal: the block cursor eats the old string and types the new one.
 function Typed({ text }: { text: string }) {
@@ -41,7 +41,7 @@ function Typed({ text }: { text: string }) {
 // only when the module comes near the viewport. No WebGL = the text alone.
 // Two views (scattered field / wheel) and a ficha: a click on the active disk
 // brings it forward over a card with the long description and the link.
-export default function FloppyModule({ items, labName, labHref, strings, mode = 'free' }: Props) {
+export default function FloppyModule({ items, labName, labHref, strings, mode = 'free', total = items.length }: Props) {
   const host = useRef<HTMLElement>(null)
   const runway = useRef<HTMLDivElement>(null)
   const scrollTo = useRef<(i: number) => void>(() => {})
@@ -167,7 +167,7 @@ export default function FloppyModule({ items, labName, labHref, strings, mode = 
 
       <div className={s.nav}>
         <button type="button" onClick={() => go(-1)} aria-label={strings.prev}>‹</button>
-        <span aria-hidden="true">{it.n} / {String(items.length).padStart(3, '0')}</span>
+        <span aria-hidden="true">{it.n} / {String(total).padStart(3, '0')}</span>
         <button type="button" onClick={() => go(1)} aria-label={strings.next}>›</button>
       </div>
       <div className={s.views} role="group">
