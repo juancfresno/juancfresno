@@ -1,5 +1,5 @@
-// Entrance of the featured pieces: Bayer-dithered pixels clear with a
-// left → right bias (Lab 05 / the Work archive fill). Chosen by Juan on
+// Entrance of the featured pieces: fine bitmap pixels (3 px, Bayer 8×8)
+// clear with a left → right bias (Lab 05 / the Work archive fill). Chosen by Juan on
 // 13 Nov 2026 out of six variants (wipe, push, slats, steps, pixels,
 // stretch; see git history of this file to bring the others back).
 //
@@ -8,8 +8,25 @@
 // cells clear left → right; going back up they fill in again right → left,
 // so the exit is the entrance played backwards.
 
-const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5]
-const CELL = 8 // css px
+// 8×8 Bayer matrix (0–63), built by recursion from the 2×2 one: a finer,
+// more "bitmap" dither than 4×4.
+const BAYER8: number[] = (() => {
+  let m = [[0, 2], [3, 1]]
+  while (m.length < 8) {
+    const n = m.length, next: number[][] = []
+    for (let y = 0; y < n * 2; y++) {
+      next.push([])
+      for (let x = 0; x < n * 2; x++) {
+        const q = [0, 2, 3, 1][(y >= n ? 2 : 0) + (x >= n ? 1 : 0)]
+        next[y].push(4 * m[y % n][x % n] + q)
+      }
+    }
+    m = next
+  }
+  return m.flat()
+})()
+const CELL = 3 // css px: fine bitmap grain (was 8, too coarse)
+const BIAS = 0.62 // share of the order that comes from the column (left → right); the rest is dither
 
 export class PixelCover {
   private cv: HTMLCanvasElement
@@ -25,26 +42,29 @@ export class PixelCover {
   constructor(private media: HTMLElement) {
     this.cv = document.createElement('canvas')
     this.cv.dataset.pixels = ''
-    this.cv.style.cssText = 'position:absolute;left:0;top:0;max-width:none;z-index:2;pointer-events:none'
+    // 1 px of bleed on every side: the media box has fractional sizes and a
+    // flush canvas let a hairline of the image show at the edges.
+    this.cv.style.cssText = 'position:absolute;left:-1px;top:-1px;max-width:none;z-index:2;pointer-events:none'
     media.appendChild(this.cv)
     this.ctx = this.cv.getContext('2d')
   }
 
   private build() {
     const w = this.media.offsetWidth, h = this.media.offsetHeight
+    const cw = w + 2, ch = h + 2 // offsetWidth rounds; the bleed covers the fraction
     const dpr = Math.min(2, window.devicePixelRatio || 1)
     this.w = w; this.h = h
-    this.cv.width = Math.max(1, Math.round(w * dpr))
-    this.cv.height = Math.max(1, Math.round(h * dpr))
-    this.cv.style.width = `${w}px`
-    this.cv.style.height = `${h}px`
+    this.cv.width = Math.max(1, Math.round(cw * dpr))
+    this.cv.height = Math.max(1, Math.round(ch * dpr))
+    this.cv.style.width = `${cw}px`
+    this.cv.style.height = `${ch}px`
     this.cell = Math.max(1, Math.round(CELL * dpr))
     this.cols = Math.ceil(this.cv.width / this.cell)
     const rows = Math.ceil(this.cv.height / this.cell)
     this.at = new Float32Array(this.cols * rows)
     for (let r = 0; r < rows; r++) for (let c = 0; c < this.cols; c++) {
       // Leaves a hair before 1 so p = 1 always means clean.
-      this.at[r * this.cols + c] = ((c / this.cols) * 0.72 + (BAYER[(r % 4) * 4 + (c % 4)] / 16) * 0.28) * 0.999
+      this.at[r * this.cols + c] = ((c / this.cols) * BIAS + (BAYER8[(r % 8) * 8 + (c % 8)] / 64) * (1 - BIAS)) * 0.999
     }
     this.on = new Uint8Array(this.at.length).fill(1)
     if (this.ctx) {
