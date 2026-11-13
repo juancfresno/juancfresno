@@ -71,6 +71,9 @@ uniform float uAspect;
 uniform float uEnergy;   // 1 right after a click, decays to 0
 uniform vec3 uLiquid;    // slosh, ripple height, ripple speed
 uniform vec3 uRip[${RIPPLES}]; // click point (ndc xy) + age in seconds (< 0 = off)
+uniform float uMorph;    // 0 = the flat vertical wordmark (nav), 1 = the ring
+uniform vec4 uStrip;     // that wordmark in ndc: centre x, top y, glyph height, length
+uniform vec3 uFlat;      // face (where the text sits around the tube), cell gap, cell fill
 out vec2 vUv;
 out vec3 vNor;
 out vec3 vPos;
@@ -96,6 +99,21 @@ void main() {
   vNor = n;
   vPos = w.xyz;
   gl_Position = uVp * w;
+  if (uMorph < 1.0) {
+    // The ring pressed flat: its front half runs down the strip (F on top, ©
+    // at the bottom), the back half folds back up behind it (hidden by the
+    // fragment shader), the tube flattens across the strip's width.
+    float sAlong = 1.0 - abs(1.0 - aUv.x * 2.0);
+    float vl = fract(aUv.y - uFlat.x + 0.5) - 0.5;
+    float across = abs(vl) < 0.25 ? vl : sign(vl) * (0.5 - abs(vl));
+    vec2 laid = vec2(
+      uStrip.x + across / uFlat.z * uStrip.z,
+      uStrip.y - uStrip.w * ((1.0 - sAlong) - uFlat.y * 0.5) / (1.0 - uFlat.y));
+    // It curls from the top: the F end leaves first, the © end last.
+    float m = clamp(uMorph * 1.5 - (1.0 - sAlong) * 0.5, 0.0, 1.0);
+    m = m * m * (3.0 - 2.0 * m);
+    gl_Position = vec4(mix(laid, gl_Position.xy / gl_Position.w, m), 0.0, 1.0);
+  }
 }`
 
 const FS = `#version 300 es
@@ -116,6 +134,7 @@ uniform vec3 uCam;
 uniform vec4 uLogo;      // flat wordmark rect in screen uv: x, y, w, h
 uniform vec2 uCell;      // texture cell: gap, fill
 uniform vec3 uGlass;     // refract, dispersion, shine
+uniform float uMorph;
 out vec4 o;
 
 float hash(vec2 p) {
@@ -140,6 +159,8 @@ void main() {
   vec2 suv = gl_FragCoord.xy / uRes;
   if (uMode == 0) {
     float a = crisp(texture(uTex, vUv * uRep + uOff).a) * uAlpha;
+    // Flat (nav wordmark): only the front half of the ring is the word.
+    a *= mix(1.0 - step(0.5, vUv.x), 1.0, smoothstep(0.35, 0.9, uMorph));
     o = vec4(uColor * g * a, a);
     return;
   }
@@ -230,7 +251,12 @@ function parseColor(css: string): [number, number, number] {
   return [Number(m[0]) / 255, Number(m[1]) / 255, Number(m[2]) / 255]
 }
 
-export type LogoDonutHandle = { stop: () => void; setGlass: (on: boolean) => void; setQuality: (q: number) => void; setPlace: (cx: number, cy: number, d: number, roll: number, open: number, alpha: number) => void; kick: (v: number) => void }
+export type LogoDonutHandle = {
+  stop: () => void; setGlass: (on: boolean) => void; setQuality: (q: number) => void; setPlace: (cx: number, cy: number, d: number, roll: number, open: number, alpha: number) => void; kick: (v: number) => void
+  setMorph: (m: number, cx: number, top: number, w: number, len: number) => void
+  setInk: (rgb: [number, number, number] | null, grain?: number) => void
+  setPaused: (on: boolean) => void
+}
 
 // Returns the handle, or null when WebGL2 is not available (the caller then
 // shows the flat SVG logo).
@@ -294,6 +320,7 @@ export function startLogoDonut(canvas: HTMLCanvasElement): LogoDonutHandle | nul
     energy: U('uEnergy'), liquid: U('uLiquid'), rip: U('uRip'), color: U('uColor'), bg: U('uBg'),
     rep: U('uRep'), off: U('uOff'), alpha: U('uAlpha'), grain: U('uGrain'), res: U('uRes'),
     cam: U('uCam'), logo: U('uLogo'), cell: U('uCell'), glass: U('uGlass'),
+    morph: U('uMorph'), strip: U('uStrip'), flat: U('uFlat'),
   }
 
   gl.disable(gl.CULL_FACE)
@@ -317,6 +344,11 @@ export function startLogoDonut(canvas: HTMLCanvasElement): LogoDonutHandle | nul
   // far it has rolled on screen (radians). LogoDonut sets it from the scroll.
   // `open` adds to the tilt (towards facing the viewer), `alpha` fades it.
   const at = { cx: 0, cy: 0, d: 1, roll: 0, open: 0, alpha: 1, set: false }
+  // Nav use: morph (0 = flat vertical wordmark → 1 ring) and that wordmark's box in canvas px.
+  const flatAt = { m: 1, cx: 0, top: 0, w: 12, len: 101 }
+  let tint: [number, number, number] | null = null // colour override (the nav mixes white → ring ink)
+  let grainK = 1, paused = false
+
   let quality = 1                    // backing-store scale (lower while docked small)
   let energy = 0
   const rip = new Float32Array(RIPPLES * 3).fill(-1)
@@ -349,12 +381,16 @@ export function startLogoDonut(canvas: HTMLCanvasElement): LogoDonutHandle | nul
     gl.uniform1f(u.energy, energy)
     gl.uniform3f(u.liquid, DONUT.liquid, DONUT.ripple, DONUT.rippleSpeed)
     gl.uniform3fv(u.rip, rip)
-    gl.uniform3f(u.color, color[0], color[1], color[2])
+    const ink = tint ?? color
+    gl.uniform3f(u.color, ink[0], ink[1], ink[2])
     gl.uniform3f(u.bg, bg[0], bg[1], bg[2])
     gl.uniform2f(u.rep, -DONUT.repeat, -DONUT.rows)
     const sway = reduced.matches ? 0 : Math.sin(t * DONUT.rollSpeed) * DONUT.roll
     gl.uniform2f(u.off, 0, 0.5 + (DONUT.face + sway) * DONUT.rows)
-    gl.uniform3f(u.grain, DONUT.grain, DONUT.grainSize * dpr, (Math.floor(t * 12) % 61) * 17)
+    gl.uniform1f(u.morph, flatAt.m)
+    gl.uniform4f(u.strip, (flatAt.cx / cssW) * 2 - 1, 1 - (flatAt.top / cssH) * 2, (flatAt.w / cssW) * 2, (flatAt.len / cssH) * 2)
+    gl.uniform3f(u.flat, DONUT.face + sway, DONUT.gap, DONUT.fill)
+    gl.uniform3f(u.grain, DONUT.grain * grainK, DONUT.grainSize * dpr, (Math.floor(t * 12) % 61) * 17)
     gl.uniform2f(u.res, canvas.width, canvas.height)
     gl.uniform3f(u.cam, 0, 0, dist)
     const lw = DONUT.flatLogo, lh = (lw * aspect * FRESNO_H) / FRESNO_W
@@ -404,7 +440,7 @@ export function startLogoDonut(canvas: HTMLCanvasElement): LogoDonutHandle | nul
     schedule()
   }
   const schedule = () => {
-    if (!raf && onScreen && !document.hidden && !reduced.matches) raf = requestAnimationFrame(frame)
+    if (!raf && !paused && onScreen && !document.hidden && !reduced.matches) raf = requestAnimationFrame(frame)
   }
   const wake = () => { last = 0; if (reduced.matches) draw(); else schedule() }
 
@@ -426,8 +462,9 @@ export function startLogoDonut(canvas: HTMLCanvasElement): LogoDonutHandle | nul
   // The canvas covers the viewport and never takes the pointer; the ring's own
   // area is tested here (an ellipse around it).
   const over = (e: PointerEvent) => {
-    if (at.alpha < 0.5) return false
-    const r = at.d / 2, dx = e.clientX - at.cx, dy = e.clientY - at.cy
+    if (at.alpha < 0.5 || paused) return false
+    const b = canvas.getBoundingClientRect()
+    const r = at.d / 2, dx = e.clientX - b.left - at.cx, dy = e.clientY - b.top - at.cy
     return (dx * dx) / (r * r) + (dy * dy) / (r * r * 0.4) < 1.1
   }
   const onMove = (e: PointerEvent) => {
@@ -440,8 +477,9 @@ export function startLogoDonut(canvas: HTMLCanvasElement): LogoDonutHandle | nul
   // Click / tap on the ring: a ripple leaves that point and the whole surface sloshes.
   const onDown = (e: PointerEvent) => {
     if (reduced.matches || !over(e)) return
-    rip[ripNext * 3] = (e.clientX / cssW) * 2 - 1
-    rip[ripNext * 3 + 1] = 1 - (e.clientY / cssH) * 2
+    const b = canvas.getBoundingClientRect()
+    rip[ripNext * 3] = ((e.clientX - b.left) / cssW) * 2 - 1
+    rip[ripNext * 3 + 1] = 1 - ((e.clientY - b.top) / cssH) * 2
     rip[ripNext * 3 + 2] = 0
     ripNext = (ripNext + 1) % RIPPLES
     energy = 1
@@ -482,5 +520,11 @@ export function startLogoDonut(canvas: HTMLCanvasElement): LogoDonutHandle | nul
     quality = next
     resize()
   }
-  return { stop, setGlass, setQuality, setPlace, kick }
+  // Nav: m 0 (the flat vertical wordmark at cx/top, w × len canvas px) → 1 (the ring).
+  const setMorph = (m: number, cx: number, top: number, w: number, len: number) => {
+    flatAt.m = m; flatAt.cx = cx; flatAt.top = top; flatAt.w = w; flatAt.len = len
+  }
+  const setInk = (rgb: [number, number, number] | null, grain = 1) => { tint = rgb; grainK = grain }
+  const setPaused = (on: boolean) => { paused = on; if (!on) { last = 0; schedule() } }
+  return { stop, setGlass, setQuality, setPlace, kick, setMorph, setInk, setPaused }
 }

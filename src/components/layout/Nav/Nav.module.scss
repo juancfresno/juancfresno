@@ -329,6 +329,27 @@
 // Light theme: the face SVG has hardcoded light strokes, so darken it.
 :global(html[data-theme="light"]) .faceGlitchWrap { filter: brightness(0.08); }
 
+// ─── NavDonut: the wordmark as the 3D ring while the header is hidden ───────
+// A small canvas in the wordmark's corner and on its layer (350), in the same
+// difference blend; it never takes the pointer. Its `color` is the ring's ink
+// (see about.module.scss .donut): reads as the brand blue on dark, ink on light.
+.navDonut {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 350;
+  visibility: hidden;
+  pointer-events: none;
+  mix-blend-mode: difference;
+  color: #d6ebff;
+
+  :global(html[data-theme="light"]) & { color: #ecece9; }
+}
+
+// While the canvas draws the logo, the real wordmark is see-through (still
+// the link home, still focusable).
+:global(html[data-nav-donut]) .logo { opacity: 0; }
+
 // Blue chrome (Contact): ink logos without the difference blend (web/nav Theme=Blue).
 :global(html[data-chrome="blue"]) {
   .face { mix-blend-mode: normal; }

@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, type CSSProperties } from 'react'
 import { usePathname } from 'next/navigation'
 import clsx from 'clsx'
 import s from './Nav.module.scss'
+import NavDonut from './NavDonut'
 import ElasticLine from '@/components/ui/ElasticLine/ElasticLine'
 import ThemeToggle from '@/components/ui/ThemeToggle/ThemeToggle'
 import NavClock from '@/components/ui/NavClock/NavClock'
@@ -188,6 +189,7 @@ export default function Nav() {
           mix-blend-mode: difference blends against the page, and it stays put
           while the header hides on scroll. ── */}
       {logoLink}
+      <NavDonut active={hidden} />
 
       {/* ── Mobile bottom tab bar ── */}
       <nav data-site-tabbar className={s.bottomBar} aria-label={ui.nav.mainMobile}>
