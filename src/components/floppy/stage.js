@@ -136,7 +136,8 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
     let delta = next - active; if (delta > N / 2) delta -= N; if (delta < -N / 2) delta += N;
     for (const d of disks) {
       const a = rel(d.i), b = rel(d.i, next);
-      if (view === 'field' && delta > 0 && b > a) { d.slot = 'exit'; d.exiting = performance.now(); d.after = slotKey(b); } // leaves past the camera, comes back from afar
+      if (d.exiting && b >= 1) d.after = slotKey(b); // already leaving: let it finish, it will reappear at its new place
+      else if (view === 'field' && delta > 0 && b > a) { d.slot = 'exit'; d.exiting = performance.now(); d.after = slotKey(b); } // leaves past the camera, comes back from afar
       else if (view === 'field' && delta < 0 && b < a) { snap(d, 'exit'); d.slot = slotKey(b); d.exiting = 0; }
       else { d.slot = slotKey(b); d.exiting = 0; }
       d.u.yawT = Math.round(d.u.yawT / (Math.PI * 2)) * Math.PI * 2; d.u.pitchT = 0; d.u.iy = d.u.ip = 0;
@@ -185,7 +186,7 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
     renderer.setPixelRatio(pr); renderer.setSize(W, H, false);
     camera.aspect = W / H; camera.updateProjectionMatrix();
     for (const k of [0.5, 0.25]) for (const t of rts[k]) t.setSize(Math.max(2, Math.round(W * pr * k)), Math.max(2, Math.round(H * pr * k)));
-    for (const d of disks) { if (d.hold) introPose(d); else if (!d.exiting && !(d.soft > performance.now())) snap(d, slotKey(rel(d.i))); }
+    for (const d of disks) if (d.hold) introPose(d); // the rest follow on their springs: no jump on resize or quality change
     wake();
   }
   function place(d, t) { // slot space → world
@@ -298,7 +299,7 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
       if (rm) for (const k of KEYS) { d.cur[k] = T[k]; d.vel[k] = 0; }
       else for (let n = 0; n < 2; n++) for (const k of KEYS) { d.vel[k] += (K * (T[k] - d.cur[k]) - C * d.vel[k]) * h; d.cur[k] += d.vel[k] * h; }
       d.cur.blur = Math.max(0, d.cur.blur); d.cur.s = Math.max(0.01, d.cur.s);
-      if (d.exiting && (now - d.exiting > 620 || d.cur.x < -d.cur.s)) { d.exiting = 0; snap(d, d.after); }
+      if (d.exiting && (d.cur.x < -d.cur.s * 0.72 || d.cur.y > 1 + d.cur.s || now - d.exiting > 1800)) { d.exiting = 0; snap(d, 'far'); d.slot = d.after; }
       // hand rotation, with the same weight as the Lab demo
       const u = d.u;
       if (ptr.d !== d) {
