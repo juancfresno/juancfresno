@@ -17,7 +17,7 @@ import { FRESNO_H, FRESNO_PATHS, FRESNO_W } from './fresnoPaths'
 export const DONUT = {
   // Shape
   ratio: 6,          // ring radius / tube radius: lower = fatter donut
-  size: 0.8,         // outer diameter as a fraction of the canvas width
+  size: 0.8,         // outer diameter in the hero, as a fraction of the page width
   // Text
   repeat: 2,         // wordmarks around the ring (2 = one whole FRESNO© on the front half)
   rows: 1,           // lines of text around the tube
@@ -26,6 +26,9 @@ export const DONUT = {
   face: 0.03,        // where the line sits around the tube (0 = outer edge, 0.25 = top, 0.5 = in the hole)
   // Motion (radians per second)
   spin: 0.22,        // the ring turns on its own axis: text travels around
+  flick: 0.014,      // spin added per px the pointer moves across the ring (rad/s)
+  spinMax: 7,        // fastest it can be thrown (rad/s)
+  spinCalm: 0.9,     // how fast a thrown ring returns to its own pace (higher = sooner)
   roll: 0.03,        // how far the text sways around the tube (fraction of a turn)
   rollSpeed: 0.6,
   tilt: 0.3,         // resting tilt towards the viewer (0 = edge-on, π/2 = flat)
@@ -116,9 +119,9 @@ uniform vec3 uGlass;     // refract, dispersion, shine
 out vec4 o;
 
 float hash(vec2 p) {
-  p = fract(p * vec2(123.34, 456.21));
-  p += dot(p, p + 45.32);
-  return fract(p.x * p.y);
+  vec3 q = fract(vec3(p.xyx) * 0.1031);
+  q += dot(q, q.yzx + 33.33);
+  return fract((q.x + q.y) * q.z);
 }
 float crisp(float a) {
   float w = clamp(fwidth(a), 0.02, 0.5);
@@ -227,7 +230,7 @@ function parseColor(css: string): [number, number, number] {
   return [Number(m[0]) / 255, Number(m[1]) / 255, Number(m[2]) / 255]
 }
 
-export type LogoDonutHandle = { stop: () => void; setGlass: (on: boolean) => void }
+export type LogoDonutHandle = { stop: () => void; setGlass: (on: boolean) => void; setQuality: (q: number) => void; setPlace: (cx: number, cy: number, d: number, roll: number, open: number, alpha: number) => void; kick: (v: number) => void }
 
 // Returns the handle, or null when WebGL2 is not available (the caller then
 // shows the flat SVG logo).
@@ -309,6 +312,12 @@ export function startLogoDonut(canvas: HTMLCanvasElement): LogoDonutHandle | nul
   let px = 0, py = 0, tx = 0, ty = 0 // pointer tilt: current, target (−1..1)
   let t = 0, last = 0, raf = 0, onScreen = true
   let glass = 0, glassTo = 0         // 0 ink → 1 glass
+  let spinA = 0, spinV = DONUT.spin  // ring angle and speed (the pointer and the scroll throw it)
+  // Where the ring is on the canvas (css px): centre, outer diameter, and how
+  // far it has rolled on screen (radians). LogoDonut sets it from the scroll.
+  // `open` adds to the tilt (towards facing the viewer), `alpha` fades it.
+  const at = { cx: 0, cy: 0, d: 1, roll: 0, open: 0, alpha: 1, set: false }
+  let quality = 1                    // backing-store scale (lower while docked small)
   let energy = 0
   const rip = new Float32Array(RIPPLES * 3).fill(-1)
   let ripNext = 0
@@ -316,17 +325,20 @@ export function startLogoDonut(canvas: HTMLCanvasElement): LogoDonutHandle | nul
   const draw = () => {
     const fov = (DONUT.fov * Math.PI) / 180
     const aspect = cssW / cssH
-    // Distance at which a radius-1 donut spans `size` of the canvas width.
-    const dist = 1 / (DONUT.size * Math.tan(fov / 2) * aspect)
+    if (!at.set) { at.cx = cssW / 2; at.cy = cssH / 2; at.d = cssW * DONUT.size }
     const wob = reduced.matches ? 0 : DONUT.wobble
-    const model = mul(rotZ(DONUT.lean), mul(
+    // Distance at which a radius-1 donut is `at.d` px across.
+    const dist = cssH / (Math.max(1, at.d) * Math.tan(fov / 2))
+    const model = mul(rotZ(DONUT.lean - at.roll), mul(
       translate(0, Math.sin(t * DONUT.floatSpeed) * DONUT.float, 0),
       mul(
-        rotX(DONUT.tilt + Math.sin(t * DONUT.wobbleSpeed) * wob + py * DONUT.pointer),
-        mul(rotZ(Math.cos(t * DONUT.wobbleSpeed * 0.7) * wob + px * DONUT.pointer), rotY(t * DONUT.spin)),
+        rotX(DONUT.tilt + at.open + Math.sin(t * DONUT.wobbleSpeed) * wob + py * DONUT.pointer),
+        mul(rotZ(Math.cos(t * DONUT.wobbleSpeed * 0.7) * wob + px * DONUT.pointer), rotY(spinA)),
       ),
     ))
-    const vp = mul(perspective(fov, aspect, 0.1, 200), translate(0, 0, -dist))
+    // The projection is shifted on screen (like a lens shift), so the ring keeps
+    // its shape wherever it sits.
+    const vp = mul(translate((at.cx / cssW) * 2 - 1, 1 - (at.cy / cssH) * 2, 0), mul(perspective(fov, aspect, 0.1, 2000), translate(0, 0, -dist)))
     const dpr = canvas.width / cssW
     gl.viewport(0, 0, canvas.width, canvas.height)
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
@@ -342,7 +354,7 @@ export function startLogoDonut(canvas: HTMLCanvasElement): LogoDonutHandle | nul
     gl.uniform2f(u.rep, -DONUT.repeat, -DONUT.rows)
     const sway = reduced.matches ? 0 : Math.sin(t * DONUT.rollSpeed) * DONUT.roll
     gl.uniform2f(u.off, 0, 0.5 + (DONUT.face + sway) * DONUT.rows)
-    gl.uniform3f(u.grain, DONUT.grain, DONUT.grainSize * dpr, Math.floor(t * 12) * 7.13)
+    gl.uniform3f(u.grain, DONUT.grain, DONUT.grainSize * dpr, (Math.floor(t * 12) % 61) * 17)
     gl.uniform2f(u.res, canvas.width, canvas.height)
     gl.uniform3f(u.cam, 0, 0, dist)
     const lw = DONUT.flatLogo, lh = (lw * aspect * FRESNO_H) / FRESNO_W
@@ -361,7 +373,7 @@ export function startLogoDonut(canvas: HTMLCanvasElement): LogoDonutHandle | nul
     gl.bindVertexArray(vao)
     if (k < 0.999) { // ink ring
       gl.uniform1i(u.mode, 0)
-      gl.uniform1f(u.alpha, 1 - k)
+      gl.uniform1f(u.alpha, (1 - k) * at.alpha)
       gl.drawElements(gl.TRIANGLES, mesh.idx.length, gl.UNSIGNED_SHORT, 0)
     }
     if (k > 0.001) { // glass tube: solid, nearest surface wins
@@ -382,6 +394,8 @@ export function startLogoDonut(canvas: HTMLCanvasElement): LogoDonutHandle | nul
     glass += (glassTo - glass) * Math.min(1, dt * 4.5)
     if (Math.abs(glassTo - glass) < 0.002) glass = glassTo
     energy *= Math.exp(-dt * DONUT.calm)
+    spinV += (DONUT.spin - spinV) * Math.min(1, dt * DONUT.spinCalm)
+    spinA += spinV * dt
     for (let i = 0; i < RIPPLES; i++) if (rip[i * 3 + 2] >= 0) {
       rip[i * 3 + 2] += dt
       if (rip[i * 3 + 2] > 5) rip[i * 3 + 2] = -1
@@ -395,10 +409,11 @@ export function startLogoDonut(canvas: HTMLCanvasElement): LogoDonutHandle | nul
   const wake = () => { last = 0; if (reduced.matches) draw(); else schedule() }
 
   const resize = () => {
-    const r = canvas.getBoundingClientRect()
-    cssW = Math.max(1, r.width)
-    cssH = Math.max(1, r.height)
-    const dpr = Math.min(2, window.devicePixelRatio || 1)
+    // Layout size, not the bounding rect: the canvas is scaled with a CSS
+    // transform when it docks in the corner.
+    cssW = Math.max(1, canvas.clientWidth)
+    cssH = Math.max(1, canvas.clientHeight)
+    const dpr = Math.min(2, window.devicePixelRatio || 1) * quality
     canvas.width = Math.round(cssW * dpr)
     canvas.height = Math.round(cssH * dpr)
     draw()
@@ -408,22 +423,30 @@ export function startLogoDonut(canvas: HTMLCanvasElement): LogoDonutHandle | nul
   const io = new IntersectionObserver(([e]) => { onScreen = e.isIntersecting; wake() })
   io.observe(canvas)
 
+  // The canvas covers the viewport and never takes the pointer; the ring's own
+  // area is tested here (an ellipse around it).
+  const over = (e: PointerEvent) => {
+    if (at.alpha < 0.5) return false
+    const r = at.d / 2, dx = e.clientX - at.cx, dy = e.clientY - at.cy
+    return (dx * dx) / (r * r) + (dy * dy) / (r * r * 0.4) < 1.1
+  }
   const onMove = (e: PointerEvent) => {
+    // Moving across the ring throws it: right = faster, left = brakes / reverses.
+    if (over(e)) kick(e.movementX * DONUT.flick)
     if (e.pointerType !== 'mouse') return
     tx = (e.clientX / window.innerWidth) * 2 - 1
     ty = (e.clientY / window.innerHeight) * 2 - 1
   }
-  // Click / tap: a ripple leaves that point and the whole surface sloshes.
+  // Click / tap on the ring: a ripple leaves that point and the whole surface sloshes.
   const onDown = (e: PointerEvent) => {
-    if (reduced.matches) return
-    const r = canvas.getBoundingClientRect()
-    rip[ripNext * 3] = ((e.clientX - r.left) / r.width) * 2 - 1
-    rip[ripNext * 3 + 1] = 1 - ((e.clientY - r.top) / r.height) * 2
+    if (reduced.matches || !over(e)) return
+    rip[ripNext * 3] = (e.clientX / cssW) * 2 - 1
+    rip[ripNext * 3 + 1] = 1 - (e.clientY / cssH) * 2
     rip[ripNext * 3 + 2] = 0
     ripNext = (ripNext + 1) % RIPPLES
     energy = 1
   }
-  canvas.addEventListener('pointerdown', onDown)
+  window.addEventListener('pointerdown', onDown, { passive: true })
   const onTheme = new MutationObserver(() => { readColors(); if (!raf) draw() })
   onTheme.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
   window.addEventListener('pointermove', onMove, { passive: true })
@@ -438,7 +461,7 @@ export function startLogoDonut(canvas: HTMLCanvasElement): LogoDonutHandle | nul
     ro.disconnect()
     io.disconnect()
     onTheme.disconnect()
-    canvas.removeEventListener('pointerdown', onDown)
+    window.removeEventListener('pointerdown', onDown)
     window.removeEventListener('pointermove', onMove)
     document.removeEventListener('visibilitychange', wake)
     reduced.removeEventListener('change', wake)
@@ -448,5 +471,16 @@ export function startLogoDonut(canvas: HTMLCanvasElement): LogoDonutHandle | nul
     glassTo = on ? 1 : 0
     if (reduced.matches) { glass = glassTo; draw() } else schedule()
   }
-  return { stop, setGlass }
+  const kick = (v: number) => { spinV = Math.max(-DONUT.spinMax, Math.min(DONUT.spinMax, spinV + v)) }
+  const setPlace = (cx: number, cy: number, d: number, roll: number, open: number, alpha: number) => {
+    at.cx = cx; at.cy = cy; at.d = d; at.roll = roll; at.open = open; at.alpha = alpha; at.set = true
+    if (reduced.matches) draw()
+  }
+  const setQuality = (q: number) => {
+    const next = Math.min(1, Math.max(0.1, q))
+    if (Math.abs(next - quality) < 0.01) return
+    quality = next
+    resize()
+  }
+  return { stop, setGlass, setQuality, setPlace, kick }
 }

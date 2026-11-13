@@ -3,6 +3,7 @@ import { pageMeta } from '@/lib/seo'
 import { getSite, getUi } from '@/content/site'
 import { localeOf, type LangParams } from '@/i18n/server'
 import ElasticLine from '@/components/ui/ElasticLine/ElasticLine'
+import v from '@/components/blocks/v0.module.scss'
 import a from '@/components/about/about.module.scss'
 import BioReveal from '@/components/about/BioReveal'
 import LogoDonut from '@/components/about/LogoDonut'
@@ -31,10 +32,8 @@ export default async function AboutPage({ params }: Props) {
   return (
     <div className={a.page}>
       <Grain />
-      <header className={a.hero} data-wf="hero">
-        <p className={a.marker} aria-hidden="true">{P.marker}</p>
-        <h1 className={a.name}>/ {ui.about.h1}</h1>
-      </header>
+      {/* No visible hero row (Figma 6964:14926): the title stays for screen readers. */}
+      <h1 className={v.srOnly}>{ui.about.h1}</h1>
 
       <div className={a.logoDonut} data-wf="logo">
         <LogoDonut />

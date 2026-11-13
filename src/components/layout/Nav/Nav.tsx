@@ -117,6 +117,7 @@ export default function Nav() {
     <a
       href={home}
       className={s.logo}
+      data-site-wordmark
       data-in="fade"
       data-wire="LOGO · FRESNO©"
       style={{ '--in-d': '120ms' } as CSSProperties}
