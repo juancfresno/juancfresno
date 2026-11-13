@@ -13,11 +13,11 @@ import { currentPageTheme } from '@/lib/pageTheme'
 export type SiteTransitionId = 'wireframe-grid' | 'wireframe-build' | 'pixels' | 'instant'
 
 /** The one switch: which Lab 002 option the real site uses. */
-export const SITE_TRANSITION: SiteTransitionId = 'wireframe-grid'
+export const SITE_TRANSITION: SiteTransitionId = 'wireframe-build'
 
 // Preview switch: `?tr=b` plays Propuesta B ('wireframe-build') for the rest of
-// the session (sessionStorage 'tr'), `?tr=a` goes back to SITE_TRANSITION.
-const TR_PREVIEW: Record<string, SiteTransitionId> = { a: SITE_TRANSITION, b: 'wireframe-build' }
+// the session (sessionStorage 'tr'), `?tr=a` is the earlier 'wireframe-grid' (Propuesta A).
+const TR_PREVIEW: Record<string, SiteTransitionId> = { a: 'wireframe-grid', b: 'wireframe-build' }
 export function siteTransitionId(): SiteTransitionId {
   try {
     const q = new URLSearchParams(location.search).get('tr')
