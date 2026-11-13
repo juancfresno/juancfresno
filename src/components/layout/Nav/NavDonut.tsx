@@ -82,7 +82,7 @@ export default function NavDonut({ active }: { active: boolean }) {
         const rgb = getComputedStyle(c).color.match(/[\d.]+/g)
         if (rgb && rgb.length >= 3) ring = [Number(rgb[0]) / 255, Number(rgb[1]) / 255, Number(rgb[2]) / 255]
       }
-      if (m === 0 && want.current) h?.kick(4) // it arrives spinning, then calms down
+      if (m === 0 && want.current) h?.kick(-4) // it arrives spinning, then calms down
       h?.setPaused(false)
       raf = requestAnimationFrame(frame)
     }

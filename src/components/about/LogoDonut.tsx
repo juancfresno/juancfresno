@@ -105,7 +105,7 @@ export default function LogoDonut() {
       // Scrolling also throws the ring: down = faster, up = against its spin.
       const dy = window.scrollY - lastY
       lastY = window.scrollY
-      if (!reduced.matches) handle.current?.kick(dy * 0.006)
+      if (!reduced.matches) handle.current?.kick(-dy * 0.006)
       place()
       ask()
     }

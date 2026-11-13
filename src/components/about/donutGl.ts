@@ -25,7 +25,7 @@ export const DONUT = {
   gap: 0.07,         // space between © and the next F, as a fraction of its lap
   face: 0.03,        // where the line sits around the tube (0 = outer edge, 0.25 = top, 0.5 = in the hole)
   // Motion (radians per second)
-  spin: 0.22,        // the ring turns on its own axis: text travels around
+  spin: -0.22,       // the ring turns on its own axis; negative = the front text travels right → left, like a ticker (reads in order)
   flick: 0.014,      // spin added per px the pointer moves across the ring (rad/s)
   spinMax: 7,        // fastest it can be thrown (rad/s)
   spinCalm: 0.9,     // how fast a thrown ring returns to its own pace (higher = sooner)
