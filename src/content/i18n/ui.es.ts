@@ -176,6 +176,12 @@ export const UI_ES: UiDict = {
   },
   contact: {
     h1: 'Contacto', // hero: "/Contacto"
+    stage: 'Empezar un proyecto',
+    brief: 'Tu encargo, en una frase',
+    change: (label: string, value: string) => `${label}: ${value}. Pulsa para cambiar`,
+    dial: 'Quién eres',
+    device: 'La cara de Juan en un panel LED que sigue al puntero',
+    place: 'Valencia · En remoto',
     doors: 'Dos formas de empezar',
     modes: 'Cómo trabajo con estudios',
     yourTeam: 'Tu equipo',

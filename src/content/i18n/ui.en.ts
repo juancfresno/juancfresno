@@ -178,6 +178,12 @@ export const UI_EN = {
   },
   contact: {
     h1: 'Contact', // hero: "/Contact"
+    stage: 'Start a project',
+    brief: 'Your brief, in one sentence',
+    change: (label: string, value: string) => `${label}: ${value}. Press to change`,
+    dial: 'Who you are',
+    device: 'Juan’s face on an LED panel, following the pointer',
+    place: 'Valencia · Remote',
     doors: 'Two ways to start',
     modes: 'How I work with studios',
     yourTeam: 'Your team',
