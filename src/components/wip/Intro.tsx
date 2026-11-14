@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { ACCENT, EASE, EASE_DROP, EASE_ENTER, EASE_OUT, EASE_SOFT, gridProbe, prog, scramble } from '@/components/transition/effects'
+import type { IntroGrid } from './introScript'
 import s from './wip.module.scss'
 
 // ─── WIP entrance: from structure to design ───────────────────────────────────
@@ -26,19 +27,25 @@ import s from './wip.module.scss'
 // wireframe). Any input skips to the end. The head script (introScript.ts)
 // decides the mode before paint and releases the page after 3.5 s if this
 // never runs.
+// Since Nov 2026 the grid itself is drawn by the inline head script
+// (introScript.ts → window.__introGrid), from the first paint, and leaves by
+// falling out of the bottom; this component adds the boxes, times GO from the
+// grid's clock and lets each box go as its own element comes in (--in-d).
+// The grid code below is the fallback when that script did not run.
 const T = {
   drop: 520, dropStagger: 28,             // per line: top → bottom (ease-out: visible at once)
   splitAt: 300, split: 520,               // gutters open (per line, same stagger)
   fillAt: 420, fill: 620, fillStagger: 0,  // all columns fill down together (no staircase)
   boxesAt: 680, boxIn: 380, boxStagger: 30, type: 380,
   go: 1100,
-  boxOut: 320, boxOutStagger: 20,        // boxes out before the background is up
+  boxOut: 320,                            // each box leaves as its element enters (GO + its --in-d)
   gridOutAt: 880, gridOut: 420,           // grid gone before the background enters
 }
 const HEAD = 72 // px of brighter "falling head" on each line
 const TAIL = { full: 1180, fast: 1180 } // ms after GO until the CSS run is over (×k)
 
-type Box = { x: number; y: number; w: number; h: number; label: string }
+// d = the element's own entrance delay after GO (--in-d): its box leaves then.
+type Box = { x: number; y: number; w: number; h: number; label: string; d: number }
 
 function labelFor(el: Element): string {
   const own = el.getAttribute('data-wire')
@@ -64,7 +71,9 @@ function measure(): Box[] {
       if (t.width > 0) r = new DOMRect(t.left, r.top, Math.min(t.width, r.width), r.height)
     }
     if (r.width < 6 || r.height < 6 || r.bottom < 0 || r.top > window.innerHeight) continue
-    out.push({ x: r.left, y: r.top, w: r.width, h: r.height, label: labelFor(el.querySelector('[data-in]') ?? el) })
+    const inner = el.querySelector('[data-in]') ?? el
+    const d = parseFloat(getComputedStyle(inner).getPropertyValue('--in-d')) || 0
+    out.push({ x: r.left, y: r.top, w: r.width, h: r.height, label: labelFor(inner), d })
   }
   out.sort((a, b) => (Math.round(a.y / 8) - Math.round(b.y / 8)) || a.x - b.x)
   return out
@@ -88,9 +97,18 @@ export default function Intro() {
       return () => window.clearTimeout(t)
     }
     const k = mode === 'fast' ? 0.5 : 1
+    // The grid has been falling since the first paint (introScript.ts). If the
+    // page was already released (slow connection: the 2.4 s safety), nothing
+    // is left for the boxes: let the grid go and stop here.
+    const grid = (window as unknown as { __introGrid?: IntroGrid }).__introGrid
+    if ('introGo' in r.dataset) {
+      grid?.out()
+      const t = window.setTimeout(clear, TAIL.full * k)
+      return () => window.clearTimeout(t)
+    }
     const canvas = cv.current
     const g = canvas?.getContext('2d')
-    if (!canvas || !g) { go(); return }
+    if (!canvas || !g) { go(); grid?.out(); return }
 
     const W = document.documentElement.clientWidth, H = window.innerHeight
     const dpr = Math.min(2, window.devicePixelRatio || 1)
@@ -103,7 +121,13 @@ export default function Intro() {
     const bg = getComputedStyle(r).getPropertyValue('--c-bg').trim() || '#10100e'
     const boxes = measure()
 
-    let raf = 0, t0 = 0, done = false
+    // With the early grid the clock is its clock; boxes, GO and the exit shift
+    // by however late the bundle arrived (0 on a normal load).
+    const late = grid?.t0 ? (performance.now() - grid.t0) / k : 0
+    const shift = Math.max(0, late - T.boxesAt + 40)
+    const maxD = boxes.reduce((m, b) => Math.max(m, b.d), 0)
+
+    let raf = 0, t0 = grid?.t0 ?? 0, done = false
     const evs = ['pointerdown', 'keydown', 'wheel', 'touchstart'] as const
     const off = () => evs.forEach((e) => window.removeEventListener(e, skip, true))
     const finish = () => {
@@ -118,6 +142,7 @@ export default function Intro() {
     function skip() {
       r.dataset.introSkip = ''
       go()
+      grid?.kill()
       window.dispatchEvent(new Event('wip:intro-skip'))
       finish()
       window.clearTimeout(endTimer)
@@ -126,14 +151,15 @@ export default function Intro() {
 
     const frame = (now: number) => {
       if (!t0) t0 = now
-      const t = (now - t0) / k
+      const t = (now - t0) / k - shift
       if (t >= T.go) go()
+      if (t >= T.gridOutAt) grid?.out()
       g.setTransform(dpr, 0, 0, dpr, 0, 0)
       g.clearRect(0, 0, W, H)
 
       // Grid: lines fall from the top, gutters open, columns fill downward;
       // then it dissolves. Everything eased, no step changes in alpha.
-      const gridA = 1 - EASE_SOFT(prog(t, T.gridOutAt, T.gridOut))
+      const gridA = grid ? 0 : 1 - EASE_SOFT(prog(t, T.gridOutAt, T.gridOut))
       const n = cols.length
       const step = n > 1 ? 11 / (n - 1) : 0 // same total stagger for 24 (or 4 phone) columns
       if (gridA > 0) {
@@ -177,7 +203,7 @@ export default function Intro() {
       g.font = `10px ${probe.font || 'monospace'}`
       boxes.forEach((b, j) => {
         const pin = EASE_ENTER(prog(t, T.boxesAt + j * T.boxStagger, T.boxIn))
-        const pout = EASE_SOFT(prog(t, T.go + j * T.boxOutStagger, T.boxOut))
+        const pout = EASE_SOFT(prog(t, T.go + b.d, T.boxOut))
         const a = pin * (1 - pout)
         if (a <= 0.003) return
         const grow = 0.96 + 0.04 * EASE(pin)
@@ -203,15 +229,15 @@ export default function Intro() {
       })
       g.globalAlpha = 1
 
-      const last = Math.max(T.gridOutAt + T.gridOut, T.go + boxes.length * T.boxOutStagger + T.boxOut)
+      const last = Math.max(grid ? 0 : T.gridOutAt + T.gridOut, T.go + maxD + T.boxOut)
       if (t >= last) { finish(); return }
       raf = requestAnimationFrame(frame)
     }
 
     evs.forEach((e) => window.addEventListener(e, skip, { capture: true, passive: true }))
     raf = requestAnimationFrame(frame)
-    endTimer = window.setTimeout(clear, (T.go + TAIL[mode === 'fast' ? 'fast' : 'full']) * k)
-    return () => { finish(); window.clearTimeout(endTimer) }
+    endTimer = window.setTimeout(clear, (shift + T.go + maxD + TAIL[mode === 'fast' ? 'fast' : 'full']) * k - (grid?.t0 ? performance.now() - grid.t0 : 0) + 200)
+    return () => { finish(); grid?.kill(); window.clearTimeout(endTimer) }
   }, [host])
 
   // Over everything (header and footer too), under the grain.

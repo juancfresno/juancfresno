@@ -134,6 +134,13 @@ export const UI_ES: UiDict = {
   },
   home: { featuredStar: ' · ★ Destacado' },
   wip: { copiedPill: 'Copiado ✓' },
+  featured: {
+    tab: 'Material',
+    aria: 'Material de las tarjetas',
+    title: 'Material · pulsa una tarjeta',
+    close: 'Cerrar',
+    materials: { cloth: 'Tela', silk: 'Seda', liquid: 'Líquido', paper: 'Papel' },
+  },
   arco: {
     open: 'abrir el proyecto',
     aria: (label) => `${label}: arrastra, haz scroll o usa ← →. Intro abre el proyecto del centro.`,

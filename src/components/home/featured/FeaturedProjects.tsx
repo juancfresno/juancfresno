@@ -1,10 +1,11 @@
 'use client'
 
-import { useEffect, useRef, type CSSProperties } from 'react'
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react'
 import ElasticLine from '@/components/ui/ElasticLine/ElasticLine'
 import { FEATURED_FRAME as F, FEATURED_LABEL, type FeaturedPiece } from '@/content/featured-preview'
 import { PixelCover } from './entrance'
-import { createCloth, type Cloth } from './cloth'
+import { createMaterial, isMaterial, MATERIAL_PAD, type Material, type MaterialId } from './materials'
+import MaterialMenu from './MaterialMenu'
 import s from './featured.module.scss'
 
 // Home · featured projects — Figma "04 · Archivo" (7173:7118). Free layout
@@ -16,10 +17,12 @@ import s from './featured.module.scss'
 //    same moment (load, fast scroll) go one after another, GAP apart.
 //  · Scroll: every piece has its own speed (parallax) and follows the page
 //    with a little lag (lerp), plus a slight skew from the scroll velocity.
-//  · Press: the piece turns into cloth (cloth.ts) and settles when let go.
+//  · Press: the piece turns into its material and settles when let go. The
+//    side tab (MaterialMenu) picks it: cloth, silk, liquid or paper
+//    (materials.ts); the choice is kept in localStorage['featured:material'].
 //  · Video (optional, per piece): a muted loop over the screen inside the
 //    frame; plays only while near the viewport, shows once the first frame
-//    is playing (the image underneath is the poster). The cloth uses the image.
+//    is playing (the image underneath is the poster). The material uses the image.
 // Reduced motion: no pixels, no parallax, no cloth.
 
 const GAP = 260 // ms between two pieces starting their entrance (or exit)
@@ -27,10 +30,27 @@ const DUR = 760 // ms for a full pixel sweep
 const LINE = 0.8 // trigger line, fraction of the viewport height
 const HYST = 24 // px below the line before a piece leaves again (no flicker)
 
+const MAT_KEY = 'featured:material'
+
 const pct = (v: number, of: number) => `${((v / of) * 100).toFixed(4)}%`
 
 export default function FeaturedProjects({ pieces, label }: { pieces: FeaturedPiece[]; label: string }) {
   const root = useRef<HTMLElement>(null)
+  const [mat, setMat] = useState<MaterialId>('cloth')
+  const matRef = useRef<MaterialId>('cloth')
+  const api = useRef<{ swap: () => void } | null>(null)
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(MAT_KEY)
+      if (isMaterial(saved)) { matRef.current = saved; setMat(saved) }
+    } catch { /* storage blocked */ }
+  }, [])
+  const pick = useCallback((m: MaterialId) => {
+    matRef.current = m
+    setMat(m)
+    try { localStorage.setItem(MAT_KEY, m) } catch { /* storage blocked */ }
+    api.current?.swap()
+  }, [])
   useEffect(() => {
     const el = root.current
     if (!el) return
@@ -77,7 +97,15 @@ export default function FeaturedProjects({ pieces, label }: { pieces: FeaturedPi
       if (busy) araf = requestAnimationFrame(animate)
       else alast = 0
     }
+    // The home entrance (wip/Intro.tsx) goes first: no piece comes in while the
+    // wireframe is still up; the first ones follow the copy once it hands over.
+    const html = document.documentElement
+    const held = () => (html.dataset.intro === 'full' || html.dataset.intro === 'fast') && !('introGo' in html.dataset)
+    let goTimer = 0
+    const onGo = () => { goTimer = window.setTimeout(check, html.dataset.intro === 'fast' ? 200 : 400) }
+    window.addEventListener('wip:intro-go', onGo)
     const check = () => {
+      if (held()) return
       const now = performance.now()
       const line = window.innerHeight * LINE
       const rs = ent.map((e) => ({ e, top: e.c.getBoundingClientRect().top }))
@@ -137,56 +165,64 @@ export default function FeaturedProjects({ pieces, label }: { pieces: FeaturedPi
     ro.observe(el)
     kick()
 
-    // ── Cloth on press ──
-    const cloths = new Map<HTMLElement, Cloth | null>()
-    const offs: (() => void)[] = []
-    for (const c of cards) {
+    // ── Material on press (side tab: cloth / silk / liquid / paper) ──
+    type Slot = { c: HTMLElement; media: HTMLElement; img: HTMLImageElement; inst?: Material | null; canvas: HTMLCanvasElement | null; kind?: MaterialId; active: boolean }
+    const slots: Slot[] = cards.map((c) => {
       const media = c.querySelector<HTMLElement>('[data-media]')!
-      const img = media.querySelector('img')!
-      let cloth: Cloth | null | undefined
-      let canvas: HTMLCanvasElement | null = null
-      let active = false
+      return { c, media, img: media.querySelector('img')!, canvas: null, active: false }
+    })
+    const drop = (k: Slot) => { k.inst?.destroy(); k.canvas?.remove(); k.inst = undefined; k.canvas = null; k.active = false; k.media.dataset.cloth = '' }
+    const ensure = (k: Slot) => {
+      const kind = matRef.current
+      if (k.inst !== undefined && k.kind === kind && k.canvas?.dataset.w === String(k.media.offsetWidth)) return k.inst
+      drop(k)
+      const w = k.media.offsetWidth, h = k.media.offsetHeight
+      const pad = Math.round(Math.min(w, h) * MATERIAL_PAD[kind]) // room for the drag + cast shadow
+      const canvas = document.createElement('canvas')
+      canvas.className = s.cloth
+      canvas.dataset.w = String(w)
+      canvas.style.cssText = `left:${-pad}px;top:${-pad}px;width:${w + pad * 2}px;height:${h + pad * 2}px`
+      k.media.appendChild(canvas)
+      k.canvas = canvas
+      k.kind = kind
+      k.inst = createMaterial(kind, { canvas, img: k.img, w, h, pad, onSleep: () => { k.active = false; k.media.dataset.cloth = '' } })
+      return k.inst
+    }
+    const start = (k: Slot, x: number, y: number) => {
+      if (!k.img.complete || !k.c.dataset.shown) return false
+      const inst = ensure(k)
+      if (!inst) return false
+      inst.press(x, y)
+      k.active = true
+      k.media.dataset.cloth = '1'
+      k.media.dataset.held = '1'
+      return true
+    }
+    const end = (k: Slot) => {
+      if (!k.media.dataset.held) return
+      k.media.dataset.held = ''
+      k.inst?.release()
+    }
+    const offs: (() => void)[] = []
+    for (const k of slots) {
+      const { media } = k
       const local = (e: PointerEvent) => {
         const r = media.getBoundingClientRect()
         return [((e.clientX - r.left) / r.width) * media.offsetWidth, ((e.clientY - r.top) / r.height) * media.offsetHeight] as const
       }
       const down = (e: PointerEvent) => {
-        if (e.button !== 0 || !img.complete || !c.dataset.shown) return
-        if (cloth === undefined || (canvas && (canvas.dataset.w !== String(media.offsetWidth)))) {
-          cloths.get(c)?.destroy()
-          canvas?.remove()
-          const w = media.offsetWidth, h = media.offsetHeight
-          const pad = Math.round(Math.min(w, h) * 0.45) // room for the drag + cast shadow
-          canvas = document.createElement('canvas')
-          canvas.className = s.cloth
-          canvas.dataset.w = String(w)
-          canvas.style.cssText = `left:${-pad}px;top:${-pad}px;width:${w + pad * 2}px;height:${h + pad * 2}px`
-          media.appendChild(canvas)
-          cloth = createCloth({
-            canvas, img, w, h, pad,
-            onSleep: () => { active = false; media.dataset.cloth = '' },
-          })
-          cloths.set(c, cloth)
-        }
-        if (!cloth) return
+        if (e.button !== 0) return
+        const [x, y] = local(e)
+        if (!start(k, x, y)) return
         e.preventDefault()
         try { media.setPointerCapture(e.pointerId) } catch { /* synthetic / already gone */ }
-        const [x, y] = local(e)
-        cloth.press(x, y)
-        active = true
-        media.dataset.cloth = '1'
-        media.dataset.held = '1'
       }
       const move = (e: PointerEvent) => {
-        if (!active || !cloth || !media.dataset.held) return
+        if (!k.active || !media.dataset.held) return
         const [x, y] = local(e)
-        cloth.move(x, y)
+        k.inst?.move(x, y)
       }
-      const up = () => {
-        if (!media.dataset.held) return
-        media.dataset.held = ''
-        cloth?.release()
-      }
+      const up = () => end(k)
       media.addEventListener('pointerdown', down)
       media.addEventListener('pointermove', move)
       media.addEventListener('pointerup', up)
@@ -201,7 +237,39 @@ export default function FeaturedProjects({ pieces, label }: { pieces: FeaturedPi
       })
     }
 
+    // Switching material: idle cards drop their canvas (the next press builds
+    // the new one) and the card nearest the screen centre shows it once.
+    let demoRaf = 0, demoTo = 0
+    api.current = {
+      swap() {
+        cancelAnimationFrame(demoRaf); clearTimeout(demoTo)
+        for (const k of slots) if (!k.media.dataset.held) drop(k)
+        const vh2 = window.innerHeight / 2
+        let best: Slot | null = null, bd = Infinity
+        for (const k of slots) {
+          const r = k.media.getBoundingClientRect()
+          if (!k.c.dataset.shown || r.top < 0 || r.bottom > window.innerHeight) continue
+          const d = Math.abs(r.top + r.height / 2 - vh2)
+          if (d < bd) { bd = d; best = k }
+        }
+        if (!best) return
+        const k = best, w = k.media.offsetWidth, h = k.media.offsetHeight
+        const x0 = w * 0.8, y0 = h * 0.76, x1 = w * 0.52, y1 = h * 0.5
+        if (!start(k, x0, y0)) return
+        const t0 = performance.now(), T = 720
+        const run = (t: number) => {
+          const u = Math.min(1, (t - t0) / T), e = u < 0.5 ? 4 * u * u * u : 1 - (-2 * u + 2) ** 3 / 2
+          k.inst?.move(x0 + (x1 - x0) * e, y0 + (y1 - y0) * e)
+          if (u < 1) demoRaf = requestAnimationFrame(run)
+          else demoTo = window.setTimeout(() => end(k), 160)
+        }
+        demoRaf = requestAnimationFrame(run)
+      },
+    }
+
     return () => {
+      window.removeEventListener('wip:intro-go', onGo)
+      window.clearTimeout(goTimer)
       vio.disconnect()
       cancelAnimationFrame(araf)
       ent.forEach((e) => e.cover.destroy())
@@ -210,14 +278,16 @@ export default function FeaturedProjects({ pieces, label }: { pieces: FeaturedPi
       window.removeEventListener('scroll', kick)
       window.removeEventListener('resize', onResize)
       offs.forEach((f) => f())
-      cloths.forEach((c) => c?.destroy())
+      slots.forEach(drop)
+      cancelAnimationFrame(demoRaf); clearTimeout(demoTo)
+      api.current = null
     }
   }, [])
 
   return (
     <section ref={root} className={s.module} aria-label={label.replace(/^\/\s*/, '')} style={{ '--fh': F.h, '--fw': F.w } as CSSProperties}>
       <div className={s.frame}>
-        <div className={s.label} style={{ left: pct(FEATURED_LABEL.x, F.w), width: pct(FEATURED_LABEL.w, F.w), top: pct(FEATURED_LABEL.y, F.h) }}>
+        <div className={s.label} data-in="fade" data-wire="LABEL" style={{ left: pct(FEATURED_LABEL.x, F.w), width: pct(FEATURED_LABEL.w, F.w), top: pct(FEATURED_LABEL.y, F.h), '--in-d': '460ms' } as CSSProperties}>
           <ElasticLine className={s.rule} />
           <p className={s.labelText}>{label}</p>
         </div>
@@ -252,6 +322,7 @@ export default function FeaturedProjects({ pieces, label }: { pieces: FeaturedPi
           ))}
         </ul>
       </div>
+      <MaterialMenu value={mat} onChange={pick} />
     </section>
   )
 }

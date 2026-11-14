@@ -122,3 +122,141 @@ $ease: cubic-bezier(0.22, 1, 0.36, 1);
   .tall.odd { margin-left: auto; }
   .tall.even { margin-left: 8%; }
 }
+
+// ── Material tab (MaterialMenu): a discreet tab on the right edge, sticky in
+// the middle of the screen while the module scrolls by; it opens a small panel.
+.rail {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 0;
+  z-index: 6;
+}
+
+.dock {
+  position: sticky;
+  top: calc(50vh - 70px);
+  height: 140px;
+}
+
+.tab {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 30px;
+  height: 140px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--c-text-mid);
+  cursor: pointer;
+  transition: color $duration-fast $ease-out-quart;
+  @include focus-ring;
+
+  &:hover, .dock[data-open] & { color: var(--c-text); }
+}
+
+.tabShape {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  fill: var(--c-surface);
+  transition: fill $duration-fast $ease-out-quart;
+  .tab:hover &, .dock[data-open] & { fill: var(--c-bg-2); }
+}
+
+.tabLabel {
+  position: absolute;
+  left: 4px;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg); // reads bottom → top, dots at the bottom
+  font-family: $font-mono; font-weight: $fw-mono;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.tabDots {
+  display: grid;
+  grid-template-columns: repeat(2, 3px);
+  gap: 2px;
+  transform: rotate(90deg);
+  i { width: 3px; height: 3px; border-radius: 50%; background: currentColor; }
+  .dock[data-open] & i:nth-child(1) { background: $raw-chip; }
+}
+
+.panel {
+  position: absolute;
+  top: 50%;
+  right: 38px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 168px;
+  padding: 10px;
+  border: 1px solid var(--c-border);
+  border-radius: 6px;
+  background: var(--c-bg-2);
+  opacity: 0;
+  transform: translate3d(8px, -50%, 0);
+  pointer-events: none;
+  transition: opacity 160ms ease-in, transform 200ms ease-in;
+
+  .dock[data-open] & {
+    opacity: 1;
+    transform: translate3d(0, -50%, 0);
+    pointer-events: auto;
+    transition: opacity 200ms ease-out, transform 320ms $ease;
+  }
+  @media (prefers-reduced-motion: reduce) { transition: none !important; }
+}
+
+.panelTitle {
+  margin: 0 0 6px;
+  white-space: nowrap;
+  padding: 0 6px;
+  font-family: $font-mono; font-weight: $fw-mono;
+  font-size: 10px;
+  text-transform: uppercase;
+  color: var(--c-text-dim);
+}
+
+.opt {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 5px 6px;
+  border: 0;
+  border-radius: 3px;
+  background: none;
+  color: var(--c-text);
+  font-family: $font-mono; font-weight: $fw-mono;
+  font-size: 11px;
+  text-transform: uppercase;
+  text-align: left;
+  cursor: pointer;
+  @include focus-ring;
+
+  &:hover { background: var(--c-surface); }
+  &[aria-checked='true'] { background: var(--c-chip); color: var(--c-chip-ink); }
+}
+.optNum { opacity: 0.55; }
+
+@include respond-to(md) {
+  .dock { top: calc(50vh - 56px); height: 112px; }
+  .tab { width: 26px; height: 112px; }
+  // ≥ 44 px hit area on touch (the touch-target mixin would make it relative).
+  @media (pointer: coarse) { .tab::after { content: ''; position: absolute; inset: 0 0 0 -18px; } }
+}
+
+// No materials without motion: no tab either.
+@media (prefers-reduced-motion: reduce) { .rail { display: none; } }
