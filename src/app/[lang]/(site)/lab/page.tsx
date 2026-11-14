@@ -7,7 +7,6 @@ import { localeOf, type LangParams } from '@/i18n/server'
 import PageHero from '@/components/blocks/PageHero'
 import FloppyBand from '@/components/floppy/FloppyBand'
 import LabDesk from '@/components/floppy/LabDesk'
-import CloseArchivo from '@/components/blocks/CloseArchivo'
 import hs from '@/components/blocks/pageHero.module.scss'
 import Pending from '@/components/blocks/Pending'
 import ElasticLine from '@/components/ui/ElasticLine/ElasticLine'
@@ -147,7 +146,6 @@ export default async function LabPage({ params }: Props) {
       </>)}
 
       <LabDesk copy={LAB_DESK} items={EXPERIMENTS.map((e) => ({ n: e.n, name: e.name, kind: e.kind }))} games={LAB_DESK.games} />
-      <CloseArchivo locale={loc} />
     </div>
   )
 }

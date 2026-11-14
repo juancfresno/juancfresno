@@ -18,7 +18,26 @@ export const UI_EN = {
   },
   theme: { group: 'Colour theme', dark: 'dark', light: 'light' },
   lang: { group: 'Idioma / Language', to: { en: 'Read this page in English', es: 'Leer esta página en español' } },
-  footer: { socials: 'Social profiles', legal: 'Legal', place: 'Valencia {Spain}', placeLabel: 'Valencia, Spain' },
+  footer: {
+    socials: 'Social profiles', legal: 'Legal', place: 'Valencia {Spain}', placeLabel: 'Valencia, Spain',
+    // Full-screen close (components/layout/Footer): the LED wall asks.
+    end: '{ End of the page ↘',
+    title: 'You’ve seen it all.\nSo, shall we talk?', // explicit line break
+    yes: 'Yes, let’s talk',
+    no: 'Not yet',
+    noHint: 'Back to top',
+    or: 'Or just write',
+    speaker: 'F-01',
+    say: {
+      hello: 'You scrolled the whole thing. I’m flattered.',
+      yes: 'Good call. The next screen writes half the email for you.',
+      no: 'No rush. I’ll leave the light on.',
+      up: 'Going up. Have another look.',
+      copied: 'Copied. Old school, I like it.',
+    },
+    session: (time: string, pages: number, px: string, m: string) =>
+      `Session ${time} · ${pages} ${pages === 1 ? 'page' : 'pages'} · ${px} px scrolled ≈ ${m} m`,
+  },
   pending: {
     word: 'Pending',
     role: 'role',

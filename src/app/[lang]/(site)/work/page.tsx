@@ -7,7 +7,6 @@ import type { WorkItem } from '@/components/work/archive/types'
 import WorkArchive from '@/components/work/archive/WorkArchive'
 import ElasticLine from '@/components/ui/ElasticLine/ElasticLine'
 import PageHero from '@/components/blocks/PageHero'
-import CloseArchivo from '@/components/blocks/CloseArchivo'
 import LabBand from '@/components/blocks/LabBand'
 import LatestFeed from '@/components/home/LatestFeed'
 import s from '@/components/work/archive/page.module.scss'
@@ -80,7 +79,6 @@ export default async function WorkPage({ params }: Props) {
 
       <div data-flip-after>
         <LatestFeed locale={l} />
-        <CloseArchivo locale={l} />
         <LabBand locale={l} />
       </div>
     </div>

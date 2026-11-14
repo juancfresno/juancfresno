@@ -5,7 +5,6 @@ import { getSite, getUi } from '@/content/site'
 import { localeOf, type LangParams } from '@/i18n/server'
 import { FEED_SELECTED, groupFeed, groupRange, monthYear } from '@/content/feed'
 import PageHero from '@/components/blocks/PageHero'
-import CloseArchivo from '@/components/blocks/CloseArchivo'
 import v from '@/components/blocks/v0.module.scss'
 import hs from '@/components/blocks/pageHero.module.scss'
 import f from '@/components/feed/feed.module.scss'
@@ -84,7 +83,6 @@ export default async function FeedPage({ params }: Props) {
         <p className={v.mono}>{ui.feed.total(FEED_SELECTED.length)}</p>
       </div>
       </FeedViews>
-      <CloseArchivo locale={l} />
     </div>
   )
 }

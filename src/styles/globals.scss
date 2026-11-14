@@ -134,6 +134,9 @@ $chrome: '[data-site-header], [data-site-tabbar]';
 :root[data-chrome="blue"] [data-site-footer] { @include theme-dark; }
 // Work: the footer continues the subtle "{ Lab ↘" band (Figma 6951:13221).
 :root:has([data-foot="subtle"]) [data-site-footer] { @include theme-subtle; }
+// The full-screen close is a screen: dark in every theme and on every page
+// (components/layout/Footer). Declared on an inner box, so it wins over the rules above.
+[data-site-footer] [data-foot-screen="full"] { @include theme-dark; }
 // About: the 3D donut docks in the header corner on scroll, so the nav
 // wordmark steps aside while that page's donut is alive (LogoDonut).
 :root:has([data-logo-dock]) [data-site-wordmark] { visibility: hidden; }
