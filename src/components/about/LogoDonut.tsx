@@ -11,14 +11,16 @@ import a from './about.module.scss'
 // which About hides while the donut is alive: [data-logo-dock] in globals.scss).
 // The trip to the corner, as the page scrolls (e: 0 hero → 1 docked):
 const GROW = 0.8       // first part of the trip: it grows and grows until you pass through it
-const CLEAR = 1.12     // how far past the screen corners its hole opens before it is gone (1 = just)
+const CLEAR = 1        // how far past the screen corners its hole opens before it is gone (1 = just)
+const OPEN_END = 0.25  // extra tip towards the viewer by the end of the growth (rad; π/2 − tilt = seen from above)
 const TURNS = 0.75     // turns the small ring spins on screen as it pops into the corner
 
 const clamp01 = (v: number) => Math.min(1, Math.max(0, v))
 const smooth = (v: number) => { const t = clamp01(v); return t * t * (3 - 2 * t) }
 
 // The FRESNO© wordmark as a floating, turning 3D donut (donutGl.ts): move over
-// it to throw its spin, click it for a liquid ripple. Its colour is the CSS
+// it and it leans towards the cursor; take it and drag to turn it by hand
+// (a ripple leaves the point you took it from). Its colour is the CSS
 // `color` of the canvas. No WebGL2 = the flat SVG logo instead.
 //
 // The canvas covers the whole viewport, above everything except the page
@@ -52,7 +54,6 @@ export default function LogoDonut() {
     let raf = 0, last = 0
     let p = 0          // where the scroll says it should be (0 hero → 1 docked)
     let e = 0, ev = 0  // where it is: follows p on a soft spring
-    let lastY = window.scrollY
 
     const place = () => {
       const W = document.documentElement.clientWidth, H = window.innerHeight
@@ -67,20 +68,29 @@ export default function LogoDonut() {
       const maxScroll = document.documentElement.scrollHeight - H
       const range = Math.max(1, Math.min(r.top + window.scrollY + r.height * 1.2 + H * 0.5 - y1, maxScroll * 0.92))
       p = clamp01(window.scrollY / range)
-      // 1. It grows and grows, opening up to face you and drifting to the middle
-      //    of the screen, until its hole is wider than the screen: you pass
+      // 1. It comes straight at the screen: it grows and grows, drifting to the
+      //    middle, until its hole is wider than the screen: you pass
       //    through it and it is gone. 2. It pops into the header corner, spinning.
       const t = clamp01(e / GROW)
       const g = t * t * (0.55 + 0.45 * t) // steady growth, a little faster at the end
       if (e < GROW) {
         const yNat = r.top + r.height / 2
-        // Face on, the hole is 0.357 × the diameter across ((ratio − 1) / (ratio + 1) / 2 … for ratio 6):
-        // it ends just wide enough to clear the screen corners, on any screen.
-        const hole = (DONUT.ratio - 1) / (DONUT.ratio + 1) / 2
-        const end = Math.max(d0 * 1.6, (Math.hypot(W, H) / 2 / hole) * CLEAR)
+        // It keeps its pose (only tips OPEN_END more, as a ring does when it comes
+        // at you) and grows until the hole, an ellipse leaning with the ring,
+        // holds the four screen corners: the letters pass by huge and it is gone.
+        const tube = 1 / (DONUT.ratio + 1) / 2                       // tube radius / diameter
+        const ax = (DONUT.ratio - 1) * tube                          // hole half-width / diameter
+        const by = Math.max(0.02, DONUT.ratio * tube * Math.sin(DONUT.tilt + OPEN_END) - tube) // hole half-height / diameter
+        const cl = Math.cos(DONUT.lean), sl = Math.sin(DONUT.lean)
+        let need = 0
+        for (const sx of [-1, 1]) {
+          const x = (sx * W) / 2, y = H / 2
+          need = Math.max(need, Math.hypot((x * cl + y * sl) / ax, (y * cl - x * sl) / by))
+        }
+        const end = Math.max(d0 * 1.6, need * CLEAR)
         const big = d0 + (end - d0) * g
         const x0 = r.left + r.width / 2
-        handle.current?.setPlace(x0 + (W / 2 - x0) * g, yNat + (H / 2 - yNat) * smooth(t * 1.6), big, 0, (Math.PI / 2 - DONUT.tilt) * g, 1 - smooth((t - 0.9) / 0.1))
+        handle.current?.setPlace(x0 + (W / 2 - x0) * g, yNat + (H / 2 - yNat) * smooth(t * 1.6), big, 0, OPEN_END * g, 1 - smooth((t - 0.88) / 0.12))
       } else {
         const k = smooth((e - GROW) / (1 - GROW))
         handle.current?.setPlace(x1, y1, d1 * k, (1 - k) * TURNS * Math.PI * 2, (1 - k) * 0.8, k)
@@ -102,10 +112,6 @@ export default function LogoDonut() {
     }
     const ask = () => { if (!raf) raf = requestAnimationFrame(frame) }
     const onScroll = () => {
-      // Scrolling also throws the ring: down = faster, up = against its spin.
-      const dy = window.scrollY - lastY
-      lastY = window.scrollY
-      if (!reduced.matches) handle.current?.kick(-dy * 0.006)
       place()
       ask()
     }

@@ -26,7 +26,7 @@ export const DONUT = {
   face: 0.03,        // where the line sits around the tube (0 = outer edge, 0.25 = top, 0.5 = in the hole)
   // Motion (radians per second)
   spin: -0.22,       // the ring turns on its own axis; negative = the front text travels right → left, like a ticker (reads in order)
-  flick: 0.014,      // spin added per px the pointer moves across the ring (rad/s)
+  grabGain: 1,       // drag: 1 = the front of the ring follows the pointer exactly
   spinMax: 7,        // fastest it can be thrown (rad/s)
   spinCalm: 0.9,     // how fast a thrown ring returns to its own pace (higher = sooner)
   roll: 0.03,        // how far the text sways around the tube (fraction of a turn)
@@ -37,7 +37,8 @@ export const DONUT = {
   wobbleSpeed: 0.45,
   float: 0.012,      // vertical bob, fraction of the donut
   floatSpeed: 0.8,
-  pointer: 0.06,     // extra tilt following the cursor
+  pointerLean: 0.26, // the ring leans to the side the cursor is on (rad at the screen edge)
+  pointerTip: 0.14,  // and tips forward / back with the cursor's height
   // Grain inside the ink (0 = none)
   grain: 0.24,
   grainSize: 1.5,    // css px per grain
@@ -339,6 +340,7 @@ export function startLogoDonut(canvas: HTMLCanvasElement): LogoDonutHandle | nul
   let px = 0, py = 0, tx = 0, ty = 0 // pointer tilt: current, target (−1..1)
   let t = 0, last = 0, raf = 0, onScreen = true
   let glass = 0, glassTo = 0         // 0 ink → 1 glass
+  let grab = false, grabX = 0, grabDx = 0, grabV = 0 // dragging the ring: last x, px to apply, speed (rad/s)
   let spinA = 0, spinV = DONUT.spin  // ring angle and speed (the pointer and the scroll throw it)
   // Where the ring is on the canvas (css px): centre, outer diameter, and how
   // far it has rolled on screen (radians). LogoDonut sets it from the scroll.
@@ -364,8 +366,8 @@ export function startLogoDonut(canvas: HTMLCanvasElement): LogoDonutHandle | nul
     const model = mul(rotZ(DONUT.lean - at.roll), mul(
       translate(0, Math.sin(t * DONUT.floatSpeed) * DONUT.float, 0),
       mul(
-        rotX(DONUT.tilt + at.open + Math.sin(t * DONUT.wobbleSpeed) * wob + py * DONUT.pointer),
-        mul(rotZ(Math.cos(t * DONUT.wobbleSpeed * 0.7) * wob + px * DONUT.pointer), rotY(spinA)),
+        rotX(DONUT.tilt + at.open + Math.sin(t * DONUT.wobbleSpeed) * wob + py * DONUT.pointerTip),
+        mul(rotZ(Math.cos(t * DONUT.wobbleSpeed * 0.7) * wob + - px * DONUT.pointerLean), rotY(spinA)),
       ),
     ))
     // The projection is shifted on screen (like a lens shift), so the ring keeps
@@ -430,8 +432,16 @@ export function startLogoDonut(canvas: HTMLCanvasElement): LogoDonutHandle | nul
     glass += (glassTo - glass) * Math.min(1, dt * 4.5)
     if (Math.abs(glassTo - glass) < 0.002) glass = glassTo
     energy *= Math.exp(-dt * DONUT.calm)
-    spinV += (DONUT.spin - spinV) * Math.min(1, dt * DONUT.spinCalm)
-    spinA += spinV * dt
+    if (grab) {
+      // In the hand: it turns only as far as it is dragged, and remembers the speed for the release.
+      const v = grabDx / Math.max(1, at.d / 2) * DONUT.grabGain
+      spinA += v
+      grabV += (v / Math.max(dt, 0.004) - grabV) * Math.min(1, dt * 14)
+      grabDx = 0
+    } else {
+      spinV += (DONUT.spin - spinV) * Math.min(1, dt * DONUT.spinCalm)
+      spinA += spinV * dt
+    }
     for (let i = 0; i < RIPPLES; i++) if (rip[i * 3 + 2] >= 0) {
       rip[i * 3 + 2] += dt
       if (rip[i * 3 + 2] > 5) rip[i * 3 + 2] = -1
@@ -459,31 +469,58 @@ export function startLogoDonut(canvas: HTMLCanvasElement): LogoDonutHandle | nul
   const io = new IntersectionObserver(([e]) => { onScreen = e.isIntersecting; wake() })
   io.observe(canvas)
 
-  // The canvas covers the viewport and never takes the pointer; the ring's own
-  // area is tested here (an ellipse around it).
-  const over = (e: PointerEvent) => {
+  // The cursor only leans the ring. To turn it you take it and drag: the front
+  // follows the pointer, and letting go throws it at the speed it had (it then
+  // eases back to its own slow spin). Mouse / pen through pointer events; touch
+  // through touch events, which keep coming while the page scrolls.
+  const hit = (x: number, y: number) => {
     if (at.alpha < 0.5 || paused) return false
     const b = canvas.getBoundingClientRect()
-    const r = at.d / 2, dx = e.clientX - b.left - at.cx, dy = e.clientY - b.top - at.cy
+    const r = at.d / 2, dx = x - b.left - at.cx, dy = y - b.top - at.cy
     return (dx * dx) / (r * r) + (dy * dy) / (r * r * 0.4) < 1.1
   }
-  const onMove = (e: PointerEvent) => {
-    // Moving across the ring throws it: right = faster, left = brakes / reverses.
-    if (over(e)) kick(e.movementX * DONUT.flick)
-    if (e.pointerType !== 'mouse') return
-    tx = (e.clientX / window.innerWidth) * 2 - 1
-    ty = (e.clientY / window.innerHeight) * 2 - 1
-  }
-  // Click / tap on the ring: a ripple leaves that point and the whole surface sloshes.
-  const onDown = (e: PointerEvent) => {
-    if (reduced.matches || !over(e)) return
+  const ripple = (x: number, y: number) => {
     const b = canvas.getBoundingClientRect()
-    rip[ripNext * 3] = ((e.clientX - b.left) / cssW) * 2 - 1
-    rip[ripNext * 3 + 1] = 1 - ((e.clientY - b.top) / cssH) * 2
+    rip[ripNext * 3] = ((x - b.left) / cssW) * 2 - 1
+    rip[ripNext * 3 + 1] = 1 - ((y - b.top) / cssH) * 2
     rip[ripNext * 3 + 2] = 0
     ripNext = (ripNext + 1) % RIPPLES
     energy = 1
   }
+  const take = (x: number, y: number) => {
+    if (reduced.matches || !hit(x, y)) return false
+    ripple(x, y) // a ripple leaves that point and the whole surface sloshes
+    grab = true; grabX = x; grabDx = 0; grabV = 0
+    document.documentElement.style.userSelect = 'none'
+    document.documentElement.style.webkitUserSelect = 'none'
+    return true
+  }
+  const pull = (x: number) => { grabDx += x - grabX; grabX = x }
+  const release = () => {
+    if (!grab) return
+    grab = false
+    spinV = Math.max(-DONUT.spinMax, Math.min(DONUT.spinMax, grabV))
+    document.documentElement.style.userSelect = ''
+    document.documentElement.style.webkitUserSelect = ''
+  }
+  const onMove = (e: PointerEvent) => {
+    if (e.pointerType === 'touch') return
+    if (grab) pull(e.clientX)
+    if (e.pointerType !== 'mouse') return
+    tx = (e.clientX / window.innerWidth) * 2 - 1
+    ty = (e.clientY / window.innerHeight) * 2 - 1
+  }
+  const onDown = (e: PointerEvent) => { if (e.pointerType !== 'touch' && e.button === 0) take(e.clientX, e.clientY) }
+  const onUp = (e: PointerEvent) => { if (e.pointerType !== 'touch') release() }
+  const onTouchStart = (e: TouchEvent) => { const p = e.touches[0]; if (e.touches.length === 1 && p) take(p.clientX, p.clientY) }
+  const onTouchMove = (e: TouchEvent) => { const p = e.touches[0]; if (grab && p) pull(p.clientX) }
+  window.addEventListener('pointerup', onUp, { passive: true })
+  window.addEventListener('pointercancel', onUp, { passive: true })
+  window.addEventListener('blur', release)
+  window.addEventListener('touchstart', onTouchStart, { passive: true })
+  window.addEventListener('touchmove', onTouchMove, { passive: true })
+  window.addEventListener('touchend', release, { passive: true })
+  window.addEventListener('touchcancel', release, { passive: true })
   window.addEventListener('pointerdown', onDown, { passive: true })
   const onTheme = new MutationObserver(() => { readColors(); if (!raf) draw() })
   onTheme.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
@@ -501,6 +538,14 @@ export function startLogoDonut(canvas: HTMLCanvasElement): LogoDonutHandle | nul
     onTheme.disconnect()
     window.removeEventListener('pointerdown', onDown)
     window.removeEventListener('pointermove', onMove)
+    window.removeEventListener('pointerup', onUp)
+    window.removeEventListener('pointercancel', onUp)
+    window.removeEventListener('blur', release)
+    window.removeEventListener('touchstart', onTouchStart)
+    window.removeEventListener('touchmove', onTouchMove)
+    window.removeEventListener('touchend', release)
+    window.removeEventListener('touchcancel', release)
+    release()
     document.removeEventListener('visibilitychange', wake)
     reduced.removeEventListener('change', wake)
     gl.getExtension('WEBGL_lose_context')?.loseContext()
