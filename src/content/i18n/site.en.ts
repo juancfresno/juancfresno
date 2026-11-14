@@ -116,6 +116,23 @@ export const SITE_EN = {
       note: 'Hyperactive graphic curiosity',
     },
   },
+  // Lab · the desk at the bottom (3D room). Draft copy by Desarrollo, 14 Nov 2026: Copywriter to review.
+  LAB_DESK: {
+    label: '{ Where it started ↘',
+    line: 'This is where I started imagining everything.',
+    note: 'My desk at home, rebuilt from memory: a beige PC, a box of floppies and the games I should not have been playing.',
+    aria: 'The desk where it started',
+    screenNote: 'This is where I started\nimagining everything.',
+    photo: 'PHOTO\nPENDING',
+    icons: ['My desk', 'Lab', 'Games', 'Bin'],
+    objects: 'object(s)',
+    menu: 'File   Edit   View   Help',
+    // Loose floppies on the desk: titles as he wrote them on the labels
+    games: [
+      { title: 'Prince of P.', sub: 'disk 1 / 2' }, { title: 'Monkey Island', sub: 'disk 3 / 4' }, { title: 'Shinobi', sub: 'copy' },
+      { title: 'PC Fútbol', sub: '— Juan' }, { title: 'Broken Sword', sub: 'do not format!' },
+    ],
+  },
   // Work · band under the close (Figma 7014:18140), links to /lab.
   LAB_BAND: { label: '{ Lab ↘' },
   // Close band "04 · Archivo" (Figma 6856:14014): label, line, email link.

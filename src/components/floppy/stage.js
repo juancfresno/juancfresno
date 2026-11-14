@@ -12,7 +12,7 @@ import { createFloppy } from './core.js';
    paper label. Local frame: origin at the centre of the base, y up, front = +z. `fillers` disks
    already stand at the back (plain stand-ins); the real ones drop into the front slots. Units: mm. */
 const BOX = { w: 100, pitch: 8, base: 44, lid: 58, wall: 2.4 };
-function buildBox(slots, fillers) {
+export function buildBox(slots, fillers) {
   const { w: Wb, pitch, base: Hb, lid: Hl, wall: t } = BOX, D = slots * pitch + 12;
   const g = new THREE.Group(), keep = [];
   const mat = (m) => (keep.push(m), m);

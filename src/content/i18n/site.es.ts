@@ -113,6 +113,21 @@ export const SITE_ES: SiteDict = {
       note: 'Hiperactiva curiosidad gráfica',
     },
   },
+  LAB_DESK: {
+    label: '{ Donde empezó ↘',
+    line: 'Aquí es donde empecé a imaginarlo todo.',
+    note: 'Mi mesa de casa, reconstruida de memoria: un PC beige, una caja de disquetes y los juegos a los que no debía estar jugando.',
+    aria: 'La mesa donde empezó todo',
+    screenNote: 'Aquí es donde empecé\na imaginarlo todo.',
+    photo: 'FOTO\nPENDIENTE',
+    icons: ['Mi mesa', 'Lab', 'Juegos', 'Papelera'],
+    objects: 'objeto(s)',
+    menu: 'Archivo   Edición   Ver   Ayuda',
+    games: [
+      { title: 'Prince of P.', sub: 'disco 1 / 2' }, { title: 'Monkey Island', sub: 'disco 3 / 4' }, { title: 'Shinobi', sub: 'copia' },
+      { title: 'PC Fútbol', sub: '— Juan' }, { title: 'Broken Sword', sub: '¡no formatear!' },
+    ],
+  },
   // Work · band under the close (Figma 7014:18140), links to /lab.
   LAB_BAND: { label: '{ Lab ↘' },
   CLOSE_ARCHIVO: {
