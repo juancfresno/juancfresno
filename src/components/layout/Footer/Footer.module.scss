@@ -18,9 +18,29 @@
   flex-direction: column;
   min-height: calc(100svh - var(--tabbar-h));
   background: $color-bg;
+  isolation: isolate; // the lens sits at z -1 inside this box
 }
 
 .close { flex: 1; }
+
+// Over the lens: the contact module and the rows keep no background of their own.
+.full .close > *, .full .inner { background: transparent; }
+
+// Veil over the lens: strong behind the contact module (top) and the rows
+// (bottom), open in the middle.
+.veil {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--c-bg) 90%, transparent) 0,
+    color-mix(in srgb, var(--c-bg) 74%, transparent) 220px,
+    color-mix(in srgb, var(--c-bg) 34%, transparent) 46%,
+    color-mix(in srgb, var(--c-bg) 34%, transparent) 62%,
+    color-mix(in srgb, var(--c-bg) 82%, transparent) calc(100% - 190px),
+    color-mix(in srgb, var(--c-bg) 94%, transparent) 100%
+  );
+}
 
 // Anchored (desktop, enough height, motion allowed): the footer box is a window
 // (clip-path) onto content fixed to the viewport, so the page above lifts like
