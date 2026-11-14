@@ -5,7 +5,6 @@ import { localeOf, type LangParams } from '@/i18n/server'
 import { headlineCycle } from '@/content/headline'
 import HeadlineCycle from '@/components/home/HeadlineCycle'
 import LatestFeed from '@/components/home/LatestFeed'
-import HomeContact from '@/components/home/HomeContact'
 import FloppyBand from '@/components/floppy/FloppyBand'
 import FeaturedProjects from '@/components/home/featured/FeaturedProjects'
 import { FEATURED_PREVIEW } from '@/content/featured-preview'
@@ -62,7 +61,6 @@ export default async function HomePage({ params }: Props) {
       {/* Featured projects (Figma 04 · Archivo 7173:7118): preview pieces, not linked to cases yet. */}
       <FeaturedProjects pieces={FEATURED_PREVIEW} label={LANDING.featuredLabel} />
       <LatestFeed locale={l} show={['block']} labels={{ block: LANDING.feedLabel }} beforeBlock={<FloppyBand locale={l} mode="flow" only={['002', '003', '005']} />} />
-      <HomeContact locale={l} />
     </>
   )
 }

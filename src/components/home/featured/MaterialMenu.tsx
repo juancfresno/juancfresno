@@ -2,10 +2,10 @@
 
 import { useEffect, useId, useRef, useState } from 'react'
 import { useUi } from '@/i18n/client'
-import { MATERIALS, type MaterialId } from './materials'
+import { MATERIAL_GROUPS, MATERIALS, type MaterialId } from './materials'
 import s from './featured.module.scss'
 
-// Discreet side tab on the right edge of the featured module (sticky while the
+// Discreet side tab on the left edge of the featured module (sticky while the
 // module is on screen). Opens a small panel to switch the card material.
 export default function MaterialMenu({ value, onChange }: { value: MaterialId; onChange: (m: MaterialId) => void }) {
   const t = useUi().featured
@@ -27,18 +27,23 @@ export default function MaterialMenu({ value, onChange }: { value: MaterialId; o
       <div ref={dock} className={s.dock} data-open={open || undefined}>
         <div id={id} className={s.panel} role="radiogroup" aria-label={t.aria} inert={!open}>
           <p className={s.panelTitle}>{t.title}</p>
-          {MATERIALS.map((m, i) => (
-            <button
-              key={m}
-              type="button"
-              role="radio"
-              aria-checked={value === m}
-              className={s.opt}
-              onClick={() => { onChange(m); setOpen(false) }}
-            >
-              <span className={s.optNum}>{String(i + 1).padStart(2, '0')}</span>
-              {t.materials[m]}
-            </button>
+          {MATERIAL_GROUPS.map((gr) => (
+            <div key={gr.id} className={s.group} role="presentation">
+              <p className={s.groupTitle}>{t.groups[gr.id]}</p>
+              {gr.items.map((m) => (
+                <button
+                  key={m}
+                  type="button"
+                  role="radio"
+                  aria-checked={value === m}
+                  className={s.opt}
+                  onClick={() => { onChange(m); setOpen(false) }}
+                >
+                  <span className={s.optNum}>{String(MATERIALS.indexOf(m) + 1).padStart(2, '0')}</span>
+                  {t.materials[m]}
+                </button>
+              ))}
+            </div>
           ))}
         </div>
         <button type="button" className={s.tab} aria-expanded={open} aria-controls={id} aria-label={t.aria} onClick={() => setOpen((o) => !o)}>
