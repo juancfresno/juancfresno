@@ -7,7 +7,8 @@ import type { WorkItem } from '@/components/work/archive/types'
 import WorkArchive from '@/components/work/archive/WorkArchive'
 import ElasticLine from '@/components/ui/ElasticLine/ElasticLine'
 import PageHero from '@/components/blocks/PageHero'
-import SelectedGrid from '@/components/work/selected/SelectedGrid'
+import FeaturedProjects from '@/components/home/featured/FeaturedProjects'
+import { FEATURED_PREVIEW } from '@/content/featured-preview'
 import LatestFeed from '@/components/home/LatestFeed'
 import s from '@/components/work/archive/page.module.scss'
 
@@ -21,7 +22,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 // Work — Figma "work" (AXxkCCuckrXGKDUCk8lNyQ · 6951:13221, read 14 Nov 2026),
 // in the frame's order: 02 · Hero (letter, "/ Work", intro, note),
-// web/projects-grid ("/ Selected projects", 7311:9611 → SelectedGrid),
+// web/projects-grid ("/ Selected projects", 7311:9611) = the Home module
+// (home/featured/FeaturedProjects, same pieces),
 // 03 · Archive (6951:13618): the 28 cases in the Figma order (ALL_PROJECTS),
 // "Feed block · Home" (7273:4642, the Home gallery) and the footer in its
 // subtle theme (data-foot). No close block and no Lab band any more.
@@ -64,7 +66,8 @@ export default async function WorkPage({ params }: Props) {
     <div className={s.page} data-work-page data-foot="subtle">
       <PageHero letter={HEROES.work.letter} name={ui.work.h1} intro={HEROES.work.intro} note={HEROES.work.note} />
 
-      <SelectedGrid />
+      {/* The Home's featured module, the same component and pieces. */}
+      <FeaturedProjects pieces={FEATURED_PREVIEW} label={LANDING.featuredLabel} />
 
       <section id="archive" className={s.archive} aria-labelledby="archive-label">
         <ElasticLine className={s.rule} />

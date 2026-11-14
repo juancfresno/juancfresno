@@ -20,14 +20,19 @@ import s from './drawer.module.scss'
 //            sheet behind it; then the case-top rises line by line and the
 //            title decodes.
 //   close    the same front, the other way: sheet → pixels → page.
-//   ← / →    the front wipes the sheet blank, the next case is under it.
+//   change   (← / →, and after the end scene) the WHOLE sheet pixelates: bar,
+//            text and images break into a mosaic of 6 → 12 → 24 → 48 px
+//            cells (SVG filter on the live content), the next case takes
+//            its place under the biggest pixels, and they resolve back
+//            48 → 6 → clean into the new layout.
 //   the end  web/case-next is a pinned scene: a window onto the next case's
 //            first image opens as you keep scrolling (000 → 100 %). At 100 %
-//            the picture fills the sheet, breaks into a mosaic and dissolves,
-//            bottom to top, into the next case. Scrolling back closes it.
+//            the picture fills the sheet, breaks into a mosaic, and the
+//            mosaic resolves into the next case. Scrolling back closes it.
 // Esc / scrim / Close = close, focus trapped and returned (useOverlay).
 // Reduced motion: no curtain, no pinned runway (the window is a plain button).
 const SHEET = '#ffffff'
+const PX_STEPS = [6, 12, 24, 48] // mosaic cell sizes, css px
 // n frames, or 120 ms if the page isn't painting (background tab).
 const frames = (n = 2) => new Promise<void>((r) => { const f = (k: number) => (k ? requestAnimationFrame(() => f(k - 1)) : r()); f(n); window.setTimeout(r, 120) })
 const wait = (ms: number) => new Promise<void>((r) => window.setTimeout(r, ms))
@@ -43,6 +48,7 @@ export default function CaseDrawer({ items, index, onClose, onNav }: {
   const t = useUi().work
   const [idx, setIdx] = useState<number | null>(null)
   const [phase, setPhase] = useState<Phase>('closed')
+  const [fresh, setFresh] = useState(true) // first case since opening: the case-top rises in
   const idxRef = useRef<number | null>(null)
   const panelRef = useRef<HTMLDivElement>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
@@ -59,6 +65,13 @@ export default function CaseDrawer({ items, index, onClose, onNav }: {
   const hand = useRef(false) // the curtain already holds the next cover (scroll hand-off)
   const raf = useRef(0)
 
+  // Mosaic over the live sheet: one SVG filter per cell size (below, in the
+  // portal), switched on the scroller. null = clean.
+  const pixelate = (cell: number | null) => {
+    const el = scrollRef.current
+    if (el) el.style.filter = cell ? `url(#wk-px-${cell})` : ''
+  }
+
   const cur = () => {
     const c = canvasRef.current
     if (!c) return null
@@ -72,13 +85,12 @@ export default function CaseDrawer({ items, index, onClose, onNav }: {
     if (index !== null && from === null) {
       idxRef.current = index
       setIdx(index)
+      setFresh(true)
       setPhase('entering')
       return
     }
     if (index !== null && from !== null && index !== from) {
       const my = ++seq.current
-      const d = dir.current
-      const side = d > 0 ? 'left' : 'right'
       const fromHand = hand.current
       hand.current = false
       busy.current = true
@@ -89,21 +101,32 @@ export default function CaseDrawer({ items, index, onClose, onNav }: {
       }
       ;(async () => {
         const c = cur()
+        setFresh(false)
         if (!c || prefersReduced()) { show(); busy.current = false; return }
-        if (!fromHand) {
-          c.size()
-          c.solidColor(SHEET)
-          await c.run({ to: 'solid', dir: side, ms: 300, band: 0.1 })
-          if (my !== seq.current) return
+        // The whole sheet breaks into bigger and bigger pixels…
+        if (fromHand) pixelate(PX_STEPS[PX_STEPS.length - 1])
+        else {
+          for (const cell of PX_STEPS) {
+            pixelate(cell)
+            await wait(55)
+            if (my !== seq.current) return
+          }
         }
+        // …the next case takes its place under them…
         show()
         await frames(2)
         if (my !== seq.current) return
         scrollRef.current?.scrollTo({ top: 0, behavior: 'instant' })
-        await c.run(fromHand
-          ? { to: 'clear', dir: 'up', ms: 680, band: 0.14, weight: 0.62 }
-          : { to: 'clear', dir: side, ms: 420, band: 0.1, weight: 0.5 })
+        if (fromHand) c.clear()
+        await wait(70)
+        // …and they resolve into it.
+        for (const cell of [...PX_STEPS].reverse()) {
+          if (my !== seq.current) return
+          pixelate(cell)
+          await wait(60)
+        }
         if (my !== seq.current) return
+        pixelate(null)
         busy.current = false
       })()
       return
@@ -112,6 +135,7 @@ export default function CaseDrawer({ items, index, onClose, onNav }: {
       const my = ++seq.current
       busy.current = true
       idxRef.current = null
+      pixelate(null)
       const done = () => {
         if (my !== seq.current) return
         setIdx(null)
@@ -262,7 +286,21 @@ export default function CaseDrawer({ items, index, onClose, onNav }: {
   const nextImg = next.images[0] ?? next.cover
 
   return createPortal(
-    <div className={s.root} data-phase={phase}>
+    <div className={s.root} data-phase={phase} data-fresh={fresh ? '' : undefined}>
+      {/* Mosaic filters: a 2 px sample in the middle of each cell, tiled, dilated to the cell. */}
+      <svg className={s.defs} width="0" height="0" aria-hidden="true" focusable="false">
+        <defs>
+          {PX_STEPS.map((c) => (
+            <filter key={c} id={`wk-px-${c}`} x="0" y="0" width="100%" height="100%" colorInterpolationFilters="sRGB">
+              <feFlood x={c / 2 - 1} y={c / 2 - 1} width="2" height="2" />
+              <feComposite width={c} height={c} />
+              <feTile result="grid" />
+              <feComposite in="SourceGraphic" in2="grid" operator="in" />
+              <feMorphology operator="dilate" radius={c / 2} />
+            </filter>
+          ))}
+        </defs>
+      </svg>
       <div className={s.scrim} onClick={close} aria-hidden="true" />
       <div
         ref={panelRef}

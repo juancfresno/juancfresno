@@ -117,7 +117,6 @@ export const UI_ES: UiDict = {
     nextSlash: '/ siguiente',
     keep: 'Sigue bajando',
     nextOpen: (name: string) => `Siguiente proyecto: ${name}`,
-    selectedSlash: '/ Proyectos seleccionados',
     question: 'La pregunta',
     client: 'Cliente',
     via: 'Vía',

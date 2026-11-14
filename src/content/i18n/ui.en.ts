@@ -114,12 +114,11 @@ export const UI_EN = {
     drag: 'Drag',
     strip: (name: string) => `${name}: images, drag or use the arrow keys`,
     nextProject: 'Next project',
-    // Drawer end scene (Figma web/case-next) and the selected grid.
+    // Drawer end scene (Figma web/case-next).
     nextCode: 'N — P',
     nextSlash: '/ next',
     keep: 'Keep scrolling',
     nextOpen: (name: string) => `Next project: ${name}`,
-    selectedSlash: '/ Selected projects',
     question: 'The question',
     client: 'Client',
     via: 'Via',

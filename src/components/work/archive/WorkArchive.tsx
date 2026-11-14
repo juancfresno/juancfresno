@@ -163,21 +163,6 @@ export default function WorkArchive({ items }: { items: WorkItem[] }) {
     fromHash()
   }, [items])
 
-  // The selected grid above the list opens a case in the same drawer.
-  useEffect(() => {
-    const onExt = (e: Event) => {
-      const slug = (e as CustomEvent<string>).detail
-      const i = items.findIndex((x) => x.slug === slug)
-      if (i < 0) return
-      opener.current = (document.activeElement as HTMLButtonElement | null) ?? null
-      preview.current?.hide()
-      setExpanded(null)
-      setOpenIdx(i)
-    }
-    window.addEventListener('work:open', onExt)
-    return () => window.removeEventListener('work:open', onExt)
-  }, [items])
-
   // Hash follows what is open.
   const current = expanded ?? openIdx
   useEffect(() => {

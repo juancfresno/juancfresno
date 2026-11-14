@@ -70,6 +70,8 @@ $gap-m: clamp(32px, 3.333cqw, 56px);
   }
 }
 
+.defs { position: absolute; width: 0; height: 0; pointer-events: none; }
+
 .curtain {
   position: absolute;
   inset: 0;
@@ -288,7 +290,12 @@ $gap-m: clamp(32px, 3.333cqw, 56px);
   to { clip-path: inset(0 0 0 0); }
 }
 .letter, .title, .lead, .question, .ficha > div, .block { opacity: 0; }
-[data-phase='open'] {
+// Only the first case after opening rises in; a change of case arrives whole
+// under the mosaic (CaseDrawer), so nothing may be mid-fade there.
+[data-phase='open']:not([data-fresh]) {
+  .letter, .title, .lead, .question, .ficha > div, .block { opacity: 1; }
+}
+[data-phase='open'][data-fresh] {
   .letter, .title, .lead, .question, .ficha > div, .block {
     animation: rise 0.9s $ease-out-expo both;
   }
