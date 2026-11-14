@@ -5,7 +5,7 @@ import clsx from 'clsx'
 import { useUi } from '@/i18n/client'
 import { scrambleTo } from '@/lib/scramble'
 import HoverPreview, { type PreviewHandle } from './HoverPreview'
-import OpenDrawer from './OpenDrawer'
+import CaseDrawer from './CaseDrawer'
 import ExpandPanel from './ExpandPanel'
 import OpenStage from './OpenStage'
 import { prefersReduced } from './useOverlay'
@@ -17,7 +17,7 @@ import s from './archive.module.scss'
 // Figma 03 · Archive (6951:13618). Rows are buttons, not links: they never go
 // to /work/[slug]; each case opens in its own mode (WorkItem.open, from
 // `open` in ALL_PROJECTS or, unset, <= 6 images → expand, else drawer):
-//   drawer — side drawer from the right    → OpenDrawer
+//   drawer — the case sheet (88 % wide)     → CaseDrawer
 //   expand — the row opens in place (FLIP) → ExpandPanel
 // Both coexist: opening a drawer case closes an open panel first; ← / → in the
 // drawer walks the list and keeps showing every case in the drawer, whatever
@@ -124,6 +124,9 @@ export default function WorkArchive({ items }: { items: WorkItem[] }) {
   const fine = useRef(false)
   const snap = useRef<{ tops: Map<Element, number>; anchor: Element | null; anchorTop: number; opening: boolean } | null>(null)
   const total = String(items.length).padStart(2, '0')
+  // The row of the case open in the drawer stays filled (it shows in the
+  // strip of page left beside the sheet) and follows ← / →.
+  const lit = force !== 'stage' && expanded === null ? openIdx : null
 
   // The expand FLIP keeps the clicked row still itself; the browser's own
   // scroll anchoring would adjust a second time.
@@ -158,6 +161,21 @@ export default function WorkArchive({ items }: { items: WorkItem[] }) {
       }
     }
     fromHash()
+  }, [items])
+
+  // The selected grid above the list opens a case in the same drawer.
+  useEffect(() => {
+    const onExt = (e: Event) => {
+      const slug = (e as CustomEvent<string>).detail
+      const i = items.findIndex((x) => x.slug === slug)
+      if (i < 0) return
+      opener.current = (document.activeElement as HTMLButtonElement | null) ?? null
+      preview.current?.hide()
+      setExpanded(null)
+      setOpenIdx(i)
+    }
+    window.addEventListener('work:open', onExt)
+    return () => window.removeEventListener('work:open', onExt)
   }, [items])
 
   // Hash follows what is open.
@@ -311,11 +329,11 @@ export default function WorkArchive({ items }: { items: WorkItem[] }) {
         onPointerLeave={onListLeave}
       >
         {items.map((it, i) => (
-          <li key={it.slug} className={s.item} data-on={hover === i ? '' : undefined} data-open={expanded === i ? '' : undefined}>
+          <li key={it.slug} className={s.item} data-on={hover === i || lit === i ? '' : undefined} data-open={expanded === i ? '' : undefined}>
             <Row
               it={it}
               i={i}
-              active={hover === i}
+              active={hover === i || lit === i}
               expanded={expanded === i}
               mode={modeOf(i)}
               panelId={`work-panel-${it.slug}`}
@@ -340,7 +358,7 @@ export default function WorkArchive({ items }: { items: WorkItem[] }) {
       <HoverPreview ref={preview} items={items} total={total} />
 
       {force !== 'stage' && (
-        <OpenDrawer items={items} index={openIdx} onClose={closeOverlay} onNav={navDrawer} />
+        <CaseDrawer items={items} index={openIdx} onClose={closeOverlay} onNav={navDrawer} />
       )}
       {force === 'stage' && (
         <OpenStage

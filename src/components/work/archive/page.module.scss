@@ -25,26 +25,6 @@
   padding-inline: max(#{$m}, env(safe-area-inset-left, 0px)) max(#{$m}, env(safe-area-inset-right, 0px));
 }
 
-// ─── Reserved band for the future gallery (537 px at 1680, liquid) ───────────
-.gallery {
-  position: relative;
-  height: clamp(280px, 31.964vw, 537px);
-  width: calc(100% - 2 * #{$m});
-  margin-inline: auto;
-
-  // Four crop marks, nothing else.
-  span {
-    position: absolute;
-    width: 12px;
-    height: 12px;
-    border: 0 solid $color-line;
-  }
-  span:nth-child(1) { top: 0; left: 0; border-top-width: 1px; border-left-width: 1px; }
-  span:nth-child(2) { top: 0; right: 0; border-top-width: 1px; border-right-width: 1px; }
-  span:nth-child(3) { bottom: 0; left: 0; border-bottom-width: 1px; border-left-width: 1px; }
-  span:nth-child(4) { bottom: 0; right: 0; border-bottom-width: 1px; border-right-width: 1px; }
-}
-
 // ─── 03 · Archive (pt 96, pb 120) ────────────────────────────────────────────
 .archive {
   @include margins;

@@ -1,0 +1,195 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+// ─── "/ Selected projects" — Figma web/projects-grid (7297:9127) ─────────────
+// 1680 × 2729 frame. --x / --y / --w are the Figma px of each plate; u() turns
+// them into a share of the block width, so the composition scales as one.
+@function u($v) { @return calc(#{$v} / 1680 * 100cqw); }
+
+.wrap {
+  width: 100%;
+  container-type: inline-size;
+  background: $color-bg;
+}
+
+.grid {
+  position: relative;
+  height: u(var(--fh));
+
+  @include respond-to(md) {
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 56px;
+    padding: 24px $m 72px;
+  }
+}
+
+// Top right: 253 px rule + "/ Selected projects" (Body/S 14, right).
+.label {
+  position: absolute;
+  top: u(58);
+  right: u(40);
+  width: max(160px, #{u(253)});
+  margin: 0;
+  padding-top: 24px;
+  border-top: 1px solid $color-line;
+  font-family: $font-body;
+  font-size: 14px;
+  line-height: 1.4;
+  text-align: right;
+  color: $color-text-hi;
+
+  // Phones: one line, clear of the vertical FRESNO wordmark.
+  @include respond-to(md) { position: static; align-self: flex-end; width: auto; min-width: 160px; margin-right: 36px; white-space: nowrap; }
+}
+
+.plate {
+  position: absolute;
+  left: u(var(--x));
+  top: u(var(--y));
+  width: u(var(--w));
+  display: flex;
+  flex-direction: column;
+  gap: max(12px, #{u(20)});
+
+  @include respond-to(md) {
+    position: static;
+    width: 100%;
+    &:nth-child(odd) { width: 78%; }
+    &:nth-child(3n) { align-self: flex-end; }
+  }
+}
+
+.hit {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  &:focus-visible { outline: 1px solid var(--c-g); outline-offset: 4px; }
+}
+
+.media {
+  position: relative;
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  background: var(--c-stage, #1d1d1c);
+  container-type: inline-size;
+
+  > img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(1.06);
+    transition: transform 1.4s $ease-out-expo;
+    [data-in] & { transform: none; }
+  }
+  .hit:hover & > img, .hit:focus-visible & > img { transform: scale(1.03); transition-duration: 0.9s; }
+}
+
+// The plate develops: a 4×4 Bayer screen in the page colour steps off the
+// image (four levels), the same dither as the feed grid and the row fill.
+.dither {
+  position: absolute;
+  inset: 0;
+  background-color: $color-bg;
+  pointer-events: none;
+  [data-in] & { animation: develop 0.72s steps(1, end) 0.08s both; }
+}
+$b: 6px; // cell
+@keyframes develop {
+  0% { background-color: var(--c-bg); mask-image: none; }
+  25% {
+    background-color: var(--c-bg);
+    mask-image: conic-gradient(#000 0 75%, transparent 0);
+    mask-size: #{$b * 2} #{$b * 2};
+  }
+  50% {
+    background-color: var(--c-bg);
+    mask-image: conic-gradient(#000 0 25%, transparent 0 50%, #000 0 75%, transparent 0);
+    mask-size: #{$b * 2} #{$b * 2};
+  }
+  75% {
+    background-color: var(--c-bg);
+    mask-image: conic-gradient(#000 0 25%, transparent 0);
+    mask-size: #{$b * 2} #{$b * 2};
+  }
+  100% { background-color: transparent; mask-image: none; }
+}
+
+// web/case-info-row: code (16) · tags (mono 11, right) / name (16, right).
+.info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  color: $color-text-hi;
+  opacity: 0;
+  transform: translate3d(0, 8px, 0);
+  transition: opacity 0.5s ease 0.5s, transform 0.8s $ease-out-expo 0.5s;
+  [data-in] & { opacity: 1; transform: none; }
+}
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  width: 100%;
+}
+.code, .name {
+  font-family: $font-body;
+  font-size: 16px;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+.tags {
+  font-family: $font-mono; font-weight: $fw-mono;
+  font-size: 11px;
+  line-height: 1.2;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  text-align: right;
+  color: $color-text-mid;
+}
+
+// Prolicht: the marble card over the photo (508 × 325 of 792 × 493).
+.card {
+  position: absolute;
+  left: 17.42%;
+  top: 17.24%;
+  width: 64.14%;
+  height: 65.95%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 4.49cqw 2cqw;
+  background: #f2f8fc;
+  color: #18191a;
+  font-family: $font-body;
+  text-align: left;
+  i, em, b { display: block; font-style: normal; font-weight: inherit; }
+  i { color: #9c9ea0; }
+  em { color: #494b4d; }
+}
+.cardHead { display: block; font-weight: $fw-light; font-size: 1.924cqw; line-height: 1.04; letter-spacing: -0.03em; }
+.cardFoot { display: flex; justify-content: space-between; align-items: flex-end; }
+.cardMark { width: 2cqw; height: 2cqw; border-radius: 50%; background: radial-gradient(circle, #18191a 0 32%, transparent 34%), conic-gradient(#18191a 0 12%, transparent 0 25%, #18191a 0 37%, transparent 0 50%, #18191a 0 62%, transparent 0 75%, #18191a 0 87%, transparent 0); }
+.cardText {
+  width: 50.75%;
+  font-size: 0.802cqw;
+  line-height: 1.45;
+  text-align: right;
+  i, em { display: inline; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .media > img { transform: none; transition: none; }
+  .dither { display: none; }
+  .info { opacity: 1; transform: none; transition: none; }
+}

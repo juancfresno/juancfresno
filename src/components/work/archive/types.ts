@@ -16,6 +16,7 @@ export type WorkItem = {
   studio?: string // ficha.via, only when it came through a studio
   chips: string[]
   lead: string
+  question?: string // "the hard question" under the lead (case-top)
   cover: Img
   images: Img[]
   open: 'drawer' | 'expand' // per case, see `open` in content/cases.ts

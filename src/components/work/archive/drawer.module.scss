@@ -1,0 +1,419 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+// ─── The case drawer — Figma "v1 · Casos" (6891:1517) ────────────────────────
+// web/case-top (Property 1 = Light) + "Behance · bloque" + web/case-next, on a
+// sheet that is 88 % of the window. Measures are the Figma ones at 1680 as a
+// share of the SHEET width (cqw), type sizes fixed. The sheet is always light,
+// whatever the site theme (the Figma case is), so colours are raw here.
+$sh-bg: #ffffff;
+$sh-text: #141414;
+$sh-ter: #4a4d4b;
+$sh-label: #a0a09b;
+$sh-line: #c9c5bd;
+$sh-line-strong: #a9aea9;
+$nx-bg: #141414;
+$g-blue: #003dff;
+$bar-h: 56px;
+
+$side: clamp(20px, 3.81cqw, 64px);
+$top: clamp(40px, 5.238cqw, 88px);
+$gap-l: clamp(56px, 6.667cqw, 112px);
+$gap-m: clamp(32px, 3.333cqw, 56px);
+
+.root {
+  position: fixed;
+  inset: 0;
+  // Above the fixed FRESNO wordmark (350): it would sit on the case title.
+  z-index: $z-modal + 60;
+  pointer-events: none;
+  &[data-phase='entering'], &[data-phase='open'] { pointer-events: auto; }
+}
+
+.scrim {
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, var(--c-bg) 72%, transparent);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  [data-phase='entering'] > &, [data-phase='open'] > & { opacity: 1; transition: opacity 0.5s ease; }
+}
+
+.panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 88vw;
+  outline: none;
+  container-type: inline-size;
+  @media (max-width: 1024px) { width: 100%; }
+}
+
+// The real sheet: invisible (not hidden, it takes focus) until the curtain has
+// laid it, and again while the curtain takes it away.
+.scroll {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  background: $sh-bg;
+  color: $sh-text;
+  opacity: 0;
+  &::-webkit-scrollbar { display: none; }
+  [data-phase='open'] & { opacity: 1; }
+  @media (prefers-reduced-motion: reduce) {
+    transition: opacity 0.16s ease;
+  }
+}
+
+.curtain {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 5;
+  pointer-events: none;
+}
+
+// ─── Bar ─────────────────────────────────────────────────────────────────────
+.bar {
+  position: sticky;
+  top: 0;
+  z-index: 4;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 16px;
+  height: $bar-h;
+  padding: 0 $side;
+  background: color-mix(in srgb, #{$sh-bg} 90%, transparent);
+  backdrop-filter: blur(10px);
+  color: $sh-text;
+  opacity: 0;
+  [data-phase='open'] & { opacity: 1; transition: opacity 0.4s ease 0.1s; }
+
+  // Over the next scene: no plate, text inverts whatever is under it.
+  &[data-dark] {
+    background: none;
+    backdrop-filter: none;
+    color: #fff;
+    mix-blend-mode: difference;
+    .read { opacity: 0; }
+  }
+}
+
+.count {
+  font-family: $font-mono; font-weight: $fw-mono;
+  font-size: 11px;
+  letter-spacing: 0.03em;
+  color: $sh-label;
+  b { font-weight: inherit; color: $sh-text; }
+  [data-dark] > & { color: inherit; b { color: inherit; } }
+}
+
+.barTitle {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-family: $font-body;
+  font-size: 14px;
+  line-height: 1.4;
+  opacity: 0;
+  transform: translate3d(0, 6px, 0);
+  transition: opacity 0.2s ease, transform 0.3s $ease-out-expo;
+  [data-scrolled] > & { opacity: 1; transform: none; }
+  [data-dark] > & { opacity: 0; }
+  @container (max-width: 560px) { display: none; }
+}
+
+.actions { justify-self: end; display: inline-flex; gap: 6px; grid-column: 3; }
+
+.ctl {
+  @include touch-target(10px, 2px);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  padding: 6px 9px;
+  border: 1px solid color-mix(in srgb, currentColor 22%, transparent);
+  border-radius: 3px;
+  background: none;
+  color: inherit;
+  font-family: $font-mono; font-weight: $fw-mono;
+  font-size: 10px;
+  line-height: 12px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+  &:hover, &:focus-visible { background: $raw-chip; color: $raw-ink; border-color: transparent; outline: none; }
+  kbd { font: inherit; opacity: 0.55; }
+  @media (hover: none) { kbd { display: none; } }
+}
+
+// Reading line: how far through the case.
+.read {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: $g-blue;
+  transform-origin: 0 50%;
+  transform: scaleX(var(--read, 0));
+  transition: opacity 0.2s ease;
+}
+
+// ─── web/case-top ────────────────────────────────────────────────────────────
+.sheet { background: $sh-bg; }
+
+.top {
+  display: flex;
+  flex-direction: column;
+  gap: $gap-l;
+  padding: $top $side $gap-l;
+}
+
+.topRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.letter {
+  flex: 0 0 24.227%;
+  margin: 0;
+  font-family: $font-body;
+  font-size: 24px;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  @container (max-width: 700px) { display: none; }
+}
+
+.cab {
+  flex: 0 0 66.323%;
+  display: flex;
+  flex-direction: column;
+  gap: $gap-m;
+  min-width: 0;
+  @container (max-width: 700px) { flex-basis: 100%; }
+}
+
+.title {
+  margin: 0;
+  font-family: $font-body;
+  font-weight: $fw-regular;
+  font-size: 24px;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  text-align: right;
+}
+
+.lead {
+  margin: 0;
+  max-width: 87.3%;
+  font-family: $font-body;
+  font-size: 18px;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+  @container (max-width: 700px) { max-width: none; }
+}
+
+.question {
+  margin: 0;
+  padding-top: 24px;
+  border-top: 1px solid $sh-line-strong;
+  font-family: $font-body;
+  font-size: 18px;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+  color: $sh-ter;
+}
+
+.ficha {
+  display: flex;
+  gap: 16px;
+  margin: 0;
+
+  > div {
+    flex: 1 0 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+    padding-top: 16px;
+    border-top: 1px solid $sh-line;
+    text-align: right;
+  }
+  dt {
+    font-family: $font-mono; font-weight: $fw-mono;
+    font-size: 11px;
+    line-height: 1.2;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: $sh-label;
+  }
+  dd {
+    margin: 0;
+    font-family: $font-body;
+    font-size: 16px;
+    line-height: 1.5;
+    letter-spacing: -0.01em;
+  }
+  @container (max-width: 700px) {
+    flex-wrap: wrap;
+    > div { flex: 1 0 calc(50% - 8px); }
+  }
+}
+
+// ─── Behance · bloque: continuous, gap 0, sheet margins ──────────────────────
+.block {
+  padding: 0 $side $gap-l;
+  img { display: block; width: 100%; height: auto; background: #f1efe9; }
+}
+
+// Entrance, on open and on every change of case (the article is keyed).
+@keyframes rise {
+  from { opacity: 0; transform: translate3d(0, 18px, 0); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes rule {
+  from { clip-path: inset(0 100% 0 0); }
+  to { clip-path: inset(0 0 0 0); }
+}
+.letter, .title, .lead, .question, .ficha > div, .block { opacity: 0; }
+[data-phase='open'] {
+  .letter, .title, .lead, .question, .ficha > div, .block {
+    animation: rise 0.9s $ease-out-expo both;
+  }
+  .letter { animation-delay: 0.04s; }
+  .title { animation-delay: 0.04s; }
+  .lead { animation-delay: 0.12s; }
+  .question { animation: rise 0.9s $ease-out-expo 0.2s both, rule 0.7s $ease-out-expo 0.2s both; }
+  .ficha > div { animation: rise 0.9s $ease-out-expo calc(0.28s + var(--i, 0) * 0.06s) both, rule 0.7s $ease-out-expo calc(0.28s + var(--i, 0) * 0.06s) both; }
+  .block { animation-delay: 0.42s; }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-phase='open'] {
+    .letter, .title, .lead, .question, .ficha > div, .block { animation: none; opacity: 1; }
+  }
+}
+
+// ─── web/case-next: the pinned scene ─────────────────────────────────────────
+// --p = scroll through the runway (0…1), --e = eased. A window onto the next
+// case's first image opens from a small plate to the whole sheet.
+.next {
+  --p: 0;
+  --e: 0;
+  --wy: calc((1 - var(--e)) * 33%);
+  --wx: calc((1 - var(--e)) * 36%);
+  position: relative;
+  height: 185dvh;
+  background: $nx-bg;
+  color: #fff;
+  @media (prefers-reduced-motion: reduce) { height: 100dvh; }
+}
+
+.pin {
+  position: sticky;
+  top: 0;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.window {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: #1d1d1c;
+  cursor: pointer;
+  clip-path: inset(var(--wy) var(--wx));
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(calc(1.22 - 0.22 * var(--e)));
+  }
+  &:focus-visible { outline: 1px solid #fff; outline-offset: -6px; }
+}
+
+// Crop marks on the window's corners; they leave as it fills the sheet.
+.tick {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border: 0 solid $g-blue;
+  opacity: calc(1 - var(--e) * 1.6);
+  pointer-events: none;
+  &[data-c='tl'] { top: calc(var(--wy) - 12px); left: calc(var(--wx) - 12px); border-top-width: 1px; border-left-width: 1px; }
+  &[data-c='tr'] { top: calc(var(--wy) - 12px); right: calc(var(--wx) - 12px); border-top-width: 1px; border-right-width: 1px; }
+  &[data-c='bl'] { bottom: calc(var(--wy) - 12px); left: calc(var(--wx) - 12px); border-bottom-width: 1px; border-left-width: 1px; }
+  &[data-c='br'] { bottom: calc(var(--wy) - 12px); right: calc(var(--wx) - 12px); border-bottom-width: 1px; border-right-width: 1px; }
+}
+
+.nCode, .nSlash, .nName, .nKeep {
+  position: absolute;
+  z-index: 2;
+  margin: 0;
+  mix-blend-mode: difference;
+  pointer-events: none;
+}
+.nCode, .nSlash {
+  top: calc(#{$bar-h} + #{$top});
+  font-family: $font-body;
+  font-size: 24px;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+.nCode { left: $side; }
+.nSlash { right: $side; }
+
+.nName, .nKeep {
+  bottom: max(#{$top}, calc(env(safe-area-inset-bottom, 0px) + 24px));
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  span {
+    font-family: $font-mono; font-weight: $fw-mono;
+    font-size: 11px;
+    line-height: 1.2;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+}
+.nName {
+  left: $side;
+  b { font-family: $font-body; font-weight: $fw-regular; font-size: 24px; line-height: 1.2; letter-spacing: -0.02em; }
+}
+.nKeep {
+  right: $side;
+  align-items: flex-end;
+  text-align: right;
+  // 20 cells; the lit ones follow the scroll.
+  i {
+    position: relative;
+    display: block;
+    width: 158px;
+    height: 6px;
+    background: repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.28) 0 6px, transparent 6px 8px);
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(90deg, #fff 0 6px, transparent 6px 8px);
+      clip-path: inset(0 calc((1 - var(--p)) * 100%) 0 0);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) { display: none; }
+}

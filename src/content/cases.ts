@@ -52,6 +52,7 @@ type ProjectBase = {
   caseStudy?: boolean
   featured?: boolean
   personal?: boolean // personal project: credits say so instead of Client
+  unlisted?: boolean // not in the Figma list: hidden everywhere, like NDA rows
   // How /work opens this case (neutral, same in every language):
   //   'drawer' — side drawer (long cases); 'expand' — in place under its row.
   // Unset = by length: 'expand' when the case has <= EXPAND_MAX_IMAGES images
@@ -63,10 +64,35 @@ export type OpenKind = 'drawer' | 'expand'
 export const EXPAND_MAX_IMAGES = 6
 export const openKind = (p: { open?: OpenKind }, imageCount: number): OpenKind =>
   p.open ?? (imageCount <= EXPAND_MAX_IMAGES ? 'expand' : 'drawer')
-export type ProjectCopy = { name: string; discipline: string; client: string /* client / studio column */ }
+// `listName` / `listVia`: what the /work list prints when it differs from the
+// index name or the ficha (Figma rows: "15 Bodegas · Website", via "Various").
+export type ProjectCopy = { name: string; discipline: string; client: string /* client / studio column */; listName?: string; listVia?: string }
 export type Project = ProjectBase & ProjectCopy
 
-const M = media as Record<string, { cover: Img; images: Img[] }>
+const M0 = media as Record<string, { cover: Img; images: Img[] }>
+// Images a case leaves out, by file number (public/work/<slug>/NN.webp): the
+// "Behance · bloque" of each frame in Figma "v1 · Casos" (6891:1517, 14 Nov
+// 2026) no longer has them. The files stay on disk; rebuild-safe (by number).
+const DROP_IMAGES: Record<string, number[]> = {
+  'signflow': [1],
+  'access': [1],
+  'educa-projects': [1],
+  'likitech': [1],
+  'awen': [8],
+  'casa-carbon': [6, 7, 14, 28, 32],
+  'google': [3],
+  'bunkr-branding': [1, 2, 4, 6],
+  'roadis': [17],
+  'icommunity': [2],
+  'drip': [1],
+}
+const fileNo = (src: string) => Number(src.slice(src.lastIndexOf('/') + 1, src.lastIndexOf('.')))
+const M: typeof M0 = Object.fromEntries(
+  Object.entries(M0).map(([slug, m]) => {
+    const drop = DROP_IMAGES[slug]
+    return [slug, drop ? { ...m, images: m.images.filter((im) => !drop.includes(fileNo(im.src))) } : m]
+  }),
+)
 export const caseMedia = (slug: string) => M[slug]
 
 // NDA rows don't match the invoices yet (copy doc, question 3): kept in the
@@ -74,23 +100,24 @@ export const caseMedia = (slug: string) => M[slug]
 export const SHOW_NDA = false
 
 // ─── Index (Work · v0, newest first) ──────────────────────────────────────────
-// Order rule (Juan, 10 Nov 2026; final list by Diseño in refs/casos-orden.md):
-// by the ficha year, newest first; ties by Behance publish date (or gallery
-// id); Biako Posters always last. NDA rows sit by year (hidden). Numbers, Next
-// links and projectTotal() follow this array.
+// Order = the Figma list, row by row ("work" 6951:13221 · 03 · Archive, 14 Nov
+// 2026; the same order as the frames in "v1 · Casos" 6891:1517): 28 cases.
+// Figma rules here: to reorder, move the row in Figma and then in this array.
+// NDA rows sit by year (hidden). Numbers, Next links and projectTotal() follow
+// this array.
 // Home selections (Arco, short index) are ARCO / FEATURED below.
 const ALL_PROJECTS = [
   { slug: 'signflow', year: '2026', caseStudy: true, featured: true },
   { slug: 'drip', year: '2026', caseStudy: true },
-  { slug: 'likitech', year: '2025', caseStudy: true, featured: true },
-  { slug: 'access', year: '2025', caseStudy: true },
-  { slug: 'educa-projects', year: '2025', caseStudy: true },
+  { slug: 'access', year: '2024—2025', caseStudy: true },
+  { slug: 'educa-projects', year: '2024—2025', caseStudy: true },
   { slug: 'wubalu', year: '2025', caseStudy: true },
-  { slug: 'entradium', year: '2024', caseStudy: true },
   { slug: 'nda-banca', year: '2024', nda: true },
   { slug: 'bonamar', year: '2024', caseStudy: true },
   { slug: 'awen', year: '2024', caseStudy: true },
   { slug: 'dinamo', year: '2024', caseStudy: true, featured: true },
+  { slug: 'likitech', year: '2023—2024', caseStudy: true, featured: true },
+  { slug: 'entradium', year: '2023—2024', caseStudy: true },
   { slug: 'correos', year: '2024', caseStudy: true },
   { slug: 'selected-logos', year: '2024', caseStudy: true },
   { slug: 'workout-app', year: '2023', caseStudy: true },
@@ -99,10 +126,10 @@ const ALL_PROJECTS = [
   { slug: 'nda-energia', year: '2021', nda: true },
   { slug: '15-bodegas-web', year: '2021', caseStudy: true },
   { slug: '15-bodegas-branding', year: '2021', caseStudy: true },
+  { slug: 'bunkr-app', year: '2020', caseStudy: true },
   { slug: 'dior-backstage', year: '2020', caseStudy: true },
   { slug: 'hm', year: '2020', caseStudy: true },
-  { slug: 'roadis', year: '2020', caseStudy: true },
-  { slug: 'bunkr-app', year: '2020', caseStudy: true },
+  { slug: 'roadis', year: '2019—2020', caseStudy: true },
   { slug: 'bunkr-branding', year: '2019', caseStudy: true },
   { slug: 'murmur', year: '2019', caseStudy: true },
   { slug: 'icommunity', year: '2018', caseStudy: true },
@@ -110,10 +137,11 @@ const ALL_PROJECTS = [
   { slug: 'shoeciety', year: '2018', caseStudy: true, featured: true, personal: true },
   { slug: 'push-for-burger', year: '2018', caseStudy: true },
   { slug: 'super-nintendo', year: '2016', caseStudy: true, personal: true },
-  { slug: 'madrid-buildings', year: '2016', caseStudy: true, personal: true },
   { slug: 'google', year: '2016', caseStudy: true, featured: true, personal: true },
-  // Biako (Juan's art project) always closes the list, whatever its year.
-  { slug: 'biako-poster', year: '2024', caseStudy: true, personal: true },
+  // Not in the Figma list or in "v1 · Casos" (14 Nov 2026): kept in the data,
+  // off the site (no row, no case page, no number) while `unlisted`.
+  { slug: 'madrid-buildings', year: '2016', caseStudy: true, personal: true, unlisted: true },
+  { slug: 'biako-poster', year: '2024', caseStudy: true, personal: true, unlisted: true },
 ] as const satisfies readonly ProjectBase[]
 
 export type ProjectSlug = (typeof ALL_PROJECTS)[number]['slug']
@@ -124,7 +152,7 @@ export const ARCHIVE_CATEGORY_DRAFT = true
 
 const WORK = { en: WORK_EN, es: WORK_ES }
 
-const VISIBLE: readonly ProjectBase[] = ALL_PROJECTS.filter((p) => SHOW_NDA || !('nda' in p && p.nda))
+const VISIBLE: readonly ProjectBase[] = ALL_PROJECTS.filter((p) => (SHOW_NDA || !('nda' in p && p.nda)) && !('unlisted' in p && p.unlisted))
 const CASE_SLUGS = VISIBLE.filter((p) => p.caseStudy && p.slug in WORK_EN.CASES).map((p) => p.slug)
 
 // Visible index rows for a locale (NDA rows hidden while SHOW_NDA = false).
