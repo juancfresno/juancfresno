@@ -118,6 +118,12 @@ export const UI_EN = {
     nextCode: 'N — P',
     nextSlash: '/ next',
     keep: 'Keep scrolling',
+    hover: {
+      tab: 'Hover',
+      aria: 'Row hover style',
+      title: 'Hover · move over a row',
+      styles: { headline: 'Headline', rule: 'Rule', inverse: 'Inverse', pixel: 'Pixel' },
+    },
     nextOpen: (name: string) => `Next project: ${name}`,
     question: 'The question',
     client: 'Client',

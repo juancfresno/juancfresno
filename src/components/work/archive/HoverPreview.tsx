@@ -34,7 +34,11 @@ const GAP = 28 // cursor → preview
 
 const clamp = (v: number, a: number, b: number) => Math.max(a, Math.min(b, v))
 
-const HoverPreview = forwardRef<PreviewHandle, { items: WorkItem[]; total: string }>(function HoverPreview({ items, total }, ref) {
+// `calm`: the editorial hovers use the same cover without the velocity skew
+// and the RGB split (it only follows on its spring).
+const HoverPreview = forwardRef<PreviewHandle, { items: WorkItem[]; total: string; calm?: boolean }>(function HoverPreview({ items, total, calm = false }, ref) {
+  const calmRef = useRef(calm)
+  calmRef.current = calm
   const [mounted, setMounted] = useState(false)
   const [cur, setCur] = useState<number | null>(null)
   const [prev, setPrev] = useState<number | null>(null)
@@ -84,12 +88,13 @@ const HoverPreview = forwardRef<PreviewHandle, { items: WorkItem[]; total: strin
       p.x += p.vx * dt
       p.y += p.vy * dt
     }
-    const skew = p.reduce ? 0 : clamp(-p.vx / 110, -SKEW_MAX, SKEW_MAX)
+    const still = p.reduce || calmRef.current
+    const skew = still ? 0 : clamp(-p.vx / 110, -SKEW_MAX, SKEW_MAX)
     root.style.transform = `translate3d(${p.x.toFixed(2)}px, ${p.y.toFixed(2)}px, 0) skewX(${skew.toFixed(2)}deg) rotate(${(skew * 0.12).toFixed(3)}deg)`
 
     // RGB split along the velocity, device-pixel snapped.
     const speed = Math.hypot(p.vx, p.vy) / 60 // px per frame @60
-    const amt = p.reduce ? 0 : clamp((speed - 0.6) * 0.6, 0, SPLIT_MAX)
+    const amt = still ? 0 : clamp((speed - 0.6) * 0.6, 0, SPLIT_MAX)
     const dpr = window.devicePixelRatio || 1
     const ux = speed > 0.01 ? p.vx / 60 / speed : 0
     const uy = speed > 0.01 ? p.vy / 60 / speed : 0

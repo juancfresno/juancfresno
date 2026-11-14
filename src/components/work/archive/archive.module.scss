@@ -161,6 +161,125 @@
   .row, .arrowShaft, .arrowHead { transition: none !important; }
 }
 
+// ═══ Row hover styles (HoverMenu, .wrap[data-hover]) ═════════════════════════
+// The tab only makes sense with a pointer.
+.hoverMenu {
+  display: contents;
+  @media (hover: none) { display: none; }
+}
+
+.stage { position: relative; }
+
+// ── 01 headline: the name, huge, filled with its cover, behind the list ──────
+// The rows lose their plate so the letters show through; the list's rules cross
+// them like a ruled page. Pinned to the middle of the screen, never outside
+// the list (clip), full window width.
+.giant {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(-1 * #{$m});
+  width: 100vw;
+  clip-path: inset(0);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  &[data-on] { opacity: 1; transition: opacity 0.2s ease; }
+  @media (hover: none) { display: none; }
+}
+.giantPin {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+@keyframes giantIn {
+  from { clip-path: inset(0 0 100% 0); transform: translate3d(0, 7%, 0); }
+  to { clip-path: inset(0 0 0 0); transform: none; }
+}
+.giantText {
+  display: block;
+  white-space: nowrap;
+  font-family: $font-body;
+  font-weight: $fw-regular;
+  font-size: 200px; // fitted by Giant()
+  line-height: 0.9;
+  letter-spacing: -0.045em;
+  color: transparent;
+  background-color: var(--c-stage);
+  background-size: cover;
+  background-position: 50% 50%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  // A hairline keeps the word readable when the cover is as dark as the page.
+  -webkit-text-stroke: 1px color-mix(in srgb, var(--c-text) 38%, transparent);
+  paint-order: stroke fill;
+  animation: giantIn 0.7s $ease-out-expo both;
+  @media (prefers-reduced-motion: reduce) { animation: none; }
+}
+[data-hover='headline'] {
+  .list { position: relative; }
+  .item { background: none; }
+  // While a word is up, the rows print in difference: light on the page, dark
+  // where a letter passes behind them, so every row stays readable.
+  @media (hover: hover) and (pointer: fine) {
+    .list:has(.item[data-on]) .row {
+      mix-blend-mode: difference;
+      color: #fff;
+      .via, .cat, .role, .year { color: #fff; }
+    }
+  }
+  // The rest step back so the letters carry the page.
+  .list:has(.item[data-on]) .item:not([data-on]) .row { opacity: 0.4; }
+}
+
+// ── 02 rule: a line draws under the row, the name steps in ───────────────────
+[data-hover='rule'] {
+  .item::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    height: 1px;
+    background: $color-text-hi;
+    transform: scaleX(0);
+    transform-origin: 100% 50%; // leaves to the right…
+    transition: transform 0.45s $ease-out-expo;
+    pointer-events: none;
+  }
+  .item[data-on]::after { transform: scaleX(1); transform-origin: 0 50%; transition-duration: 0.7s; } // …enters from the left
+  .project { transition: transform 0.6s $ease-out-expo; }
+  .item[data-on] .project { transform: translate3d(14px, 0, 0); }
+  .item[data-on] .row { color: $color-text-hi; }
+  .item[data-on] .cat, .item[data-on] .role { color: $color-text-hi; }
+}
+
+// ── 03 inverse: the row turns over into a solid band ─────────────────────────
+[data-hover='inverse'] {
+  .row::before {
+    content: '';
+    position: absolute;
+    inset: 0 -10px;
+    z-index: -1;
+    background: $color-text;
+    transform: scaleY(0);
+    transform-origin: 50% 0;
+    transition: transform 0.22s ease-in;
+    pointer-events: none;
+  }
+  .item[data-on] .row::before { transform: scaleY(1); transform-origin: 50% 100%; transition: transform 0.42s $ease-out-expo; }
+  .row, .via, .cat, .role, .year { transition: opacity 0.28s $ease-out-quart, color 0.12s linear 0.04s; }
+  .item[data-on] .row { color: $color-bg; }
+  .item[data-on] .via, .item[data-on] .cat, .item[data-on] .role, .item[data-on] .year { color: $color-bg; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .item::after, .row::before, .project { transition: none !important; }
+}
+
 // ── Touch: no hover; a small fixed thumbnail per row ─────────────────────────
 @media (hover: none) {
   .thumb { display: block; }

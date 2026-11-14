@@ -116,6 +116,12 @@ export const UI_ES: UiDict = {
     nextCode: 'S — P',
     nextSlash: '/ siguiente',
     keep: 'Sigue bajando',
+    hover: {
+      tab: 'Hover',
+      aria: 'Estilo de hover de las filas',
+      title: 'Hover · pasa por una fila',
+      styles: { headline: 'Titular', rule: 'Línea', inverse: 'Inverso', pixel: 'Píxel' },
+    },
     nextOpen: (name: string) => `Siguiente proyecto: ${name}`,
     question: 'La pregunta',
     client: 'Cliente',

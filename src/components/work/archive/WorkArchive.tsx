@@ -10,6 +10,7 @@ import ExpandPanel from './ExpandPanel'
 import OpenStage from './OpenStage'
 import { prefersReduced } from './useOverlay'
 import { usePixelFill } from './usePixelFill'
+import HoverMenu, { HOVER_DEFAULT, HOVER_KEY, isHoverStyle, type HoverStyle } from './HoverMenu'
 import { OPEN_MODES, type OpenMode, type WorkItem } from './types'
 import s from './archive.module.scss'
 
@@ -33,10 +34,11 @@ import s from './archive.module.scss'
 // First two images of the project preload on hover. Touch: no hover, each row
 // shows a small fixed thumbnail.
 
-function Row({ it, i, active, expanded, mode, panelId, onEnter, onLeave, onFocusRow, onBlurRow, onOpen }: {
+function Row({ it, i, active, pixel, expanded, mode, panelId, onEnter, onLeave, onFocusRow, onBlurRow, onOpen }: {
   it: WorkItem
   i: number
   active: boolean
+  pixel: boolean // hover style 'pixel': Bayer fill + name decode
   expanded: boolean
   mode: OpenMode
   panelId: string
@@ -50,16 +52,16 @@ function Row({ it, i, active, expanded, mode, panelId, onEnter, onLeave, onFocus
   const t = ui0.work
   const rowRef = useRef<HTMLButtonElement>(null)
   const fillRef = useRef<HTMLCanvasElement>(null)
-  usePixelFill(fillRef, rowRef, active)
+  usePixelFill(fillRef, rowRef, active && pixel)
   // Name decode on activation: case-preserving glyphs (lib/scramble), so the
   // Switzer line keeps its width while it resolves.
   const nameRef = useRef<HTMLSpanElement>(null)
   useEffect(() => {
     const el = nameRef.current
-    if (!active || !el || prefersReduced()) return
+    if (!active || !pixel || !el || prefersReduced()) return
     const cancel = scrambleTo(el, it.name, it.name, 420)
     return () => { cancel(); el.textContent = it.name }
-  }, [active, it.name])
+  }, [active, pixel, it.name])
   return (
     <button
       ref={rowRef}
@@ -98,6 +100,35 @@ function Row({ it, i, active, expanded, mode, panelId, onEnter, onLeave, onFocus
   )
 }
 
+// Hover style 'headline': the project name as big as the screen allows, its
+// letters filled with the cover, pinned to the middle of the viewport BEHIND
+// the list (the rows rule it like a page). One line, fitted to the width.
+function Giant({ it }: { it: WorkItem | null }) {
+  const boxRef = useRef<HTMLDivElement>(null)
+  const [shown, setShown] = useState<WorkItem | null>(null)
+  useEffect(() => { if (it) setShown(it) }, [it])
+  useLayoutEffect(() => {
+    const box = boxRef.current
+    const el = box?.querySelector<HTMLElement>('[data-giant]')
+    if (!box || !el) return
+    el.style.fontSize = '200px'
+    const w = el.scrollWidth || 1
+    const size = Math.min((box.clientWidth * 0.94 * 200) / w, window.innerHeight * 0.62)
+    el.style.fontSize = `${size.toFixed(1)}px`
+  }, [shown])
+  return (
+    <div className={s.giant} data-on={it ? '' : undefined} aria-hidden="true">
+      <div ref={boxRef} className={s.giantPin}>
+        {shown && (
+          <span key={shown.slug} data-giant className={s.giantText} style={{ backgroundImage: `url(${shown.cover.src})` }}>
+            {shown.title}
+          </span>
+        )}
+      </div>
+    </div>
+  )
+}
+
 const preloaded = new Set<string>()
 const preload = (src?: string) => {
   if (!src || preloaded.has(src)) return
@@ -113,6 +144,15 @@ export default function WorkArchive({ items }: { items: WorkItem[] }) {
   const [force, setForce] = useState<OpenMode | null>(null) // ?open= dev override
   const modeOf = useCallback((i: number): OpenMode => force ?? items[i].open, [force, items])
   const [hover, setHover] = useState<number | null>(null)
+  // Row hover style (HoverMenu), kept in localStorage.
+  const [style, setStyle] = useState<HoverStyle>(HOVER_DEFAULT)
+  const styleRef = useRef<HoverStyle>(HOVER_DEFAULT)
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(HOVER_KEY)
+      if (isHoverStyle(saved)) { styleRef.current = saved; setStyle(saved) }
+    } catch { /* storage blocked */ }
+  }, [])
   const [openIdx, setOpenIdx] = useState<number | null>(null) // drawer / stage
   const [expanded, setExpanded] = useState<number | null>(null)
   const [stageOrigin, setStageOrigin] = useState<DOMRect | null>(null)
@@ -175,14 +215,21 @@ export default function WorkArchive({ items }: { items: WorkItem[] }) {
   const onEnter = useCallback((i: number, e: React.PointerEvent) => {
     if (e.pointerType !== 'mouse' || !fine.current) return
     setHover(i)
-    preview.current?.show(i, e.clientX, e.clientY)
+    if (styleRef.current !== 'headline') preview.current?.show(i, e.clientX, e.clientY)
+    else preload(items[i].cover.src)
     preload(items[i].images[0]?.src)
     preload(items[i].images[1]?.src)
   }, [items])
+  const pickStyle = useCallback((v: HoverStyle) => {
+    styleRef.current = v
+    setStyle(v)
+    preview.current?.hide(true)
+    try { localStorage.setItem(HOVER_KEY, v) } catch { /* storage blocked */ }
+  }, [])
   const onLeave = useCallback(() => setHover(null), [])
   const onFocusRow = useCallback((i: number, el: HTMLElement) => {
     setHover(i)
-    if (fine.current) preview.current?.anchor(i, el.getBoundingClientRect())
+    if (fine.current && styleRef.current !== 'headline') preview.current?.anchor(i, el.getBoundingClientRect())
     preload(items[i].images[0]?.src)
   }, [items])
   const onBlurRow = useCallback(() => {
@@ -298,7 +345,8 @@ export default function WorkArchive({ items }: { items: WorkItem[] }) {
   }, [items])
 
   return (
-    <div className={s.wrap}>
+    <div className={s.wrap} data-hover={style}>
+      <HoverMenu value={style} onChange={pickStyle} />
       <div className={s.head} aria-hidden="true">
         <span>{a.project}</span>
         <span>{a.via}</span>
@@ -306,6 +354,8 @@ export default function WorkArchive({ items }: { items: WorkItem[] }) {
         <span className={s.role}>{a.role}</span>
         <span className={s.year}>{a.year}</span>
       </div>
+      <div className={s.stage}>
+        {style === 'headline' && <Giant it={hover !== null ? items[hover] : null} />}
       <ol
         ref={listRef}
         className={clsx(s.list, expanded !== null && s.hasOpen)}
@@ -319,6 +369,7 @@ export default function WorkArchive({ items }: { items: WorkItem[] }) {
               it={it}
               i={i}
               active={hover === i || lit === i}
+              pixel={style === 'pixel'}
               expanded={expanded === i}
               mode={modeOf(i)}
               panelId={`work-panel-${it.slug}`}
@@ -339,8 +390,9 @@ export default function WorkArchive({ items }: { items: WorkItem[] }) {
           </li>
         ))}
       </ol>
+      </div>
 
-      <HoverPreview ref={preview} items={items} total={total} />
+      <HoverPreview ref={preview} items={items} total={total} calm={style !== 'pixel'} />
 
       {force !== 'stage' && (
         <CaseDrawer items={items} index={openIdx} onClose={closeOverlay} onNav={navDrawer} />

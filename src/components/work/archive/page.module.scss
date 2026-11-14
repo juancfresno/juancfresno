@@ -28,6 +28,7 @@
 // ─── 03 · Archive (pt 96, pb 120) ────────────────────────────────────────────
 .archive {
   @include margins;
+  position: relative; // the hover tab's rail (HoverMenu) hangs from the section's left edge
   display: grid;
   grid-template-columns: $cols-12;
   column-gap: $gutter;
