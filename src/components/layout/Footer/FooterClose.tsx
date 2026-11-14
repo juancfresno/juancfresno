@@ -7,8 +7,9 @@ import s from './Footer.module.scss'
 
 // The middle of the full-screen footer · Figma "web/footer · full · feed lens"
 // (7370:5290): one row at mid-height (the line on the left, the email on the
-// right: decodes on hover, copies on click), a rule under it, and the Contact
-// chip (web/nav-link, always on) right-aligned below.
+// right, both 20 px: decodes on hover, copies on click), a rule under it, and
+// the Contact link right-aligned below: the header's nav item (at rest plain,
+// chip + decode + arrow on hover / focus).
 export default function FooterClose({ locale }: { locale: Locale }) {
   const { LANDING, PERSON } = getSite(locale)
   const ui = getUi(locale)
@@ -20,7 +21,7 @@ export default function FooterClose({ locale }: { locale: Locale }) {
       </div>
       <ElasticLine className={s.askRule} />
       <div className={s.askGo}>
-        <NavLinkItem label={ui.nav.links.contact} href={localePath(locale, '/contact')} active />
+        <NavLinkItem label={ui.nav.links.contact} href={localePath(locale, '/contact')} />
       </div>
     </section>
   )

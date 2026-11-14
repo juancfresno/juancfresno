@@ -49,17 +49,17 @@
   @include respond-to(md) { flex-direction: column; align-items: flex-start; }
 }
 
-// Switzer 24 / 1.2, −2 %.
+// Line and email share one size: Switzer 20 / 1.2, −2 % (Juan, 14 Nov 2026).
 .askLine {
   margin: 0;
   font-family: $font-body;
   font-weight: 400;
-  font-size: clamp(1.25rem, 1.1rem + 0.5vw, 1.5rem); // 24 at 1680, never larger
+  font-size: 20px;
   line-height: 1.2;
   letter-spacing: -0.02em;
 }
 
-// Switzer 16 / 1.5, −1 %. The "Copied ✓" pill sits to the left of the address.
+// The "Copied ✓" pill sits to the left of the address.
 .askEmail {
   margin: 0;
   display: flex;
@@ -67,9 +67,9 @@
   align-items: baseline;
   font-family: $font-body;
   font-weight: 400;
-  font-size: 16px;
-  line-height: 1.5;
-  letter-spacing: -0.01em;
+  font-size: 20px;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
   @include respond-to(md) { flex-direction: row; }
 }
 .askEmail .askPill { margin-left: 0; margin-right: 10px; @include respond-to(md) { margin-left: 10px; margin-right: 0; } }
