@@ -115,8 +115,14 @@ export const SITE_ES: SiteDict = {
   },
   LAB_DESK: {
     label: '{ Donde empezó ↘',
-    line: 'Aquí es donde empecé a imaginarlo todo.',
-    note: 'Mi mesa de casa, reconstruida de memoria: un PC beige, una caja de disquetes y los juegos a los que no debía estar jugando.',
+    timeline: 'Escritorios por año',
+    eras: [
+      { key: 'dos', year: '1990', name: 'MS-DOS', line: 'Empezó en el ordenador de mi padre.', note: 'Nací en 1986. Una pantalla verde, un cursor y juegos que venían en disquetes grandes.' },
+      { key: 'pc', year: '2002', name: 'Mi propio PC', line: 'Aquí es donde empecé a imaginarlo todo.', note: 'Con dieciséis, mi torre beige en mi cuarto: una caja de disquetes y los juegos a los que no debía estar jugando.' },
+      { key: 'big', year: '2011', name: 'La pantalla grande', line: 'El diseño se convirtió en el trabajo.', note: 'Un todo en uno de 27 pulgadas y días enteros maquetando.' },
+      { key: 'touch', year: '2017', name: 'El portátil', line: 'El estudio cabía en una mochila.', note: 'Un portátil con una pantallita en el teclado. Diseño y código en la misma ventana.' },
+      { key: 'now', year: '2026', name: 'Ahora', line: 'La misma curiosidad, mejores herramientas.', note: 'La mesa de hoy. Provisional hasta que fotografíe la de verdad.' },
+    ],
     aria: 'La mesa donde empezó todo',
     screenNote: 'Aquí es donde empecé\na imaginarlo todo.',
     photo: 'FOTO\nPENDIENTE',

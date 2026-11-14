@@ -119,8 +119,15 @@ export const SITE_EN = {
   // Lab · the desk at the bottom (3D room). Draft copy by Desarrollo, 14 Nov 2026: Copywriter to review.
   LAB_DESK: {
     label: '{ Where it started ↘',
-    line: 'This is where I started imagining everything.',
-    note: 'My desk at home, rebuilt from memory: a beige PC, a box of floppies and the games I should not have been playing.',
+    timeline: 'Desks by year',
+    // One desk per era. Years are approximate (Desarrollo's guess from what Juan told): Juan to confirm.
+    eras: [
+      { key: 'dos', year: '1990', name: 'MS-DOS', line: 'It started on my father’s computer.', note: 'Born in 1986. A green screen, a prompt and games that came on big floppies.' },
+      { key: 'pc', year: '2002', name: 'My own PC', line: 'This is where I started imagining everything.', note: 'At sixteen, my own beige tower in my room: a box of floppies and the games I should not have been playing.' },
+      { key: 'big', year: '2011', name: 'The big screen', line: 'Design became the job.', note: 'A 27-inch all-in-one and whole days of layout.' },
+      { key: 'touch', year: '2017', name: 'The laptop', line: 'The studio fit in a backpack.', note: 'A laptop with a little screen on the keyboard. Design and code in the same window.' },
+      { key: 'now', year: '2026', name: 'Now', line: 'Same curiosity, better tools.', note: 'Today’s desk. A stand-in until I photograph the real one.' },
+    ],
     aria: 'The desk where it started',
     screenNote: 'This is where I started\nimagining everything.',
     photo: 'PHOTO\nPENDING',
