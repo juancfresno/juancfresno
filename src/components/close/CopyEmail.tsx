@@ -9,7 +9,7 @@ import s from './close.module.scss'
 // Big email (mailto) + a "Copy" button that turns into "Copied" for 1.6 s.
 // Falls back to a hidden textarea + execCommand when the Clipboard API is
 // missing or blocked (http previews, old Safari).
-export default function CopyEmail({ size = 'xl', className }: { size?: 'xl' | 'md'; className?: string }) {
+export default function CopyEmail({ size = 'xl', className, onCopied }: { size?: 'xl' | 'md'; className?: string; onCopied?: () => void }) {
   const ui = useUi()
   const [done, setDone] = useState(false)
   const timer = useRef<number>(0)
@@ -34,6 +34,7 @@ export default function CopyEmail({ size = 'xl', className }: { size?: 'xl' | 'm
     }
     if (!ok) return
     setDone(true)
+    onCopied?.()
     window.clearTimeout(timer.current)
     timer.current = window.setTimeout(() => setDone(false), 1600)
   }

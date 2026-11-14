@@ -180,6 +180,60 @@ export const SITE_ES: SiteDict = {
       { id: 'whole', name: 'Proyecto completo', text: 'De la primera idea visual a la última interacción, con desarrolladores de confianza.' },
     ],
     small: 'Tarifas y dosier para agencias, bajo petición.',
+    brief: {
+      speaker: 'F-01',
+      hello: 'Hola. Soy el suplente de Juan. ¿Quién hay al otro lado?',
+      greeting: 'Hola, Juan:',
+      who: {
+        label: 'Quién',
+        options: [
+          { id: 'agency', dial: 'Agencia', led: 'AGENCIA', text: 'soy de una agencia', say: '¿Faltan manos o falta dirección? Me integro en tu equipo. En marca blanca, si lo necesitas.' },
+          { id: 'studio', dial: 'Estudio', led: 'ESTUDIO', text: 'soy de un estudio', say: 'Dentro de tu equipo, con tus herramientas y tus rituales, durante semanas o meses.' },
+          { id: 'brand', dial: 'Marca', led: 'MARCA', text: 'trabajo en una marca', say: 'De la primera idea visual a la última interacción, con desarrolladores de confianza.' },
+          { id: 'startup', dial: 'Startup', led: 'START', text: 'estoy montando una startup', say: 'Marca, UI de producto y una web que sale. Una persona, sin traspasos.' },
+          { id: 'solo', dial: 'Solo yo', led: 'HOLA', text: 'voy por mi cuenta', say: 'Bien. Cuéntame qué es y vemos si encajamos.' },
+        ],
+      },
+      what: {
+        label: 'Qué',
+        before: 'y necesito',
+        options: [
+          { id: 'web', led: 'WEB', text: 'una web' },
+          { id: 'brand', led: 'MARCA', text: 'una identidad de marca' },
+          { id: 'ui', led: 'UI', text: 'UI de producto' },
+          { id: 'ad', led: 'D.A.', text: 'dirección de arte' },
+          { id: 'hands', led: '+1', text: 'un par de manos extra' },
+          { id: 'unknown', led: '???', text: 'algo que aún no sé nombrar' },
+        ],
+      },
+      when: {
+        label: 'Cuándo',
+        before: 'Tendría que estar',
+        options: [
+          { id: 'asap', led: 'YA', text: 'cuanto antes' },
+          { id: 'month', led: '30D', text: 'el mes que viene' },
+          { id: 'quarter', led: '90D', text: 'este trimestre' },
+          { id: 'open', led: '~', text: 'cuando toque' },
+        ],
+      },
+      budget: {
+        label: 'Presupuesto',
+        before: 'El presupuesto:',
+        options: [
+          { id: 'open', led: 'OPEN', text: 'abierto, lo hablamos' },
+          { id: 'a', led: '<5K', text: 'menos de 5.000 €' },
+          { id: 'b', led: '5-10', text: 'entre 5.000 y 10.000 €' },
+          { id: 'c', led: '10+', text: 'entre 10.000 y 25.000 €' },
+          { id: 'd', led: '25+', text: 'más de 25.000 €' },
+        ],
+      },
+      cta: 'Escribir este correo',
+      ctaNote: 'Abre tu app de correo con esto como borrador. Desde aquí no se envía nada.',
+      or: 'O copia la dirección',
+      linkedin: '¿Mejor por LinkedIn?',
+      subject: 'Proyecto nuevo',
+      bodyMore: '(Unas líneas sobre el proyecto, enlaces, lo que ayude.)',
+    },
   },
 
   // ─── Lab ───────────────────────────────────────────────────────────────────

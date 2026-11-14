@@ -1,25 +1,35 @@
 @use '../../styles/variables' as *;
 @use '../../styles/mixins' as *;
 
-// Contact — Figma "contact" (7014:18145). The page is always blue
-// (html[data-page-theme="blue"]): every colour here is a --c-* token, which
-// the blue scope maps to the FDS light ink tokens (globals.scss).
+// Contact v2 (14 Nov 2026). Follows the site theme (dark by default): page
+// colours are --c-* tokens. The device shell is warm grey on dark and ink on
+// light (the --dev-* vars on .rig); its screen is always black with pearl +
+// blue LEDs. --acc = small blue text (light blue on dark, G blue on light).
+
+$led-blue:  #2f5dff;
+$spring:    cubic-bezier(0.3, 1.45, 0.45, 1);
 
 .page {
   display: flex;
   flex-direction: column;
-  padding-top: 72px; // header height (Figma web/nav)
+  padding-top: 72px; // header height
 }
 
-// ─── Hero: "/Contact" on the right + one line (same pattern as Work) ────────
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+// ─── Hero: "/Contact" on the right (same pattern as Work) ───────────────────
 .hero {
   width: 100%;
   box-sizing: border-box;
   padding-inline: max(#{$m-hero}, env(safe-area-inset-left, 0px)) max(#{$m-hero}, env(safe-area-inset-right, 0px));
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  padding-block: clamp(2.5rem, 4.94vw, 83px);
+  padding-block: clamp(1.5rem, 2.4vw, 40px) 0;
 }
 
 .name {
@@ -31,116 +41,547 @@
   letter-spacing: -0.02em;
   text-align: right;
   color: $color-text;
-  // Phones: clear the vertical FRESNO wordmark hanging from the header.
   @include respond-to(md) { padding-right: 24px; }
 }
 
-.intro {
-  margin: 0;
-  font-family: $font-body;
-  font-size: clamp(1rem, 0.4vw + 0.85rem, 18px);
-  line-height: 1.4;
-  color: $color-text;
-}
-
-// ─── Two doors (64 px side inset at 1680, as in Figma) ──────────────────────
-.doorsWrap {
-  width: 100%;
+// ─── Stage: copy (cols 1–7) + rig (cols 8–12) ───────────────────────────────
+.stage {
   box-sizing: border-box;
-  padding-inline: max(#{$m}, 3.81vw, env(safe-area-inset-left, 0px)) max(#{$m}, 3.81vw, env(safe-area-inset-right, 0px));
-  padding-bottom: clamp(4.5rem, 7vw, 7.5rem);
-}
-
-.doors {
+  width: 100%;
+  min-height: calc(100svh - 72px - 70px);
+  padding-inline: max(#{$m}, env(safe-area-inset-left, 0px)) max(#{$m}, env(safe-area-inset-right, 0px));
+  padding-block: clamp(1rem, 1.6vw, 28px) clamp(2.5rem, 3.4vw, 56px);
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: $space-4;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--gutter);
+  color: $color-text;
+  --acc: #{$raw-chip};
+  :global(:root[data-theme='light']) & { --acc: var(--c-g); }
 
-  @include respond-to(md) { grid-template-columns: 1fr; }
+  @media (max-width: 900px) {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 0;
+  }
 }
 
-.door {
+.copy {
+  grid-column: 1 / span 6;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: $space-12;
-  min-height: clamp(20rem, 28.6vw, 30rem);
-  padding: 32px clamp(1.25rem, 2.4vw, 2.5rem) 36px;
-  border: 1px solid var(--c-control); // border/control
-  border-radius: 2px;
-  color: $color-text;
-  text-decoration: none;
-  transition: background 0.35s $ease-out-expo, color 0.35s $ease-out-expo, border-color 0.35s;
+  gap: clamp(2rem, 3.4vw, 56px);
+  min-width: 0;
 }
 
-.doorTop {
+.top { display: flex; flex-direction: column; gap: 20px; }
+
+.meta {
+  margin: 0;
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
+  gap: 8px;
   font-family: $font-mono; font-weight: $fw-mono;
   font-size: 0.6875rem;
   letter-spacing: 0.04em;
   text-transform: uppercase;
+  color: $color-text;
+
+  i {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--c-g);
+    animation: pulse 2.4s ease-in-out infinite;
+  }
+  span { white-space: pre; }
 }
 
-.doorN {
-  font-weight: $fw-regular;
-  font-size: clamp(2.5rem, 3.8vw, 4rem);
-  line-height: 1;
-  letter-spacing: -0.04em;
-  color: $color-text-muted; // text/tertiary
-  transition: color 0.35s;
+@keyframes pulse { 50% { opacity: 0.25; } }
+
+// The stand-in's line (typed).
+.say {
+  position: relative;
+  margin: 0;
+  max-width: 36em;
+  min-height: 3.1em; // two lines: the sentence below doesn't jump
+  font-family: $font-mono; font-weight: 400;
+  font-size: clamp(0.8125rem, 0.25vw + 0.72rem, 0.9375rem);
+  line-height: 1.55;
+  color: $color-text;
 }
 
-.doorBody { display: flex; flex-direction: column; gap: 20px; }
+.speaker { font-weight: $fw-mono; color: var(--acc); }
 
-// min(…, 6.9vw): the address fits inside the door on a 360 px phone.
-.doorEmail { column-gap: 16px; }
-.doorEmail :global(a) { font-size: min(clamp(1.75rem, 3.1vw, 3.25rem), 6.9vw) !important; letter-spacing: -0.03em !important; }
-.doorEmail :global(button):not(:hover):not(:focus-visible) { border-color: $color-line-hi; } // border/strongest
+.caret {
+  display: inline-block;
+  width: 0.55em; height: 1em;
+  margin-left: 2px;
+  vertical-align: -0.15em;
+  background: var(--c-g);
+  animation: blink 1s steps(1) infinite;
+}
 
-.doorAction {
+@keyframes blink { 50% { opacity: 0; } }
+
+// ─── The brief: one sentence, four options ──────────────────────────────────
+.sentence {
+  margin: 0;
+  max-width: 21em;
   font-family: $font-body;
   font-weight: $fw-light;
-  font-size: clamp(1.75rem, 3.1vw, 3.25rem);
-  letter-spacing: -0.03em;
-  line-height: 1.1;
+  font-size: clamp(1.75rem, 3.1vw, 4rem);
+  line-height: 1.2;
+  letter-spacing: -0.035em;
+  color: $color-text;
+  text-wrap: pretty;
 }
 
-.arrow {
-  display: inline-block;
-  transition: transform 0.4s $ease-out-expo;
+.dim { color: color-mix(in srgb, var(--c-text) 52%, transparent); }
+
+.token {
+  position: relative;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  outline: none;
 }
 
-.doorLine {
+.tokenText {
+  padding: 0 0.06em;
+  border-radius: 2px;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.14em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  transition: background 0.18s, color 0.18s;
+}
+
+.tokenN {
+  margin-left: 0.25em;
+  font-family: $font-mono; font-weight: $fw-mono;
+  font-size: 0.6875rem;
+  letter-spacing: 0;
+  vertical-align: super;
+  line-height: 0;
+  color: var(--acc);
+}
+
+// The label chip shows on hover / focus, above the option's first word.
+.tokenTag {
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 2px);
+  padding: 3px 6px;
+  border-radius: 2px;
+  background: var(--c-g);
+  color: #fff;
+  font-family: $font-mono; font-weight: $fw-mono;
+  font-size: 0.625rem;
+  line-height: 1.2;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.15s, transform 0.3s $ease-out-expo;
+  pointer-events: none;
+}
+
+.token:hover, .token:focus-visible {
+  .tokenText { background: var(--c-chip); color: var(--c-chip-ink); text-decoration-color: transparent; }
+  .tokenTag { opacity: 1; transform: none; }
+}
+.token:active .tokenText { background: var(--c-g); color: #fff; }
+
+// ─── Actions ────────────────────────────────────────────────────────────────
+.bottom { display: flex; flex-direction: column; gap: clamp(1.5rem, 2.2vw, 36px); }
+
+.actions {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  gap: 16px 28px;
+}
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 28px;
+  padding: 18px 22px 19px 26px;
+  border-radius: 2px;
+  background: var(--c-chip);
+  color: var(--c-chip-ink);
+  font-family: $font-body;
+  font-size: clamp(1.125rem, 0.5vw + 1rem, 1.5rem);
+  letter-spacing: -0.02em;
+  line-height: 1;
+  text-decoration: none;
+  transition: background 0.25s, color 0.25s;
+
+  &:hover, &:focus-visible {
+    background: var(--c-g);
+    color: #fff;
+    .arrow { transform: translate(4px, -4px); }
+  }
+  @include focus-ring($color-text);
+}
+
+.arrow { display: inline-block; transition: transform 0.4s $ease-out-expo; }
+
+.note {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  max-width: 34em;
+  flex: 1 1 16em;
+  font-family: $font-mono; font-weight: 400;
+  font-size: 0.6875rem;
+  line-height: 1.5;
+  color: $color-text-muted;
 
   :global([class*='pending']) { margin-left: 0; }
 }
 
-.doorText {
-  font-family: $font-body;
-  font-size: 1.125rem;
-  line-height: 1.5;
-  letter-spacing: -0.01em;
-  color: $color-text-mid; // text/secondary
-  max-width: 32rem;
-  transition: color 0.35s;
+.alt {
+  display: grid;
+  grid-template-columns: minmax(0, 4fr) minmax(0, 3fr);
+  column-gap: var(--gutter);
+  row-gap: 20px;
+  padding-top: 16px;
+  border-top: 1px solid $color-line;
+
+  @media (max-width: 560px) { grid-template-columns: 1fr; }
 }
 
-// Talk door: at rest like Write; on hover it fills in pearl (bg/surface) and
-// the arrow moves.
-.doorTalk {
-  &:hover, &:focus-visible {
-    background: var(--c-fill);
-    border-color: var(--c-fill);
+.altItem { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
 
-    .doorN { color: $color-text; }
-    .arrow { transform: translate(4px, -4px); }
-  }
+.k {
+  margin: 0;
+  font-family: $font-mono; font-weight: $fw-mono;
+  font-size: 0.625rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: $color-text-muted;
+}
+
+.email { column-gap: 14px; }
+.email :global(a) { font-size: min(clamp(1.375rem, 1.9vw, 2rem), 6.4vw) !important; letter-spacing: -0.02em !important; }
+.email :global(button):not(:hover):not(:focus-visible) { border-color: $color-line-hi; }
+
+.link {
+  align-self: flex-start;
+  font-family: $font-body;
+  font-weight: $fw-light;
+  font-size: min(clamp(1.375rem, 1.9vw, 2rem), 6.4vw);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: $color-text;
+  text-decoration: none;
+  background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat;
+  transition: background-size 0.5s $ease-out-expo;
+
+  &:hover, &:focus-visible { background-size: 100% 1px; }
   @include focus-ring($color-text);
+}
+
+// ─── Rig: dial + device. Sizes in cqw (100cqw = the rig's width) ────────────
+.rig {
+  --cx: 60cqw;   // device centre
+  --dev: 54cqw;  // device side
+  --d: 8cqw;     // device depth
+  --r: 41cqw;    // dial radius (82 in the 200-unit viewBox)
+  --dev-front: #c9c5bd;
+  --dev-hi:    #dedad2;
+  --dev-side:  #a5a199;
+  --dev-top:   #e6e2da;
+  --dev-back:  #86827b;
+  --dev-mark:  rgba(20, 20, 20, 0.62);
+  --dev-metal: #3c3c3a;
+  --dev-shadow: rgba(0, 0, 0, 0.55);
+  :global(:root[data-theme='light']) & {
+    --dev-front: #151513;
+    --dev-hi:    #1e1e1b;
+    --dev-side:  #20201d;
+    --dev-top:   #2b2b27;
+    --dev-back:  #0b0b0a;
+    --dev-mark:  rgba(255, 255, 230, 0.5);
+    --dev-metal: #6f6f69;
+    --dev-shadow: rgba(20, 20, 20, 0.34);
+  }
+  grid-column: 7 / span 6;
+  align-self: center;
+  justify-self: center;
+  position: relative;
+  container-type: inline-size;
+  // Never taller than the screen: the stage fits one viewport on desktop.
+  width: min(100%, calc((100svh - 240px) / 1.04));
+  aspect-ratio: 1 / 1.04;
+  min-width: 0;
+
+  @media (max-width: 900px) {
+    --cx: 50cqw;
+    --dev: 58cqw;
+    --d: 8cqw;
+    order: -1;
+    align-self: center;
+    width: min(100%, 440px);
+    aspect-ratio: 1 / 1.02;
+    margin-bottom: 8px;
+  }
+}
+
+.dial {
+  position: absolute;
+  inset: 0;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 6%, #000 34%, #000 66%, transparent 94%);
+  mask-image: linear-gradient(to bottom, transparent 6%, #000 34%, #000 66%, transparent 94%);
+
+  @media (max-width: 900px) { display: none; }
+}
+
+.ticks {
+  position: absolute;
+  left: calc(var(--cx) - 50cqw);
+  top: calc(50% - 50cqw);
+  width: 100cqw;
+  height: 100cqw;
+  fill: none;
+  stroke: var(--c-text);
+  transform: rotate(calc(var(--sel) * var(--step)));
+  transition: transform 0.9s $spring;
+  // Only the left arc, as a tuning scale.
+  clip-path: none;
+
+  circle:first-child { opacity: 0.55; }
+}
+
+.needle {
+  position: absolute;
+  left: calc(var(--cx) - var(--r) + 2.2cqw);
+  top: 50%;
+  width: 4cqw;
+  height: 1px;
+  background: var(--c-g);
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: -1px; top: -3px;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--c-g);
+  }
+}
+
+.dialSlot {
+  position: absolute;
+  left: var(--cx);
+  top: 50%;
+  width: 0;
+  height: 0;
+  transform: rotate(calc((var(--sel) - var(--i)) * var(--step)));
+  transition: transform 0.9s $spring;
+}
+
+.dialItem {
+  position: absolute;
+  right: calc(var(--r) + 3.4cqw);
+  top: 0;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 5px 8px;
+  border-radius: 2px;
+  font-family: $font-mono; font-weight: $fw-mono;
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: $color-text;
+  cursor: pointer;
+  transition: opacity 0.4s, background 0.2s, color 0.2s;
+
+  &[data-far='1'] { opacity: 0.6; }
+  &[data-far='2'] { opacity: 0.38; }
+  &[data-far='3'] { opacity: 0.22; }
+  &:hover, &:focus-visible { opacity: 1; }
+  @include focus-ring($color-text);
+}
+
+.dialN { font-weight: 400; opacity: 0.6; }
+
+.dialOn { background: var(--c-chip); color: var(--c-chip-ink); }
+
+// ─── Device (CSS 3D box; the LEDs are a canvas) ─────────────────────────────
+.device {
+  position: absolute;
+  left: calc(var(--cx) - var(--dev) / 2);
+  top: calc(50% - var(--dev) / 2);
+  width: var(--dev);
+  height: var(--dev);
+  perspective: 150cqw;
+}
+
+.body {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transform: rotateX(3deg) rotateY(-16deg); // rest pose (and reduced motion)
+  will-change: transform;
+  cursor: pointer;
+}
+
+.front, .back, .side, .cap { position: absolute; box-sizing: border-box; backface-visibility: hidden; }
+
+.front {
+  inset: 0;
+  transform: translateZ(calc(var(--d) / 2));
+  display: flex;
+  flex-direction: column;
+  padding: 3cqw 3cqw 0;
+  border-radius: 1cqw;
+  background: linear-gradient(160deg, var(--dev-hi), var(--dev-front) 40%);
+}
+
+.screen {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 0.5cqw;
+  background: #050505;
+  box-shadow: inset 0 0 0 1px #000, inset 0 0 3cqw rgba(0, 0, 0, 0.9);
+  overflow: hidden;
+
+  // Glass.
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(125deg, rgba(255, 255, 255, 0.09), transparent 32%);
+    pointer-events: none;
+  }
+}
+
+.led {
+  display: block;
+  width: 100%;
+  height: 100%;
+  font-family: $font-mono; // read by led.ts for the words
+}
+
+.plate {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: $font-mono; font-weight: $fw-mono;
+  font-size: max(6px, 1.25cqw);
+  letter-spacing: 0.08em;
+  color: var(--dev-mark);
+
+  &::after {
+    content: '';
+    width: 0.9cqw; height: 0.9cqw; border-radius: 50%;
+    background: $led-blue;
+    box-shadow: 0 0 1.2cqw $led-blue;
+    animation: pulse 2.4s ease-in-out infinite;
+  }
+}
+
+.back {
+  inset: 0;
+  transform: translateZ(calc(var(--d) / -2)) rotateY(180deg);
+  border-radius: 1cqw;
+  background: var(--dev-back);
+}
+
+.side {
+  top: 0.6cqw;
+  width: var(--d);
+  height: calc(100% - 1.2cqw);
+  background: var(--dev-side);
+}
+.left { left: calc(var(--d) / -2); transform: rotateY(-90deg); }
+.right {
+  left: calc(100% - var(--d) / 2);
+  transform: rotateY(90deg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2.2cqw;
+  padding: 3cqw 0;
+  background: linear-gradient(to right, var(--dev-hi), var(--dev-side) 60%);
+}
+
+.handle {
+  width: 46%;
+  height: 26%;
+  border: 0.55cqw solid var(--dev-metal);
+  border-radius: 2cqw;
+}
+
+.knob {
+  width: 58%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #0c0c0b;
+  color: $raw-chip;
+  font-family: $font-mono; font-style: normal; font-weight: $fw-mono;
+  font-size: 2.4cqw;
+  line-height: 1;
+}
+
+.port { width: 46%; height: 5%; border-radius: 0.3cqw; background: #050505; margin-top: auto; }
+
+.lamp {
+  width: 1cqw; height: 1cqw; border-radius: 50%;
+  background: $led-blue;
+  box-shadow: 0 0 1.4cqw $led-blue;
+}
+
+.cap {
+  left: 0.6cqw;
+  width: calc(100% - 1.2cqw);
+  height: var(--d);
+  background: var(--dev-top);
+}
+.capTop { top: calc(var(--d) / -2); transform: rotateX(90deg); }
+.capBottom { top: calc(100% - var(--d) / 2); transform: rotateX(-90deg); background: var(--dev-back); }
+
+.cable {
+  position: absolute;
+  left: 40%;
+  top: 100%;
+  width: 16%;
+  fill: none;
+  stroke: var(--dev-front);
+  stroke-width: 3.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  overflow: visible;
+}
+
+.shadow {
+  position: absolute;
+  left: calc(var(--cx) - 19cqw);
+  bottom: 0;
+  width: 38cqw;
+  height: 3.2cqw;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, var(--dev-shadow), transparent);
+  filter: blur(4px);
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .meta i, .caret, .plate::after { animation: none; }
+  .ticks, .dialSlot { transition: none; }
 }

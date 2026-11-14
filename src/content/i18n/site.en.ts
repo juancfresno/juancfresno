@@ -187,6 +187,63 @@ export const SITE_EN = {
       { id: 'whole', name: 'Whole project', text: 'From the first visual idea to the last interaction, with developers I trust.' },
     ],
     small: 'Rates and agency dossier on request.',
+    // Contact v2 (14 Nov 2026, draft copy): the LED stand-in talks, the visitor
+    // fills a one-sentence brief by picking options, and it leaves as an email
+    // draft (mailto). `led` = the short word the panel flashes.
+    brief: {
+      speaker: 'F-01',
+      hello: 'Hi. I’m Juan’s stand-in. Who’s on the other side?',
+      greeting: 'Hi Juan,',
+      who: {
+        label: 'Who',
+        options: [
+          { id: 'agency', dial: 'Agency', led: 'AGENCY', text: 'I’m with an agency', say: 'Short on hands, or short on direction? I plug into your team. White label if you need it.' },
+          { id: 'studio', dial: 'Studio', led: 'STUDIO', text: 'I’m with a studio', say: 'Inside your team, with your tools and your rituals, for weeks or months.' },
+          { id: 'brand', dial: 'Brand', led: 'BRAND', text: 'I work at a brand', say: 'From the first visual idea to the last interaction, with developers I trust.' },
+          { id: 'startup', dial: 'Startup', led: 'START', text: 'I’m building a startup', say: 'Brand, product UI and a site that ships. One person, no handoffs.' },
+          { id: 'solo', dial: 'Just me', led: 'HELLO', text: 'I’m on my own', say: 'Good. Tell me what it is and we see if it’s a fit.' },
+        ],
+      },
+      what: {
+        label: 'What',
+        before: 'and I need',
+        options: [
+          { id: 'web', led: 'WEB', text: 'a website' },
+          { id: 'brand', led: 'BRAND', text: 'a brand identity' },
+          { id: 'ui', led: 'UI', text: 'product UI' },
+          { id: 'ad', led: 'A.D.', text: 'art direction' },
+          { id: 'hands', led: '+1', text: 'an extra pair of hands' },
+          { id: 'unknown', led: '???', text: 'something I can’t name yet' },
+        ],
+      },
+      when: {
+        label: 'When',
+        before: 'It should ship',
+        options: [
+          { id: 'asap', led: 'ASAP', text: 'as soon as possible' },
+          { id: 'month', led: '30D', text: 'next month' },
+          { id: 'quarter', led: '90D', text: 'this quarter' },
+          { id: 'open', led: '~', text: 'when it’s right' },
+        ],
+      },
+      budget: {
+        label: 'Budget',
+        before: 'The budget is',
+        options: [
+          { id: 'open', led: 'OPEN', text: 'open, let’s talk' },
+          { id: 'a', led: '<5K', text: 'under 5k €' },
+          { id: 'b', led: '5-10', text: '5–10k €' },
+          { id: 'c', led: '10+', text: '10–25k €' },
+          { id: 'd', led: '25+', text: 'over 25k €' },
+        ],
+      },
+      cta: 'Write this email',
+      ctaNote: 'Opens your mail app with this as a draft. Nothing is sent from here.',
+      or: 'Or just copy the address',
+      linkedin: 'Prefer LinkedIn?',
+      subject: 'New project',
+      bodyMore: '(A few lines about it, links, anything useful.)',
+    },
   },
 
   // ─── Lab ──────────────────────────────────────────────────────────────────────
