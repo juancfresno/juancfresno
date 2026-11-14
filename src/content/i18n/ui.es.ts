@@ -18,25 +18,7 @@ export const UI_ES: UiDict = {
   },
   theme: { group: 'Tema de color', dark: 'oscuro', light: 'claro' },
   lang: { group: 'Idioma / Language', to: { en: 'Read this page in English', es: 'Leer esta página en español' } },
-  footer: {
-    socials: 'Perfiles sociales', legal: 'Aviso legal', place: 'Valencia {España}', placeLabel: 'Valencia, España',
-    end: '{ Fin de la página ↘',
-    title: 'Ya lo has visto todo.\n¿Qué, hablamos?',
-    yes: 'Sí, hablemos',
-    no: 'Aún no',
-    noHint: 'Volver arriba',
-    or: 'O escríbeme',
-    speaker: 'F-01',
-    say: {
-      hello: 'Te lo has visto entero. Me halagas.',
-      yes: 'Buena elección. La siguiente pantalla te escribe medio email.',
-      no: 'Sin prisa. Te dejo la luz encendida.',
-      up: 'Subiendo. Échale otro vistazo.',
-      copied: 'Copiado. A la antigua, me gusta.',
-    },
-    session: (time: string, pages: number, px: string, m: string) =>
-      `Sesión ${time} · ${pages} ${pages === 1 ? 'página' : 'páginas'} · ${px} px de scroll ≈ ${m} m`,
-  },
+  footer: { socials: 'Perfiles sociales', legal: 'Aviso legal', place: 'Valencia {España}', placeLabel: 'Valencia, España', available: 'Disponible ya' },
   pending: {
     word: 'Pendiente',
     role: 'rol',
