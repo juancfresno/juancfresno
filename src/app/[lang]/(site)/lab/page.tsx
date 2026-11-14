@@ -24,6 +24,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 const STAGES: Record<string, (p: { labels: string[] }) => React.ReactElement> = { botones: ButtonsStage, transiciones: TransitionsStage, galerias: GalleriesStage, 'entradas-pixel': PixelsStage, cursores: CursorsStage, carruseles: CarouselsStage }
 
+// The modules under the floppies (index + log, featured, cards, own products, resources) are
+// hidden since 14 Nov 2026 (Juan): they may come back inside a drawer that opens from a disk.
+// Kept in the code and drawn in Figma (frame "lab" 6964:15013, `Lab · … (web actual)`).
+const SHOW_MODULES: boolean = false
+
 function Head({ label, link }: { label: string; link?: React.ReactNode }) {
   return (
     <div className={l.head}>
@@ -50,6 +55,7 @@ export default async function LabPage({ params }: Props) {
     <div className={hs.shell}>
       <PageHero letter={HEROES.lab.letter} name={ui.lab.h1} intro={HEROES.lab.intro} note={HEROES.lab.note} />
       <FloppyBand locale={loc} mode="flow" views />
+      {SHOW_MODULES && (<>
       <div className={`${l.mod} ${l.header}`}>
         <div className={l.headRow}>
           <ul className={l.index} aria-label={ui.lab.onPage}>
@@ -136,6 +142,8 @@ export default async function LabPage({ params }: Props) {
           <code className={l.repo}>{LAB_LABELS.repo}</code>
         </div>
       </section>
+
+      </>)}
 
       <CloseArchivo locale={loc} />
     </div>
