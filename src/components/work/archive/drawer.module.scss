@@ -28,6 +28,8 @@ $leave: cubic-bezier(0.6, 0, 0.84, 0.2);
   &[data-phase='entering'], &[data-phase='open'] { pointer-events: auto; }
 }
 
+.defs { position: absolute; width: 0; height: 0; overflow: hidden; }
+
 // ─── The glass ───────────────────────────────────────────────────────────────
 .glass {
   position: absolute;

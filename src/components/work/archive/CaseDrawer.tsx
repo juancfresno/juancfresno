@@ -17,7 +17,8 @@ import s from './drawer.module.scss'
 //
 // Motion (no pixels):
 //   open     the glass fogs up, the card glides in from the right on a long
-//            ease-out, then the case-top rises line by line.
+//            ease-out, then the case-top rises line by line, each line
+//            resolving from a pixel mosaic (the one pixel wink left here).
 //   close    the card leaves the way it came, the glass clears.
 //   change   (← / →, and the end of a case) the case lifts away and the next
 //            one rises into its place.
@@ -32,6 +33,7 @@ import s from './drawer.module.scss'
 // Reduced motion: fades only, no accordion, no wipes, no pinned runway.
 const wait = (ms: number) => new Promise<void>((r) => window.setTimeout(r, ms))
 const OUT_MS = 480
+const PX_STEPS = [12, 8, 4] // text mosaic cell sizes (css px), big → small → clean
 const clamp = (v: number, a: number, b: number) => Math.max(a, Math.min(b, v))
 
 type Phase = 'closed' | 'entering' | 'open' | 'leaving'
@@ -197,6 +199,22 @@ export default function CaseDrawer({ items, index, onClose, onNav }: {
     return () => { io.disconnect(); set.clear() }
   }, [idx])
 
+  // ── the texts resolve from pixels: each line of the case-top arrives as a
+  // mosaic (SVG filter on the live text) and sharpens 12 → 8 → 4 px → clean ──
+  useEffect(() => {
+    const body = bodyRef.current
+    if (phase !== 'open' || idx === null || !body || prefersReduced()) return
+    const els = Array.from(body.querySelectorAll<HTMLElement>('[data-rise]'))
+    const timers: number[] = []
+    els.forEach((el, i) => {
+      el.style.filter = `url(#wk-px-${PX_STEPS[0]})`
+      const start = (fresh ? 220 : 80) + i * 70
+      PX_STEPS.slice(1).forEach((c, k) => timers.push(window.setTimeout(() => { el.style.filter = `url(#wk-px-${c})` }, start + (k + 1) * 110)))
+      timers.push(window.setTimeout(() => { el.style.filter = '' }, start + PX_STEPS.length * 110))
+    })
+    return () => { timers.forEach((id) => window.clearTimeout(id)); els.forEach((el) => { el.style.filter = '' }) }
+  }, [idx, phase, fresh])
+
   useOverlay(index !== null, panelRef, onClose, (e) => {
     if (e.key === 'ArrowRight') { e.preventDefault(); go(1) }
     else if (e.key === 'ArrowLeft') { e.preventDefault(); go(-1) }
@@ -214,6 +232,20 @@ export default function CaseDrawer({ items, index, onClose, onNav }: {
 
   return createPortal(
     <div className={s.root} data-phase={phase} data-fresh={fresh ? '' : undefined} data-dir={dir}>
+      {/* Mosaic filters: a 2 px sample in the middle of each cell, tiled, dilated to the cell. */}
+      <svg className={s.defs} width="0" height="0" aria-hidden="true" focusable="false">
+        <defs>
+          {PX_STEPS.map((c) => (
+            <filter key={c} id={`wk-px-${c}`} x="0" y="0" width="100%" height="100%" colorInterpolationFilters="sRGB">
+              <feFlood x={c / 2 - 1} y={c / 2 - 1} width="2" height="2" />
+              <feComposite width={c} height={c} />
+              <feTile result="grid" />
+              <feComposite in="SourceGraphic" in2="grid" operator="in" />
+              <feMorphology operator="dilate" radius={c / 2} />
+            </filter>
+          ))}
+        </defs>
+      </svg>
       <div className={s.glass} onClick={onClose} aria-hidden="true" />
       <div
         ref={panelRef}
