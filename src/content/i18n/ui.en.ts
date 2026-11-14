@@ -141,7 +141,8 @@ export const UI_EN = {
     aria: 'Card material',
     title: 'Material · press a card',
     close: 'Close',
-    materials: { cloth: 'Cloth', silk: 'Silk', liquid: 'Liquid', paper: 'Paper' },
+    materials: { cloth: 'Cloth', silk: 'Silk', liquid: 'Liquid', paper: 'Paper', grid: 'Grid', halftone: 'Halftone', net: 'Net' },
+    groups: { matter: 'Matter', pixel: 'Pixel' },
   }, // email link on the home (components/wip/EmailLink)
   arco: {
     open: 'open the case',

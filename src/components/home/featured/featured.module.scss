@@ -123,13 +123,15 @@ $ease: cubic-bezier(0.22, 1, 0.36, 1);
   .tall.even { margin-left: 8%; }
 }
 
-// ── Material tab (MaterialMenu): a discreet tab on the right edge, sticky in
+// ── Material tab (MaterialMenu): a discreet tab on the left edge, sticky in
 // the middle of the screen while the module scrolls by; it opens a small panel.
 .rail {
   position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
+  // Inset so the panel (centred on the tab) never hits the module's clip at
+  // either end while the tab rests at its first or last position.
+  top: 160px;
+  left: 0;
+  bottom: 160px;
   width: 0;
   z-index: 6;
 }
@@ -143,7 +145,7 @@ $ease: cubic-bezier(0.22, 1, 0.36, 1);
 .tab {
   position: absolute;
   top: 0;
-  right: 0;
+  left: 0;
   width: 30px;
   height: 140px;
   padding: 0;
@@ -163,14 +165,15 @@ $ease: cubic-bezier(0.22, 1, 0.36, 1);
   width: 100%;
   height: 100%;
   fill: var(--c-surface);
+  transform: scaleX(-1); // the notch shape is drawn for the right edge
   transition: fill $duration-fast $ease-out-quart;
   .tab:hover &, .dock[data-open] & { fill: var(--c-bg-2); }
 }
 
 .tabLabel {
   position: absolute;
-  left: 4px;
-  right: 0;
+  left: 0;
+  right: 4px;
   top: 0;
   bottom: 0;
   display: flex;
@@ -197,7 +200,7 @@ $ease: cubic-bezier(0.22, 1, 0.36, 1);
 .panel {
   position: absolute;
   top: 50%;
-  right: 38px;
+  left: 38px;
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -207,7 +210,7 @@ $ease: cubic-bezier(0.22, 1, 0.36, 1);
   border-radius: 6px;
   background: var(--c-bg-2);
   opacity: 0;
-  transform: translate3d(8px, -50%, 0);
+  transform: translate3d(-8px, -50%, 0);
   pointer-events: none;
   transition: opacity 160ms ease-in, transform 200ms ease-in;
 
@@ -218,6 +221,17 @@ $ease: cubic-bezier(0.22, 1, 0.36, 1);
     transition: opacity 200ms ease-out, transform 320ms $ease;
   }
   @media (prefers-reduced-motion: reduce) { transition: none !important; }
+}
+
+.group { display: flex; flex-direction: column; gap: 2px; }
+.group + .group { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--c-border); }
+.groupTitle {
+  margin: 0 0 2px;
+  padding: 0 6px;
+  font-family: $font-mono; font-weight: $fw-mono;
+  font-size: 9px;
+  text-transform: uppercase;
+  color: var(--c-text-dim);
 }
 
 .panelTitle {
@@ -255,7 +269,7 @@ $ease: cubic-bezier(0.22, 1, 0.36, 1);
   .dock { top: calc(50vh - 56px); height: 112px; }
   .tab { width: 26px; height: 112px; }
   // ≥ 44 px hit area on touch (the touch-target mixin would make it relative).
-  @media (pointer: coarse) { .tab::after { content: ''; position: absolute; inset: 0 0 0 -18px; } }
+  @media (pointer: coarse) { .tab::after { content: ''; position: absolute; inset: 0 -18px 0 0; } }
 }
 
 // No materials without motion: no tab either.

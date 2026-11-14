@@ -139,7 +139,8 @@ export const UI_ES: UiDict = {
     aria: 'Material de las tarjetas',
     title: 'Material · pulsa una tarjeta',
     close: 'Cerrar',
-    materials: { cloth: 'Tela', silk: 'Seda', liquid: 'Líquido', paper: 'Papel' },
+    materials: { cloth: 'Tela', silk: 'Seda', liquid: 'Líquido', paper: 'Papel', grid: 'Rejilla', halftone: 'Trama', net: 'Red' },
+    groups: { matter: 'Materia', pixel: 'Píxel' },
   },
   arco: {
     open: 'abrir el proyecto',
