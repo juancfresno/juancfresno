@@ -5,7 +5,7 @@ import { Analytics } from '@vercel/analytics/next'
 import '@/styles/globals.scss'
 import Nav from '@/components/layout/Nav/Nav'
 import Footer from '@/components/layout/Footer/Footer'
-import HomeContact from '@/components/home/HomeContact'
+import FooterClose from '@/components/layout/Footer/FooterClose'
 import { FEED_SELECTED } from '@/content/feed'
 import GridOverlay from '@/components/ui/GridOverlay/GridOverlay'
 import Shortcuts from '@/components/ui/Shortcuts/Shortcuts'
@@ -108,7 +108,7 @@ export default async function RootLayout({ children, params }: Props) {
           <PageTransitionProvider>
             <Nav />
             <main id="content" tabIndex={-1} style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>{children}</main>
-            <Footer close={<HomeContact locale={l} />} feed={FEED_SELECTED} />
+            <Footer close={<FooterClose locale={l} />} feed={FEED_SELECTED} />
           </PageTransitionProvider>
           <GridOverlay />
           <Shortcuts />
