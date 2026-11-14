@@ -10,32 +10,22 @@
 
 .screen { position: relative; }
 
-// ─── Full-screen close (every page except Contact) ───────────────────────────
-// The footer is a screen: always dark (tokens forced in globals.scss through
-// [data-foot-screen='full']), one LED wall behind everything (wall.ts), the
-// question on the left, the face on the right, the classic rows at the bottom.
-$screen-bg: #0a0a09;
-
-.full {
-  background: $screen-bg;
-
-  .screen {
-    display: flex;
-    flex-direction: column;
-    min-height: calc(100svh - var(--tabbar-h));
-    background: $screen-bg;
-    color: $color-text;
-    overflow: hidden;
-  }
-  .inner { position: relative; z-index: 1; }
-  // The rows sit on the wall: an opaque plate keeps the small text clean.
-  .meta { position: relative; }
+// ─── Full-screen footer (every page except Contact) ──────────────────────────
+// One screen: the contact module on top, the classic rows at the bottom.
+.full .screen {
+  overflow: hidden; // the X wordmark's touch area reaches past the margin
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100svh - var(--tabbar-h));
+  background: $color-bg;
 }
 
-// Curtain (desktop, enough height, motion allowed): the footer box is a window
-// (clip-path) onto content fixed to the viewport, so the page above slides away
-// and uncovers a footer that was already there. Elsewhere it is a normal block.
-@media (min-width: 769px) and (min-height: 700px) and (prefers-reduced-motion: no-preference) {
+.close { flex: 1; }
+
+// Anchored (desktop, enough height, motion allowed): the footer box is a window
+// (clip-path) onto content fixed to the viewport, so the page above lifts like
+// a lid and uncovers a footer that was already there. Elsewhere a normal block.
+@media (min-width: 769px) and (min-height: 560px) and (prefers-reduced-motion: no-preference) {
   .full {
     height: 100svh;
     clip-path: inset(0);
@@ -51,39 +41,21 @@ $screen-bg: #0a0a09;
   }
 }
 
-.close {
-  flex: 1;
+// ─── Top row: availability tag (left) + social row (right) ───────────────────
+// Narrow screens: the tag wraps to its own line above the socials.
+.top {
   display: flex;
-  flex-direction: column;
-  min-height: 0;
-}
-
-.wall {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-}
-
-.hud {
-  @include container;
-  position: relative;
-  z-index: 1;
-  display: flex;
-  align-items: baseline;
-  justify-content: flex-start; // the right corner belongs to the nav wordmark / donut
-  gap: 8px 40px;
+  align-items: center;
+  justify-content: space-between;
   flex-wrap: wrap;
-  padding-top: 88px; // clears the 72 px header
-  @include respond-to(md) { padding-top: 32px; flex-direction: column; }
+  gap: 14px $space-4;
+  padding-bottom: 1.5625rem;
 }
 
-.label,
-.session,
-.k {
-  margin: 0;
+.availability {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   font-family: $font-mono; font-weight: $fw-mono;
   font-size: 0.6875rem;
   line-height: 0.8125rem;
@@ -92,182 +64,31 @@ $screen-bg: #0a0a09;
   color: $color-text;
 }
 
-.session {
-  min-height: 0.8125rem;
-  color: $color-text-mid;
-  font-variant-numeric: tabular-nums;
-}
-
-.k { color: $color-text-mid; }
-
-.stage {
-  @include container;
+.dot {
   position: relative;
-  z-index: 1;
-  flex: 1;
-  min-height: 0;
-  display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  column-gap: $gutter;
-
-  @include respond-to(md) { display: flex; flex-direction: column; }
-}
-
-.ask {
-  grid-column: 1 / span 8;
-  align-self: end;
-  padding: 24px 0 clamp(28px, 6svh, 72px);
-  @include respond-to(md) { padding: 8px 0 40px; }
-}
-
-.face {
-  grid-column: 9 / span 4;
-  align-self: stretch;
-  margin: 2svh 0 4svh;
-  min-height: 0;
-  @include respond-to(md) { order: -1; height: 34svh; min-height: 220px; margin: 16px 0 8px; }
-}
-
-// The stand-in's line (same voice as Contact).
-.say {
-  margin: 0 0 clamp(14px, 2.4svh, 28px);
-  min-height: 1.55em;
-  font-family: $font-mono; font-weight: 400;
-  font-size: clamp(0.8125rem, 0.25vw + 0.72rem, 0.9375rem);
-  line-height: 1.55;
-  color: $color-text;
-  @include respond-to(md) { min-height: 3.1em; }
-}
-
-.speaker { font-weight: $fw-mono; color: $raw-chip; }
-
-.caret {
-  display: inline-block;
-  width: 0.55em; height: 1em;
-  margin-left: 2px;
-  vertical-align: -0.15em;
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
   background: var(--c-g);
-  animation: footCaret 1s steps(1) infinite;
-}
 
-@keyframes footCaret { 50% { opacity: 0; } }
-
-.title {
-  margin: 0;
-  font-family: $font-body;
-  font-weight: $fw-light;
-  font-size: min(clamp(2.5rem, 5.6vw, 7rem), 11.5svh);
-  line-height: 1;
-  letter-spacing: -0.04em;
-  color: $color-text-hi;
-  @include respond-to(md) { font-size: clamp(2.125rem, 10.4vw, 3.5rem); line-height: 1.02; }
-}
-
-// Each line rises out of its own mask when the close lights up.
-.mask {
-  display: block;
-  overflow: hidden;
-  padding-bottom: 0.12em; // descenders
-  margin-bottom: -0.12em;
-
-  > span {
-    display: block;
-    transform: translateY(112%);
-    transition: transform 1s $ease-out-expo;
-  }
-}
-
-.say, .answers, .mail, .session {
-  opacity: 0;
-  transition: opacity 0.6s ease 0.35s;
-}
-
-.close[data-on] {
-  .mask > span { transform: none; }
-  .say, .answers, .mail, .session { opacity: 1; }
-  .say { transition-delay: 0s; }
-  .mail { transition-delay: 0.5s; }
-}
-
-.answers {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-top: clamp(20px, 4svh, 44px);
-  @include respond-to(md) { flex-direction: column; }
-}
-
-.yes,
-.no {
-  display: inline-flex;
-  align-items: center;
-  justify-content: space-between;
-  height: clamp(52px, 7svh, 64px);
-  border-radius: 2px;
-  font-family: $font-body;
-  font-size: clamp(1.125rem, 0.6vw + 1rem, 1.625rem);
-  letter-spacing: -0.02em;
-  line-height: 1;
-  text-decoration: none;
-  cursor: pointer;
-  transition: background 0.25s, color 0.25s, border-color 0.25s;
-  @include focus-ring($color-text);
-}
-
-.yes {
-  gap: 40px;
-  padding: 0 22px 1px 26px;
-  background: var(--c-chip);
-  color: var(--c-chip-ink);
-
-  &:hover, &:focus-visible {
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
     background: var(--c-g);
-    color: #fff;
-    .arrow { transform: translateX(8px); }
+    opacity: 0.6;
+    animation: availPulse 2.4s cubic-bezier(0.22, 1, 0.36, 1) infinite;
   }
+
+  @media (prefers-reduced-motion: reduce) { &::after { animation: none; display: none; } }
 }
 
-.arrow { display: inline-block; transition: transform 0.4s $ease-out-expo; }
-
-.no {
-  gap: 18px;
-  padding: 0 20px 1px 24px;
-  border: 1px solid $color-line;
-  background: $screen-bg;
-  color: $color-text;
-
-  &:hover, &:focus-visible {
-    border-color: $color-text;
-    .noHint { color: $color-text; }
-  }
+@keyframes availPulse {
+  from { transform: scale(1); opacity: 0.6; }
+  to   { transform: scale(3.2); opacity: 0; }
 }
-
-.noHint {
-  font-family: $font-mono; font-weight: $fw-mono;
-  font-size: 0.6875rem;
-  letter-spacing: $ls-wide;
-  text-transform: uppercase;
-  color: $color-text-mid;
-  transition: color 0.25s;
-}
-
-.mail {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-top: clamp(18px, 3.4svh, 36px);
-
-  .email a { font-size: clamp(1.125rem, 1.35vw, 1.5rem); }
-}
-
-.srOnly { @include visually-hidden; }
-
-@media (prefers-reduced-motion: reduce) {
-  .mask > span { transform: none; transition: none; }
-  .say, .answers, .mail, .session { opacity: 1; transition: none; }
-  .caret { animation: none; }
-}
-
 
 .inner {
   @include container;               // same margins as the page grid (see GridOverlay)
@@ -280,9 +101,9 @@ $screen-bg: #0a0a09;
   display: flex;
   align-items: center;
   justify-content: flex-end; // row sits on the right margin (Figma web/footer, Juan 10 Nov 2026)
+  margin-left: auto;
   gap: 1.5625rem; // 25px — del Figma
   flex-wrap: wrap;
-  padding-bottom: 1.5625rem;
 }
 
 // Color/opacity theming only — glitch structure + keyframes now live in the
