@@ -180,7 +180,7 @@ export const UI_EN = {
   },
   lab: {
     h1: 'Lab',
-    floppy: { region: 'Lab experiments', prev: 'Previous experiment', next: 'Next experiment', open: 'View experiment', close: 'Close', built: 'Built with', how: 'How it’s built', year: 'Year', viewField: 'Scattered view', viewRing: 'Wheel view', boxLine: 'Six experiments, one box.', boxCta: 'Open the Lab' },
+    floppy: { region: 'Lab experiments', prev: 'Previous experiment', next: 'Next experiment', open: 'View experiment', close: 'Close', built: 'Built with', how: 'How it’s built', year: 'Year', viewField: 'Scattered view', viewRing: 'Wheel view', views: 'View', viewsAria: 'How the experiments are shown', flow: 'Floating', field: 'Scattered', ring: 'Wheel', boxLine: 'Six experiments, one box.', boxCta: 'Open the Lab' },
     onPage: 'On this page',
     products: 'Own products',
     resources: 'Resources',

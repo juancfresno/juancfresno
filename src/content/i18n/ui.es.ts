@@ -179,7 +179,7 @@ export const UI_ES: UiDict = {
   },
   lab: {
     h1: 'Lab',
-    floppy: { region: 'Experimentos del Lab', prev: 'Experimento anterior', next: 'Experimento siguiente', open: 'Ver experimento', close: 'Cerrar', built: 'Hecho con', how: 'Cómo está hecho', year: 'Año', viewField: 'Vista dispersa', viewRing: 'Vista en rueda', boxLine: 'Seis experimentos, una caja.', boxCta: 'Abrir el Lab' },
+    floppy: { region: 'Experimentos del Lab', prev: 'Experimento anterior', next: 'Experimento siguiente', open: 'Ver experimento', close: 'Cerrar', built: 'Hecho con', how: 'Cómo está hecho', year: 'Año', viewField: 'Vista dispersa', viewRing: 'Vista en rueda', views: 'Vista', viewsAria: 'Cómo se muestran los experimentos', flow: 'Flotando', field: 'Dispersa', ring: 'Rueda', boxLine: 'Seis experimentos, una caja.', boxCta: 'Abrir el Lab' },
     onPage: 'En esta página',
     products: 'Productos propios',
     resources: 'Recursos',

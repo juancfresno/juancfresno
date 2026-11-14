@@ -306,3 +306,36 @@
   -webkit-user-select: text; user-select: text;
   @include respond-to(md) { font-size: 15px; line-height: 21px; }
 }
+
+// Lab: the view selector sits above the module in both layouts, so it never moves when the
+// view changes. Same language as the site's segmented toggles, with the nav's blue chip.
+.withViews {
+  position: relative; background: $color-bg;
+  .mod.flow .head { padding-top: clamp(40px, 3.81vw, 64px); }
+}
+.picker {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding: clamp(24px, 2.86vw, 48px) max(#{$m}, env(safe-area-inset-right, 0px)) 0 max(#{$m}, env(safe-area-inset-left, 0px));
+  font-family: $font-mono; font-weight: $fw-mono;
+  font-size: 12px; line-height: 14px; letter-spacing: 0.04em; text-transform: uppercase;
+  color: $color-text-mid;
+}
+.pickerLabel { @include respond-to(md) { display: none; } }
+.pickerSet {
+  display: inline-flex; gap: 2px; padding: 3px;
+  border: 1px solid $color-line; border-radius: 999px;
+  @include respond-to(md) { width: 100%; }
+  button {
+    appearance: none; border: 0; background: none; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+    padding: 9px 16px 9px 12px; border-radius: 999px;
+    font: inherit; letter-spacing: inherit; text-transform: inherit; color: $color-text-mid; white-space: nowrap;
+    transition: background 0.2s ease, color 0.2s ease;
+    &:hover, &:focus-visible { color: $color-text-hi; }
+    &[aria-pressed='true'] { background: var(--c-chip); color: var(--c-chip-ink); }
+    &:focus-visible { outline: 1px solid var(--c-g, #003dff); outline-offset: 2px; }
+    @include respond-to(md) { flex: 1; padding: 11px 8px; gap: 8px; }
+  }
+  svg { display: block; flex: none; fill: none; stroke: currentColor; stroke-width: 1; [data-solid] { fill: currentColor; stroke: none; } }
+  @media (max-width: 359px) { svg { display: none; } }
+}

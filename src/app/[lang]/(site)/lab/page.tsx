@@ -49,7 +49,7 @@ export default async function LabPage({ params }: Props) {
   return (
     <div className={hs.shell}>
       <PageHero letter={HEROES.lab.letter} name={ui.lab.h1} intro={HEROES.lab.intro} note={HEROES.lab.note} />
-      <FloppyBand locale={loc} />
+      <FloppyBand locale={loc} mode="flow" views />
       <div className={`${l.mod} ${l.header}`}>
         <div className={l.headRow}>
           <ul className={l.index} aria-label={ui.lab.onPage}>

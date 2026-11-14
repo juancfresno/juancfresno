@@ -179,9 +179,11 @@ export function createFloppyStage(host, canvas, { items, onChange = (_i) => {}, 
       c.x = a.x + dir * e * (m ? 0.2 : 0.15); c.y = (vh / 2 + u * vh * 1.08 - top) / H; c.s = a.s;
       c.blur = Math.max(0, Math.abs(e) - 0.42) * 9; c.rx = 0.08 + e * 0.4; c.ry = dir * (-0.3 + e * 1.15); c.rz = dir * (0.06 - e * 0.42);
     } else {
-      const g = DEPTH[(d.i - flow.main) % DEPTH.length], near = g.v > 1, u = (g.y * flow.h - flow.c) / vh, e = Math.max(-2, Math.min(2, u));
-      c.x = g.x + g.dx * e; c.y = (vh / 2 + u * vh * g.v - top) / H; c.s = g.s * (m ? (near ? 1.1 : 1.8) : 1);
-      c.blur = g.blur; c.rx = g.rx + e * 0.3; c.ry = g.ry + e * (near ? 0.5 : 0.9); c.rz = g.rz + e * 0.3;
+      // more than five depth disks (Lab): the pattern repeats down the section in bands, mirrored on every other one
+      const k = d.i - flow.main, g = DEPTH[k % DEPTH.length], band = Math.floor(k / DEPTH.length), bands = Math.ceil((N - flow.main) / DEPTH.length), f = band % 2 ? -1 : 1;
+      const near = g.v > 1, u = (((band + g.y) / bands) * flow.h - flow.c) / vh, e = Math.max(-2, Math.min(2, u));
+      c.x = (f < 0 ? 1 - g.x : g.x) + f * g.dx * e; c.y = (vh / 2 + u * vh * g.v - top) / H; c.s = g.s * (m ? (near ? 1.1 : 1.8) : 1);
+      c.blur = g.blur; c.rx = g.rx + e * 0.3; c.ry = f * (g.ry + e * (near ? 0.5 : 0.9)); c.rz = f * (g.rz + e * 0.3);
     }
   }
   // Scroll mode (Home): the page scroll is the timeline. q = how many disks have gone by (a float);

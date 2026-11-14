@@ -12,8 +12,16 @@ export type FloppyItem = {
 }
 type View = 'field' | 'ring'
 type Stage = { setActive(i: number): void; next(): void; prev(): void; setOpen(o: boolean, silent?: boolean): void; setView(v: View): void; setScroll(q: number): void; span: number; dispose(): void }
-type Strings = { region: string; prev: string; next: string; open: string; close: string; built: string; how: string; year: string; viewField: string; viewRing: string; boxLine: string; boxCta: string }
-type Props = { items: FloppyItem[]; labName: string; labHref: string; strings: Strings; mode?: 'free' | 'scroll' | 'flow'; total?: number; depth?: FloppyItem[] }
+type Strings = { region: string; prev: string; next: string; open: string; close: string; built: string; how: string; year: string; viewField: string; viewRing: string; views: string; viewsAria: string; flow: string; field: string; ring: string; boxLine: string; boxCta: string }
+type Props = { items: FloppyItem[]; labName: string; labHref: string; strings: Strings; mode?: 'free' | 'scroll' | 'flow'; total?: number; depth?: FloppyItem[]; views?: boolean }
+type Layout = 'flow' | View
+
+// The three ways to look at the disks, drawn small: floating down the page, scattered, a wheel.
+const ICONS: Record<Layout, React.ReactNode> = {
+  flow: <><rect x="1.5" y="0.5" width="5" height="5" /><rect x="8.5" y="4.5" width="5" height="5" /><rect x="13.5" y="10.5" width="3" height="3" /></>,
+  field: <><rect x="0.5" y="6.5" width="5" height="5" /><rect x="7.5" y="1.5" width="7" height="7" /><rect x="16.5" y="9.5" width="3" height="3" /></>,
+  ring: <><ellipse cx="10" cy="7" rx="9.5" ry="5" /><rect x="7.5" y="7.5" width="5" height="5" data-solid="" /></>,
+}
 
 // Text that changes like an old terminal: the block cursor eats the old string and types the new one.
 function Typed({ text }: { text: string }) {
@@ -55,7 +63,11 @@ function BoxLink({ href, text, on }: { href: string; text: string; on: boolean }
 // only when the module comes near the viewport. No WebGL = the text alone.
 // Two views (scattered field / wheel) and a ficha: a click on the active disk
 // brings it forward over a card with the long description and the link.
-export default function FloppyModule({ items, labName, labHref, strings, mode = 'free', total = items.length, depth = [] }: Props) {
+export default function FloppyModule({ items, labName, labHref, strings, mode: modeProp = 'free', total = items.length, depth = [], views = false }: Props) {
+  // Lab: the visitor picks the view. Floating = the Home flow; scattered / wheel = the free module.
+  const [layout, setLayout] = useState<Layout>(modeProp === 'flow' ? 'flow' : 'field')
+  const mode = views ? (layout === 'flow' ? 'flow' : 'free') : modeProp
+  const viewRef = useRef<View>('field')
   const host = useRef<HTMLElement>(null)
   const runway = useRef<HTMLDivElement>(null)
   const scrollTo = useRef<(i: number) => void>(() => {})
@@ -101,6 +113,7 @@ export default function FloppyModule({ items, labName, labHref, strings, mode = 
               box: mode === 'scroll' && !matchMedia('(prefers-reduced-motion: reduce)').matches ? { total } : null,
             })
             stage.current = st
+            if (!flow && viewRef.current === 'ring') st.setView('ring')
             // Scroll mode (Home): the module is pinned inside a tall runway and the page scroll
             // is the timeline. Native scroll, nothing hijacked; reduced motion keeps the free module.
             const rw = runway.current
@@ -139,11 +152,31 @@ export default function FloppyModule({ items, labName, labHref, strings, mode = 
     else setActive((a) => (a + d + items.length) % items.length)
   }
   const toggle = (o: boolean) => { setOpen(o); stage.current?.setOpen(o, true) }
-  const pick = (v: View) => { setView(v); stage.current?.setView(v) }
+  const pick = (v: View) => { viewRef.current = v; setView(v); stage.current?.setView(v) }
+  const choose = (l: Layout) => {
+    if (l === layout) return
+    setOpen(false); setFinale(false); setLayout(l)
+    if ((l === 'flow') !== (layout === 'flow')) setReady(false) // another canvas and another stage
+    if (l !== 'flow') { viewRef.current = l; setView(l); if (layout !== 'flow') stage.current?.setView(l) }
+  }
+  const picker = views && (
+    <div className={s.picker} role="group" aria-label={strings.viewsAria}>
+      <span className={s.pickerLabel} aria-hidden="true">{strings.views}</span>
+      <div className={s.pickerSet}>
+        {(['flow', 'field', 'ring'] as const).map((l) => (
+          <button key={l} type="button" onClick={() => choose(l)} aria-pressed={layout === l}>
+            <svg viewBox="0 0 20 14" width="20" height="14" aria-hidden="true">{ICONS[l]}</svg>
+            <span>{strings[l]}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+  const wrap = (body: React.ReactElement) => (views ? <div className={s.withViews}>{picker}{body}</div> : body)
 
   // Flow (Home): a normal section of the page, nothing pinned. Each disk has its spot and its
   // text in the document; the canvas is a sticky viewport layer over them.
-  if (flow) return (
+  if (flow) return wrap(
     <section ref={host} className={`${s.mod} ${s.flow}`} aria-label={strings.region} data-wf="media">
       <div className={s.sky}><canvas ref={canvas} className={s.canvas} data-ready={ready || undefined} aria-hidden="true" /></div>
       <div className={s.head}>
@@ -168,7 +201,7 @@ export default function FloppyModule({ items, labName, labHref, strings, mode = 
     </section>
   )
 
-  return (
+  return wrap(
     <div ref={runway} className={mode === 'scroll' ? s.runway : undefined} style={{ ['--n' as string]: items.length }}>
     <section
       ref={host}
@@ -227,14 +260,14 @@ export default function FloppyModule({ items, labName, labHref, strings, mode = 
         <span aria-hidden="true">{it.n} / {String(total).padStart(3, '0')}</span>
         <button type="button" onClick={() => go(1)} aria-label={strings.next}>›</button>
       </div>
-      <div className={s.views} role="group">
+      {!views && <div className={s.views} role="group">
         <button type="button" onClick={() => pick('field')} aria-pressed={view === 'field'} aria-label={strings.viewField} title={strings.viewField}>
           <svg viewBox="0 0 20 14" width="20" height="14" aria-hidden="true"><rect x="0.5" y="6.5" width="5" height="5" /><rect x="7.5" y="1.5" width="7" height="7" /><rect x="16.5" y="9.5" width="3" height="3" /></svg>
         </button>
         <button type="button" onClick={() => pick('ring')} aria-pressed={view === 'ring'} aria-label={strings.viewRing} title={strings.viewRing}>
           <svg viewBox="0 0 20 14" width="20" height="14" aria-hidden="true"><ellipse cx="10" cy="7" rx="9.5" ry="5" /><rect x="7.5" y="7.5" width="5" height="5" className={s.solid} /></svg>
         </button>
-      </div>
+      </div>}
       <canvas ref={canvas} className={s.canvas} data-ready={ready || undefined} aria-hidden="true" />
     </section>
     </div>

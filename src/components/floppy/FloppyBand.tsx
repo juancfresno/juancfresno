@@ -32,7 +32,8 @@ function labelSrc(n: string) {
 // Lab module with the 3D floppies (Figma 7025:21805), for Home and Lab.
 // `only` = which experiments to show, by number and in that order (the Home shows a few;
 // the counter still counts the whole Lab).
-export default function FloppyBand({ locale, mode, only }: { locale: Locale; mode?: 'free' | 'scroll' | 'flow'; only?: string[] }) {
+// `views` (Lab) = the view selector: floating (flow, the default) / scattered / wheel.
+export default function FloppyBand({ locale, mode, only, views }: { locale: Locale; mode?: 'free' | 'scroll' | 'flow'; only?: string[]; views?: boolean }) {
   const { EXPERIMENTS } = getSite(locale)
   const ui = getUi(locale)
   const all: FloppyItem[] = EXPERIMENTS.map((e, i) => ({
@@ -41,6 +42,8 @@ export default function FloppyBand({ locale, mode, only }: { locale: Locale; mod
   }))
   const items = only ? only.map((n) => all.find((x) => x.n === n)).filter((x): x is FloppyItem => !!x) : all
   // flow: the experiments not shown still fly by, out of focus, as depth
-  const rest = all.filter((x) => !items.includes(x)), depth = mode === 'flow' ? [...rest, ...rest].slice(0, 5) : undefined
-  return <FloppyModule depth={depth} items={items} labName={ui.lab.h1} labHref={localePath(locale, '/lab')} strings={ui.lab.floppy} mode={mode} total={all.length} />
+  // (with every experiment on show, as in the Lab, the depth disks are copies of them: two bands of five)
+  const rest = all.filter((x) => !items.includes(x))
+  const depth = mode !== 'flow' ? undefined : rest.length ? [...rest, ...rest].slice(0, 5) : Array.from({ length: 10 }, (_, k) => all[(k * 2 + 3) % all.length])
+  return <FloppyModule views={views} depth={depth} items={items} labName={ui.lab.h1} labHref={localePath(locale, '/lab')} strings={ui.lab.floppy} mode={mode} total={all.length} />
 }
