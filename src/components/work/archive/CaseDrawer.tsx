@@ -13,6 +13,9 @@ import s from './drawer.module.scss'
 // A light sheet, 88 % of the window (full width ≤ 1024), with the case as drawn
 // in Figma "v1 · Casos" (6891:1517): web/case-top (letter · title · lead · the
 // question · ficha row), the continuous image block, and web/case-next.
+// No top bar: ← and → sit in the sheet's left and right margins, Close runs
+// vertically at the top of the right margin, and an old-style tag (NN / 28 ·
+// title) at its bottom; a blue reading line runs down the left edge.
 //
 // Nothing slides: every change is the PIXEL CURTAIN (pixelCurtain.ts), the row
 // hover's Bayer fill at the size of the sheet.
@@ -52,6 +55,7 @@ export default function CaseDrawer({ items, index, onClose, onNav }: {
   const idxRef = useRef<number | null>(null)
   const panelRef = useRef<HTMLDivElement>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
+  const viewRef = useRef<HTMLDivElement>(null) // sheet + side controls: what the mosaic filter covers
   const barRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const nextRef = useRef<HTMLElement>(null)
@@ -68,7 +72,7 @@ export default function CaseDrawer({ items, index, onClose, onNav }: {
   // Mosaic over the live sheet: one SVG filter per cell size (below, in the
   // portal), switched on the scroller. null = clean.
   const pixelate = (cell: number | null) => {
-    const el = scrollRef.current
+    const el = viewRef.current
     if (el) el.style.filter = cell ? `url(#wk-px-${cell})` : ''
   }
 
@@ -250,7 +254,6 @@ export default function CaseDrawer({ items, index, onClose, onNav }: {
       const nextTop = nx.offsetTop
       const runway = nx.offsetHeight - sc.clientHeight
       bar.style.setProperty('--read', String(Math.max(0, Math.min(1, top / Math.max(1, nextTop - sc.clientHeight)))))
-      bar.toggleAttribute('data-scrolled', top > 120)
       bar.toggleAttribute('data-dark', top >= nextTop - 28)
       const p = runway > 8 ? Math.max(0, Math.min(1, (top - nextTop) / runway)) : 0
       nx.style.setProperty('--p', p.toFixed(4))
@@ -266,7 +269,6 @@ export default function CaseDrawer({ items, index, onClose, onNav }: {
     nx?.style.setProperty('--p', '0')
     nx?.style.setProperty('--e', '0')
     bar?.style.setProperty('--read', '0')
-    bar?.removeAttribute('data-scrolled')
     bar?.removeAttribute('data-dark')
     if (pctRef.current) pctRef.current.textContent = '000 %'
   }, [idx])
@@ -310,18 +312,8 @@ export default function CaseDrawer({ items, index, onClose, onNav }: {
         aria-label={t.dialog(it.title)}
         tabIndex={-1}
       >
+        <div ref={viewRef} className={s.view}>
         <div ref={scrollRef} className={s.scroll} onScroll={onScroll}>
-          <div ref={barRef} className={s.bar}>
-            <span className={s.count}><b>{it.n}</b> / {total}</span>
-            <span className={s.barTitle} aria-hidden="true">{it.title}</span>
-            <span className={s.actions}>
-              <button type="button" className={s.ctl} onClick={() => go(-1)} aria-label={t.prev}>←</button>
-              <button type="button" className={s.ctl} onClick={() => go(1)} aria-label={t.next}>→</button>
-              <button type="button" className={s.ctl} onClick={close} data-autofocus>{t.close} <kbd>{t.esc}</kbd></button>
-            </span>
-            <span className={s.read} aria-hidden="true" />
-          </div>
-
           <article className={s.sheet} key={it.slug}>
             <header className={s.top}>
               <div className={s.topRow}>
@@ -381,6 +373,19 @@ export default function CaseDrawer({ items, index, onClose, onNav }: {
               </p>
             </div>
           </section>
+        </div>
+
+          {/* Controls live in the sheet's side margins, so nothing sits on the work. */}
+          <div ref={barRef} className={s.rails}>
+            <span className={s.read} aria-hidden="true" />
+            <button type="button" className={`${s.ctl} ${s.prev}`} onClick={() => go(-1)} aria-label={t.prev}>←</button>
+            <button type="button" className={`${s.ctl} ${s.next2}`} onClick={() => go(1)} aria-label={t.next}>→</button>
+            <button type="button" className={`${s.ctl} ${s.close}`} onClick={close} data-autofocus>{t.close} <kbd>{t.esc}</kbd></button>
+            <p className={s.tag} aria-hidden="true">
+              <span><b>{it.n}</b> / {total}</span>
+              <span className={s.tagName}>{it.title}</span>
+            </p>
+          </div>
         </div>
         <canvas ref={canvasRef} className={s.curtain} aria-hidden="true" />
       </div>
