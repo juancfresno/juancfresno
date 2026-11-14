@@ -32,7 +32,9 @@ function geometry(mode: OrbMode, W: number, H: number) {
   return { cx: W / 2, cy: H / 2, r: Math.hypot(W, H) * 0.5 }
 }
 
-export default function OrbBackdrop({ items, mode }: { items: FeedItem[]; mode: OrbMode }) {
+// `scale` shrinks the mosaic (lens only); `veilClassName` swaps the hero's veil
+// for another (the footer has its own).
+export default function OrbBackdrop({ items, mode, scale = 1, veilClassName }: { items: FeedItem[]; mode: OrbMode; scale?: number; veilClassName?: string }) {
   const [fallback, setFallback] = useState(false)
   const stageRef = useRef<HTMLDivElement>(null)
   const glRef = useRef<HTMLCanvasElement>(null)
@@ -60,7 +62,7 @@ export default function OrbBackdrop({ items, mode }: { items: FeedItem[]; mode: 
     }
 
     let g = geometry(mode, W, H)
-    let bg = pageBg()
+    let bg = pageBg(stage)
     // a, b = the mode's two axes; va, vb = their velocities per 60 Hz frame.
     let a = mode === 'sphere' ? 0.6 : 0, b = mode === 'sphere' ? 0.18 : 0
     let va = 0, vb = 0
@@ -107,7 +109,7 @@ export default function OrbBackdrop({ items, mode }: { items: FeedItem[]; mode: 
       const sp = Math.hypot(sx, sy)
       const mag = splitMag(sp) * fx
       const split: [number, number] = sp > 0.001 ? [(sx / sp) * mag, (sy / sp) * mag] : [0, 0]
-      o.draw({ mode, a, b, cx: g.cx, cy: g.cy, r: g.r, split, bg })
+      o.draw({ mode, a, b, cx: g.cx, cy: g.cy, r: g.r, split, bg, scale })
       ;(window as unknown as { __orb?: object }).__orb = { mode, speed: sp, split: mag, cx: g.cx, cy: g.cy } // QA probe, like window.__feedCanvas
       lastDraw = now
       if (force) return false
@@ -179,7 +181,7 @@ export default function OrbBackdrop({ items, mode }: { items: FeedItem[]; mode: 
       wake()
     }, { passive: true })
 
-    const mo = new MutationObserver(() => { bg = pageBg(); frame(performance.now(), true) })
+    const mo = new MutationObserver(() => { bg = pageBg(stage); frame(performance.now(), true) })
     mo.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
     const ro = new ResizeObserver(() => resize())
     ro.observe(stage)
@@ -196,13 +198,13 @@ export default function OrbBackdrop({ items, mode }: { items: FeedItem[]; mode: 
       o.destroy()
       document.documentElement.classList.remove(s.canvasDragging)
     }
-  }, [items, mode, fallback])
+  }, [items, mode, fallback, scale])
 
   // No WebGL2: the flat stage with its veil (no picture, nothing to run).
   return (
     <div ref={stageRef} className={s.canvasStage} aria-hidden="true">
       {!fallback && <canvas ref={glRef} className={s.canvasGl} />}
-      <div className={s.canvasVeil} />
+      <div className={veilClassName ?? s.canvasVeil} />
     </div>
   )
 }

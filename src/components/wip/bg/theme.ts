@@ -10,7 +10,8 @@ export function parseColor(v: string, fallback: [number, number, number]): [numb
   return m ? [Number(m[0]) / 255, Number(m[1]) / 255, Number(m[2]) / 255] : fallback
 }
 
-export const pageBg = () => parseColor(getComputedStyle(document.documentElement).getPropertyValue('--c-bg'), [0.063, 0.063, 0.055])
+// `el` = where to read the token (the footer may carry its own theme).
+export const pageBg = (el: Element = document.documentElement) => parseColor(getComputedStyle(el).getPropertyValue('--c-bg'), [0.063, 0.063, 0.055])
 export const pageFill = () => parseColor(getComputedStyle(document.documentElement).getPropertyValue('--c-bg-2'), [0.1, 0.1, 0.094])
 
 // Same split curve as the feed canvas (feed/canvas/gl.ts).

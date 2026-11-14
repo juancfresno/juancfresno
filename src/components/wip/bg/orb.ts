@@ -39,6 +39,7 @@ export type OrbFrame = {
   cx: number; cy: number; r: number // centre + radius / scale, device px
   split: [number, number] // device px
   bg: [number, number, number]
+  scale?: number // lens: size of the mosaic (1 = the landing; < 1 = smaller pieces)
 }
 
 const VS = `#version 300 es
@@ -254,7 +255,7 @@ export function createOrb(canvas: HTMLCanvasElement, items: FeedItem[], small: b
       gl.uniform2f(prog.u.split, f.split[0] * dpr, f.split[1] * dpr)
       // Lens: one tile ≈ 1.6 screens wide at 1680, in device px.
       const ln = LENS[f.mode] ?? LENS.lens
-      const tw = Math.max(W, 900) * 1.6 * dpr * (ln.c0 / 0.72)
+      const tw = Math.max(W, 900) * 1.6 * dpr * (ln.c0 / 0.72) * (f.scale ?? 1)
       gl.uniform2f(prog.u.tile, tw, tw * (AH / AW))
       gl.uniform4f(prog.u.lens, ln.c0, ln.k2, ln.k4, ln.vig)
       gl.uniform1f(prog.u.ca, ln.ca * dpr)

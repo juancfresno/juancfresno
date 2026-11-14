@@ -1,6 +1,7 @@
 'use client'
 
-import { useRef, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
+import dynamic from 'next/dynamic'
 import { usePathname } from 'next/navigation'
 import clsx from 'clsx'
 
@@ -11,6 +12,12 @@ import { BehanceLogo, InstagramLogo, DribbbleLogo, LinkedInLogo, XLogo } from '@
 import GlitchSocialIcon from '@/components/ui/GlitchSocialIcon/GlitchSocialIcon'
 import { useHref, useUi } from '@/i18n/client'
 import LocaleSwitch from '@/components/ui/LocaleSwitch/LocaleSwitch'
+import type { FeedItem } from '@/content/feed'
+
+// The live landing's background (the feed mosaic through the fisheye), with
+// smaller pieces. Client-only (WebGL2), loaded when the footer is near.
+const OrbBackdrop = dynamic(() => import('@/components/wip/bg/OrbBackdrop'), { ssr: false })
+const LENS_SCALE = 0.6
 
 // ─── Social links data ─────────────────────────────────────────────────────────
 // Order as in Figma web/footer: Behance · Dribbble · LinkedIn · Instagram · X.
@@ -26,16 +33,26 @@ const SOCIALS = [
 // Full-screen footer on every page except Contact: the contact module that used
 // to close the home (`close`, a server component passed by the layout) on top,
 // then the rows of the live WIP landing: availability tag + socials, the line,
-// © · language · ? and clock · place.
+// © · language · ? and clock · place. Behind it all, the landing's feed lens.
 // On desktop it is anchored: its content is fixed to the viewport and the page
 // above lifts to uncover it (clip-path on the footer box). On Contact only the
 // classic rows show.
-export default function Footer({ close }: { close?: ReactNode }) {
+export default function Footer({ close, feed }: { close?: ReactNode; feed?: FeedItem[] }) {
   const ui = useUi()
   const href = useHref()
   const pathname = usePathname() || '/'
   const full = !!close && !/\/contact\/?$/.test(pathname)
   const root = useRef<HTMLElement | null>(null)
+
+  // Mount the lens (30 images + a WebGL context) only when the footer is close.
+  const [near, setNear] = useState(false)
+  useEffect(() => {
+    const el = root.current
+    if (!el || !full || near) return
+    const io = new IntersectionObserver(([en]) => { if (en.isIntersecting) setNear(true) }, { rootMargin: '900px 0px' })
+    io.observe(el)
+    return () => io.disconnect()
+  }, [full, near])
 
   // The content is fixed and clipped: bring it on screen when focus lands in it.
   const onFocus = () => {
@@ -47,6 +64,7 @@ export default function Footer({ close }: { close?: ReactNode }) {
   return (
     <footer ref={root} data-site-footer className={clsx(s.footer, full && s.full)} onFocusCapture={onFocus}>
       <div className={s.screen}>
+        {full && near && !!feed?.length && <OrbBackdrop items={feed} mode="lens" scale={LENS_SCALE} veilClassName={s.veil} />}
         {full && <div className={s.close}>{close}</div>}
 
         <div className={s.inner}>
