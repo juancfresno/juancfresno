@@ -1,15 +1,11 @@
 @use '../../styles/variables' as *;
 @use '../../styles/mixins' as *;
 
-// Contact v2 (14 Nov 2026). The page is always blue
-// (html[data-page-theme="blue"]): page colours are --c-* tokens, which the blue
-// scope maps to the FDS light ink tokens (globals.scss). The device is an
-// object with its own fixed colours (ink body, pearl + blue LEDs).
+// Contact v2 (14 Nov 2026). Follows the site theme (dark by default): page
+// colours are --c-* tokens. The device shell is warm grey on dark and ink on
+// light (the --dev-* vars on .rig); its screen is always black with pearl +
+// blue LEDs. --acc = small blue text (light blue on dark, G blue on light).
 
-$dev-ink:   #151513;
-$dev-side:  #20201d;
-$dev-top:   #2b2b27;
-$dev-back:  #0b0b0a;
 $led-blue:  #2f5dff;
 $spring:    cubic-bezier(0.3, 1.45, 0.45, 1);
 
@@ -59,6 +55,8 @@ $spring:    cubic-bezier(0.3, 1.45, 0.45, 1);
   grid-template-columns: repeat(12, minmax(0, 1fr));
   column-gap: var(--gutter);
   color: $color-text;
+  --acc: #{$raw-chip};
+  :global(:root[data-theme='light']) & { --acc: var(--c-g); }
 
   @media (max-width: 900px) {
     display: flex;
@@ -112,7 +110,7 @@ $spring:    cubic-bezier(0.3, 1.45, 0.45, 1);
   color: $color-text;
 }
 
-.speaker { font-weight: $fw-mono; color: var(--c-g); }
+.speaker { font-weight: $fw-mono; color: var(--acc); }
 
 .caret {
   display: inline-block;
@@ -166,7 +164,7 @@ $spring:    cubic-bezier(0.3, 1.45, 0.45, 1);
   letter-spacing: 0;
   vertical-align: super;
   line-height: 0;
-  color: var(--c-g);
+  color: var(--acc);
 }
 
 // The label chip shows on hover / focus, above the option's first word.
@@ -295,6 +293,24 @@ $spring:    cubic-bezier(0.3, 1.45, 0.45, 1);
   --dev: 54cqw;  // device side
   --d: 8cqw;     // device depth
   --r: 41cqw;    // dial radius (82 in the 200-unit viewBox)
+  --dev-front: #c9c5bd;
+  --dev-hi:    #dedad2;
+  --dev-side:  #a5a199;
+  --dev-top:   #e6e2da;
+  --dev-back:  #86827b;
+  --dev-mark:  rgba(20, 20, 20, 0.62);
+  --dev-metal: #3c3c3a;
+  --dev-shadow: rgba(0, 0, 0, 0.55);
+  :global(:root[data-theme='light']) & {
+    --dev-front: #151513;
+    --dev-hi:    #1e1e1b;
+    --dev-side:  #20201d;
+    --dev-top:   #2b2b27;
+    --dev-back:  #0b0b0a;
+    --dev-mark:  rgba(255, 255, 230, 0.5);
+    --dev-metal: #6f6f69;
+    --dev-shadow: rgba(20, 20, 20, 0.34);
+  }
   grid-column: 7 / span 6;
   align-self: center;
   justify-self: center;
@@ -429,8 +445,7 @@ $spring:    cubic-bezier(0.3, 1.45, 0.45, 1);
   flex-direction: column;
   padding: 3cqw 3cqw 0;
   border-radius: 1cqw;
-  background: linear-gradient(160deg, #1e1e1b, $dev-ink 40%);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 230, 0.07);
+  background: linear-gradient(160deg, var(--dev-hi), var(--dev-front) 40%);
 }
 
 .screen {
@@ -468,7 +483,7 @@ $spring:    cubic-bezier(0.3, 1.45, 0.45, 1);
   font-family: $font-mono; font-weight: $fw-mono;
   font-size: max(6px, 1.25cqw);
   letter-spacing: 0.08em;
-  color: rgba(255, 255, 230, 0.5);
+  color: var(--dev-mark);
 
   &::after {
     content: '';
@@ -483,14 +498,14 @@ $spring:    cubic-bezier(0.3, 1.45, 0.45, 1);
   inset: 0;
   transform: translateZ(calc(var(--d) / -2)) rotateY(180deg);
   border-radius: 1cqw;
-  background: $dev-back;
+  background: var(--dev-back);
 }
 
 .side {
   top: 0.6cqw;
   width: var(--d);
   height: calc(100% - 1.2cqw);
-  background: $dev-side;
+  background: var(--dev-side);
 }
 .left { left: calc(var(--d) / -2); transform: rotateY(-90deg); }
 .right {
@@ -501,13 +516,13 @@ $spring:    cubic-bezier(0.3, 1.45, 0.45, 1);
   align-items: center;
   gap: 2.2cqw;
   padding: 3cqw 0;
-  background: linear-gradient(to right, #2a2a26, $dev-side 60%);
+  background: linear-gradient(to right, var(--dev-hi), var(--dev-side) 60%);
 }
 
 .handle {
   width: 46%;
   height: 26%;
-  border: 0.55cqw solid #6f6f69;
+  border: 0.55cqw solid var(--dev-metal);
   border-radius: 2cqw;
 }
 
@@ -536,10 +551,10 @@ $spring:    cubic-bezier(0.3, 1.45, 0.45, 1);
   left: 0.6cqw;
   width: calc(100% - 1.2cqw);
   height: var(--d);
-  background: $dev-top;
+  background: var(--dev-top);
 }
 .capTop { top: calc(var(--d) / -2); transform: rotateX(90deg); }
-.capBottom { top: calc(100% - var(--d) / 2); transform: rotateX(-90deg); background: $dev-back; }
+.capBottom { top: calc(100% - var(--d) / 2); transform: rotateX(-90deg); background: var(--dev-back); }
 
 .cable {
   position: absolute;
@@ -547,7 +562,7 @@ $spring:    cubic-bezier(0.3, 1.45, 0.45, 1);
   top: 100%;
   width: 16%;
   fill: none;
-  stroke: $dev-ink;
+  stroke: var(--dev-front);
   stroke-width: 3.2;
   stroke-linecap: round;
   stroke-linejoin: round;
@@ -561,7 +576,7 @@ $spring:    cubic-bezier(0.3, 1.45, 0.45, 1);
   width: 38cqw;
   height: 3.2cqw;
   border-radius: 50%;
-  background: radial-gradient(closest-side, rgba(20, 20, 20, 0.34), transparent);
+  background: radial-gradient(closest-side, var(--dev-shadow), transparent);
   filter: blur(4px);
   pointer-events: none;
 }

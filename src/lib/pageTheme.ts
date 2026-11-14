@@ -4,7 +4,9 @@
 // PageTransition flips them during the site transition.
 export type PageTheme = 'blue' | null
 
-const BLUE = /^(?:\/(?:en|es))?\/contact\/?$/
+// No page uses it today: Contact follows the site theme since 14 Nov 2026 (Juan).
+// To bring a blue page back, put its path here, e.g. /^(?:\/(?:en|es))?\/contact\/?$/.
+const BLUE = /(?!)/
 
 /** The page theme of a public pathname (/contact, /es/contact → blue). */
 export const pageThemeOf = (pathname: string): PageTheme => (BLUE.test(pathname) ? 'blue' : null)

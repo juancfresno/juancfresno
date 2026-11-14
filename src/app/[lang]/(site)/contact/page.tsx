@@ -14,9 +14,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return pageMeta({ locale: l, path: '/contact', title: META.contact.title, description: META.contact.description })
 }
 
-// Contact v2 (14 Nov 2026), always in the brand blue
-// (html[data-page-theme="blue"], see lib/pageTheme.ts): "/Contact" on the
-// right, then one stage (components/contact/ContactStage): the LED stand-in
+// Contact v2 (14 Nov 2026), in the site theme (dark by default; the blue page
+// theme of lib/pageTheme.ts is off): "/Contact" on the right, then one stage (components/contact/ContactStage): the LED stand-in
 // that follows the pointer and talks, a dial to say who you are, and a
 // one-sentence brief that leaves as an email draft. Email only: no call, no
 // form, no global close.
