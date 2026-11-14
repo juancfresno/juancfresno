@@ -1,438 +1,465 @@
 @use '../../../styles/variables' as *;
 @use '../../../styles/mixins' as *;
 
-// ─── The case drawer — Figma "v1 · Casos" (6891:1517) ────────────────────────
-// web/case-top (Property 1 = Light) + "Behance · bloque" + web/case-next, on a
-// sheet that is 88 % of the window. Measures are the Figma ones at 1680 as a
-// share of the SHEET width (cqw), type sizes fixed. The sheet is always light,
-// whatever the site theme (the Figma case is), so colours are raw here.
+// ─── The case drawer ─────────────────────────────────────────────────────────
+// A light card, 40 % of the window, 8 px away from its edges, over the site
+// seen through frosted glass. The card is always light, whatever the site
+// theme (the Figma cases are), so its colours are raw. Measures inside follow
+// the CARD width (cqw).
 $sh-bg: #ffffff;
 $sh-text: #141414;
 $sh-ter: #4a4d4b;
-$sh-label: #a0a09b;
-$sh-line: #c9c5bd;
-$sh-line-strong: #a9aea9;
-$nx-bg: #141414;
+$sh-label: #8d8d88;
+$sh-line: #d9d6cf;
 $g-blue: #003dff;
 
-$side: clamp(20px, 3.81cqw, 64px);
-$top: clamp(40px, 5.238cqw, 88px);
-$gap-l: clamp(56px, 6.667cqw, 112px);
-$gap-m: clamp(32px, 3.333cqw, 56px);
+$gap: 8px;
+$radius: 14px;
+$pad: clamp(20px, 5.4cqw, 40px);
+$glide: cubic-bezier(0.16, 1, 0.3, 1);
+$leave: cubic-bezier(0.6, 0, 0.84, 0.2);
 
 .root {
   position: fixed;
   inset: 0;
-  // Above the fixed FRESNO wordmark (350): it would sit on the case title.
+  // Above the fixed FRESNO wordmark (350).
   z-index: $z-modal + 60;
   pointer-events: none;
   &[data-phase='entering'], &[data-phase='open'] { pointer-events: auto; }
 }
 
-.scrim {
+// ─── The glass ───────────────────────────────────────────────────────────────
+.glass {
   position: absolute;
   inset: 0;
-  background: color-mix(in srgb, var(--c-bg) 72%, transparent);
+  background:
+    linear-gradient(105deg, color-mix(in srgb, var(--c-text) 7%, transparent), transparent 42%),
+    color-mix(in srgb, var(--c-bg) 44%, transparent);
+  -webkit-backdrop-filter: blur(26px) saturate(1.6);
+  backdrop-filter: blur(26px) saturate(1.6);
   opacity: 0;
-  transition: opacity 0.4s ease;
-  [data-phase='entering'] > &, [data-phase='open'] > & { opacity: 1; transition: opacity 0.5s ease; }
+  transition: opacity 0.42s ease;
+  [data-phase='open'] > & { opacity: 1; transition: opacity 0.7s ease; }
 }
 
+// ─── The card ────────────────────────────────────────────────────────────────
 .panel {
   position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  width: 88vw;
+  top: $gap;
+  right: $gap;
+  bottom: $gap;
+  width: max(calc(40vw - #{$gap}), 440px);
   outline: none;
-  container-type: inline-size;
-  @media (max-width: 1024px) { width: 100%; }
+  transform: translate3d(calc(100% + 40px), 0, 0);
+  transition: transform 0.46s $leave;
+
+  [data-phase='open'] > & {
+    transform: none;
+    transition: transform 0.95s $glide;
+  }
+
+  @media (max-width: 1024px) { width: calc(62vw - #{$gap}); }
+  @media (max-width: 768px) {
+    left: $gap;
+    width: auto;
+    top: max(#{$gap}, env(safe-area-inset-top, 0px));
+    bottom: max(#{$gap}, env(safe-area-inset-bottom, 0px));
+    transform: translate3d(0, calc(100% + 40px), 0);
+  }
 }
 
-// Sheet + side controls: invisible (not hidden, it takes focus) until the
-// curtain has laid the sheet, and again while the curtain takes it away. The
-// mosaic filter of a case change goes on this box, so controls pixelate too.
-.view {
+.card {
   position: absolute;
   inset: 0;
-  opacity: 0;
-  [data-phase='open'] & { opacity: 1; }
-  @media (prefers-reduced-motion: reduce) { transition: opacity 0.16s ease; }
+  overflow: hidden;
+  border-radius: $radius;
+  background: $sh-bg;
+  color: $sh-text;
+  box-shadow: 0 40px 90px -30px rgb(0 0 0 / 0.55), 0 0 0 1px rgb(255 255 255 / 0.08);
+  container-type: size;
 }
 
 .scroll {
   position: absolute;
   inset: 0;
-  overflow-y: auto;
   overflow-x: hidden;
+  overflow-y: auto;
   overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
-  background: $sh-bg;
-  color: $sh-text;
   &::-webkit-scrollbar { display: none; }
 }
 
-.defs { position: absolute; width: 0; height: 0; pointer-events: none; }
-
-.curtain {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 5;
-  pointer-events: none;
+.body {
+  position: relative;
+  animation: wk-case-in 0.8s $glide both;
+  [data-fresh] & { animation: none; }
+  [data-dir='-1'] & { --from: -56px; }
 }
 
-// ─── Side rails: the controls, in the sheet's margins ────────────────────────
-// Nothing on top of the work: ← mid-left, → mid-right, Close vertical at the
-// top of the right margin, the tag (NN / 28 · title) vertical at its bottom.
-// $rail centres a 28 px control in the margin (never closer than 4 px to the edge).
-$rail: max(4px, calc((#{$side} - 28px) / 2));
-
-.rails {
-  position: absolute;
-  inset: 0;
-  z-index: 4;
-  pointer-events: none;
-  color: $sh-text;
-  > * { pointer-events: auto; }
-
-  // Over the next scene: everything inverts whatever is under it.
-  &[data-dark] {
-    color: #fff;
-    mix-blend-mode: difference;
-    .ctl { background: none; }
-    .read, .tag { opacity: 0; }
-  }
+@keyframes wk-case-in {
+  from { opacity: 0; transform: translate3d(0, var(--from, 56px), 0); }
+  to { opacity: 1; transform: none; }
 }
 
-.ctl {
-  @include touch-target(10px, 2px);
-  position: absolute;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  min-width: 28px;
-  min-height: 28px;
-  padding: 6px 0;
-  border: 1px solid color-mix(in srgb, currentColor 22%, transparent);
-  border-radius: 3px;
-  // A plate, for the narrow screens where the margin is thinner than the control.
-  background: color-mix(in srgb, #{$sh-bg} 88%, transparent);
-  color: inherit;
-  font-family: $font-mono; font-weight: $fw-mono;
-  font-size: 10px;
-  line-height: 12px;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
-  &:hover, &:focus-visible { background: $raw-chip; color: $raw-ink; border-color: transparent; outline: none; }
-  kbd { font: inherit; opacity: 0.55; }
-  @media (hover: none) { kbd { display: none; } }
-}
-.prev { left: $rail; top: 50%; transform: translateY(-50%); }
-.next2 { right: $rail; top: 50%; transform: translateY(-50%); }
-.close {
-  right: $rail;
-  top: 20px;
-  width: 28px;
-  padding: 10px 0;
-  writing-mode: vertical-rl;
-}
-
-// The old-style tag: number and title, set vertically up the right margin.
-.tag {
-  position: absolute;
-  right: $rail;
-  bottom: max(20px, env(safe-area-inset-bottom, 0px));
-  width: 28px;
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  writing-mode: vertical-rl;
-  pointer-events: none;
-  white-space: nowrap;
-  font-family: $font-mono; font-weight: $fw-mono;
-  font-size: 11px;
-  line-height: 28px;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  color: $sh-label;
-  transition: opacity 0.2s ease;
-  b { font-weight: inherit; color: $sh-text; }
-  // Narrow sheets have no margin to hold it.
-  @container (max-width: 700px) { display: none; }
-}
-.tagName { color: $sh-text; }
-
-// Reading line: how far through the case, down the left edge.
+// Reading line across the top of the card.
 .read {
   position: absolute;
-  left: 0;
+  z-index: 3;
   top: 0;
-  bottom: 0;
-  width: 2px;
+  left: 0;
+  right: 0;
+  height: 2px;
   background: $g-blue;
-  transform-origin: 50% 0;
-  transform: scaleY(var(--read, 0));
-  transition: opacity 0.2s ease;
+  transform: scaleX(var(--read, 0));
+  transform-origin: 0 50%;
   pointer-events: none;
 }
 
-// ─── web/case-top ────────────────────────────────────────────────────────────
-.sheet { background: $sh-bg; }
-
+// ─── Case-top ────────────────────────────────────────────────────────────────
 .top {
-  display: flex;
-  flex-direction: column;
-  gap: $gap-l;
-  padding: $top $side $gap-l;
+  padding: $pad $pad clamp(28px, 7cqw, 52px);
 }
 
-.topRow {
+.meta {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-}
-
-.letter {
-  flex: 0 0 24.227%;
+  gap: 16px;
   margin: 0;
-  font-family: $font-body;
-  font-size: 24px;
-  line-height: 1.2;
-  letter-spacing: -0.02em;
-  @container (max-width: 700px) { display: none; }
-}
-
-.cab {
-  flex: 0 0 66.323%;
-  display: flex;
-  flex-direction: column;
-  gap: $gap-m;
-  min-width: 0;
-  @container (max-width: 700px) { flex-basis: 100%; }
+  font-family: $font-mono;
+  font-weight: $fw-mono;
+  font-size: 10px;
+  line-height: 14px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: $sh-label;
 }
 
 .title {
-  margin: 0;
+  margin: clamp(40px, 13cqw, 96px) 0 0;
   font-family: $font-body;
-  font-weight: $fw-regular;
-  font-size: 24px;
-  line-height: 1.2;
-  letter-spacing: -0.02em;
-  text-align: right;
+  font-weight: 400;
+  font-size: clamp(38px, 10.5cqw, 72px);
+  line-height: 0.96;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
 }
 
 .lead {
-  margin: 0;
-  max-width: 87.3%;
+  margin: 20px 0 0;
+  max-width: 34em;
   font-family: $font-body;
-  font-size: 18px;
-  line-height: 1.5;
-  letter-spacing: -0.01em;
-  @container (max-width: 700px) { max-width: none; }
-}
-
-.question {
-  margin: 0;
-  padding-top: 24px;
-  border-top: 1px solid $sh-line-strong;
-  font-family: $font-body;
-  font-size: 18px;
-  line-height: 1.5;
+  font-size: clamp(15px, 2.8cqw, 18px);
+  line-height: 1.45;
   letter-spacing: -0.01em;
   color: $sh-ter;
 }
 
-.ficha {
-  display: flex;
-  gap: 16px;
-  margin: 0;
+.question {
+  margin-top: clamp(28px, 6cqw, 44px);
+  padding-top: 14px;
+  border-top: 1px solid $sh-line;
 
-  > div {
-    flex: 1 0 0;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 10px;
-    padding-top: 16px;
-    border-top: 1px solid $sh-line;
-    text-align: right;
+  span {
+    display: block;
+    font-family: $font-mono;
+    font-weight: $fw-mono;
+    font-size: 10px;
+    line-height: 14px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: $sh-label;
   }
+  p {
+    margin: 10px 0 0;
+    font-family: $font-body;
+    font-size: clamp(18px, 3.6cqw, 24px);
+    line-height: 1.22;
+    letter-spacing: -0.02em;
+  }
+}
+
+.ficha {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px $pad;
+  margin: clamp(28px, 6cqw, 44px) 0 0;
+  padding-top: 14px;
+  border-top: 1px solid $sh-line;
+
+  div { min-width: 0; }
   dt {
-    font-family: $font-mono; font-weight: $fw-mono;
-    font-size: 11px;
-    line-height: 1.2;
-    letter-spacing: 0.03em;
+    font-family: $font-mono;
+    font-weight: $fw-mono;
+    font-size: 10px;
+    line-height: 14px;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
     color: $sh-label;
   }
   dd {
-    margin: 0;
+    margin: 4px 0 0;
     font-family: $font-body;
-    font-size: 16px;
-    line-height: 1.5;
+    font-size: 14px;
+    line-height: 20px;
     letter-spacing: -0.01em;
   }
-  @container (max-width: 700px) {
-    flex-wrap: wrap;
-    > div { flex: 1 0 calc(50% - 8px); }
-  }
 }
 
-// ─── Behance · bloque: continuous, gap 0, sheet margins ──────────────────────
+// The case-top rises line by line on open.
+.root[data-fresh] [data-rise] {
+  opacity: 0;
+  transform: translate3d(0, 28px, 0);
+}
+.root[data-phase='open'][data-fresh] [data-rise] {
+  opacity: 1;
+  transform: none;
+  transition: opacity 0.7s ease, transform 1s $glide;
+  transition-delay: calc(0.22s + var(--i, 0) * 0.07s);
+}
+
+// ─── The pictures ────────────────────────────────────────────────────────────
 .block {
-  padding: 0 $side $gap-l;
-  img { display: block; width: 100%; height: auto; background: #f1efe9; }
+  display: flex;
+  flex-direction: column;
 }
 
-// Entrance, on open and on every change of case (the article is keyed).
-@keyframes rise {
-  from { opacity: 0; transform: translate3d(0, 18px, 0); }
-  to { opacity: 1; transform: none; }
-}
-@keyframes rule {
-  from { clip-path: inset(0 100% 0 0); }
-  to { clip-path: inset(0 0 0 0); }
-}
-.letter, .title, .lead, .question, .ficha > div, .block { opacity: 0; }
-// Only the first case after opening rises in; a change of case arrives whole
-// under the mosaic (CaseDrawer), so nothing may be mid-fade there.
-[data-phase='open']:not([data-fresh]) {
-  .letter, .title, .lead, .question, .ficha > div, .block { opacity: 1; }
-}
-[data-phase='open'][data-fresh] {
-  .letter, .title, .lead, .question, .ficha > div, .block {
-    animation: rise 0.9s $ease-out-expo both;
-  }
-  .letter { animation-delay: 0.04s; }
-  .title { animation-delay: 0.04s; }
-  .lead { animation-delay: 0.12s; }
-  .question { animation: rise 0.9s $ease-out-expo 0.2s both, rule 0.7s $ease-out-expo 0.2s both; }
-  .ficha > div { animation: rise 0.9s $ease-out-expo calc(0.28s + var(--i, 0) * 0.06s) both, rule 0.7s $ease-out-expo calc(0.28s + var(--i, 0) * 0.06s) both; }
-  .block { animation-delay: 0.42s; }
-}
-@media (prefers-reduced-motion: reduce) {
-  [data-phase='open'] {
-    .letter, .title, .lead, .question, .ficha > div, .block { animation: none; opacity: 1; }
-  }
-}
-
-// ─── web/case-next: the pinned scene ─────────────────────────────────────────
-// --p = scroll through the runway (0…1), --e = eased. A window onto the next
-// case's first image opens from a small plate to the whole sheet.
-.next {
-  --p: 0;
-  --e: 0;
-  --wy: calc((1 - var(--e)) * 33%);
-  --wx: calc((1 - var(--e)) * 36%);
+// --o: the accordion offset (px), set per frame while scrolling.
+.fig {
   position: relative;
-  height: 185dvh;
-  background: $nx-bg;
-  color: #fff;
-  @media (prefers-reduced-motion: reduce) { height: 100dvh; }
+  margin: 0;
+  width: 100%;
+  transform: translate3d(0, var(--o, 0px), 0);
+  will-change: transform;
+}
+
+.clip {
+  display: block;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 1.15s $glide;
+
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    object-fit: cover;
+    transform: scale(1.16);
+    transform-origin: 0 50%;
+    transition: transform 1.5s $glide;
+  }
+
+  [data-in] > & {
+    clip-path: inset(0);
+    img { transform: none; }
+  }
+}
+
+// ─── The end: a window onto the next case ────────────────────────────────────
+.next {
+  position: relative;
+  height: 185cqh;
+  background: $sh-bg;
 }
 
 .pin {
   position: sticky;
   top: 0;
-  height: 100dvh;
+  height: 100cqh;
   overflow: hidden;
 }
 
 .window {
   position: absolute;
   inset: 0;
-  display: block;
-  width: 100%;
-  height: 100%;
   padding: 0;
   border: 0;
-  background: #1d1d1c;
+  background: none;
   cursor: pointer;
-  clip-path: inset(var(--wy) var(--wx));
+  // 000 %: a strip in the middle. 100 %: the whole card.
+  --wy: calc((1 - var(--e, 0)) * 36%);
+  --wx: calc((1 - var(--e, 0)) * #{$pad});
+  clip-path: inset(var(--wy) var(--wx) round calc((1 - var(--e, 0)) * 8px));
+
   img {
     display: block;
     width: 100%;
     height: 100%;
+    max-width: none;
     object-fit: cover;
-    transform: scale(calc(1.22 - 0.22 * var(--e)));
+    transform: scale(calc(1.25 - var(--e, 0) * 0.25));
   }
-  &:focus-visible { outline: 1px solid #fff; outline-offset: -6px; }
+  &:focus-visible { outline: 2px solid $g-blue; outline-offset: -6px; }
 }
 
-// Crop marks on the window's corners; they leave as it fills the sheet.
-.tick {
-  position: absolute;
-  width: 10px;
-  height: 10px;
-  border: 0 solid $g-blue;
-  opacity: calc(1 - var(--e) * 1.6);
-  pointer-events: none;
-  &[data-c='tl'] { top: calc(var(--wy) - 12px); left: calc(var(--wx) - 12px); border-top-width: 1px; border-left-width: 1px; }
-  &[data-c='tr'] { top: calc(var(--wy) - 12px); right: calc(var(--wx) - 12px); border-top-width: 1px; border-right-width: 1px; }
-  &[data-c='bl'] { bottom: calc(var(--wy) - 12px); left: calc(var(--wx) - 12px); border-bottom-width: 1px; border-left-width: 1px; }
-  &[data-c='br'] { bottom: calc(var(--wy) - 12px); right: calc(var(--wx) - 12px); border-bottom-width: 1px; border-right-width: 1px; }
-}
-
-.nCode, .nSlash, .nName, .nKeep {
-  position: absolute;
-  z-index: 2;
-  margin: 0;
-  mix-blend-mode: difference;
-  pointer-events: none;
-}
-.nCode, .nSlash {
-  top: $top;
-  font-family: $font-body;
-  font-size: 24px;
-  line-height: 1.2;
-  letter-spacing: -0.02em;
-}
-.nCode { left: $side; }
-.nSlash { right: $side; }
-
-.nName, .nKeep {
-  bottom: max(#{$top}, calc(env(safe-area-inset-bottom, 0px) + 24px));
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  span {
-    font-family: $font-mono; font-weight: $fw-mono;
-    font-size: 11px;
-    line-height: 1.2;
-    letter-spacing: 0.03em;
-    text-transform: uppercase;
-  }
-}
-.nName {
-  left: $side;
-  b { font-family: $font-body; font-weight: $fw-regular; font-size: 24px; line-height: 1.2; letter-spacing: -0.02em; }
-}
+.nLabel,
 .nKeep {
-  right: $side;
-  align-items: flex-end;
-  text-align: right;
-  // 20 cells; the lit ones follow the scroll.
+  position: absolute;
+  left: $pad;
+  right: $pad;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 0;
+  font-family: $font-mono;
+  font-weight: $fw-mono;
+  font-size: 10px;
+  line-height: 14px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: $sh-label;
+  pointer-events: none;
+  opacity: calc(1 - var(--p, 0) * 2.2);
+}
+.nLabel { top: $pad; }
+
+.nName {
+  position: absolute;
+  left: $pad;
+  right: $pad;
+  top: calc(64% + 20px);
+  margin: 0;
+  font-family: $font-body;
+  font-size: clamp(34px, 9cqw, 60px);
+  line-height: 0.98;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+  pointer-events: none;
+  opacity: calc(1 - var(--p, 0) * 2.2);
+  transform: translate3d(0, calc(var(--e, 0) * 60px), 0);
+}
+
+.nKeep {
+  bottom: $pad;
+  justify-content: flex-start;
+  align-items: center;
+
   i {
     position: relative;
-    display: block;
-    width: 158px;
-    height: 6px;
-    background: repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.28) 0 6px, transparent 6px 8px);
+    flex: 1;
+    height: 1px;
+    background: $sh-line;
     &::after {
       content: '';
       position: absolute;
       inset: 0;
-      background: repeating-linear-gradient(90deg, #fff 0 6px, transparent 6px 8px);
-      clip-path: inset(0 calc((1 - var(--p)) * 100%) 0 0);
+      background: $g-blue;
+      transform: scaleX(var(--p, 0));
+      transform-origin: 0 50%;
     }
   }
-  @media (prefers-reduced-motion: reduce) { display: none; }
+}
+
+// ─── Controls, on the glass ──────────────────────────────────────────────────
+.ctls {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: calc(100% + 12px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: $color-text;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+
+  [data-phase='open'] & { opacity: 1; transition: opacity 0.5s ease 0.35s; }
+}
+
+.ctl {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 1px solid color-mix(in srgb, currentColor 22%, transparent);
+  border-radius: 50%;
+  background: color-mix(in srgb, currentColor 8%, transparent);
+  color: inherit;
+  font-family: $font-mono;
+  font-weight: $fw-mono;
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.4s $ease-spring;
+
+  &:hover {
+    color: var(--c-bg);
+    background: var(--c-text);
+    border-color: var(--c-text);
+    transform: scale(1.08);
+  }
+  &:active { transform: scale(0.94); }
+  &:focus-visible { outline: 2px solid $g-blue; outline-offset: 2px; }
+}
+
+.count {
+  margin: auto 0 4px;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-family: $font-mono;
+  font-weight: $fw-mono;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: $color-text-mid;
+  b { font-weight: inherit; color: $color-text; }
+}
+
+// Phones: the card is the whole width, so the controls are a pill inside it.
+@media (max-width: 768px) {
+  .ctls {
+    top: auto;
+    right: auto;
+    left: 50%;
+    bottom: 12px;
+    flex-direction: row;
+    gap: 4px;
+    padding: 4px;
+    border-radius: 999px;
+    color: $sh-text;
+    background: rgb(255 255 255 / 0.72);
+    -webkit-backdrop-filter: blur(16px) saturate(1.5);
+    backdrop-filter: blur(16px) saturate(1.5);
+    box-shadow: 0 8px 30px -8px rgb(0 0 0 / 0.35), 0 0 0 1px rgb(0 0 0 / 0.08);
+    transform: translateX(-50%);
+  }
+  .ctl {
+    border-color: transparent;
+    background: none;
+    &:hover { color: #fff; background: $sh-text; border-color: $sh-text; }
+  }
+  .close { order: 4; }
+  .count {
+    order: 2;
+    margin: 0 6px;
+    align-self: center;
+    writing-mode: horizontal-tb;
+    transform: none;
+    color: $sh-label;
+    b { color: $sh-text; }
+  }
+  .ctls > :nth-child(3) { order: 1; }
+  .ctls > :nth-child(4) { order: 3; }
+  .nKeep { bottom: 72px; }
+}
+
+// ─── Reduced motion ──────────────────────────────────────────────────────────
+@media (prefers-reduced-motion: reduce) {
+  .panel, [data-phase='open'] > .panel { transform: none; transition: opacity 0.16s ease; }
+  .panel { opacity: 0; }
+  [data-phase='open'] > .panel { opacity: 1; }
+  .glass, [data-phase='open'] > .glass { transition: opacity 0.16s ease; }
+  .body { animation: none; }
+  .root[data-fresh] [data-rise], .root[data-phase='open'][data-fresh] [data-rise] { opacity: 1; transform: none; transition: none; }
+  .fig { transform: none; }
+  .clip { clip-path: none; transition: none; img { transform: none; transition: none; } }
+  .next { height: 100cqh; }
+  .window { --wy: 30%; img { transform: none; } }
+  .nKeep { display: none; }
+  .ctl { transition: none; }
 }

@@ -1,432 +1,155 @@
 @use '../../../styles/variables' as *;
 @use '../../../styles/mixins' as *;
 
-// ─── /work list (Figma v1/archive-row 6878:98) ───────────────────────────────
-// 12-col grid, 4 · 3 · 2 · 2 · 1, rows 44 px with a 1 px rule. Project in
-// Switzer 15, the rest Sometype Mono 10 uppercase. Hover voice = the nav chip.
+// ─── /work list, the Biakone way (biakone.com/work) ──────────────────────────
+// Mono uppercase rows at half strength; the active one at full strength with
+// its two ends stepping in on a spring; ElasticLine dividers; one fixed
+// picture in the middle of the window.
 
 .wrap {
   grid-column: 1 / -1;
-}
-
-@mixin cols {
-  display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  column-gap: $gutter;
-  > :nth-child(1) { grid-column: span 4; }
-  > :nth-child(2) { grid-column: span 3; }
-  > :nth-child(3) { grid-column: span 2; }
-  > :nth-child(4) { grid-column: span 2; }
-  > :nth-child(5) { grid-column: span 1; }
-}
-
-.head {
-  @include cols;
-  padding-bottom: 12px;
-  border-bottom: 1px solid $color-line;
-  font-family: $font-mono; font-weight: $fw-mono;
-  font-size: 10px;
-  line-height: 12px;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  color: $color-text-mid;
-  .year { text-align: right; }
-
-  @include respond-to(md) { display: none; }
 }
 
 .list {
   list-style: none;
   margin: 0;
   padding: 0;
-  overflow-anchor: none;
+  font-family: $font-mono;
+  font-weight: $fw-mono;
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: $color-text;
 }
 
-// Every row has the page background: during an expand FLIP the rows below
-// slide over the panel and work as its curtain.
 .item {
   position: relative;
-  background: $color-bg;
-  border-bottom: 1px solid $color-line;
 }
+
+.line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  color: $color-line;
+  pointer-events: none;
+}
+.lineTop { top: 0; bottom: auto; }
 
 .row {
-  display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  column-gap: $gutter;
-  position: relative;
-  isolation: isolate;
-  width: 100%;
-  min-height: 44px;
-  align-items: center;
-  padding: 0;
-  border: 0;
-  background: none;
-  color: $color-text;
-  text-align: left;
-  cursor: pointer;
-  font: inherit;
-  --wk-chip: #{$raw-chip}; // read by usePixelFill
-  transition: opacity 0.28s $ease-out-quart, color 0.06s linear;
-  -webkit-tap-highlight-color: transparent;
-
-  // Grid children skip the sweep (absolute), so re-point the spans.
-  > .project { grid-column: 1 / span 4; }
-  > .via { grid-column: 5 / span 3; }
-  > .cat { grid-column: 8 / span 2; }
-  > .role { grid-column: 10 / span 2; }
-  > .year { grid-column: 12 / span 1; }
-
-  &:focus-visible { outline: none; }
-}
-
-// ── Pixel fill: square chip-blue cells in Bayer order (usePixelFill) ─────────
-// The canvas has no size until the row is active. Text flips with [data-ink].
-.fill {
-  position: absolute;
-  left: -10px;
-  top: 4px;
-  width: calc(100% + 20px);
-  height: calc(100% - 8px);
-  z-index: -1;
-  pointer-events: none;
-  image-rendering: pixelated;
-}
-
-.project {
   display: flex;
   align-items: center;
-  gap: 8px;
-  min-width: 0;
-  font-family: $font-body;
-  font-size: 15px;
-  line-height: 18px;
-  letter-spacing: -0.005em;
-}
-.nameText { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  padding: 19px 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  text-align: left;
+  cursor: pointer;
+  opacity: 0.5;
+  transition: opacity 0.2s ease;
+  --indent: clamp(56px, 7vw, 104px);
 
-.via, .cat, .role, .year {
-  font-family: $font-mono; font-weight: $fw-mono;
-  font-size: 10px;
-  line-height: 12px;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
+  .item[data-on] & { opacity: 1; }
+  &:focus-visible { outline: 1px solid $color-text; outline-offset: -1px; }
+}
+
+.left,
+.right {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 16px;
+  transition: transform 0.55s $ease-spring;
+  will-change: transform;
+}
+.left { min-width: 0; }
+.right { flex-shrink: 0; color: $color-text-mid; white-space: nowrap; }
+
+.item[data-on] .left { transform: translate3d(var(--indent), 0, 0); }
+.item[data-on] .right { transform: translate3d(calc(-1 * var(--indent)), 0, 0); }
+
+.arrow {
+  opacity: 0;
+  transition: opacity 0.16s ease;
+  .item[data-on] & { opacity: 1; }
+}
+.code { color: $color-text-mid; }
+.name {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  transition: color 0.06s linear;
 }
-.cat, .role { color: $color-text-mid; }
-.year { text-align: right; }
-
-// Arrow draws itself after the chip (same dash numbers as ui/NavLink).
-.arrow { flex: none; overflow: visible; margin-top: 1px; }
-.arrowShaft { stroke-dasharray: 8.5; stroke-dashoffset: 8.5; transition: stroke-dashoffset 0.2s ease-in; }
-.arrowHead { stroke-dasharray: 8; stroke-dashoffset: 8; transition: stroke-dashoffset 0.18s ease-in; }
-
-.thumb {
-  display: none;
-  flex: none;
-  width: 48px;
-  aspect-ratio: 4 / 3;
-  overflow: hidden;
-  border-radius: 2px;
-  background: var(--c-stage);
-  img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.via {
+  @media (max-width: 1279px) { display: none; }
 }
 
-// ── Active row (pointer hover or keyboard focus) ─────────────────────────────
-// Text goes ink when the pixel fill covers >= 50 % (data-ink, set by the hook).
-.row[data-ink] {
-  color: $raw-ink;
-  .via, .cat, .role, .year { color: $raw-ink; }
-}
-
-@mixin on {
-  .arrowShaft { stroke-dashoffset: 0; transition: stroke-dashoffset 0.36s $ease-out-expo 0.12s; }
-  .arrowHead { stroke-dashoffset: 0; transition: stroke-dashoffset 0.32s $ease-out-expo 0.26s; }
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .item[data-on] .row { @include on; }
-}
-.item[data-on] .row:focus-visible { @include on; }
-
-// Others dim while one is active; an expanded row keeps the rest at 45 %.
-.list:has(.item[data-on]) .item:not([data-on]) .row { opacity: 0.35; }
-.hasOpen .item:not([data-open]):not([data-on]) .row { opacity: 0.45; }
-.item[data-open] .row .year { color: $color-text-hi; }
-
-@media (prefers-reduced-motion: reduce) {
-  .row, .arrowShaft, .arrowHead { transition: none !important; }
-}
-
-// ═══ Row hover styles (HoverMenu, .wrap[data-hover]) ═════════════════════════
-// The tab only makes sense with a pointer.
-.hoverMenu {
-  display: contents;
-  @media (hover: none) { display: none; }
-}
-
-.stage { position: relative; }
-
-// ── 01 headline: the name, huge, filled with its cover, behind the list ──────
-// The rows lose their plate so the letters show through; the list's rules cross
-// them like a ruled page. Pinned to the middle of the screen, never outside
-// the list (clip), full window width.
-.giant {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: calc(-1 * #{$m});
-  width: 100vw;
-  clip-path: inset(0);
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  &[data-on] { opacity: 1; transition: opacity 0.2s ease; }
-  @media (hover: none) { display: none; }
-}
-.giantPin {
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  display: grid;
-  place-items: center;
-  overflow: hidden;
-}
-@keyframes giantIn {
-  from { clip-path: inset(0 0 100% 0); transform: translate3d(0, 7%, 0); }
-  to { clip-path: inset(0 0 0 0); transform: none; }
-}
-.giantText {
-  display: block;
-  white-space: nowrap;
-  font-family: $font-body;
-  font-weight: $fw-regular;
-  font-size: 200px; // fitted by Giant()
-  line-height: 0.9;
-  letter-spacing: -0.045em;
-  color: transparent;
-  background-color: var(--c-stage);
-  background-size: cover;
-  background-position: 50% 50%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  // A hairline keeps the word readable when the cover is as dark as the page.
-  -webkit-text-stroke: 1px color-mix(in srgb, var(--c-text) 38%, transparent);
-  paint-order: stroke fill;
-  animation: giantIn 0.7s $ease-out-expo both;
-  @media (prefers-reduced-motion: reduce) { animation: none; }
-}
-[data-hover='headline'] {
-  .list { position: relative; }
-  .item { background: none; }
-  // While a word is up, the rows print in difference: light on the page, dark
-  // where a letter passes behind them, so every row stays readable.
-  @media (hover: hover) and (pointer: fine) {
-    .list:has(.item[data-on]) .row {
-      mix-blend-mode: difference;
-      color: #fff;
-      .via, .cat, .role, .year { color: #fff; }
-    }
-  }
-  // The rest step back so the letters carry the page.
-  .list:has(.item[data-on]) .item:not([data-on]) .row { opacity: 0.4; }
-}
-
-// ── 02 rule: a line draws under the row, the name steps in ───────────────────
-[data-hover='rule'] {
-  .item::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: -1px;
-    height: 1px;
-    background: $color-text-hi;
-    transform: scaleX(0);
-    transform-origin: 100% 50%; // leaves to the right…
-    transition: transform 0.45s $ease-out-expo;
-    pointer-events: none;
-  }
-  .item[data-on]::after { transform: scaleX(1); transform-origin: 0 50%; transition-duration: 0.7s; } // …enters from the left
-  .project { transition: transform 0.6s $ease-out-expo; }
-  .item[data-on] .project { transform: translate3d(14px, 0, 0); }
-  .item[data-on] .row { color: $color-text-hi; }
-  .item[data-on] .cat, .item[data-on] .role { color: $color-text-hi; }
-}
-
-// ── 03 inverse: the row turns over into a solid band ─────────────────────────
-[data-hover='inverse'] {
-  .row::before {
-    content: '';
-    position: absolute;
-    inset: 0 -10px;
-    z-index: -1;
-    background: $color-text;
-    transform: scaleY(0);
-    transform-origin: 50% 0;
-    transition: transform 0.22s ease-in;
-    pointer-events: none;
-  }
-  .item[data-on] .row::before { transform: scaleY(1); transform-origin: 50% 100%; transition: transform 0.42s $ease-out-expo; }
-  .row, .via, .cat, .role, .year { transition: opacity 0.28s $ease-out-quart, color 0.12s linear 0.04s; }
-  .item[data-on] .row { color: $color-bg; }
-  .item[data-on] .via, .item[data-on] .cat, .item[data-on] .role, .item[data-on] .year { color: $color-bg; }
-}
-
-// ── 05 swell: the row comes closer ───────────────────────────────────────────
-// --k is how near a row is to the pointer: 1 on it, 0.42 one row away, 0.14
-// two away, 0 beyond. Everything reads from it, so the swell has a soft
-// shoulder instead of one row popping out. Only transforms: the name grows
-// from its left edge (up to 12 %), the mono cells half as much, and the rows
-// above and below part 5 px so the list opens around it. Subtle on purpose.
-[data-hover='swell'] {
-  .item { --k: 0; transition: transform 0.6s $ease-out-expo; }
-  .item[data-on] { --k: 1; }
-  .item[data-on] + .item, .item:has(+ .item[data-on]) { --k: 0.42; }
-  .item[data-on] + .item + .item, .item:has(+ .item + .item[data-on]) { --k: 0.14; }
-  // The list parts around the row.
-  .item:has(~ .item[data-on]) { transform: translate3d(0, -5px, 0); }
-  .item[data-on] ~ .item { transform: translate3d(0, 5px, 0); }
-
-  .project, .via, .cat, .role, .year {
-    transition: transform 0.6s $ease-out-expo, color 0.2s ease;
-    transform-origin: 0 50%;
-    will-change: transform;
-  }
-  .project { transform: scale(calc(1 + 0.12 * var(--k))); }
-  .via, .cat, .role, .year { transform: scale(calc(1 + 0.06 * var(--k))); }
-  .year { transform-origin: 100% 50%; }
-  .nameText { overflow: visible; }
-
-  .item[data-on] .row { color: $color-text-hi; }
-  .item[data-on] .cat, .item[data-on] .role { color: $color-text; }
-  // Far rows recede; the neighbours stay half-way.
-  .list:has(.item[data-on]) .item:not([data-on]) .row { opacity: calc(0.38 + 0.62 * var(--k)); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .item, .item::after, .row::before, .project, .via, .cat, .role, .year { transition: none !important; }
-}
-
-// ── Touch: no hover; a small fixed thumbnail per row ─────────────────────────
-@media (hover: none) {
-  .thumb { display: block; }
-}
-
-// ── Phones: two lines (name + year / via · category), role hidden ────────────
-@include respond-to(md) {
-  .row {
-    grid-template-columns: minmax(0, 1fr) auto;
-    grid-template-areas: 'p y' 'm m';
-    row-gap: 4px;
-    padding-block: 12px;
-    > .project { grid-column: auto; grid-area: p; }
-    > .year { grid-column: auto; grid-area: y; }
-    > .via { grid-column: auto; grid-area: m; padding-left: 56px; }
-    > .cat, > .role { display: none; }
-  }
-  .via::after { content: none; }
-}
-
-// ─── Floating preview ─────────────────────────────────────────────────────────
-.svgDefs { position: absolute; width: 0; height: 0; overflow: hidden; }
-
-.preview {
+// ─── The fixed picture ───────────────────────────────────────────────────────
+.stage {
   position: fixed;
-  left: 0;
-  top: 0;
-  z-index: 60; // above main (10) and the transition canvas, under the nav (100)
-  pointer-events: none;
-  will-change: transform;
-}
-
-.pvFrame {
-  position: relative;
-  width: clamp(240px, 22vw, 400px);
-  aspect-ratio: 4 / 3;
-  opacity: 0;
-  transform: scale(0.88);
-  transform-origin: 30% 50%;
-  transition: opacity 0.14s ease-in, transform 0.18s ease-in;
-  [data-on] > & {
-    opacity: 1;
-    transform: scale(1);
-    transition: opacity 0.18s ease-out, transform 0.42s $ease-spring;
-  }
-  [data-instant] > & { transition: none; }
-}
-
-.pvSlot {
-  position: absolute;
-  inset: 0;
+  left: 50%;
+  top: 50%;
+  z-index: 40;
+  width: clamp(240px, min(27vw, 46vh), 480px);
+  aspect-ratio: 4 / 5;
   overflow: hidden;
-  isolation: isolate;
-  background: #000;
-  opacity: 0;
-  transition: opacity 0.22s ease;
-  &[data-cur] { opacity: 1; }
+  pointer-events: none;
+  background: var(--c-stage, #{$color-bg});
+  transform: translate(-50%, -50%);
+  clip-path: inset(50% 0 50% 0);
+  transition: clip-path 0.45s $ease-in-out-quart;
+
+  &[data-on] {
+    clip-path: inset(0);
+    transition: clip-path 0.7s $ease-out-expo;
+  }
 
   img {
     position: absolute;
-    inset: -16px; // room for the split
-    width: calc(100% + 32px);
-    height: calc(100% + 32px);
-    object-fit: cover;
+    inset: 0;
+    width: 100%;
+    height: 100%;
     max-width: none;
-    mix-blend-mode: screen;
-    will-change: transform;
+    object-fit: cover;
   }
 }
-// At rest: ONE plain image. The three-channel split only exists while moving.
-.pvR, .pvB { display: none; }
-[data-moving] {
-  .pvR { display: block; filter: url(#wk-ch-r); }
-  .pvG { filter: url(#wk-ch-g); }
-  .pvB { display: block; filter: url(#wk-ch-b); }
+
+.stageImg {
+  animation: wk-stage-in 0.75s $ease-out-expo both;
 }
 
-// G-blue crop ticks on the corners (the wireframe voice).
-.pvTick {
-  position: absolute;
-  width: 10px;
-  height: 10px;
-  border: 0 solid var(--c-g);
-  &[data-c='tl'] { top: -5px; left: -5px; border-top-width: 1px; border-left-width: 1px; }
-  &[data-c='tr'] { top: -5px; right: -5px; border-top-width: 1px; border-right-width: 1px; }
-  &[data-c='bl'] { bottom: -5px; left: -5px; border-bottom-width: 1px; border-left-width: 1px; }
-  &[data-c='br'] { bottom: -5px; right: -5px; border-bottom-width: 1px; border-right-width: 1px; }
+@keyframes wk-stage-in {
+  from { clip-path: inset(0 0 100% 0); transform: scale(1.14); }
+  to { clip-path: inset(0); transform: scale(1); }
 }
 
-.pvLabel {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 10px;
-  padding: 4px 6px;
-  border-radius: 3px;
-  background: $raw-chip;
-  color: $raw-ink;
-  font-family: $font-mono; font-weight: $fw-mono;
-  font-size: 10px;
-  line-height: 12px;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  white-space: nowrap;
-  opacity: 0;
-  transform: translate3d(0, -4px, 0);
-  transition: opacity 0.12s ease-in, transform 0.12s ease-in;
-  [data-on] > & {
-    opacity: 1;
-    transform: none;
-    transition: opacity 0.2s ease-out 0.08s, transform 0.3s $ease-out-expo 0.08s;
-  }
+// ─── Touch / small screens ───────────────────────────────────────────────────
+@media (hover: none), (max-width: 767px) {
+  .row { opacity: 1; }
+  .item[data-on] .left,
+  .item[data-on] .right { transform: none; }
+  .arrow { display: none; }
 }
-.pvDot { width: 5px; height: 5px; border-radius: 50%; background: var(--c-g); }
-.pvName { min-width: 1ch; }
+
+@media (max-width: 767px) {
+  .list { font-size: 10px; line-height: 14px; }
+  .row { padding: 14px 0; gap: 12px; }
+  .left, .right { gap: 12px; }
+}
+
+@media (max-width: 479px) {
+  .cat { display: none; }
+}
 
 @media (prefers-reduced-motion: reduce) {
-  .pvFrame, .pvLabel, .pvSlot { transition-duration: 0.01s !important; transition-delay: 0s !important; }
+  .left, .right, .row, .arrow { transition: none; }
+  .item[data-on] .left,
+  .item[data-on] .right { transform: none; }
+  .stage, .stage[data-on] { transition: none; }
+  .stageImg { animation: none; }
 }

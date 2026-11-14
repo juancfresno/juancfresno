@@ -10,13 +10,6 @@
   display: flex;
   flex-direction: column;
   padding-top: 72px; // header height (Figma v1/nav)
-  // Drawer open: the page steps back a little (transform only).
-  transition: transform 0.6s $ease-out-expo;
-  :global(html[data-work-open='drawer']) & { transform: translate3d(-2.5vw, 0, 0); }
-  @media (prefers-reduced-motion: reduce) {
-    transition: none;
-    :global(html[data-work-open='drawer']) & { transform: none; }
-  }
 }
 
 @mixin margins {
@@ -28,7 +21,6 @@
 // ─── 03 · Archive (pt 96, pb 120) ────────────────────────────────────────────
 .archive {
   @include margins;
-  position: relative; // the hover tab's rail (HoverMenu) hangs from the section's left edge
   display: grid;
   grid-template-columns: $cols-12;
   column-gap: $gutter;

@@ -1,133 +1,25 @@
 'use client'
 
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
-import clsx from 'clsx'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useUi } from '@/i18n/client'
-import { scrambleTo } from '@/lib/scramble'
-import HoverPreview, { type PreviewHandle } from './HoverPreview'
+import ElasticLine from '@/components/ui/ElasticLine/ElasticLine'
 import CaseDrawer from './CaseDrawer'
-import ExpandPanel from './ExpandPanel'
-import OpenStage from './OpenStage'
-import { prefersReduced } from './useOverlay'
-import { usePixelFill } from './usePixelFill'
-import HoverMenu, { HOVER_DEFAULT, HOVER_KEY, isHoverStyle, type HoverStyle } from './HoverMenu'
-import { OPEN_MODES, type OpenMode, type WorkItem } from './types'
+import type { WorkItem } from './types'
 import s from './archive.module.scss'
 
-// ─── /work list: Project · Via · Category · Role · Year (4 · 3 · 2 · 2 · 1) ───
-// Figma 03 · Archive (6951:13618). Rows are buttons, not links: they never go
-// to /work/[slug]; each case opens in its own mode (WorkItem.open, from
-// `open` in ALL_PROJECTS or, unset, <= 6 images → expand, else drawer):
-//   drawer — the case sheet (88 % wide)     → CaseDrawer
-//   expand — the row opens in place (FLIP) → ExpandPanel
-// Both coexist: opening a drawer case closes an open panel first; ← / → in the
-// drawer walks the list and keeps showing every case in the drawer, whatever
-// its mode (no jump between two UIs). Dev override: ?open=drawer|expand|stage
-// forces one mode for all rows (stage = OpenStage); not linked anywhere.
-// URL hash #slug while a project is open (shareable; opens on load).
-//
-// Row hover (fine pointers): the row fills with blue chip PIXELS in Bayer order
-// sweeping left → right (usePixelFill; text turns ink at 50 % cover), the project name
-// decodes (useScramble, 420 ms), an arrow draws itself, the other rows dim to
-// 35 %, and ONE floating cover follows the cursor (HoverPreview: spring,
-// velocity skew, RGB split, `NN / 30 · NAME` chip). Keyboard focus = the same.
-// First two images of the project preload on hover. Touch: no hover, each row
-// shows a small fixed thumbnail.
-
-function Row({ it, i, active, pixel, expanded, mode, panelId, onEnter, onLeave, onFocusRow, onBlurRow, onOpen }: {
-  it: WorkItem
-  i: number
-  active: boolean
-  pixel: boolean // hover style 'pixel': Bayer fill + name decode
-  expanded: boolean
-  mode: OpenMode
-  panelId: string
-  onEnter: (i: number, e: React.PointerEvent) => void
-  onLeave: () => void
-  onFocusRow: (i: number, el: HTMLElement) => void
-  onBlurRow: () => void
-  onOpen: (i: number, el: HTMLButtonElement) => void
-}) {
-  const ui0 = useUi()
-  const t = ui0.work
-  const rowRef = useRef<HTMLButtonElement>(null)
-  const fillRef = useRef<HTMLCanvasElement>(null)
-  usePixelFill(fillRef, rowRef, active && pixel)
-  // Name decode on activation: case-preserving glyphs (lib/scramble), so the
-  // Switzer line keeps its width while it resolves.
-  const nameRef = useRef<HTMLSpanElement>(null)
-  useEffect(() => {
-    const el = nameRef.current
-    if (!active || !pixel || !el || prefersReduced()) return
-    const cancel = scrambleTo(el, it.name, it.name, 420)
-    return () => { cancel(); el.textContent = it.name }
-  }, [active, pixel, it.name])
-  return (
-    <button
-      ref={rowRef}
-      type="button"
-      className={s.row}
-      data-row-btn={it.slug}
-      data-cursor="view"
-      data-cursor-label={ui0.cursor.row}
-      aria-label={`${it.name} · ${it.via} · ${it.category} · ${it.role} · ${it.year}. ${t.open(it.name)}`}
-      aria-expanded={mode === 'expand' ? expanded : undefined}
-      aria-controls={mode === 'expand' && expanded ? panelId : undefined}
-      aria-haspopup={mode === 'expand' ? undefined : 'dialog'}
-      onPointerEnter={(e) => onEnter(i, e)}
-      onPointerLeave={onLeave}
-      onFocus={(e) => { if (e.currentTarget.matches(':focus-visible')) onFocusRow(i, e.currentTarget) }}
-      onBlur={onBlurRow}
-      onClick={(e) => onOpen(i, e.currentTarget)}
-    >
-      <canvas ref={fillRef} className={s.fill} width={0} height={0} aria-hidden="true" />
-      <span className={s.project} data-name aria-hidden="true">
-        <span className={s.thumb}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={it.cover.src} alt="" loading="lazy" decoding="async" width={it.cover.w} height={it.cover.h} />
-        </span>
-        <span ref={nameRef} className={s.nameText}>{it.name}</span>
-        <svg className={s.arrow} width="9" height="9" viewBox="0 0 9 9" fill="none" aria-hidden="true">
-          <path className={s.arrowShaft} d="M 1.5 1.5 L 7.5 7.5" stroke="currentColor" strokeWidth="1.15" strokeLinecap="round" />
-          <path className={s.arrowHead} d="M 7.5 3.5 L 7.5 7.5 L 3.5 7.5" stroke="currentColor" strokeWidth="1.15" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      </span>
-      <span className={s.via} aria-hidden="true">{it.via}</span>
-      <span className={s.cat} aria-hidden="true">{it.category}</span>
-      <span className={s.role} aria-hidden="true">{it.role}</span>
-      <span className={s.year} aria-hidden="true">{it.year}</span>
-    </button>
-  )
-}
-
-// Hover style 'headline': the project name as big as the screen allows, its
-// letters filled with the cover, pinned to the middle of the viewport BEHIND
-// the list (the rows rule it like a page). One line, fitted to the width.
-function Giant({ it }: { it: WorkItem | null }) {
-  const boxRef = useRef<HTMLDivElement>(null)
-  const [shown, setShown] = useState<WorkItem | null>(null)
-  useEffect(() => { if (it) setShown(it) }, [it])
-  useLayoutEffect(() => {
-    const box = boxRef.current
-    const el = box?.querySelector<HTMLElement>('[data-giant]')
-    if (!box || !el) return
-    el.style.fontSize = '200px'
-    const w = el.scrollWidth || 1
-    const size = Math.min((box.clientWidth * 0.94 * 200) / w, window.innerHeight * 0.62)
-    el.style.fontSize = `${size.toFixed(1)}px`
-  }, [shown])
-  return (
-    <div className={s.giant} data-on={it ? '' : undefined} aria-hidden="true">
-      <div ref={boxRef} className={s.giantPin}>
-        {shown && (
-          <span key={shown.slug} data-giant className={s.giantText} style={{ backgroundImage: `url(${shown.cover.src})` }}>
-            {shown.title}
-          </span>
-        )}
-      </div>
-    </div>
-  )
-}
+// ─── /work list, the Biakone way (biakone.com/work) ──────────────────────────
+// Mono uppercase rows across the whole width, resting at half strength:
+//   ↘  NN  NAME ……………………………………………… VIA  CATEGORY  YEAR
+// The row under the pointer (or with keyboard focus) is the ACTIVE one: full
+// strength, the arrow shows, and its two ends step in towards the middle on a
+// spring. ONE picture, fixed in the middle of the window, shows the active
+// case's cover; a change of case wipes the new cover over the old one (top →
+// bottom, with a small settle). Dividers are ElasticLines, as on Biakone.
+// Rows are buttons (never navigate): every one opens the case drawer; the row
+// of the open case stays active and follows ← / →. URL hash #slug while a case
+// is open (shareable; opens on load).
+// Touch / small screens: no picture, rows at full strength.
 
 const preloaded = new Set<string>()
 const preload = (src?: string) => {
@@ -138,202 +30,65 @@ const preload = (src?: string) => {
   im.src = src
 }
 
+// The fixed picture: the current cover on top of the one before it.
+function Stage({ it, on }: { it: WorkItem | null; on: boolean }) {
+  const [pair, setPair] = useState<{ cur: WorkItem | null; prev: WorkItem | null }>({ cur: null, prev: null })
+  useEffect(() => {
+    if (!it) return
+    setPair((p) => (p.cur?.slug === it.slug ? p : { cur: it, prev: p.cur }))
+  }, [it])
+  if (typeof document === 'undefined') return null
+  return createPortal(
+    <div className={s.stage} data-on={on && pair.cur ? '' : undefined} aria-hidden="true">
+      {pair.prev && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img key={`p-${pair.prev.slug}`} className={s.stagePrev} src={pair.prev.cover.src} alt="" decoding="async" />
+      )}
+      {pair.cur && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img key={pair.cur.slug} className={s.stageImg} src={pair.cur.cover.src} alt="" decoding="async" />
+      )}
+    </div>,
+    document.body,
+  )
+}
+
 export default function WorkArchive({ items }: { items: WorkItem[] }) {
   const ui = useUi()
-  const a = ui.archive
-  const [force, setForce] = useState<OpenMode | null>(null) // ?open= dev override
-  const modeOf = useCallback((i: number): OpenMode => force ?? items[i].open, [force, items])
+  const t = ui.work
   const [hover, setHover] = useState<number | null>(null)
-  // Row hover style (HoverMenu), kept in localStorage.
-  const [style, setStyle] = useState<HoverStyle>(HOVER_DEFAULT)
-  const styleRef = useRef<HoverStyle>(HOVER_DEFAULT)
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem(HOVER_KEY)
-      if (isHoverStyle(saved)) { styleRef.current = saved; setStyle(saved) }
-    } catch { /* storage blocked */ }
-  }, [])
-  const [openIdx, setOpenIdx] = useState<number | null>(null) // drawer / stage
-  const [expanded, setExpanded] = useState<number | null>(null)
-  const [stageOrigin, setStageOrigin] = useState<DOMRect | null>(null)
-  const [stageRow, setStageRow] = useState<HTMLElement | null>(null)
-  const preview = useRef<PreviewHandle>(null)
-  const listRef = useRef<HTMLOListElement>(null)
-  const panelRef = useRef<HTMLDivElement>(null)
+  const [openIdx, setOpenIdx] = useState<number | null>(null)
+  const [fine, setFine] = useState(false)
   const opener = useRef<HTMLButtonElement | null>(null)
-  const fine = useRef(false)
-  const snap = useRef<{ tops: Map<Element, number>; anchor: Element | null; anchorTop: number; opening: boolean } | null>(null)
-  const total = String(items.length).padStart(2, '0')
-  // The row of the case open in the drawer stays filled (it shows in the
-  // strip of page left beside the sheet) and follows ← / →.
-  const lit = force !== 'stage' && expanded === null ? openIdx : null
+  const active = hover ?? openIdx
 
-  // The expand FLIP keeps the clicked row still itself; the browser's own
-  // scroll anchoring would adjust a second time.
+  // #slug on load.
   useEffect(() => {
-    const html = document.documentElement
-    const prev = html.style.overflowAnchor
-    html.style.overflowAnchor = 'none'
-    return () => { html.style.overflowAnchor = prev }
-  }, [])
-
-  // ?open= and #slug on load.
-  useEffect(() => {
-    fine.current = window.matchMedia('(hover: hover) and (pointer: fine)').matches
-    const q = new URLSearchParams(window.location.search).get('open') as OpenMode | null
-    const f: OpenMode | null = q && OPEN_MODES.includes(q) ? q : null
-    setForce(f)
-    const fromHash = () => {
-      const slug = decodeURIComponent(window.location.hash.slice(1))
-      const i = items.findIndex((x) => x.slug === slug)
-      if (i < 0) return
-      if ((f ?? items[i].open) === 'expand') {
-        setExpanded(i)
-        requestAnimationFrame(() => {
-          const li = listRef.current?.children[i] as HTMLElement | undefined
-          if (li) window.scrollTo({ top: window.scrollY + li.getBoundingClientRect().top - 96, behavior: 'instant' })
-        })
-      } else {
-        opener.current = document.querySelector<HTMLButtonElement>(`[data-row-btn="${slug}"]`)
-        setStageRow(opener.current)
-        setStageOrigin(null)
-        setOpenIdx(i)
-      }
-    }
-    fromHash()
+    setFine(window.matchMedia('(hover: hover) and (pointer: fine)').matches)
+    const slug = decodeURIComponent(window.location.hash.slice(1))
+    const i = items.findIndex((x) => x.slug === slug)
+    if (i < 0) return
+    opener.current = document.querySelector<HTMLButtonElement>(`[data-row-btn="${slug}"]`)
+    setOpenIdx(i)
   }, [items])
 
   // Hash follows what is open.
-  const current = expanded ?? openIdx
   useEffect(() => {
     const url = window.location.pathname + window.location.search
-    if (current === null) { if (window.location.hash) history.replaceState(history.state, '', url) }
-    else history.replaceState(history.state, '', `${url}#${items[current].slug}`)
-  }, [current, items])
+    if (openIdx === null) { if (window.location.hash) history.replaceState(history.state, '', url) }
+    else history.replaceState(history.state, '', `${url}#${items[openIdx].slug}`)
+  }, [openIdx, items])
 
-  // ── Hover ──
-  const onEnter = useCallback((i: number, e: React.PointerEvent) => {
-    if (e.pointerType !== 'mouse' || !fine.current) return
+  const activate = useCallback((i: number) => {
     setHover(i)
-    if (styleRef.current !== 'headline') preview.current?.show(i, e.clientX, e.clientY)
-    else preload(items[i].cover.src)
-    preload(items[i].images[0]?.src)
-    preload(items[i].images[1]?.src)
-  }, [items])
-  const pickStyle = useCallback((v: HoverStyle) => {
-    styleRef.current = v
-    setStyle(v)
-    preview.current?.hide(true)
-    try { localStorage.setItem(HOVER_KEY, v) } catch { /* storage blocked */ }
-  }, [])
-  const onLeave = useCallback(() => setHover(null), [])
-  const onFocusRow = useCallback((i: number, el: HTMLElement) => {
-    setHover(i)
-    if (fine.current && styleRef.current !== 'headline') preview.current?.anchor(i, el.getBoundingClientRect())
+    preload(items[i].cover.src)
     preload(items[i].images[0]?.src)
   }, [items])
-  const onBlurRow = useCallback(() => {
-    if (fine.current && document.activeElement?.closest('[data-row-btn]')) return
-    setHover(null)
-    preview.current?.hide()
-  }, [])
-  const onListMove = (e: React.PointerEvent) => { if (e.pointerType === 'mouse') preview.current?.move(e.clientX, e.clientY) }
-  const onListLeave = () => { setHover(null); preview.current?.hide() }
 
-  // ── Expand: FLIP snapshot → state → animate ──
-  const snapshot = (anchor: Element | null, opening: boolean) => {
-    const tops = new Map<Element, number>()
-    const list = listRef.current
-    if (!list) return
-    Array.from(list.children).forEach((li) => tops.set(li, li.getBoundingClientRect().top))
-    const after = document.querySelector('[data-flip-after]')
-    if (after) tops.set(after, after.getBoundingClientRect().top)
-    snap.current = { tops, anchor, anchorTop: anchor?.getBoundingClientRect().top ?? 0, opening }
-  }
-
-  useLayoutEffect(() => {
-    const sn = snap.current
-    if (!sn) return
-    snap.current = null
-    // Keep the clicked row still (a panel above it may have closed).
-    if (sn.anchor) {
-      const d = sn.anchor.getBoundingClientRect().top - sn.anchorTop
-      if (Math.abs(d) > 0.5) window.scrollBy({ top: d, behavior: 'instant' }) // html has scroll-behavior: smooth
-    }
-    const reduce = prefersReduced()
-    sn.tops.forEach((oldTop, el) => {
-      const dy = oldTop - el.getBoundingClientRect().top
-      if (Math.abs(dy) < 0.5 || reduce) return
-      ;(el as HTMLElement).animate(
-        [{ transform: `translate3d(0, ${dy}px, 0)` }, { transform: 'translate3d(0, 0, 0)' }],
-        { duration: 620, easing: 'cubic-bezier(0.19, 1, 0.22, 1)' },
-      )
-    })
-    const panel = panelRef.current
-    if (panel && sn.opening) {
-      panel.animate(
-        reduce
-          ? [{ opacity: 0 }, { opacity: 1 }]
-          : [{ opacity: 0, transform: 'translate3d(0, -24px, 0)' }, { opacity: 1, transform: 'none' }],
-        { duration: reduce ? 160 : 560, delay: reduce ? 0 : 80, easing: 'cubic-bezier(0.19, 1, 0.22, 1)', fill: 'backwards' },
-      )
-      // Bring the opened row near the top if the panel would run off screen.
-      const li = panel.parentElement
-      if (li) {
-        const r = li.getBoundingClientRect()
-        if (r.bottom > window.innerHeight || r.top < 72) {
-          window.scrollTo({ top: window.scrollY + r.top - 96, behavior: reduce ? 'auto' : 'smooth' })
-        }
-      }
-      requestAnimationFrame(() => panel.focus({ preventScroll: true }))
-    }
-  }, [expanded])
-
-  const collapse = useCallback((then?: () => void) => {
-    const panel = panelRef.current
-    const li = panel?.parentElement ?? null
-    const finish = () => {
-      snapshot(li, false)
-      setExpanded(null)
-      then?.()
-    }
-    if (!panel || prefersReduced()) { finish(); return }
-    panel.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 160, easing: 'ease-in', fill: 'forwards' }).onfinish = finish
-  }, [])
-
-  // ── Open ──
-  const onOpen = useCallback((i: number, el: HTMLButtonElement) => {
-    opener.current = el
-    const mode = modeOf(i)
-    if (mode === 'expand') {
-      preview.current?.hide()
-      if (expanded === i) { collapse(() => el.focus({ preventScroll: true })); return }
-      // Only one panel at a time (a different one open collapses into this one).
-      snapshot(el.parentElement, true)
-      setExpanded(i)
-      return
-    }
-    // Drawer / stage: an open panel closes first.
-    if (expanded !== null) {
-      preview.current?.hide()
-      collapse(() => setOpenIdx(i))
-      return
-    }
-    if (mode === 'stage') {
-      setStageOrigin(preview.current?.rect() ?? null)
-      setStageRow(el)
-      preview.current?.hide(true)
-    } else {
-      preview.current?.hide()
-    }
-    setOpenIdx(i)
-  }, [modeOf, expanded, collapse])
-
-  const closeOverlay = useCallback(() => {
+  const closeDrawer = useCallback(() => {
     setOpenIdx(null)
-    // Return focus to the row (drawer now; the stage after its fly-back).
-    if (force !== 'stage') requestAnimationFrame(() => opener.current?.focus({ preventScroll: true }))
-  }, [force])
+    requestAnimationFrame(() => opener.current?.focus({ preventScroll: true }))
+  }, [])
 
   const navDrawer = useCallback((dir: 1 | -1) => {
     setOpenIdx((v) => {
@@ -345,68 +100,43 @@ export default function WorkArchive({ items }: { items: WorkItem[] }) {
   }, [items])
 
   return (
-    <div className={s.wrap} data-hover={style}>
-      <HoverMenu value={style} onChange={pickStyle} />
-      <div className={s.head} aria-hidden="true">
-        <span>{a.project}</span>
-        <span>{a.via}</span>
-        <span className={s.cat}>{a.category}</span>
-        <span className={s.role}>{a.role}</span>
-        <span className={s.year}>{a.year}</span>
-      </div>
-      <div className={s.stage}>
-        {style === 'headline' && <Giant it={hover !== null ? items[hover] : null} />}
-      <ol
-        ref={listRef}
-        className={clsx(s.list, expanded !== null && s.hasOpen)}
-        aria-label={ui.work.list}
-        onPointerMove={onListMove}
-        onPointerLeave={onListLeave}
-      >
+    <div className={s.wrap}>
+      <ol className={s.list} aria-label={t.list} onPointerLeave={() => setHover(null)}>
         {items.map((it, i) => (
-          <li key={it.slug} className={s.item} data-on={hover === i || lit === i ? '' : undefined} data-open={expanded === i ? '' : undefined}>
-            <Row
-              it={it}
-              i={i}
-              active={hover === i || lit === i}
-              pixel={style === 'pixel'}
-              expanded={expanded === i}
-              mode={modeOf(i)}
-              panelId={`work-panel-${it.slug}`}
-              onEnter={onEnter}
-              onLeave={onLeave}
-              onFocusRow={onFocusRow}
-              onBlurRow={onBlurRow}
-              onOpen={onOpen}
-            />
-            {expanded === i && (
-              <ExpandPanel
-                ref={panelRef}
-                it={it}
-                id={`work-panel-${it.slug}`}
-                onClose={() => collapse(() => opener.current?.focus({ preventScroll: true }))}
-              />
-            )}
+          <li key={it.slug} className={s.item} data-on={active === i ? '' : undefined}>
+            {i === 0 && <ElasticLine className={`${s.line} ${s.lineTop}`} />}
+            <button
+              type="button"
+              className={s.row}
+              data-row-btn={it.slug}
+              data-cursor="view"
+              data-cursor-label={ui.cursor.row}
+              aria-label={`${it.name} · ${it.via} · ${it.category} · ${it.year}. ${t.open(it.name)}`}
+              aria-haspopup="dialog"
+              onPointerEnter={(e) => { if (e.pointerType === 'mouse') activate(i) }}
+              onFocus={(e) => { if (e.currentTarget.matches(':focus-visible')) activate(i) }}
+              onBlur={() => setHover(null)}
+              onClick={(e) => { opener.current = e.currentTarget; setHover(null); setOpenIdx(i) }}
+            >
+              <span className={s.left} aria-hidden="true">
+                <span className={s.arrow}>↘</span>
+                <span className={s.code}>{it.n}</span>
+                <span className={s.name}>{it.name}</span>
+              </span>
+              <span className={s.right} aria-hidden="true">
+                <span className={s.via}>{it.via}</span>
+                <span className={s.cat}>{it.category}</span>
+                <span>{it.year}</span>
+              </span>
+            </button>
+            <ElasticLine className={s.line} />
           </li>
         ))}
       </ol>
-      </div>
 
-      <HoverPreview ref={preview} items={items} total={total} calm={style !== 'pixel'} />
+      {fine && <Stage it={hover !== null ? items[hover] : null} on={hover !== null && openIdx === null} />}
 
-      {force !== 'stage' && (
-        <CaseDrawer items={items} index={openIdx} onClose={closeOverlay} onNav={navDrawer} />
-      )}
-      {force === 'stage' && (
-        <OpenStage
-          items={items}
-          index={openIdx}
-          origin={stageOrigin}
-          rowEl={stageRow}
-          onClose={() => setOpenIdx(null)}
-          onClosed={() => requestAnimationFrame(() => opener.current?.focus({ preventScroll: true }))}
-        />
-      )}
+      <CaseDrawer items={items} index={openIdx} onClose={closeDrawer} onNav={navDrawer} />
     </div>
   )
 }
