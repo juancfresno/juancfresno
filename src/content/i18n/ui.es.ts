@@ -120,7 +120,7 @@ export const UI_ES: UiDict = {
       tab: 'Hover',
       aria: 'Estilo de hover de las filas',
       title: 'Hover · pasa por una fila',
-      styles: { headline: 'Titular', rule: 'Línea', inverse: 'Inverso', pixel: 'Píxel' },
+      styles: { headline: 'Titular', rule: 'Línea', inverse: 'Inverso', pixel: 'Píxel', swell: 'Hinchar' },
     },
     nextOpen: (name: string) => `Siguiente proyecto: ${name}`,
     question: 'La pregunta',

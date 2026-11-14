@@ -13,7 +13,8 @@ import s from './archive.module.scss'
 //   rule     — a line draws under the row, the name steps in, a calm cover follows
 //   inverse  — the row turns over into a solid band
 //   pixel    — the earlier one: blue Bayer pixels + RGB-split cover (kept)
-export const HOVER_STYLES = ['headline', 'rule', 'inverse', 'pixel'] as const
+//   swell    — the row comes closer: it grows a little, its neighbours less, the list opens around it
+export const HOVER_STYLES = ['headline', 'rule', 'inverse', 'pixel', 'swell'] as const
 export type HoverStyle = (typeof HOVER_STYLES)[number]
 export const HOVER_DEFAULT: HoverStyle = 'headline'
 export const HOVER_KEY = 'work:hover'

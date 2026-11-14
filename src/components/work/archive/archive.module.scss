@@ -276,8 +276,39 @@
   .item[data-on] .via, .item[data-on] .cat, .item[data-on] .role, .item[data-on] .year { color: $color-bg; }
 }
 
+// ── 05 swell: the row comes closer ───────────────────────────────────────────
+// --k is how near a row is to the pointer: 1 on it, 0.42 one row away, 0.14
+// two away, 0 beyond. Everything reads from it, so the swell has a soft
+// shoulder instead of one row popping out. Only transforms: the name grows
+// from its left edge (up to 12 %), the mono cells half as much, and the rows
+// above and below part 5 px so the list opens around it. Subtle on purpose.
+[data-hover='swell'] {
+  .item { --k: 0; transition: transform 0.6s $ease-out-expo; }
+  .item[data-on] { --k: 1; }
+  .item[data-on] + .item, .item:has(+ .item[data-on]) { --k: 0.42; }
+  .item[data-on] + .item + .item, .item:has(+ .item + .item[data-on]) { --k: 0.14; }
+  // The list parts around the row.
+  .item:has(~ .item[data-on]) { transform: translate3d(0, -5px, 0); }
+  .item[data-on] ~ .item { transform: translate3d(0, 5px, 0); }
+
+  .project, .via, .cat, .role, .year {
+    transition: transform 0.6s $ease-out-expo, color 0.2s ease;
+    transform-origin: 0 50%;
+    will-change: transform;
+  }
+  .project { transform: scale(calc(1 + 0.12 * var(--k))); }
+  .via, .cat, .role, .year { transform: scale(calc(1 + 0.06 * var(--k))); }
+  .year { transform-origin: 100% 50%; }
+  .nameText { overflow: visible; }
+
+  .item[data-on] .row { color: $color-text-hi; }
+  .item[data-on] .cat, .item[data-on] .role { color: $color-text; }
+  // Far rows recede; the neighbours stay half-way.
+  .list:has(.item[data-on]) .item:not([data-on]) .row { opacity: calc(0.38 + 0.62 * var(--k)); }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .item::after, .row::before, .project { transition: none !important; }
+  .item, .item::after, .row::before, .project, .via, .cat, .role, .year { transition: none !important; }
 }
 
 // ── Touch: no hover; a small fixed thumbnail per row ─────────────────────────

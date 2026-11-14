@@ -122,7 +122,7 @@ export const UI_EN = {
       tab: 'Hover',
       aria: 'Row hover style',
       title: 'Hover · move over a row',
-      styles: { headline: 'Headline', rule: 'Rule', inverse: 'Inverse', pixel: 'Pixel' },
+      styles: { headline: 'Headline', rule: 'Rule', inverse: 'Inverse', pixel: 'Pixel', swell: 'Swell' },
     },
     nextOpen: (name: string) => `Next project: ${name}`,
     question: 'The question',
