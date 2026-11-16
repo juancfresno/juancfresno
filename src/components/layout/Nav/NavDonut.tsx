@@ -99,5 +99,5 @@ export default function NavDonut({ active }: { active: boolean }) {
 
   useEffect(() => { wake.current() }, [active])
 
-  return <canvas ref={ref} className={s.navDonut} style={{ width: BOX, height: BOX }} aria-hidden="true" />
+  return <canvas ref={ref} className={s.navDonut} data-corner-donut="" style={{ width: BOX, height: BOX }} aria-hidden="true" />
 }

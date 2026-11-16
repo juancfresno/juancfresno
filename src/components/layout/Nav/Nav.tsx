@@ -63,7 +63,7 @@ const GlitchLogo = () => (
 
 // ─── VHS Glitch Face — 3-layer con CSS filter para el split de color ─────────
 // El face SVG tiene colores hardcoded, usamos filter para crear los canales R/B
-const GlitchFace = () => (
+export const GlitchFace = () => (
   <span className={s.faceGlitchWrap} aria-hidden="true">
     {/* Canal cian — filter hue-rotate hacia cian */}
     <span className={clsx(s.faceGl, s.faceGlB)}><BiakoFace /></span>
@@ -159,7 +159,7 @@ export default function Nav() {
 
   return (
     <>
-      <header data-site-header className={clsx(s.nav, hidden && s.hidden, scrolled && s.scrolled)}>
+      <header data-site-header data-hidden={hidden || undefined} className={clsx(s.nav, hidden && s.hidden, scrolled && s.scrolled)}>
         <div className={s.inner}>
           {/* ── Left cluster: face + nav menu ── */}
           <div className={s.left}>

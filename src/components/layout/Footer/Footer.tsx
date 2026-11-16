@@ -13,6 +13,8 @@ import GlitchSocialIcon from '@/components/ui/GlitchSocialIcon/GlitchSocialIcon'
 import { useHref, useUi } from '@/i18n/client'
 import LocaleSwitch from '@/components/ui/LocaleSwitch/LocaleSwitch'
 import type { FeedItem } from '@/content/feed'
+import { GlitchFace } from '@/components/layout/Nav/Nav'
+import FooterDonut, { grabBackdrop } from './FooterDonut'
 
 // The live landing's background (the feed mosaic through the fisheye), with
 // smaller pieces. Client-only (WebGL2), loaded when the footer is near.
@@ -43,6 +45,7 @@ export default function Footer({ close, feed }: { close?: ReactNode; feed?: Feed
   const pathname = usePathname() || '/'
   const full = !!close && !/\/contact\/?$/.test(pathname)
   const root = useRef<HTMLElement | null>(null)
+  const screen = useRef<HTMLDivElement | null>(null)
 
   // Mount the lens (30 images + a WebGL context) only when the footer is close.
   const [near, setNear] = useState(false)
@@ -63,8 +66,11 @@ export default function Footer({ close, feed }: { close?: ReactNode; feed?: Feed
 
   return (
     <footer ref={root} data-site-footer className={clsx(s.footer, full && s.full)} onFocusCapture={onFocus}>
-      <div className={s.screen}>
-        {full && near && !!feed?.length && <OrbBackdrop items={feed} mode="lens" scale={LENS_SCALE} veilClassName={s.veil} />}
+      <div className={s.screen} ref={screen}>
+        {full && near && !!feed?.length && <OrbBackdrop items={feed} mode="lens" scale={LENS_SCALE} veilClassName={s.veil} onFrame={grabBackdrop} />}
+        {/* The face, where the header has it (Figma 7370:5290): the header is hidden down here. */}
+        {full && <a href={href('/')} className={s.footFace} aria-label={ui.nav.home}><GlitchFace /></a>}
+        {full && <FooterDonut root={root} screen={screen} />}
         {full && <div className={s.close}>{close}</div>}
 
         <div className={s.inner}>

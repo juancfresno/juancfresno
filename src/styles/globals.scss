@@ -137,6 +137,11 @@ $chrome: '[data-site-header], [data-site-tabbar]';
 // About: the 3D donut docks in the header corner on scroll, so the nav
 // wordmark steps aside while that page's donut is alive (LogoDonut).
 :root:has([data-logo-dock]) [data-site-wordmark] { visibility: hidden; }
+
+// The footer has its own donut (FooterDonut): while the footer is being
+// uncovered, the header corner (wordmark, nav ring, About's docked ring) clears.
+html[data-foot-donut] [data-site-wordmark],
+html[data-foot-donut] [data-corner-donut] { opacity: 0 !important; transition: opacity 0.2s; }
 // Leaving Contact: the chrome goes back to the site theme before the page does.
 :root[data-page-theme="blue"]:not([data-chrome="blue"]) :is(#{$chrome}, [data-site-footer]) { @include theme-dark; }
 :root[data-theme="light"][data-page-theme="blue"]:not([data-chrome="blue"]) :is(#{$chrome}, [data-site-footer]) { @include theme-light; }

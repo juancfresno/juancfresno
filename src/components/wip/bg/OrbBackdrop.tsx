@@ -34,7 +34,11 @@ function geometry(mode: OrbMode, W: number, H: number) {
 
 // `scale` shrinks the mosaic (lens only); `veilClassName` swaps the hero's veil
 // for another (the footer has its own).
-export default function OrbBackdrop({ items, mode, scale = 1, veilClassName }: { items: FeedItem[]; mode: OrbMode; scale?: number; veilClassName?: string }) {
+// `onFrame` is called right after each draw, while the canvas still holds the
+// picture (the footer's glass donut copies it from there).
+export default function OrbBackdrop({ items, mode, scale = 1, veilClassName, onFrame }: { items: FeedItem[]; mode: OrbMode; scale?: number; veilClassName?: string; onFrame?: (canvas: HTMLCanvasElement) => void }) {
+  const frameCb = useRef(onFrame)
+  frameCb.current = onFrame
   const [fallback, setFallback] = useState(false)
   const stageRef = useRef<HTMLDivElement>(null)
   const glRef = useRef<HTMLCanvasElement>(null)
@@ -110,6 +114,7 @@ export default function OrbBackdrop({ items, mode, scale = 1, veilClassName }: {
       const mag = splitMag(sp) * fx
       const split: [number, number] = sp > 0.001 ? [(sx / sp) * mag, (sy / sp) * mag] : [0, 0]
       o.draw({ mode, a, b, cx: g.cx, cy: g.cy, r: g.r, split, bg, scale })
+      frameCb.current?.(cv)
       ;(window as unknown as { __orb?: object }).__orb = { mode, speed: sp, split: mag, cx: g.cx, cy: g.cy } // QA probe, like window.__feedCanvas
       lastDraw = now
       if (force) return false

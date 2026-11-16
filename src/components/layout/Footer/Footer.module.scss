@@ -305,3 +305,35 @@
     display: none;
   }
 }
+
+// ─── The donut and the face (FooterDonut, Figma 7370:5290) ───────────────────
+// One canvas over the whole viewport, above everything but the page transition
+// and the cursor; it never takes the pointer. The ink is the brand blue here
+// only until FooterDonut reads the footer's own colours (it picks blue or ink
+// from the footer background, whatever the page theme).
+.footDonut {
+  position: fixed;
+  inset: 0;
+  z-index: 440;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  visibility: hidden;
+  pointer-events: none;
+  color: $raw-chip;
+}
+
+// The face at the header's own spot (row padding 1.25rem, page margin). Hidden
+// while the real header is showing, so the two never overlap.
+.footFace {
+  position: absolute;
+  top: 1.25rem;
+  left: max($m, env(safe-area-inset-left, 0px));
+  z-index: 2;
+  display: block;
+  line-height: 0;
+  transition: opacity $duration-base $ease-out-quart;
+  @include focus-ring;
+
+  :global(html:has([data-site-header]:not([data-hidden]))) & { opacity: 0; pointer-events: none; }
+}
