@@ -51,9 +51,6 @@ export const DONUT = {
   refract: 0.15,     // how far the glass bends what is behind it
   dispersion: 0.04,  // colour split at the edges (0 = none)
   shine: 1.5,        // strength of the reflections
-  backDim: 0.22,     // glass over a backdrop (footer): how much of the page bg veils what it bends
-  backGap: 0.9,      // … how solid the glass is between the letters (1 = opaque)
-  backShine: 0.4,    // … reflections there (× shine)
   flatLogo: 0.952,   // width of the flat wordmark behind the glass (fraction of the canvas)
   fov: 9,            // degrees; lower = flatter, more graphic (less difference between front and back)
 }
@@ -139,9 +136,6 @@ uniform vec4 uLogo;      // flat wordmark rect in screen uv: x, y, w, h
 uniform vec2 uCell;      // texture cell: gap, fill
 uniform vec3 uGlass;     // refract, dispersion, shine
 uniform float uMorph;
-uniform sampler2D uBack;  // what is behind the ring (the footer's lens), top row first
-uniform vec4 uBackRect;  // its box on the canvas: x, y from the top-left, w, h (0..1)
-uniform vec4 uBackFx;    // 1 = there is a backdrop, veil towards the bg, glass alpha between letters, shine
 out vec4 o;
 
 float hash(vec2 p) {
@@ -183,24 +177,6 @@ void main() {
   if (dot(N, V) < 0.0) N = -N;
   float F = pow(1.0 - dot(N, V), 3.0);
   vec2 k = vec2(uRes.y / uRes.x, 1.0) * uGlass.x;
-  if (uBackFx.x > 0.5) {
-    // Glass tube over a live backdrop: the picture behind is bent through it.
-    // The wordmark is drawn over it afterwards, in ink, as on the plain ring.
-    vec3 bk;
-    for (int i = 0; i < 3; i++) {
-      vec2 p = suv + refract(-V, N, 1.0 / (1.18 + (float(i) - 1.0) * uGlass.y)).xy * k;
-      vec2 q = (vec2(p.x, 1.0 - p.y) - uBackRect.xy) / uBackRect.zw;
-      bk[i] = texture(uBack, clamp(q, 0.0, 1.0))[i];
-    }
-    vec3 R = reflect(-V, N);
-    float env = smoothstep(0.5, 0.85, R.y) + 0.7 * smoothstep(0.8, 0.97, abs(R.x)) + 0.4 * smoothstep(-0.7, -0.95, R.y);
-    vec3 irid = 0.5 + 0.5 * cos(6.2832 * (F * 1.4 + R.x * 0.6 + vec3(0.0, 0.33, 0.67)));
-    vec3 col = mix(bk, uBg, uBackFx.y) * (1.0 + F * 0.6);
-    col += uGlass.z * uBackFx.w * (env * mix(vec3(1.0), irid, 0.3) * (0.22 + F * 0.9) + F * irid * 0.25 + pow(1.0 - dot(N, V), 6.0) * 0.8);
-    float A = mix(uBackFx.z, 1.0, F) * uAlpha;
-    o = vec4(col * A, A);
-    return;
-  }
   vec3 a = vec3(
     logoAt(suv + refract(-V, N, 1.0 / (1.18 - uGlass.y)).xy * k),
     logoAt(suv + refract(-V, N, 1.0 / 1.18).xy * k),
@@ -277,9 +253,7 @@ function parseColor(css: string): [number, number, number] {
 }
 
 export type LogoDonutHandle = {
-  /** Glass over a live picture: `src` is drawn behind the ring (a small 2D canvas, re-uploaded when `version` changes), `rect` its box on this canvas in css px. null = none. */
-  setBackdrop: (src: HTMLCanvasElement | null, version?: number, rect?: { x: number; y: number; w: number; h: number }, veil?: [number, number, number]) => void
-  stop: () => void; setGlass: (on: boolean | number) => void; setQuality: (q: number) => void; setPlace: (cx: number, cy: number, d: number, roll: number, open: number, alpha: number) => void; kick: (v: number) => void
+  stop: () => void; setGlass: (on: boolean) => void; setQuality: (q: number) => void; setPlace: (cx: number, cy: number, d: number, roll: number, open: number, alpha: number) => void; kick: (v: number) => void
   setMorph: (m: number, cx: number, top: number, w: number, len: number) => void
   setInk: (rgb: [number, number, number] | null, grain?: number) => void
   setPaused: (on: boolean) => void
@@ -348,20 +322,7 @@ export function startLogoDonut(canvas: HTMLCanvasElement): LogoDonutHandle | nul
     rep: U('uRep'), off: U('uOff'), alpha: U('uAlpha'), grain: U('uGrain'), res: U('uRes'),
     cam: U('uCam'), logo: U('uLogo'), cell: U('uCell'), glass: U('uGlass'),
     morph: U('uMorph'), strip: U('uStrip'), flat: U('uFlat'),
-    back: U('uBack'), backRect: U('uBackRect'), backFx: U('uBackFx'),
   }
-  gl.uniform1i(U('uTex'), 0)
-  gl.uniform1i(u.back, 1)
-  const backTex = gl.createTexture()
-  gl.activeTexture(gl.TEXTURE1)
-  gl.bindTexture(gl.TEXTURE_2D, backTex)
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 0, 255]))
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
-  gl.activeTexture(gl.TEXTURE0)
-  const back = { src: null as HTMLCanvasElement | null, v: -1, up: -2, x: 0, y: 0, w: 1, h: 1, bg: null as [number, number, number] | null }
 
   gl.disable(gl.CULL_FACE)
   gl.enable(gl.BLEND)
@@ -424,8 +385,7 @@ export function startLogoDonut(canvas: HTMLCanvasElement): LogoDonutHandle | nul
     gl.uniform3fv(u.rip, rip)
     const ink = tint ?? color
     gl.uniform3f(u.color, ink[0], ink[1], ink[2])
-    const veil = back.bg ?? bg
-    gl.uniform3f(u.bg, veil[0], veil[1], veil[2])
+    gl.uniform3f(u.bg, bg[0], bg[1], bg[2])
     gl.uniform2f(u.rep, -DONUT.repeat, -DONUT.rows)
     const sway = reduced.matches ? 0 : Math.sin(t * DONUT.rollSpeed) * DONUT.roll
     gl.uniform2f(u.off, 0, 0.5 + (DONUT.face + sway) * DONUT.rows)
@@ -441,38 +401,25 @@ export function startLogoDonut(canvas: HTMLCanvasElement): LogoDonutHandle | nul
     gl.uniform3f(u.glass, DONUT.refract, DONUT.dispersion, DONUT.shine)
 
     const k = glass * glass * (3 - 2 * glass)
-    const live = !!back.src
-    if (live && k > 0.001 && back.up !== back.v) {
-      gl.activeTexture(gl.TEXTURE1)
-      gl.bindTexture(gl.TEXTURE_2D, backTex)
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, back.src!)
-      gl.activeTexture(gl.TEXTURE0)
-      back.up = back.v
-    }
-    gl.uniform4f(u.backRect, back.x / cssW, back.y / cssH, Math.max(1e-4, back.w / cssW), Math.max(1e-4, back.h / cssH))
-    gl.uniform4f(u.backFx, live ? 1 : 0, DONUT.backDim, DONUT.backGap, DONUT.backShine)
     gl.disable(gl.DEPTH_TEST)
-    if (k > 0.001 && !live) { // the flat wordmark the glass bends
+    if (k > 0.001) { // the flat wordmark the glass bends
       gl.bindVertexArray(flat)
       gl.uniform1i(u.mode, 2)
       gl.uniform1f(u.alpha, k)
       gl.drawArrays(gl.TRIANGLES, 0, 3)
     }
     gl.bindVertexArray(vao)
-    const inkPass = () => {
-      gl.disable(gl.DEPTH_TEST)
+    if (k < 0.999) { // ink ring
       gl.uniform1i(u.mode, 0)
-      gl.uniform1f(u.alpha, (live ? 1 : 1 - k) * at.alpha)
+      gl.uniform1f(u.alpha, (1 - k) * at.alpha)
       gl.drawElements(gl.TRIANGLES, mesh.idx.length, gl.UNSIGNED_SHORT, 0)
     }
-    if (k < 0.999 && !live) inkPass()
     if (k > 0.001) { // glass tube: solid, nearest surface wins
       gl.enable(gl.DEPTH_TEST)
       gl.uniform1i(u.mode, 1)
-      gl.uniform1f(u.alpha, live ? k * at.alpha : k)
+      gl.uniform1f(u.alpha, k)
       gl.drawElements(gl.TRIANGLES, mesh.idx.length, gl.UNSIGNED_SHORT, 0)
     }
-    if (live) inkPass() // over live glass the letters stay on top, both sides of the ring
   }
 
   const frame = (now: number) => {
@@ -603,9 +550,7 @@ export function startLogoDonut(canvas: HTMLCanvasElement): LogoDonutHandle | nul
     reduced.removeEventListener('change', wake)
     gl.getExtension('WEBGL_lose_context')?.loseContext()
   }
-  const setGlass = (on: boolean | number) => {
-    // A number sets the amount at once (the footer drives it from the scroll).
-    if (typeof on === 'number') { glass = glassTo = Math.min(1, Math.max(0, on)); return }
+  const setGlass = (on: boolean) => {
     glassTo = on ? 1 : 0
     if (reduced.matches) { glass = glassTo; draw() } else schedule()
   }
@@ -624,11 +569,7 @@ export function startLogoDonut(canvas: HTMLCanvasElement): LogoDonutHandle | nul
   const setMorph = (m: number, cx: number, top: number, w: number, len: number) => {
     flatAt.m = m; flatAt.cx = cx; flatAt.top = top; flatAt.w = w; flatAt.len = len
   }
-  const setBackdrop = (src: HTMLCanvasElement | null, version = 0, rect?: { x: number; y: number; w: number; h: number }, veil?: [number, number, number]) => {
-    back.src = src; back.v = version; back.bg = veil ?? null
-    if (rect) { back.x = rect.x; back.y = rect.y; back.w = rect.w; back.h = rect.h }
-  }
   const setInk = (rgb: [number, number, number] | null, grain = 1) => { tint = rgb; grainK = grain }
   const setPaused = (on: boolean) => { paused = on; if (!on) { last = 0; schedule() } }
-  return { setBackdrop, stop, setGlass, setQuality, setPlace, kick, setMorph, setInk, setPaused }
+  return { stop, setGlass, setQuality, setPlace, kick, setMorph, setInk, setPaused }
 }

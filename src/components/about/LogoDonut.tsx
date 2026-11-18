@@ -134,7 +134,7 @@ export default function LogoDonut() {
   return (
     <>
       <div ref={slot} className={a.donutSlot} data-logo-dock="" />
-      {host && createPortal(<canvas ref={ref} className={a.donut} data-corner-donut="" role="img" aria-label="Fresno©" />, host)}
+      {host && createPortal(<canvas ref={ref} className={a.donut} role="img" aria-label="Fresno©" />, host)}
     </>
   )
 }
