@@ -14,12 +14,13 @@
 // MosaicCover is stateless about time: `render(p, gate)` draws the piece at
 // scroll progress p (0 = not there, 1 = clean image) capped by `gate`, a
 // timed 0 → 1 ramp the caller plays once (page load, fast scroll), which
-// sweeps left → right. Scrolling back simply lowers p: blocks merge again.
+// has no direction: the blocks resolve scattered over the whole piece, like
+// a picture coming into focus. Scrolling back simply lowers p: blocks merge again.
 
 const SIZES = [48, 24, 12, 6] // css px, coarse → fine
 const NOISE = 0.34 // per-block offset in the order
 const VERT = 0.5 // top → bottom share (scroll)
-const SIDE = 0.45 // left → right share (timed gate)
+const SCATTER = 0.7 // spread of the per-block order in the timed gate (no direction)
 const STEPS = SIZES.length + 1 // hidden, then one step per size; 1 = clean
 const OFF = 27 // css px the grid starts before the photo (off every cell size: 27 mod 6, 12, 24, 48 ≠ 0)
 
@@ -129,7 +130,7 @@ export class MosaicCover {
     }
     if (this.cv.style.display === 'none') this.cv.style.display = ''
     const { cols, rows, block, lvl, noise, mips } = this
-    const ps = p * (1 + NOISE + VERT), pg = gate * (1 + NOISE + SIDE)
+    const ps = p * (1 + NOISE + VERT), pg = gate * (1 + SCATTER)
     let any = false, clean = true
     ctx.imageSmoothingEnabled = false
     ctx.fillStyle = this.bg
@@ -138,7 +139,7 @@ export class MosaicCover {
       for (let c = 0; c < cols; c++) {
         const i = r * cols + c
         const nz = noise[i] * NOISE
-        const q = Math.min(ps - nz - v, pg - nz - (c / Math.max(1, cols - 1)) * SIDE)
+        const q = Math.min(ps - nz - v, pg - noise[i] * SCATTER)
         // Without the bitmaps yet (image still loading) a block is hidden or clean.
         let L = q >= 1 ? STEPS : q <= 0 ? 0 : Math.floor(q * STEPS)
         if (!this.ready && L > 0 && L < STEPS) L = 0
