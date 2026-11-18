@@ -3,32 +3,31 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react'
 import ElasticLine from '@/components/ui/ElasticLine/ElasticLine'
 import { FEATURED_FRAME as F, FEATURED_LABEL, type FeaturedPiece } from '@/content/featured-preview'
-import { PixelCover } from './entrance'
+import { MosaicCover } from './entrance'
 import { createMaterial, isMaterial, MATERIAL_PAD, type Material, type MaterialId } from './materials'
 import MaterialMenu from './MaterialMenu'
 import s from './featured.module.scss'
 
 // Home · featured projects — Figma "04 · Archivo" (7173:7118). Free layout
 // on the 1680 frame (percentages, liquid), stacked on mobile.
-//  · Entrance: a trigger line at LINE × the viewport height. When a piece's
-//    top crosses it going down, the piece clears in Bayer-dithered pixels
-//    sweeping left → right (entrance.ts); scrolling back above the line it
-//    covers again the same way, played backwards. Pieces that cross in the
-//    same moment (load, fast scroll) go one after another, GAP apart.
+//  · Entrance: a mosaic that resolves (entrance.ts). The piece arrives as fat
+//    pixels and every block splits in four until it is the image; the
+//    progress follows the piece's way up the window, so the scroll makes and
+//    unmakes it. Pieces on screen at load play it on a clock, GAP apart.
 //  · Scroll: every piece has its own speed (parallax) and follows the page
 //    with a little lag (lerp), plus a slight skew from the scroll velocity.
 //  · Press: the piece turns into its material and settles when let go. The
-//    side tab (MaterialMenu) picks it: cloth, silk, liquid or paper
-//    (materials.ts); the choice is kept in localStorage['featured:material'].
+//    side tab (MaterialMenu) picks it: cloth, silk, liquid, paper or one of
+//    the pixel ones, mosaic by default (materials.ts); the choice is kept in localStorage['featured:material'].
 //  · Video (optional, per piece): a muted loop over the screen inside the
 //    frame; plays only while near the viewport, shows once the first frame
 //    is playing (the image underneath is the poster). The material uses the image.
 // Reduced motion: no pixels, no parallax, no cloth.
 
 const GAP = 260 // ms between two pieces starting their entrance (or exit)
-const DUR = 760 // ms for a full pixel sweep
-const LINE = 0.8 // trigger line, fraction of the viewport height
-const HYST = 24 // px below the line before a piece leaves again (no flicker)
+const DUR = 900 // ms for the timed pass of the mosaic (load, fast scroll)
+const Y0 = 1 // the piece's top at this fraction of the window height = nothing yet
+const Y1 = 0.56 // … and here it is the clean image
 
 const MAT_KEY = 'featured:material'
 
@@ -36,8 +35,8 @@ const pct = (v: number, of: number) => `${((v / of) * 100).toFixed(4)}%`
 
 export default function FeaturedProjects({ pieces, label }: { pieces: FeaturedPiece[]; label: string }) {
   const root = useRef<HTMLElement>(null)
-  const [mat, setMat] = useState<MaterialId>('cloth')
-  const matRef = useRef<MaterialId>('cloth')
+  const [mat, setMat] = useState<MaterialId>('mosaic')
+  const matRef = useRef<MaterialId>('mosaic')
   const api = useRef<{ swap: () => void } | null>(null)
   useEffect(() => {
     try {
@@ -73,9 +72,16 @@ export default function FeaturedProjects({ pieces, label }: { pieces: FeaturedPi
     }, { rootMargin: '200px 0px' })
     videos.forEach((v) => vio.observe(v))
 
-    // ── Entrance on a screen line (reversible pixels) ──
-    const ent = cards.map((c) => ({ c, cover: new PixelCover(c.querySelector<HTMLElement>('[data-media]')!), p: 0, target: 0, startAt: 0 }))
-    let lastIn = 0, lastOut = 0
+    // ── Entrance: a mosaic that resolves with the scroll (entrance.ts) ──
+    // Progress = how far the piece's top has climbed from Y0 to Y1 of the
+    // window, so scrolling makes and unmakes it. A timed gate (DUR, pieces GAP
+    // apart) plays it once for the pieces already on screen at load and for
+    // the ones a fast scroll throws in.
+    const ent = cards.map((c) => {
+      const media = c.querySelector<HTMLElement>('[data-media]')!
+      return { c, media, cover: new MosaicCover(media, media.querySelector('img')!), g: 0, on: false, startAt: 0 }
+    })
+    let lastIn = 0
     let araf = 0, alast = 0
     const animate = (t: number) => {
       araf = 0
@@ -84,16 +90,11 @@ export default function FeaturedProjects({ pieces, label }: { pieces: FeaturedPi
       const now = performance.now()
       let busy = false
       for (const e of ent) {
-        if (e.p === e.target) continue
+        if (!e.on || e.g >= 1) continue
         busy = true
-        if (now < e.startAt) continue
-        const step = dt / DUR
-        e.p = e.target > e.p ? Math.min(e.target, e.p + step) : Math.max(e.target, e.p - step)
-        e.cover.draw(e.p)
-        const isIn = e.p > 0, isShown = e.p >= 1
-        if (isIn !== ('in' in e.c.dataset)) { if (isIn) e.c.dataset.in = '1'; else delete e.c.dataset.in }
-        if (isShown !== ('shown' in e.c.dataset)) { if (isShown) e.c.dataset.shown = '1'; else delete e.c.dataset.shown }
+        if (now >= e.startAt) e.g = Math.min(1, e.g + dt / DUR)
       }
+      check()
       if (busy) araf = requestAnimationFrame(animate)
       else alast = 0
     }
@@ -105,17 +106,24 @@ export default function FeaturedProjects({ pieces, label }: { pieces: FeaturedPi
     const onGo = () => { goTimer = window.setTimeout(check, html.dataset.intro === 'fast' ? 200 : 400) }
     window.addEventListener('wip:intro-go', onGo)
     const check = () => {
-      if (held()) return
       const now = performance.now()
-      const line = window.innerHeight * LINE
-      const rs = ent.map((e) => ({ e, top: e.c.getBoundingClientRect().top }))
-      const ins = rs.filter(({ e, top }) => e.target === 0 && top < line).sort((a, b) => a.top - b.top)
-      const outs = rs.filter(({ e, top }) => e.target === 1 && top > line + HYST).sort((a, b) => b.top - a.top)
-      for (const { e } of ins) { e.target = 1; e.startAt = Math.max(now, lastIn + GAP); lastIn = e.startAt }
-      for (const { e } of outs) { e.target = 0; e.startAt = Math.max(now, lastOut + GAP); lastOut = e.startAt }
-      if ((ins.length || outs.length) && !araf) araf = requestAnimationFrame(animate)
+      const vh0 = window.innerHeight
+      const go = !held()
+      const rs = ent.map((e) => ({ e, r: e.media.getBoundingClientRect() })).sort((a, b) => a.r.top - b.r.top)
+      for (const { e, r } of rs) {
+        if (go && !e.on && r.top < vh0) {
+          e.on = true
+          e.startAt = Math.max(now, lastIn + GAP)
+          lastIn = e.startAt
+          if (!araf) araf = requestAnimationFrame(animate)
+        }
+        const p = Math.max(0, Math.min(1, (vh0 * Y0 - r.top) / (vh0 * (Y0 - Y1))))
+        const { any, clean } = e.cover.render(p, e.g)
+        if (any !== ('in' in e.c.dataset)) { if (any) e.c.dataset.in = '1'; else delete e.c.dataset.in }
+        if (clean !== ('shown' in e.c.dataset)) { if (clean) e.c.dataset.shown = '1'; else delete e.c.dataset.shown }
+      }
     }
-    ent.forEach((e) => e.cover.draw(0))
+    check()
 
     // ── Parallax with lag ──
     const mobile = window.matchMedia('(max-width: 768px)')
