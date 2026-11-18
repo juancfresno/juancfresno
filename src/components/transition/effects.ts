@@ -10,14 +10,15 @@ import grid from '@/components/ui/GridOverlay/GridOverlay.module.scss'
 import { GRID_COLS } from '@/components/ui/GridOverlay/config'
 import { currentPageTheme } from '@/lib/pageTheme'
 
-export type SiteTransitionId = 'wireframe-grid' | 'wireframe-build' | 'pixels' | 'instant'
+export type SiteTransitionId = 'wireframe-grid' | 'wireframe-build' | 'wireframe-skeleton' | 'pixels' | 'instant'
 
 /** The one switch: which Lab 002 option the real site uses. */
 export const SITE_TRANSITION: SiteTransitionId = 'wireframe-build'
 
 // Preview switch: `?tr=b` plays Propuesta B ('wireframe-build') for the rest of
-// the session (sessionStorage 'tr'), `?tr=a` is the earlier 'wireframe-grid' (Propuesta A).
-const TR_PREVIEW: Record<string, SiteTransitionId> = { a: 'wireframe-grid', b: 'wireframe-build' }
+// the session (sessionStorage 'tr'), `?tr=a` is the earlier 'wireframe-grid' (Propuesta A),
+// `?tr=c` the skeleton reveal ('wireframe-skeleton', prototype of 18 Nov 2026).
+const TR_PREVIEW: Record<string, SiteTransitionId> = { a: 'wireframe-grid', b: 'wireframe-build', c: 'wireframe-skeleton' }
 export function siteTransitionId(): SiteTransitionId {
   try {
     const q = new URLSearchParams(location.search).get('tr')
@@ -482,8 +483,81 @@ function match(A: Box[], B: Box[], W: number, line: (x: number) => number): Pair
   return pairs.sort((p, q) => p.order - q.order)
 }
 
+// ─── Bones (the skeleton reveal, 'wireframe-skeleton') ────────────────────────
+// What a crosshair-style skeleton draws, measured on the new page under the
+// cover: one bar per line of text at its real width, media and controls with
+// their own shape and radius. Reading order = DOM order, which is how they open.
+type BoneKind = 'text' | 'media' | 'ctl'
+type Bone = Rect & { t: BoneKind; r: number }
+const MAX_BONES = 260
+
+function collectBones(W: number, top: number, bottom: number): Bone[] {
+  const main = document.querySelector('main')
+  if (!main) return []
+  range ??= document.createRange()
+  const out: Bone[] = []
+  const clip = (q: Rect): Rect | null => {
+    const y0 = Math.max(top, q.y), y1 = Math.min(bottom, q.y + q.h)
+    const x0 = Math.max(0, q.x), x1 = Math.min(W, q.x + q.w)
+    return x1 - x0 >= 2 && y1 - y0 >= 2 ? { x: x0, y: y0, w: x1 - x0, h: y1 - y0 } : null
+  }
+  const radius = (cs: CSSStyleDeclaration, q: Rect) => Math.min(parseFloat(cs.borderTopLeftRadius) || 0, q.w / 2, q.h / 2)
+  const push = (q: Rect, t: BoneKind, r = 0) => {
+    const c = clip(q)
+    if (!c) return
+    // Inline runs on the same line (a span, a link inside a sentence) join into one bar.
+    const last = out[out.length - 1]
+    if (t === 'text' && last?.t === 'text' && Math.abs(last.y - c.y) < 3 && Math.abs(last.h - c.h) < 4 && c.x - (last.x + last.w) < 14 && c.x >= last.x) {
+      last.w = c.x + c.w - last.x
+      return
+    }
+    out.push({ ...c, t, r })
+  }
+  const isControl = (cs: CSSStyleDeclaration) =>
+    rgba(cs.backgroundColor, [0, 0, 0, 0])[3] > 0.05 || (parseFloat(cs.borderTopWidth) || 0) > 0 || (parseFloat(cs.borderBottomWidth) || 0) > 0
+  const shown = (el: Element) => typeof el.checkVisibility !== 'function' || el.checkVisibility({ visibilityProperty: true })
+  // `faded`: inside something at opacity 0. Media there is waiting for its own
+  // entrance and is drawn where it will be; text and controls there are hidden UI.
+  let visited = 0
+  const walk = (el: Element, depth: number, faded = false) => {
+    if (out.length >= MAX_BONES || depth > 24 || ++visited > 4000 || el.matches(SKIP)) return
+    const d = el.getBoundingClientRect()
+    // A wrapper's own box says little: positioned and parallaxed children (the
+    // featured pieces) live outside it. Off-screen or empty boxes are walked
+    // through without drawing; every bone is clipped to the screen on its own.
+    const off = d.width < 1 || d.height < 1 || d.bottom <= top || d.top >= bottom || d.right <= 0 || d.left >= W
+    if (off) {
+      if (!el.matches(MEDIA)) for (const c of Array.from(el.children)) walk(c, depth + 1, faded || !visible(el))
+      return
+    }
+    if (!shown(el)) return
+    faded ||= !visible(el)
+    // A [data-wf] stage with no text of its own (a canvas scene, the About logo) is one media block.
+    const stage = el.hasAttribute('data-wf') && !el.textContent?.trim()
+    const media = el.matches(MEDIA) || stage
+    const cs = getComputedStyle(el)
+    if (media) {
+      const q = fromDOM(d)
+      // One bone per picture: a cover canvas over its image counts once.
+      if (!out.some((b) => b.t === 'media' && iou(b, q) > 0.4)) push(q, 'media', radius(cs, q))
+      return
+    }
+    if (!faded && el.matches('a,button,[role="button"]') && isControl(cs) && d.height <= 96) { push(fromDOM(d), 'ctl', radius(cs, fromDOM(d))); return }
+    for (const n of Array.from(el.childNodes)) {
+      if (out.length >= MAX_BONES) return
+      if (n.nodeType === Node.TEXT_NODE) {
+        if (faded || !n.textContent?.trim()) continue
+        range!.selectNodeContents(n)
+        for (const q of Array.from(range!.getClientRects())) if (q.width > 1) push(fromDOM(q), 'text')
+      } else if (n.nodeType === Node.ELEMENT_NODE) walk(n as Element, depth + 1, faded)
+    }
+  }
+  walk(main, 0)
+  return out
+}
+
 // QA hook: set window.__wfDebug = [] and each phase pushes what it drew.
-type Dbg = { ev: string; t: number; A?: Box[]; B?: Box[]; bands?: Box[]; lines?: number[]; cols?: { x: number; w: number }[] }
+type Dbg = { ev: string; t: number; A?: Box[]; B?: Box[]; bands?: Box[]; lines?: number[]; cols?: { x: number; w: number }[]; bones?: number; boneList?: Bone[] }
 const debug = (d: Dbg) => { const w = window as unknown as { __wfDebug?: Dbg[] }; if (Array.isArray(w.__wfDebug)) w.__wfDebug.push(d) }
 
 const wireframeGrid: Factory = (canvas) => {
@@ -752,7 +826,31 @@ const WB = {
   still: 120,
 }
 
-const wireframeBuild: Factory = (canvas) => {
+// ─── 'wireframe-skeleton' · Propuesta C (prototype, `?tr=c`) ──────────────────
+// The cover is Propuesta B's, unchanged. The reveal draws the new page as a
+// crosshair-style skeleton (idea: github.com/velox-themes/crosshair-skeleton,
+// MIT; no code taken) and swaps it for the content element by element:
+//   0–300   section boxes travel to the new blocks (as in B), crosshair ticks
+//           on their corners.
+//  60–400   bones draw in reading order: text bars grow left → right at their
+//           real width, media and controls fade in with their own radius;
+//           the two biggest media get a `W × H` label.
+// 260–640   each bone opens onto the real content (text left → right, the rest
+//           top → bottom), a 1 px line on the wipe's edge, in reading order.
+// 260–640   lines fall out; 420–640 what is left of the curtain dissolves.
+// Same length as B's reveal (≈ 640 ms). Back/forward: the order is mirrored.
+const WS = {
+  move: 300, moveStagger: 50,
+  bandsAt: 60, bands: 260,
+  bonesAt: 60, bone: 180, boneStagger: 160,
+  labelAt: 120, label: 120,
+  openAt: 260, open: 160, openStagger: 220,
+  linesOutAt: 260, linesOut: 280, linesOutSpread: 100,
+  restAt: 420, rest: 220,
+  tick: 6,
+}
+
+const wireframeBuild = (skeleton: boolean): Factory => (canvas) => {
   const g = canvas.getContext('2d')
   let raf = 0
   let W = 0, H = 0, dpr = 1
@@ -764,6 +862,8 @@ const wireframeBuild: Factory = (canvas) => {
   let bands: Box[] = []
   let A: Box[] = []
   let pairs: Pair[] = []
+  let bones: Bone[] = []
+  let labelled: Set<number> = new Set()
   let back = false, pop = false, still = false
   let hud = ''
   let t0 = 0, t1 = -1, tCovered = -1
@@ -839,7 +939,105 @@ const wireframeBuild: Factory = (canvas) => {
   const os = () => (pairs.length > 1 ? WB.openStagger / (pairs.length - 1) : 0)
   const moved = (j: number, tr: number) => {
     const m = pairs.length
-    return EASE_ENTER(prog(tr, (back ? m - 1 - j : j) * (m > 1 ? WB.moveStagger / (m - 1) : 0), WB.move))
+    const ms = skeleton ? WS.moveStagger : WB.moveStagger
+    return EASE_ENTER(prog(tr, (back ? m - 1 - j : j) * (m > 1 ? ms / (m - 1) : 0), skeleton ? WS.move : WB.move))
+  }
+
+  // Skeleton: bone i's place in the reading order (0 → 1, mirrored on back).
+  const boneK = (i: number) => {
+    const n = bones.length
+    const o = back ? n - 1 - i : i
+    return n > 1 ? o / (n - 1) : 0
+  }
+  const boneShape = (r: Rect, rad: number) => {
+    if (!g) return
+    g.beginPath()
+    if (rad > 0.5 && typeof g.roundRect === 'function') g.roundRect(r.x, r.y, r.w, r.h, rad)
+    else g.rect(r.x, r.y, r.w, r.h)
+    g.fill()
+  }
+  // The skeleton plane: curtain, windows onto the page, bones still waiting.
+  const drawSkeleton = (tr: number, P: Palette, rest: number) => {
+    if (!g) return
+    if (rest < 1) { g.fillStyle = css(P.bg, 1 - rest); g.fillRect(0, 0, W, H) }
+    const edge = css(P.line, 1 - rest)
+    // Windows: cut out of the curtain with destination-out (keeps the radius).
+    g.globalCompositeOperation = 'destination-out'
+    g.fillStyle = '#000'
+    const pb = EASE_SOFT(prog(tr, WS.bandsAt, WS.bands))
+    for (const b of bands) if (pb > 0) g.fillRect(px(b.x), px(b.y), px(b.w), px(b.h * pb))
+    const opened: number[] = []
+    for (let i = 0; i < bones.length; i++) {
+      const b = bones[i]
+      const q = EASE_SOFT(prog(tr, WS.openAt + boneK(i) * WS.openStagger, WS.open))
+      opened.push(q)
+      if (q <= 0) continue
+      // Text opens its whole line box (descenders included), the rest its own shape.
+      const pad = b.t === 'text' ? 2 : 0
+      const r = b.t === 'text' ? { x: b.x - pad, y: b.y - pad, w: (b.w + pad * 2) * q, h: b.h + pad * 2 } : { x: b.x, y: b.y, w: b.w, h: b.h * q }
+      boneShape(r, b.t === 'text' ? 0 : b.r)
+    }
+    g.globalCompositeOperation = 'source-over'
+    // Wipe edges.
+    g.fillStyle = edge
+    for (const b of bands) if (pb > 0 && pb < 1) g.fillRect(px(b.x), px(b.y + b.h * pb) - 1 / dpr, px(b.w), 1)
+    for (let i = 0; i < bones.length; i++) {
+      const b = bones[i], q = opened[i]
+      if (q <= 0 || q >= 1) continue
+      if (b.t === 'text') g.fillRect(px(b.x + b.w * q), b.y, 1, b.h)
+      else g.fillRect(b.x, px(b.y + b.h * q) - 1 / dpr, b.w, 1)
+    }
+    // Bones: what has not opened yet, drawn in as the crosshair passes.
+    const fill = mix(P.bg, P.ink, 0.14)
+    for (let i = 0; i < bones.length; i++) {
+      const b = bones[i], q = opened[i]
+      if (q >= 1) continue
+      const d = EASE_ENTER(prog(tr, WS.bonesAt + boneK(i) * WS.boneStagger, WS.bone))
+      if (d <= 0) continue
+      g.fillStyle = css(fill)
+      if (b.t === 'text') {
+        // A bar at 62 % of the line height, centred, growing left → right; its left part goes as it opens.
+        const bh = Math.max(4, Math.round(b.h * 0.62)), by = b.y + (b.h - bh) / 2
+        const x0 = b.x + b.w * q, x1 = b.x + b.w * d
+        if (x1 > x0) boneShape({ x: x0, y: by, w: x1 - x0, h: bh }, Math.min(2, bh / 2))
+      } else {
+        // Media: a lighter fill and a 1 px outline (a plan, not a grey slab); controls stay solid.
+        const r = { x: b.x, y: b.y + b.h * q, w: b.w, h: b.h * (1 - q) }
+        g.globalAlpha = d
+        if (b.t === 'media') {
+          g.fillStyle = css(mix(P.bg, P.ink, 0.07))
+          boneShape(r, q > 0 ? 0 : b.r)
+          g.strokeStyle = css(P.ink, 0.28)
+          g.lineWidth = 1
+          g.strokeRect(Math.round(r.x) + 0.5, Math.round(r.y) + 0.5, Math.round(r.w) - 1, Math.round(r.h) - 1)
+        } else boneShape(r, q > 0 ? 0 : b.r)
+        g.globalAlpha = 1
+      }
+    }
+    // `W × H` labels on the two biggest media, until they open.
+    g.font = `9px ${font}`
+    for (const i of labelled) {
+      const b = bones[i]
+      const a = EASE_OUT(prog(tr, WS.labelAt, WS.label)) * (1 - EASE_OUT(Math.min(1, opened[i] * 2)))
+      if (a <= 0.01) continue
+      const s = `${Math.round(b.w)} × ${Math.round(b.h)}`
+      const tw = g.measureText(s).width + 8
+      const lx = Math.round(b.x + b.w / 2 - tw / 2), ly = Math.round(Math.min(H - 16, b.y + b.h + 6))
+      g.fillStyle = css(P.line, a)
+      g.fillRect(lx, ly, tw, 13)
+      g.fillStyle = css([255, 255, 255, 1], a)
+      g.fillText(s, lx + 4, ly + 9.5)
+    }
+  }
+  // Crosshair ticks on a box's corners.
+  const ticks = (r: Rect, color: string) => {
+    if (!g || r.w < 2) return
+    const t = WS.tick
+    g.fillStyle = color
+    for (const [cx, cy] of [[r.x, r.y], [r.x + r.w, r.y], [r.x, r.y + r.h], [r.x + r.w, r.y + r.h]]) {
+      g.fillRect(Math.round(cx - t), Math.round(cy), t * 2, 1)
+      g.fillRect(Math.round(cx), Math.round(cy - t), 1, t * 2)
+    }
   }
   const travel = (j: number, tr: number): Rect => {
     const x = pairs[j], p = moved(j, tr)
@@ -865,7 +1063,8 @@ const wireframeBuild: Factory = (canvas) => {
     }
 
     const n = lines.length
-    const rest = tr < 0 ? 0 : EASE_SOFT(prog(tr, WB.restAt, WB.rest))
+    const T = skeleton ? WS : WB
+    const rest = tr < 0 ? 0 : EASE_SOFT(prog(tr, T.restAt, T.rest))
     const m = pairs.length
 
     // Curtain. Cover: one strip per grid column, each following its line down.
@@ -879,6 +1078,8 @@ const wireframeBuild: Factory = (canvas) => {
         const x0 = k === 0 ? 0 : px(lines[k - 1]), x1 = k === n ? W : px(lines[k])
         g.fillRect(x0, 0, x1 - x0, px(H * p))
       }
+    } else if (skeleton) {
+      drawSkeleton(tr, P, rest)
     } else {
       if (rest < 1) { g.fillStyle = css(P.bg, 1 - rest); g.fillRect(0, 0, W, H) }
       const edge = css(P.line, 1 - rest)
@@ -892,13 +1093,13 @@ const wireframeBuild: Factory = (canvas) => {
     }
 
     // Grid lines: fall in from the clicked column outwards, fall on out.
-    const outStep = spread ? WB.linesOutSpread / spread : 0
+    const outStep = spread ? T.linesOutSpread / spread : 0
     const bright = mix(P.line, P.ink, 0.7)
     for (let i = 0; i < n; i++) {
       const d = Math.abs(i - origin)
       const pd = lineP(i, tc)
       if (pd <= 0) continue
-      const pu = tr < 0 ? 0 : EASE_SOFT(prog(tr, WB.linesOutAt + d * outStep, WB.linesOut))
+      const pu = tr < 0 ? 0 : EASE_SOFT(prog(tr, T.linesOutAt + d * outStep, T.linesOut))
       if (pu >= 1) continue
       const x = px(lines[i])
       // Forward: the top end follows the line down and out. Back: it retracts upwards.
@@ -928,9 +1129,12 @@ const wireframeBuild: Factory = (canvas) => {
       for (let j = 0; j < m; j++) {
         const x = pairs[j]
         const o = back ? m - 1 - j : j
-        const filled = prog(tr, WB.openAt + o * os() + WB.open * 0.4, WB.open * 0.6)
+        const filled = skeleton ? prog(tr, WS.openAt, 260) : prog(tr, WB.openAt + o * os() + WB.open * 0.4, WB.open * 0.6)
         const a = 0.55 * (x.born ? Math.min(1, moved(j, tr) * 2) : 1) * (1 - EASE_OUT(filled))
-        if (a > 0.003) outline(travel(j, tr), css(P.ink, a))
+        if (a <= 0.003) continue
+        const r = travel(j, tr)
+        outline(r, css(P.ink, skeleton ? a * 0.6 : a))
+        if (skeleton && !x.dies) ticks(r, css(P.line, Math.min(1, a * 1.8)))
       }
     }
 
@@ -964,6 +1168,8 @@ const wireframeBuild: Factory = (canvas) => {
     A = []
     bands = []
     pairs = []
+    bones = []
+    labelled = new Set()
     onCovered?.()
     onCovered = null
     const done = onRevealed
@@ -972,7 +1178,11 @@ const wireframeBuild: Factory = (canvas) => {
   }
 
   const coverEnd = () => (pop ? 0 : still ? WB.still : spread * step + WB.lag + WB.drop)
-  const revealEnd = () => (still ? WB.still : Math.max(WB.openAt + WB.openStagger + WB.open, WB.linesOutAt + WB.linesOutSpread + WB.linesOut, WB.restAt + WB.rest))
+  const revealEnd = () => {
+    if (still) return WB.still
+    const T = skeleton ? WS : WB
+    return Math.max(T.openAt + T.openStagger + T.open, T.linesOutAt + T.linesOutSpread + T.linesOut, T.restAt + T.rest)
+  }
 
   const loop = (now: number) => {
     raf = 0
@@ -1030,7 +1240,11 @@ const wireframeBuild: Factory = (canvas) => {
         const { top, bottom } = contentSpan()
         const B = collectSections(W, H, cols, top, bottom)
         pairs = match(A, B, W, lineX)
-        debug({ ev: 'reveal', t: performance.now() - t0, B })
+        if (skeleton) {
+          bones = collectBones(W, top, bottom)
+          labelled = new Set(bones.map((b, i) => [area(b), i, b.t] as const).filter((x) => x[2] === 'media' && x[0] > 12000).sort((p, q) => q[0] - p[0]).slice(0, 2).map((x) => x[1]))
+        }
+        debug({ ev: 'reveal', t: performance.now() - t0, B, bones: bones.length, boneList: bones })
       }
       return new Promise<void>((r) => {
         onRevealed = r
@@ -1042,4 +1256,10 @@ const wireframeBuild: Factory = (canvas) => {
   }
 }
 
-export const EFFECTS: Record<SiteTransitionId, Factory> = { 'wireframe-grid': wireframeGrid, 'wireframe-build': wireframeBuild, pixels, instant }
+export const EFFECTS: Record<SiteTransitionId, Factory> = {
+  'wireframe-grid': wireframeGrid,
+  'wireframe-build': wireframeBuild(false),
+  'wireframe-skeleton': wireframeBuild(true),
+  pixels,
+  instant,
+}
